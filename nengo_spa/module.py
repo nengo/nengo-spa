@@ -85,10 +85,12 @@ class Module(nengo.Network, SupportDefaultsMixin):
         This is so that we can use the variable name for the Module as
         the name that all of the SPA system will use to access that module.
         """
-        if hasattr(self, key) and isinstance(getattr(self, key), Module):
-            raise SpaModuleError("Cannot re-assign module-attribute %s to %s. "
-                                 "SPA module-attributes can only be assigned "
-                                 "once." % (key, value))
+        if isinstance(value, Module):
+            if hasattr(self, key) and isinstance(getattr(self, key), Module):
+                raise SpaModuleError(
+                    "Cannot re-assign module-attribute %s to %s. SPA "
+                    "module-attributes can only be assigned once."
+                    % (key, value))
 
         super(Module, self).__setattr__(key, value)
 
