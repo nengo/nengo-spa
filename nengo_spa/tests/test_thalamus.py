@@ -1,8 +1,8 @@
 import pytest
 
 import nengo
-from nengo import spa
-from nengo.exceptions import SpaModuleError
+import nengo_spa as spa
+from nengo_spa.exceptions import SpaModuleError
 
 import numpy as np
 

@@ -12,3 +12,5 @@ from .state import State
 from .thalamus import Thalamus
 from .utils import similarity
 from .vocab import Vocabulary, VocabularyMap
+
+from nengo_spa import networks

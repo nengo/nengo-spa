@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 import nengo
-from nengo import spa
-from nengo.exceptions import SpaTypeError
+import nengo_spa as spa
+from nengo_spa.exceptions import SpaTypeError
 
 
 def test_new_action_syntax(Simulator, seed, plt, rng):

@@ -1,5 +1,5 @@
 import nengo
-from nengo import spa
+import nengo_spa as spa
 
 
 def test_basic():

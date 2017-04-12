@@ -59,7 +59,7 @@ class Input(nengo.Network):
         self.input_nodes = {}
 
         if module is None:
-            from nengo.spa.module import get_current_module
+            from nengo_spa.module import get_current_module
             module = get_current_module()
         self.module = module
 

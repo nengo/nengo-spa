@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from nengo.exceptions import ValidationError
-from nengo.spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
+from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
 from nengo.utils.compat import range
 
 

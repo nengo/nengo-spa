@@ -1,8 +1,9 @@
 import nengo
 import numpy as np
-from nengo.spa import Vocabulary, Input
-from nengo.spa.utils import similarity
-from nengo.spa.assoc_mem import AssociativeMemory
+import nengo_spa
+from nengo_spa import Vocabulary, Input
+from nengo_spa.utils import similarity
+from nengo_spa.assoc_mem import AssociativeMemory
 
 
 def test_am_spa_interaction(Simulator, seed, rng):
@@ -18,9 +19,9 @@ def test_am_spa_interaction(Simulator, seed, rng):
     def input_func(t):
         return '0.49*A' if t < 0.5 else '0.79*A'
 
-    with nengo.spa.Module(seed=seed) as m:
-        m.buf = nengo.spa.State(vocab=vocab)
-        m.input = nengo.spa.Input()
+    with nengo_spa.Module(seed=seed) as m:
+        m.buf = nengo_spa.State(vocab=vocab)
+        m.input = nengo_spa.Input()
         m.input.buf = input_func
 
         m.am = AssociativeMemory(vocab, vocab2,
@@ -32,7 +33,7 @@ def test_am_spa_interaction(Simulator, seed, rng):
                                  wta_output=True,
                                  threshold_output=True)
 
-        nengo.spa.Actions('am = buf').build()
+        nengo_spa.Actions('am = buf').build()
 
     # Check to see if model builds properly. No functionality test needed
     with Simulator(m):
@@ -52,7 +53,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     in_keys = ['A', 'A*B']
     out_keys = ['C*D', 'C+D']
 
-    with nengo.spa.Module(seed=seed) as model:
+    with nengo_spa.Module(seed=seed) as model:
         model.am = AssociativeMemory(input_vocab=vocab_in,
                                      output_vocab=vocab_out,
                                      input_keys=in_keys,

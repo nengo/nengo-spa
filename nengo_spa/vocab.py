@@ -6,8 +6,8 @@ import numpy as np
 
 import nengo
 from nengo.exceptions import NengoWarning, SpaParseError, ValidationError
-from nengo.spa import pointer
-from nengo.spa.pointer import Identity
+from nengo_spa import pointer
+from nengo_spa.pointer import Identity
 from nengo.utils.compat import is_number, is_integer, range
 
 

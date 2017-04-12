@@ -3,10 +3,10 @@ import numpy as np
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo.exceptions import SpaModuleError
+from nengo_spa.exceptions import SpaModuleError
 from nengo.network import Network
-from nengo.spa.input import Input
-from nengo.spa.vocab import VocabularyMap, VocabularyMapParam
+from nengo_spa.input import Input
+from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 from nengo.utils.compat import iteritems
 
 
@@ -203,4 +203,4 @@ class Module(nengo.Network, SupportDefaultsMixin):
         """
         if vocab is None:
             vocab = self.vocabs[data[probe].shape[1]]
-        return nengo.spa.similarity(data[probe], vocab)
+        return nengo_spa.similarity(data[probe], vocab)

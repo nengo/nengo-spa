@@ -4,8 +4,8 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
 
-from nengo.spa.utils import pairs, prob_cleanup, similarity, text
-from nengo.spa.vocab import Vocabulary
+from nengo_spa.utils import pairs, prob_cleanup, similarity, text
+from nengo_spa.vocab import Vocabulary
 
 
 def test_similarity(rng):

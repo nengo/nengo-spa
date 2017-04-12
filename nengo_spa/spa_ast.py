@@ -84,11 +84,11 @@ from collections import defaultdict
 import numpy as np
 
 import nengo
-from nengo.spa.bind import Bind
-from nengo.spa.compare import Compare
-from nengo.spa.pointer import SemanticPointer
-from nengo.spa.product import Product as ProductModule
-from nengo.exceptions import SpaModuleError, SpaParseError, SpaTypeError
+from nengo_spa.bind import Bind
+from nengo_spa.compare import Compare
+from nengo_spa.pointer import SemanticPointer
+from nengo_spa.product import Product as ProductModule
+from nengo_spa.exceptions import SpaModuleError, SpaParseError, SpaTypeError
 
 
 class ConstructionContext(object):

@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 
 import nengo
-from nengo import spa
-from nengo.exceptions import SpaModuleError
+import nengo_spa as spa
+from nengo_spa.exceptions import SpaModuleError
 
 
 def test_connect(Simulator, seed):

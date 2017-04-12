@@ -6,7 +6,7 @@ import numpy as np
 import nengo.utils.numpy as npext
 from nengo.dists import CosineSimilarity
 from nengo.exceptions import ValidationError
-from nengo.spa.pointer import SemanticPointer
+from nengo_spa.pointer import SemanticPointer
 from nengo.utils.compat import is_iterable
 
 
@@ -27,7 +27,7 @@ def similarity(data, vocab, normalize=False):
     normalize : bool, optional (Default: False)
         Whether to normalize all vectors, to compute the cosine similarity.
     """
-    from nengo.spa.vocab import Vocabulary
+    from nengo_spa.vocab import Vocabulary
 
     if isinstance(data, SemanticPointer):
         data = data.v

@@ -2,9 +2,9 @@
 
 from nengo.exceptions import NetworkContextError, SpaParseError
 from nengo.network import Network
-from nengo.spa.basalganglia import BasalGanglia
-from nengo.spa.thalamus import Thalamus
-from nengo.spa.spa_ast import (
+from nengo_spa.basalganglia import BasalGanglia
+from nengo_spa.thalamus import Thalamus
+from nengo_spa.spa_ast import (
     Action, ConstructionContext, DotProduct, Effect, Effects, Module,
     Reinterpret, Sink, Symbol, Translate)
 from nengo.utils.compat import is_integer

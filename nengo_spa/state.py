@@ -4,8 +4,8 @@ import nengo
 from nengo.exceptions import ValidationError
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo.spa.module import Module
-from nengo.spa.vocab import VocabularyOrDimParam
+from nengo_spa.module import Module
+from nengo_spa.vocab import VocabularyOrDimParam
 
 
 class State(Module):

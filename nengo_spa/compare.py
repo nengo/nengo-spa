@@ -2,8 +2,8 @@ import numpy as np
 
 import nengo
 from nengo.params import Default, IntParam
-from nengo.spa.module import Module
-from nengo.spa.vocab import VocabularyOrDimParam
+from nengo_spa.module import Module
+from nengo_spa.vocab import VocabularyOrDimParam
 
 
 class Compare(Module):

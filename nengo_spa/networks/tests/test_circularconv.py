@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 import nengo
-from nengo.networks.circularconvolution import (
+import nengo_spa
+from nengo_spa.networks.circularconvolution import (
     circconv, transform_in, transform_out)
 from nengo.utils.numpy import rmse
 
@@ -42,13 +43,13 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     with model:
         input_a = nengo.Node(a)
         input_b = nengo.Node(b)
-        cconv = nengo.networks.CircularConvolution(
+        cconv = nengo_spa.networks.CircularConvolution(
             neurons_per_product, dimensions=dims,
             input_magnitude=magnitude)
         nengo.Connection(input_a, cconv.input_a, synapse=None)
         nengo.Connection(input_b, cconv.input_b, synapse=None)
         res_p = nengo.Probe(cconv.output)
-        cconv_bad = nengo.networks.CircularConvolution(
+        cconv_bad = nengo_spa.networks.CircularConvolution(
             neurons_per_product, dimensions=dims,
             input_magnitude=1)  # incorrect magnitude
         nengo.Connection(input_a, cconv_bad.input_a, synapse=None)
@@ -75,7 +76,7 @@ def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
     with model:
         input_a = nengo.Node(a)
         input_b = nengo.Node(b)
-        cconv = nengo.networks.CircularConvolution(
+        cconv = nengo_spa.networks.CircularConvolution(
             neurons_per_product, dimensions=dims)
         nengo.Connection(input_a, cconv.input_a, synapse=None)
         nengo.Connection(input_b, cconv.input_b, synapse=None)

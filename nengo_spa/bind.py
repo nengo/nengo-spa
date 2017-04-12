@@ -1,7 +1,8 @@
 import nengo
 from nengo.params import BoolParam, Default, IntParam
-from nengo.spa.module import Module
-from nengo.spa.vocab import VocabularyOrDimParam
+import nengo_spa
+from nengo_spa.module import Module
+from nengo_spa.vocab import VocabularyOrDimParam
 
 
 class Bind(Module):
@@ -43,7 +44,7 @@ class Bind(Module):
         self.invert_b = invert_b
 
         with self:
-            self.cc = nengo.networks.CircularConvolution(
+            self.cc = nengo_spa.networks.CircularConvolution(
                 self.neurons_per_dimension, self.vocab.dimensions,
                 self.invert_a, self.invert_b)
 

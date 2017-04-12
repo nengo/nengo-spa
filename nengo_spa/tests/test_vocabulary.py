@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 
 from nengo.exceptions import NengoWarning, SpaParseError, ValidationError
-from nengo.spa import Vocabulary, VocabularyMap
-from nengo.spa.pointer import Identity
+from nengo_spa import Vocabulary, VocabularyMap
+from nengo_spa.pointer import Identity
 from nengo.utils.testing import warns
 
 

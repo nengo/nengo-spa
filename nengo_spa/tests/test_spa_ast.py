@@ -1,9 +1,9 @@
 import pytest
 
-from nengo import spa
-from nengo.exceptions import SpaTypeError
-from nengo.spa.actions import Parser
-from nengo.spa.spa_ast import (
+import nengo_spa as spa
+from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.actions import Parser
+from nengo_spa.spa_ast import (
     Action, ApproxInverse, DotProduct, Effect, Effects, Negative, Module,
     Product, Sink, Sum, Symbol, TAction, TEffect, TEffects, TScalar,
     TVocabulary)

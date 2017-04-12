@@ -1,6 +1,6 @@
 import nengo
 from nengo.params import Default, IntParam
-from nengo.spa.module import Module
+from nengo_spa.module import Module
 
 
 class Product(Module):

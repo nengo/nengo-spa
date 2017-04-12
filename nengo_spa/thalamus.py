@@ -3,9 +3,9 @@ import numpy as np
 import nengo
 from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
-from nengo.spa.module import Module
-from nengo.spa.scalar import Scalar
-from nengo.spa.state import State
+from nengo_spa.module import Module
+from nengo_spa.scalar import Scalar
+from nengo_spa.state import State
 from nengo.synapses import Lowpass, SynapseParam
 
 

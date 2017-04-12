@@ -2,10 +2,10 @@ import numpy as np
 import pytest
 
 import nengo
-from nengo import spa
-from nengo.exceptions import SpaModuleError, SpaTypeError
-from nengo.spa.utils import similarity
-from nengo.spa.vocab import VocabularyMap
+import nengo_spa as spa
+from nengo_spa.exceptions import SpaModuleError, SpaTypeError
+from nengo_spa.utils import similarity
+from nengo_spa.vocab import VocabularyMap
 
 
 class SpaCommunicationChannel(spa.Module):

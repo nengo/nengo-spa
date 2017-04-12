@@ -3,10 +3,10 @@ import warnings
 import numpy as np
 
 import nengo
-from nengo.config import ConfigParam
+from nengo_spa.config import ConfigParam
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo.spa.module import Module
+from nengo_spa.module import Module
 from nengo.synapses import Lowpass, SynapseParam
 
 
