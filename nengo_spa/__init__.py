@@ -14,3 +14,6 @@ from .utils import similarity
 from .vocab import Vocabulary, VocabularyMap
 
 from nengo_spa import networks
+from nengo_spa import version
+
+__version__ = version.version
