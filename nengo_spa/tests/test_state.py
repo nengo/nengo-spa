@@ -18,14 +18,16 @@ def test_basic():
 
 def test_neurons():
     with spa.Network() as model:
-        model.state = spa.State(vocab=16, neurons_per_dimension=2)
+        model.state = spa.State(
+            vocab=16, neurons_per_dimension=2, represent_identity=False)
 
     assert len(model.state.state_ensembles.ensembles) == 1
     assert model.state.state_ensembles.ensembles[0].n_neurons == 16 * 2
 
     with spa.Network() as model:
-        model.state = spa.State(vocab=16, subdimensions=1,
-                                neurons_per_dimension=2)
+        model.state = spa.State(
+            vocab=16, subdimensions=1, neurons_per_dimension=2,
+            represent_identity=False)
 
     assert len(model.state.state_ensembles.ensembles) == 16
     assert model.state.state_ensembles.ensembles[0].n_neurons == 2
@@ -125,3 +127,18 @@ def test_memory_run_decay(Simulator, plt, seed):
 
     assert data[t == 0.05, 0] > 1.0
     assert data[t == 0.299, 0] < 0.4
+
+
+def test_represent_identity(Simulator, seed):
+    d = 32
+    with spa.Network(seed=seed) as model:
+        model.memory = spa.State(d, represent_identity=True)
+        model.input = spa.Input()
+        model.input.memory = '1'
+        p = nengo.Probe(model.memory.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert np.all(sim.data[p][sim.trange() > 0.2][:, 0] > 0.9)
+    assert np.all(np.abs(sim.data[p][sim.trange() > 0.2][:, 1:]) < 0.1)
