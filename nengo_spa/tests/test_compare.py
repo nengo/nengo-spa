@@ -3,12 +3,12 @@ import nengo_spa as spa
 
 
 def test_basic():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.compare = spa.Compare(vocab=16)
 
-    inputA = model.get_module_input('compare.input_a')
-    inputB = model.get_module_input('compare.input_b')
-    output = model.get_module_output('compare')
+    inputA = model.get_network_input('compare.input_a')
+    inputB = model.get_network_input('compare.input_b')
+    output = model.get_network_output('compare')
     # all nodes should be acquired correctly
     assert inputA[0] is model.compare.input_a
     assert inputB[0] is model.compare.input_b
@@ -21,7 +21,7 @@ def test_basic():
 
 
 def test_run(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.compare = spa.Compare(vocab=16)
         model.compare.vocab.populate('A; B')
 
@@ -35,7 +35,7 @@ def test_run(Simulator, seed):
         model.input.compare.input_a = inputA
         model.input.compare.input_b = 'A'
 
-    compare, vocab = model.get_module_output('compare')
+    compare, vocab = model.get_network_output('compare')
 
     with model:
         p = nengo.Probe(compare, 'output', synapse=0.03)

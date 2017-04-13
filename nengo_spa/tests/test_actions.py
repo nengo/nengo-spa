@@ -7,7 +7,7 @@ from nengo_spa.exceptions import SpaTypeError
 
 
 def test_new_action_syntax(Simulator, seed, plt, rng):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 3
     model.config[spa.State].subdimensions = 3
     with model:
@@ -76,7 +76,7 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
 def test_dot_product(Simulator, seed, plt):
     d = 16
 
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.state_a = spa.State(d)
         model.state_b = spa.State(d)
         model.result = spa.Scalar()
@@ -103,7 +103,7 @@ def test_dot_product(Simulator, seed, plt):
 class TestExceptions():
     @pytest.fixture
     def model(self):
-        with spa.Module() as model:
+        with spa.Network() as model:
             model.state_a = spa.State(16)
             model.state_b = spa.State(32)
             model.state_c = spa.State(32)
@@ -174,7 +174,7 @@ def test_access_actions():
 
 
 def test_provides_access_to_constructed_objects_of_effect():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.config[spa.State].vocab = 16
         model.a = spa.State()
         model.b = spa.State()

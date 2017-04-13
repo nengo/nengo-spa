@@ -16,7 +16,7 @@ def test_am_basic(Simulator, plt, seed, rng):
     vocab = Vocabulary(d, rng=rng)
     vocab.populate('A; B; C; D')
 
-    with spa.Module('model', seed=seed) as m:
+    with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.3, input_vocab=vocab,
                                     function=filtered_step_fn)
         m.stimulus = spa.Input()
@@ -56,7 +56,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
     def input_func(t):
         return '0.49 * A' if t < 0.1 else '0.8 * B'
 
-    with spa.Module('model', seed=seed) as m:
+    with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(
             threshold=0.5, input_vocab=vocab, output_vocab=vocab2,
             function=filtered_step_fn)
@@ -100,7 +100,7 @@ def test_am_wta(Simulator, plt, seed, rng):
         else:
             return '0.8 * A + B'
 
-    with spa.Module('model', seed=seed) as m:
+    with spa.Network('model', seed=seed) as m:
         m.am = WTAAssocMem(
             threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
         m.stimulus = spa.Input()
@@ -139,7 +139,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
     def input_func(t):
         return '0.2 * A' if t < 0.25 else 'A'
 
-    with spa.Module('model', seed=seed) as m:
+    with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.5, input_vocab=vocab,
                                     function=filtered_step_fn)
         m.am.add_default_output('D', 0.5)
@@ -183,7 +183,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     in_keys = ['A', 'A*B']
     out_keys = ['C*D', 'C+D']
 
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.am = ThresholdingAssocMem(
             threshold=0.3, input_vocab=vocab_in, output_vocab=vocab_out,
             input_keys=in_keys, output_keys=out_keys)

@@ -7,12 +7,12 @@ from nengo.utils.numpy import rmse
 
 
 def test_basic():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.bind = spa.Bind(vocab=16)
 
-    inputA = model.get_module_input('bind.input_a')
-    inputB = model.get_module_input('bind.input_b')
-    output = model.get_module_output('bind')
+    inputA = model.get_network_input('bind.input_a')
+    inputB = model.get_network_input('bind.input_b')
+    output = model.get_network_output('bind')
     # all nodes should be acquired correctly
     assert inputA[0] is model.bind.input_a
     assert inputB[0] is model.bind.input_b
@@ -28,7 +28,7 @@ def test_run(Simulator, seed):
     vocab = spa.Vocabulary(32, rng=rng)
     vocab.populate('A; B')
 
-    with spa.Module(seed=seed, vocabs=VocabularyMap([vocab])) as model:
+    with spa.Network(seed=seed, vocabs=VocabularyMap([vocab])) as model:
         model.bind = spa.Bind(vocab=32)
 
         def inputA(t):
@@ -41,7 +41,7 @@ def test_run(Simulator, seed):
         model.input.bind.input_a = inputA
         model.input.bind.input_b = 'A'
 
-    bind, vocab = model.get_module_output('bind')
+    bind, vocab = model.get_network_output('bind')
 
     with model:
         p = nengo.Probe(bind, 'output', synapse=0.03)

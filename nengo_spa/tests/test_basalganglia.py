@@ -5,7 +5,7 @@ import nengo_spa as spa
 
 
 def test_basal_ganglia(Simulator, seed, plt):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
 
     with model:
         model.vision = spa.State(vocab=16)
@@ -70,14 +70,14 @@ def test_basal_ganglia(Simulator, seed, plt):
 
 
 def test_scalar_product():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.scalar = spa.Scalar()
         spa.Actions('scalar*scalar --> scalar=1').build()
     # just testing network construction without exception here
 
 
 def test_constructed_input_connections_are_accessible():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.config[spa.State].vocab = 16
         model.state1 = spa.State()
         model.state2 = spa.State()

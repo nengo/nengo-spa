@@ -217,27 +217,27 @@ class Actions(object):
 
         if len(Network.context) <= 0:
             raise NetworkContextError(
-                "Actions.build can only be called inside a ``with module:`` "
+                "Actions.build can only be called inside a ``with network:`` "
                 "block.")
-        root_module = Network.context[-1]
+        root_network = Network.context[-1]
 
-        with root_module:
+        with root_network:
             if needs_bg and bg is None:
                 bg = BasalGanglia(action_count=len(self.actions))
-                root_module.bg = bg
+                root_network.bg = bg
             if needs_bg and thalamus is None:
                 thalamus = Thalamus(action_count=len(self.actions))
                 for i, a in enumerate(self.actions):
                     thalamus.actions.ensembles[i].label = (
                         'action[{}]: {}'.format(i, a.effects))
                 thalamus.connect_bg(bg)
-                root_module.thalamus = thalamus
+                root_network.thalamus = thalamus
 
         self.construction_context = ConstructionContext(
-            root_module, bg=bg, thalamus=thalamus)
-        with root_module:
+            root_network, bg=bg, thalamus=thalamus)
+        with root_network:
             for action in self.actions:
-                action.infer_types(root_module, None)
+                action.infer_types(root_network, None)
             # Infer types for all actions before doing any construction, so
             # that # all semantic pointers are added to the respective
             # vocabularies so that the translate transform are identical.

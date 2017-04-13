@@ -6,7 +6,7 @@ import nengo
 from nengo_spa.config import ConfigParam
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo.synapses import Lowpass, SynapseParam
 
 
@@ -54,7 +54,7 @@ class Weights(object):
         return cls.mg * (x - cls.eg)
 
 
-class BasalGanglia(Module):
+class BasalGanglia(Network):
     """Winner take all network, typically used for action selection.
 
     The basal ganglia network outputs approximately 0 at the dimension with
@@ -106,7 +106,7 @@ class BasalGanglia(Module):
         and GPe to GPi and STN). If None, a default configuration using an
         8 ms lowpass synapse will be used.
     kwargs
-        Passed through the ``spa.Module``.
+        Passed through the ``spa.Network``.
 
     Attributes
     ----------

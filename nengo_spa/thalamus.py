@@ -3,13 +3,13 @@ import numpy as np
 import nengo
 from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo_spa.scalar import Scalar
 from nengo_spa.state import State
 from nengo.synapses import Lowpass, SynapseParam
 
 
-class Thalamus(Module):
+class Thalamus(Network):
     """Inhibits non-selected actions.
 
     The thalamus is intended to work in tandem with a basal ganglia network.
@@ -50,7 +50,7 @@ class Thalamus(Module):
         Synaptic filter for controlling a gate.
 
     kwargs
-        Passed through to ``spa.Module``.
+        Passed through to ``spa.Network``.
 
     Attributes
     ----------
@@ -100,7 +100,7 @@ class Thalamus(Module):
         self.synapse_bg = synapse_bg
 
         self.gates = {}     # gating ensembles per action (created as needed)
-        self.channels = []  # channels to pass transformed data between modules
+        self.channels = []  # channels to pass data between networks
 
         self.gate_in_connections = {}
         self.gate_out_connections = {}
@@ -164,7 +164,7 @@ class Thalamus(Module):
         return self.gates[index]
 
     def construct_channel(
-            self, target_module, target_input, net, label=None):
+            self, target_net, target_input, net, label=None):
         """Construct a channel.
 
         Channels are an additional neural population in-between a source
@@ -173,8 +173,8 @@ class Thalamus(Module):
 
         Parameters
         ----------
-        target_module : :class:`spa.Module`
-            The module that the channel will project to.
+        target_net : :class:`spa.Network`
+            The network that the channel will project to.
         target_vocab : :class:`spa.Vocabulary`
             The vocabulary used by the target population..
         net : :class:`nengo.Network`, optional
@@ -188,8 +188,8 @@ class Thalamus(Module):
             The constructed channel.
         """
         if label is None:
-            if target_module.label is not None:
-                label = 'channel to ' + target_module.label
+            if target_net.label is not None:
+                label = 'channel to ' + target_net.label
             else:
                 label = 'channel'
         with net:

@@ -28,9 +28,9 @@ def test_symbol():
         ast.infer_types(None, TScalar)
 
 
-def test_module():
+def test_spa_network():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr('state')
@@ -39,15 +39,15 @@ def test_module():
     ast.infer_types(model, None)
     assert ast.type.vocab == model.state.vocabs[d]
 
-    with spa.Module() as model:
-        with spa.Module() as model.module:
-            model.module.state = spa.State(d)
+    with spa.Network() as model:
+        with spa.Network() as model.network:
+            model.network.state = spa.State(d)
 
-    ast = Parser().parse_expr('module.state')
-    assert ast == Module('module.state')
-    assert str(ast) == 'module.state'
+    ast = Parser().parse_expr('network.state')
+    assert ast == Module('network.state')
+    assert str(ast) == 'network.state'
     ast.infer_types(model, None)
-    assert ast.type.vocab == model.module.state.vocabs[d]
+    assert ast.type.vocab == model.network.state.vocabs[d]
 
 
 def test_scalar_multiplication():
@@ -68,7 +68,7 @@ def test_scalar_multiplication():
     assert ast.type == vocab_type
 
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr('2 * state')
@@ -97,7 +97,7 @@ def test_binary_operations(symbol, klass):
     assert ast.type == vocab_type
 
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
         model.state2 = spa.State(d)
 
@@ -135,7 +135,7 @@ def test_unary(symbol, klass):
     assert ast.type == vocab_type
 
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr(symbol + 'state')
@@ -148,7 +148,7 @@ def test_unary(symbol, klass):
 
 def test_dot_product():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr('dot(A, state)')
@@ -168,7 +168,7 @@ def test_dot_product():
 
 def test_effect():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_effect('state = A')
@@ -196,7 +196,7 @@ def test_effects():
 
 def test_action():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_action('dot(state, A) --> state = B')
@@ -209,7 +209,7 @@ def test_action():
 
 def test_complex_epressions():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr('~(A - B * state)')
@@ -235,7 +235,7 @@ def test_complex_epressions():
 
 def test_zero_vector():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_effect('state = 0')
@@ -245,7 +245,7 @@ def test_zero_vector():
 
 def test_vocab_transform_in_multiplication():
     d = 16
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(d)
 
     ast = Parser().parse_expr('2 * translate(state)')

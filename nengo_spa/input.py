@@ -23,10 +23,10 @@ class _HierachicalInputProxy(object):
 
 
 class Input(nengo.Network):
-    """A SPA module for providing external inputs to other modules.
+    """A SPA network for providing external inputs to other networks.
 
-    The parameters passed to this module indicate the module input name
-    and the function to execute to generate inputs to that module.
+    The parameters passed to this network indicate the network input name
+    and the function to execute to generate inputs to that network.
     The functions should always return strings, which will then be parsed
     by the relevant vocabulary. For example::
 
@@ -40,33 +40,33 @@ class Input(nengo.Network):
 
     will create two inputs:
 
-    1. an input to the ``vision`` module, which for the first 0.1 seconds
+    1. an input to the ``vision`` network, which for the first 0.1 seconds
        is the value associated with the ``'A'`` semantic pointer and then
        a vector of all zeros, and
-    2. an input to the ``task`` module which is always the value associated
+    2. an input to the ``task`` network which is always the value associated
        with the ``'X'`` semantic pointer.
 
     Parameters
     ----------
-    module : spa.Module, optional (Default: the current module)
+    network : spa.Module, optional (Default: the current SPA network)
         Module that this network provides input for.
     kwargs
         Keyword arguments passed through to ``nengo.Network``.
     """
 
-    def __init__(self, module=None, **kwargs):
+    def __init__(self, network=None, **kwargs):
         super(Input, self).__init__(**kwargs)
         self.input_nodes = {}
 
-        if module is None:
-            from nengo_spa.module import get_current_module
-            module = get_current_module()
-        self.module = module
+        if network is None:
+            from nengo_spa.network import get_current_spa_network
+            network = get_current_spa_network()
+        self.network = network
 
         self._initialized = True
 
     def __connect(self, name, expr):
-        target, vocab = self.module.get_module_input(name)
+        target, vocab = self.network.get_network_input(name)
         if callable(expr):
             val = make_parse_func(expr, vocab)
         else:
@@ -76,7 +76,7 @@ class Input(nengo.Network):
             node = nengo.Node(val, label='input_%s' % name)
         self.input_nodes[name] = node
 
-        with self.module:
+        with self.network:
             nengo.Connection(node, target, synapse=None)
 
     def __setattr__(self, name, value):

@@ -2,12 +2,12 @@ import numpy as np
 
 import nengo
 from nengo.params import Default, IntParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
-class Compare(Module):
-    """A module for computing the dot product of two inputs.
+class Compare(Network):
+    """A SPA network for computing the dot product of two inputs.
 
     Parameters
     ----------
@@ -17,7 +17,7 @@ class Compare(Module):
     neurons_per_dimension : int, optional (Default: 200)
         Number of neurons to use in each product computation.
     kwargs
-        Keyword arguments passed through to ``spa.Module``.
+        Keyword arguments passed through to ``spa.Network``.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

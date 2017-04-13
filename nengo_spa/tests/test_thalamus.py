@@ -2,14 +2,14 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaModuleError
+from nengo_spa.exceptions import SpaNetworkError
 
 import numpy as np
 
 
 @pytest.mark.slow
 def test_thalamus(Simulator, plt, seed):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
 
     with model:
         model.vision = spa.State(vocab=16, neurons_per_dimension=80)
@@ -37,8 +37,8 @@ def test_thalamus(Simulator, plt, seed):
         model.input.vision = input_f
         model.input.vision2 = 'B*~A'
 
-        input, vocab = model.get_module_input('motor')
-        input2, vocab2 = model.get_module_input('motor2')
+        input, vocab = model.get_network_input('motor')
+        input2, vocab2 = model.get_network_input('motor2')
         p = nengo.Probe(input, 'output', synapse=0.03)
         p2 = nengo.Probe(input2, 'output', synapse=0.03)
 
@@ -72,7 +72,7 @@ def test_thalamus(Simulator, plt, seed):
 
 
 def test_routing(Simulator, seed, plt):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 3
     model.config[spa.State].subdimensions = 3
     with model:
@@ -131,7 +131,7 @@ def test_routing(Simulator, seed, plt):
 
 
 def test_routing_recurrency_compilation(Simulator, seed, plt):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 2
     model.config[spa.State].subdimensions = 2
     with model:
@@ -144,7 +144,7 @@ def test_routing_recurrency_compilation(Simulator, seed, plt):
 
 
 def test_nondefault_routing(Simulator, seed):
-    model = spa.Module(seed=seed)
+    model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 3
     model.config[spa.State].subdimensions = 3
     with model:
@@ -194,14 +194,14 @@ def test_nondefault_routing(Simulator, seed):
 
 def test_errors():
     # motor does not exist
-    with pytest.raises(SpaModuleError):
-        with spa.Module() as model:
+    with pytest.raises(SpaNetworkError):
+        with spa.Network() as model:
             model.vision = spa.State(vocab=16)
             spa.Actions('0.5 --> motor=A').build()
 
 
 def test_constructed_objects_are_accessible():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.config[spa.State].vocab = 16
         model.state1 = spa.State()
         model.state2 = spa.State()

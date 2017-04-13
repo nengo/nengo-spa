@@ -1,12 +1,12 @@
 import nengo
 from nengo.params import BoolParam, Default, IntParam
 import nengo_spa
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
-class Bind(Module):
-    """A module for binding together two inputs.
+class Bind(Network):
+    """A network for binding together two inputs.
 
     Binding is done with circular convolution. For more details on how
     this is computed, see the underlying `~.network.CircularConvolution`
@@ -25,7 +25,7 @@ class Bind(Module):
         Flipping the second input will make the network perform circular
         correlation instead of circular convolution.
     kwargs
-        Keyword arguments passed through to ``spa.Module``.
+        Keyword arguments passed through to ``spa.Network``.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

@@ -4,14 +4,15 @@ import nengo
 from nengo.exceptions import ValidationError
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
-class State(Module):
-    """A module capable of representing a single vector, with optional memory.
+class State(Network):
+    """A SPA network capable of representing a single vector, with optional
+    memory.
 
-    This is a minimal SPA module, useful for passing data along (for example,
+    This is a minimal SPA network, useful for passing data along (for example,
     visual input).
 
     Parameters
@@ -31,7 +32,7 @@ class State(Module):
     feedback_synapse : float, optional (Default: 0.1)
         The synapse on the feedback connection.
     kwargs
-        Keyword arguments passed through to ``spa.Module``.
+        Keyword arguments passed through to ``spa.Network``.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

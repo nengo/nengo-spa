@@ -1,10 +1,10 @@
 import nengo
 from nengo.params import Default, IntParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 
 
-class Scalar(Module):
-    """A module capable of representing a single scalar.
+class Scalar(Network):
+    """A SPA network capable of representing a single scalar.
 
     Parameters
     ----------

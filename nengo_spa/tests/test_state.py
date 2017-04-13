@@ -5,11 +5,11 @@ import nengo_spa as spa
 
 
 def test_basic():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(vocab=16)
 
-    input = model.get_module_input('state')
-    output = model.get_module_output('state')
+    input = model.get_network_input('state')
+    output = model.get_network_output('state')
     assert input[0] is model.state.input
     assert output[0] is model.state.output
     assert input[1] is output[1]
@@ -17,13 +17,13 @@ def test_basic():
 
 
 def test_neurons():
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(vocab=16, neurons_per_dimension=2)
 
     assert len(model.state.state_ensembles.ensembles) == 1
     assert model.state.state_ensembles.ensembles[0].n_neurons == 16 * 2
 
-    with spa.Module() as model:
+    with spa.Network() as model:
         model.state = spa.State(vocab=16, subdimensions=1,
                                 neurons_per_dimension=2)
 
@@ -32,7 +32,7 @@ def test_neurons():
 
 
 def test_no_feedback_run(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.state = spa.State(vocab=32, feedback=0.0)
 
         def state_input(t):
@@ -45,7 +45,7 @@ def test_no_feedback_run(Simulator, seed):
         model.state_input = spa.Input()
         model.state_input.state = state_input
 
-    state, vocab = model.get_module_output('state')
+    state, vocab = model.get_network_output('state')
 
     with model:
         p = nengo.Probe(state, 'output', synapse=0.03)
@@ -63,7 +63,7 @@ def test_no_feedback_run(Simulator, seed):
 
 
 def test_memory_run(Simulator, seed, plt):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.memory = spa.State(vocab=32, feedback=1.0,
                                  feedback_synapse=0.01)
 
@@ -76,7 +76,7 @@ def test_memory_run(Simulator, seed, plt):
         model.state_input = spa.Input()
         model.state_input.memory = state_input
 
-    memory, vocab = model.get_module_output('memory')
+    memory, vocab = model.get_network_output('memory')
 
     with model:
         p = nengo.Probe(memory, 'output', synapse=0.03)
@@ -97,7 +97,7 @@ def test_memory_run(Simulator, seed, plt):
 
 
 def test_memory_run_decay(Simulator, plt, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.memory = spa.State(vocab=32, feedback=(1.0 - 0.01/0.05),
                                  feedback_synapse=0.01)
 
@@ -110,7 +110,7 @@ def test_memory_run_decay(Simulator, plt, seed):
         model.state_input = spa.Input()
         model.state_input.memory = state_input
 
-    memory, vocab = model.get_module_output('memory')
+    memory, vocab = model.get_network_output('memory')
 
     with model:
         p = nengo.Probe(memory, 'output', synapse=0.03)

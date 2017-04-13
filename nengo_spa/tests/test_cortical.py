@@ -3,11 +3,11 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaModuleError
+from nengo_spa.exceptions import SpaNetworkError
 
 
 def test_connect(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
         model.buffer3 = spa.State(vocab=16)
@@ -16,8 +16,8 @@ def test_connect(Simulator, seed):
         model.input = spa.Input()
         model.input.buffer1 = 'A'
 
-    output2, vocab = model.get_module_output('buffer2')
-    output3, vocab = model.get_module_output('buffer3')
+    output2, vocab = model.get_network_output('buffer2')
+    output3, vocab = model.get_network_output('buffer3')
 
     with model:
         p2 = nengo.Probe(output2, 'output', synapse=0.03)
@@ -33,14 +33,14 @@ def test_connect(Simulator, seed):
 
 
 def test_transform(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
         spa.Actions('buffer2=buffer1*B').build()
         model.input = spa.Input()
         model.input.buffer1 = 'A'
 
-    output, vocab = model.get_module_output('buffer2')
+    output, vocab = model.get_network_output('buffer2')
 
     with model:
         p = nengo.Probe(output, 'output', synapse=0.03)
@@ -54,14 +54,14 @@ def test_transform(Simulator, seed):
 
 # FIXME test different populate arguments
 def test_translate(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=32)
         model.input = spa.Input()
         model.input.buffer1 = 'A'
         spa.Actions('buffer2=translate(buffer1, populate=True)').build()
 
-    output, vocab = model.get_module_output('buffer2')
+    output, vocab = model.get_network_output('buffer2')
 
     with model:
         p = nengo.Probe(output, 'output', synapse=0.03)
@@ -75,14 +75,14 @@ def test_translate(Simulator, seed):
 
 def test_errors():
     # buffer2 does not exist
-    with pytest.raises(SpaModuleError):
-        with spa.Module() as model:
+    with pytest.raises(SpaNetworkError):
+        with spa.Network() as model:
             model.buffer = spa.State(vocab=16)
             spa.Actions('buffer2=buffer').build()
 
 
 def test_direct(Simulator, seed):
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer1.vocab.populate('A; B; C')
         model.buffer2 = spa.State(vocab=32)
@@ -90,8 +90,8 @@ def test_direct(Simulator, seed):
         spa.Actions(
             'buffer1=A', 'buffer2=B', 'buffer1=C, buffer2=C').build()
 
-    output1, vocab1 = model.get_module_output('buffer1')
-    output2, vocab2 = model.get_module_output('buffer2')
+    output1, vocab1 = model.get_network_output('buffer1')
+    output2, vocab2 = model.get_network_output('buffer2')
 
     with model:
         p1 = nengo.Probe(output1, 'output', synapse=0.03)
@@ -110,7 +110,7 @@ def test_direct(Simulator, seed):
 
 def test_convolution(Simulator, plt, seed):
     D = 5
-    with spa.Module(seed=seed) as model:
+    with spa.Network(seed=seed) as model:
         model.config[spa.State].vocab = D
         model.config[spa.State].subdimensions = D
         model.inA = spa.State()

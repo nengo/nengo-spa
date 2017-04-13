@@ -3,16 +3,16 @@ import numpy as np
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo_spa.exceptions import SpaModuleError
-from nengo.network import Network
+from nengo_spa.exceptions import SpaNetworkError
 from nengo_spa.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 from nengo.utils.compat import iteritems
+import nengo_spa
 
 
-def get_current_module():
+def get_current_spa_network():
     for net in reversed(Network.context):
-        if isinstance(net, Module):
+        if isinstance(net, Network):
             return net
     return None
 
@@ -30,10 +30,10 @@ class _AutoConfig(object):
         return self._cfg[key]
 
 
-class Module(nengo.Network, SupportDefaultsMixin):
-    """Base class for SPA Modules.
+class Network(nengo.Network, SupportDefaultsMixin):
+    """Base class for SPA networks.
 
-    Modules are networks that also have a list of inputs and outputs,
+    SPA networks are networks that also have a list of inputs and outputs,
     each with an associated `.Vocabulary` (or a desired dimensionality for
     the vocabulary).
 
@@ -45,11 +45,11 @@ class Module(nengo.Network, SupportDefaultsMixin):
 
     def __init__(
             self, label=None, seed=None, add_to_container=None, vocabs=None):
-        super(Module, self).__init__(label, seed, add_to_container)
-        self.config.configures(Module)
+        super(Network, self).__init__(label, seed, add_to_container)
+        self.config.configures(Network)
 
         if vocabs is None:
-            vocabs = Config.default(Module, 'vocabs')
+            vocabs = Config.default(Network, 'vocabs')
             if vocabs is None:
                 if seed is not None:
                     rng = np.random.RandomState(seed)
@@ -57,11 +57,11 @@ class Module(nengo.Network, SupportDefaultsMixin):
                     rng = None
                 vocabs = VocabularyMap(rng=rng)
         self.vocabs = vocabs
-        self.config[Module].vocabs = vocabs
+        self.config[Network].vocabs = vocabs
 
-        self.__dict__['_parent_module'] = get_current_module()
+        self.__dict__['_parent_spa_network'] = get_current_spa_network()
 
-        self._modules = {}
+        self._spa_networks = {}
 
         self.inputs = {}
         self.outputs = {}
@@ -80,117 +80,119 @@ class Module(nengo.Network, SupportDefaultsMixin):
         return self._stimuli
 
     def __setattr__(self, key, value):
-        """A setattr that handles Modules being added specially.
+        """A setattr that handles SPA networks being added specially.
 
-        This is so that we can use the variable name for the Module as
-        the name that all of the SPA system will use to access that module.
+        This is so that we can use the variable name for the Network as
+        the name that all of the SPA system will use to access that network.
         """
-        if isinstance(value, Module):
-            if hasattr(self, key) and isinstance(getattr(self, key), Module):
-                raise SpaModuleError(
-                    "Cannot re-assign module-attribute %s to %s. SPA "
-                    "module-attributes can only be assigned once."
+        if isinstance(value, Network):
+            if hasattr(self, key) and isinstance(getattr(self, key), Network):
+                raise SpaNetworkError(
+                    "Cannot re-assign network-attribute %s to %s. SPA "
+                    "network-attributes can only be assigned once."
                     % (key, value))
 
-        super(Module, self).__setattr__(key, value)
+        super(Network, self).__setattr__(key, value)
 
-        if isinstance(value, Module):
-            self.__set_module(key, value)
+        if isinstance(value, Network):
+            self.__set_spa_network(key, value)
 
-    def __set_module(self, key, module):
-        if module.label is None:
-            module.label = key
-        self._modules[key] = module
-        for k, (obj, v) in iteritems(module.inputs):
+    def __set_spa_network(self, key, net):
+        if net.label is None:
+            net.label = key
+        self._spa_networks[key] = net
+        for k, (obj, v) in iteritems(net.inputs):
             if isinstance(v, int):
-                module.inputs[k] = (obj, self.vocabs.get_or_create(v))
-        for k, (obj, v) in iteritems(module.outputs):
+                net.inputs[k] = (obj, self.vocabs.get_or_create(v))
+        for k, (obj, v) in iteritems(net.outputs):
             if isinstance(v, int):
-                module.outputs[k] = (obj, self.vocabs.get_or_create(v))
+                net.outputs[k] = (obj, self.vocabs.get_or_create(v))
 
-    def get_module(self, name, strip_output=False):
-        """Return the module for the given name.
+    def get_spa_network(self, name, strip_output=False):
+        """Return the SPA network for the given name.
 
-        Raises :class:`SpaModuleError` if the module cannot be found.
+        Raises :class:`SpaNetworkError` if the network cannot be found.
 
         Parameters
         ----------
         name : str
-            Name of the module to retrieve.
+            Name of the network to retrieve.
         strip_output : bool, optional
-            If ``True``, the module name is allowed to be followed by the name
-            of an input or output that will be stripped (so the module with
+            If ``True``, the network name is allowed to be followed by the name
+            of an input or output that will be stripped (so the network with
             that input or output will be returned).
 
         Returns
         -------
-        :class:`Module`
-            Requested module.
+        :class:`Network`
+            Requested network.
         """
         try:
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._modules[head].get_module(
+                return self._spa_networks[head].get_spa_network(
                     tail, strip_output=strip_output)
             else:
-                if name in self._modules:
-                    return self._modules[name]
+                if name in self._spa_networks:
+                    return self._spa_networks[name]
                 elif strip_output and (
                         name in self.inputs or name in self.outputs):
                     return self
                 else:
                     raise KeyError
         except KeyError:
-            raise SpaModuleError("Could not find module %r." % name)
+            raise SpaNetworkError("Could not find network %r." % name)
 
-    def get_module_input(self, name):
+    def get_network_input(self, name):
         """Return the object to connect into for the given name.
 
-        The name will be either the same as a module, or of the form
-        <module_name>.<input_name>.
+        The name will be either the same as a spa network, or of the form
+        <network_name>.<input_name>.
         """
         try:
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._modules[head].get_module_input(tail)
+                return self._spa_networks[head].get_network_input(tail)
             else:
                 if name in self.inputs:
                     return self.inputs[name]
-                elif name in self._modules:
-                    return self._modules[name].get_module_input('default')
+                elif name in self._spa_networks:
+                    return self._spa_networks[name].get_network_input(
+                        'default')
                 else:
                     raise KeyError
         except KeyError:
-            raise SpaModuleError("Could not find module input %r." % name)
+            raise SpaNetworkError("Could not find network input %r." % name)
 
     def get_input_vocab(self, name):
-        return self.get_module_input(name)[1]
+        return self.get_network_input(name)[1]
 
-    def get_module_output(self, name):
+    def get_network_output(self, name):
         """Return the object to connect into for the given name.
 
-        The name will be either the same as a module, or of the form
-        <module_name>.<output_name>.
+        The name will be either the same as a spa network, or of the form
+        <network_name>.<output_name>.
         """
         try:
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._modules[head].get_module_output(tail)
+                return self._spa_networks[head].get_network_output(tail)
             else:
                 if name in self.outputs:
                     return self.outputs[name]
-                elif name in self._modules:
-                    return self._modules[name].get_module_output('default')
+                elif name in self._spa_networks:
+                    return self._spa_networks[name].get_network_output(
+                        'default')
                 else:
                     raise KeyError
         except KeyError:
-            raise SpaModuleError("Could not find module output %r." % name)
+            raise SpaNetworkError("Could not find network output %r." % name)
 
     def get_output_vocab(self, name):
-        return self.get_module_output(name)[1]
+        return self.get_network_output(name)[1]
 
     def similarity(self, data, probe, vocab=None):
         """Return the similarity between the probed data and corresponding

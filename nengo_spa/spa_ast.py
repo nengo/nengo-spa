@@ -18,12 +18,12 @@ pointers of a matching vocabulary are assigned.
 
 To determine the type of each node an actual model has to be provided. This is
 because names of semantic pointers are not associated with a vocabulary and it
-needs to be inferred from some actual SPA module for which we have to be able
-to resolve the names of those modules. There are a few basic rules for this
+needs to be inferred from some actual SPA network for which we have to be able
+to resolve the names of those networks. There are a few basic rules for this
 type inference:
 
-1. If something with unknown vocabulary is assigned to a module, that module's
-   vocabulary provides the type.
+1. If something with unknown vocabulary is assigned to a network, that
+   network's vocabulary provides the type.
 2. If a binary operation has an operand with unknown vocabulary it is
    determined from the other operand.
 
@@ -88,20 +88,20 @@ from nengo_spa.bind import Bind
 from nengo_spa.compare import Compare
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.product import Product as ProductModule
-from nengo_spa.exceptions import SpaModuleError, SpaParseError, SpaTypeError
+from nengo_spa.exceptions import SpaNetworkError, SpaParseError, SpaTypeError
 
 
 class ConstructionContext(object):
     """Context in which SPA actions are constructed.
 
-    This primarily provides the SPA modules used to construct certain
-    components. All attributes except `root_module` may be ``None`` if these
+    This primarily provides the SPA networks used to construct certain
+    components. All attributes except `root_network` may be ``None`` if these
     are not provided in the current construction context.
 
     Attributes
     ----------
-    root_module : :class:`spa.Module`
-        The root module the encapsulated all of the constructed structures.
+    root_network : :class:`spa.Module`
+        The root network the encapsulated all of the constructed structures.
     bg : :class:`spa.BasalGanglia`
         Module to manage the basal ganglia part of action selection.
     thalamus : :class:`spa.Thalamus`
@@ -112,19 +112,19 @@ class ConstructionContext(object):
         Network to add constructed components to.
     """
     __slots__ = [
-        'root_module', 'bg', 'thalamus', 'bias', 'sink', 'active_net',
+        'root_network', 'bg', 'thalamus', 'bias', 'sink', 'active_net',
         'constructed']
 
     def __init__(
-            self, root_module, bg=None, thalamus=None,
+            self, root_network, bg=None, thalamus=None,
             sink=None, active_net=None, constructed=None):
-        self.root_module = root_module
+        self.root_network = root_network
         self.bg = bg
         self.thalamus = thalamus
         self.bias = None
         self.sink = sink
         if active_net is None:
-            active_net = root_module
+            active_net = root_network
         self.active_net = active_net
         if constructed is None:
             constructed = defaultdict(list)
@@ -136,17 +136,18 @@ class ConstructionContext(object):
         if active_net is None:
             active_net = self.active_net
         return self.__class__(
-            root_module=self.root_module, bg=self.bg,
+            root_network=self.root_network, bg=self.bg,
             thalamus=self.thalamus, sink=sink, active_net=active_net,
             constructed=self.constructed)
 
     @property
-    def sink_module(self):
-        return self.root_module.get_module(self.sink.name, strip_output=True)
+    def sink_network(self):
+        return self.root_network.get_spa_network(
+            self.sink.name, strip_output=True)
 
     @property
     def sink_input(self):
-        return self.root_module.get_module_input(self.sink.name)
+        return self.root_network.get_network_input(self.sink.name)
 
     def add_constructed(self, ast_node, *objects):
         self.constructed[ast_node].extend(objects)
@@ -230,7 +231,7 @@ class Artifact(object):
         return Artifact(self.nengo_source, np.dot(tr, self.transform))
 
 
-def infer_vocab(root_module, *nodes):
+def infer_vocab(root_network, *nodes):
     """Return the first vocabulary type that can be inferred for one of the
     `nodes`.
 
@@ -245,7 +246,7 @@ def infer_vocab(root_module, *nodes):
     """
     for node in nodes:
         try:
-            node.infer_types(root_module, None)
+            node.infer_types(root_network, None)
             if isinstance(node.type, TVocabulary):
                 return node.type
         except SpaTypeError:
@@ -334,7 +335,7 @@ class Node(object):
         return (self.__class__ is other.__class__ and
                 self.__dict__ == other.__dict__)
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         """Run type inference on this node and its children.
 
         Will raise a :class:`nengo.exceptions.SpaTypeError` if invalid,
@@ -344,8 +345,8 @@ class Node(object):
 
         Parameters
         ----------
-        root_module : :class:`spa.Module`
-            The root_module used to resolve names.
+        root_network : :class:`spa.Module`
+            The root_network used to resolve names.
         context_type : :class:`Type`
             The type of the context of this node. Allows to infer the type
             from the context if the node has no definitive type on its own.
@@ -404,7 +405,7 @@ class Source(Node):
     def __rmul__(self, other):
         return Product(other, self)
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         raise NotImplementedError()
 
     def construct(self, context):
@@ -421,7 +422,7 @@ class Scalar(Source):
         self.value = value
         self.type = TScalar
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         pass
 
     def construct(self, context):
@@ -449,7 +450,7 @@ class Symbol(Source):
             raise SpaParseError(
                 "Semantic pointers must begin with a capital letter.")
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if not isinstance(context_type, TVocabulary):
             raise SpaTypeError("Invalid type.")
         self.type = context_type
@@ -475,7 +476,7 @@ class Zero(Source):
     def __init__(self):
         super(Zero, self).__init__(staticity=Node.Staticity.FIXED)
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if context_type is None:
             self.type = TScalar
         elif context_type == TScalar or isinstance(context_type, TVocabulary):
@@ -497,24 +498,25 @@ class Zero(Source):
 
 
 class Module(Source):
-    """A SPA module or module output identified by its name.
+    """A SPA network or network output identified by its name.
 
     This will provide potentially time varying input. This class is not used
-    for modules that act as sink.
+    for networks that act as sink.
     """
     def __init__(self, name):
         super(Module, self).__init__(staticity=Node.Staticity.TRANSFORM_ONLY)
         self.name = name
 
-    def infer_types(self, root_module, context_type):
-        vocab = root_module.get_module_output(self.name)[1]
+    def infer_types(self, root_network, context_type):
+        vocab = root_network.get_network_output(self.name)[1]
         if vocab is None:
             self.type = TScalar
         else:
             self.type = TVocabulary(vocab)
 
     def construct(self, context):
-        return [Artifact(context.root_module.get_module_output(self.name)[0])]
+        return [Artifact(
+            context.root_network.get_network_output(self.name)[0])]
 
     def evaluate(self):
         raise ValueError("Module cannot be statically evaluated.")
@@ -545,14 +547,14 @@ class BinaryNode(Source):
         self.lhs = lhs
         self.rhs = rhs
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         raise NotImplementedError()
 
     def construct(self, context):
         raise NotImplementedError()
 
     def _connect_binary_operation(self, context, net):
-        with context.root_module:
+        with context.root_network:
             for artifact in self.lhs.construct(context):
                 context.add_constructed(
                     self, nengo.Connection(
@@ -585,12 +587,12 @@ class BinaryOperation(BinaryNode):
         self.operator = operator
         self.allow_scalar = allow_scalar
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if context_type is None:
-            context_type = infer_vocab(root_module, self.lhs, self.rhs)
+            context_type = infer_vocab(root_network, self.lhs, self.rhs)
 
-        self.lhs.infer_types(root_module, context_type)
-        self.rhs.infer_types(root_module, context_type)
+        self.lhs.infer_types(root_network, context_type)
+        self.rhs.infer_types(root_network, context_type)
 
         if self.lhs.type == self.rhs.type:
             self.type = self.lhs.type
@@ -706,8 +708,8 @@ class UnaryOperation(Source):
         self.source = source
         self.operator = operator
 
-    def infer_types(self, root_module, context_type):
-        self.source.infer_types(root_module, context_type)
+    def infer_types(self, root_network, context_type):
+        self.source.infer_types(root_network, context_type)
         self.type = self.source.type
 
     def construct(self, context):
@@ -724,8 +726,8 @@ class ApproxInverse(UnaryOperation):
     def __init__(self, source):
         super(ApproxInverse, self).__init__(source, '~')
 
-    def infer_types(self, root_module, context_type):
-        super(ApproxInverse, self).infer_types(root_module, context_type)
+    def infer_types(self, root_network, context_type):
+        super(ApproxInverse, self).infer_types(root_network, context_type)
         if not isinstance(self.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot apply approximate inverse to '{}' which is not of "
@@ -769,10 +771,10 @@ class DotProduct(BinaryNode):
         super(DotProduct, self).__init__(lhs, rhs, staticity)
         self.type = TScalar
 
-    def infer_types(self, root_module, context_type):
-        context_type = infer_vocab(root_module, self.lhs, self.rhs)
-        self.lhs.infer_types(root_module, context_type)
-        self.rhs.infer_types(root_module, context_type)
+    def infer_types(self, root_network, context_type):
+        context_type = infer_vocab(root_network, self.lhs, self.rhs)
+        self.lhs.infer_types(root_network, context_type)
+        self.rhs.infer_types(root_network, context_type)
         if not isinstance(self.lhs.type, TVocabulary):
             raise SpaTypeError(
                 "First argument of dot product '{}' is not of type "
@@ -820,11 +822,11 @@ class Reinterpret(Source):
         self.source = source
         self.vocab = vocab
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if self.vocab is None:
             self.type = context_type
         elif isinstance(self.vocab, Module):
-            self.vocab.infer_types(root_module, None)
+            self.vocab.infer_types(root_network, None)
             self.type = self.vocab.type
         else:
             self.type = TVocabulary(self.vocab)
@@ -832,7 +834,7 @@ class Reinterpret(Source):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
-        self.source.infer_types(root_module, None)
+        self.source.infer_types(root_network, None)
         if not isinstance(self.source.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot reinterpret '{}' because it is not of type "
@@ -862,11 +864,11 @@ class Translate(Source):
         self.vocab = vocab
         self.populate = populate
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if self.vocab is None:
             self.type = context_type
         elif isinstance(self.vocab, Module):
-            self.vocab.infer_types(root_module, None)
+            self.vocab.infer_types(root_network, None)
             self.type = self.vocab.type
         else:
             self.type = TVocabulary(self.vocab)
@@ -874,7 +876,7 @@ class Translate(Source):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
-        self.source.infer_types(root_module, None)
+        self.source.infer_types(root_network, None)
         if not isinstance(self.source.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot translate '{}' because it is not of type "
@@ -896,7 +898,7 @@ class Translate(Source):
 
 
 class Effect(Node):
-    """Assignment of an expression to a SPA module.
+    """Assignment of an expression to a SPA network.
 
     Attributes
     ----------
@@ -920,11 +922,11 @@ class Effect(Node):
         self.channeled = channeled
         self.channel = None
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if context_type is not None:
             raise ValueError("Effect only allows a context_type of None.")
-        self.sink.infer_types(root_module, None)
-        self.source.infer_types(root_module, self.sink.type)
+        self.sink.infer_types(root_network, None)
+        self.source.infer_types(root_network, self.sink.type)
         if self.sink.type != self.source.type:
             raise SpaTypeError("Cannot assign {} to {} in '{}'".format(
                 self.source.type, self.sink.type, self))
@@ -938,7 +940,7 @@ class Effect(Node):
 
         if self.channeled:
             self.channel = context.thalamus.construct_channel(
-                context.sink_module, context.sink_input,
+                context.sink_network, context.sink_input,
                 net=context.active_net, label='channel: ' + str(self))
             target = self.channel.input
             connect_fn = context.thalamus.connect
@@ -967,9 +969,9 @@ class Effects(Node):
         self.type = TEffects
         self.effects = effects
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         for e in self.effects:
-            e.infer_types(root_module, context_type)
+            e.infer_types(root_network, context_type)
 
     def construct(self, context):
         for effect in self.effects:
@@ -984,14 +986,14 @@ class Effects(Node):
 
 
 class Sink(Node):
-    """SPA module that acts as sink identified by its name."""
+    """SPA network that acts as sink identified by its name."""
 
     def __init__(self, name):
         super(Sink, self).__init__(staticity=Node.Staticity.DYNAMIC)
         self.name = name
 
-    def infer_types(self, root_module, context_type):
-        vocab = root_module.get_module_input(self.name)[1]
+    def infer_types(self, root_network, context_type):
+        vocab = root_network.get_network_input(self.name)[1]
         if vocab is None:
             self.type = TScalar
         else:
@@ -1034,19 +1036,19 @@ class Action(Node):
         warnings.warn(DeprecationWarning("Use the effects attribute instead."))
         return self.effects
 
-    def infer_types(self, root_module, context_type):
+    def infer_types(self, root_network, context_type):
         if isinstance(self.condition, Node):
-            self.condition.infer_types(root_module, context_type)
+            self.condition.infer_types(root_network, context_type)
             if self.condition.type != TScalar:
                 raise SpaTypeError(
                     "Condition '{}' does not evaluate to a scalar.".format(
                         self.condition))
 
-        self.effects.infer_types(root_module, None)
+        self.effects.infer_types(root_network, None)
 
     def construct(self, context):
         if context.bg is None or context.thalamus is None:
-            raise SpaModuleError(
+            raise SpaNetworkError(
                 "Conditional actions require basal ganglia and thalamus.")
 
         # construct bg utility
@@ -1073,7 +1075,7 @@ class Action(Node):
         # connect up
         for effect in self.effects.effects:
             if effect.fixed:
-                sink = context.root_module.get_module_input(
+                sink = context.root_network.get_network_input(
                     effect.sink.name)[0]
                 tr = value_to_transform(effect.source.evaluate())
                 context.thalamus.connect_fixed(self.index, sink, transform=tr)

@@ -5,14 +5,14 @@ See :doc:`examples/associative_memory` for an introduction and examples.
 
 import nengo
 import numpy as np
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 from nengo_spa.selection import IA, Thresholding, WTA
 from nengo_spa.vocab import VocabularyOrDimParam
 from nengo.utils.network import with_self
 
 
-class AssociativeMemory(Module):
-    """General associative memory module.
+class AssociativeMemory(Network):
+    """General associative memory network.
 
     This provides a low-level selection network with the necessary interface
     to include it within the SPA system.

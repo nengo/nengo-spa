@@ -2,8 +2,8 @@ class SpaException(Exception):
     """A exception within the SPA subsystem."""
 
 
-class SpaModuleError(SpaException, ValueError):
-    """An error in how SPA keeps track of modules."""
+class SpaNetworkError(SpaException, ValueError):
+    """An error in how SPA keeps track of networks."""
 
 
 class SpaParseError(SpaException, ValueError):

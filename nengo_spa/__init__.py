@@ -4,7 +4,7 @@ from .basalganglia import BasalGanglia
 from .bind import Bind
 from .compare import Compare
 from .input import Input
-from .module import Module
+from .network import Network
 from .pointer import SemanticPointer
 from .product import Product
 from .scalar import Scalar

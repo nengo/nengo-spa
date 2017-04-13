@@ -1,17 +1,17 @@
 import nengo
 from nengo.params import Default, IntParam
-from nengo_spa.module import Module
+from nengo_spa.network import Network
 
 
-class Product(Module):
-    """A module capable of multiplying two scalars.
+class Product(Network):
+    """A SPA network capable of multiplying two scalars.
 
     Parameters
     ----------
     n_neurons : int, optional (Default: 200)
         Number of neurons to use in product computation.
     kwargs
-        Keyword arguments passed through to ``spa.Module``.
+        Keyword arguments passed through to ``spa.Network``.
     """
 
     n_neurons = IntParam('n_neurons', default=200, low=1, readonly=True)
