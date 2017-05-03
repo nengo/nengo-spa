@@ -2,7 +2,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import nengo
-from nengo_spa.selection import IA, ThresholdingArray, WTA
+from nengo_spa.selection import IA, Thresholding, WTA
 
 
 def test_ia(Simulator, plt, seed):
@@ -50,7 +50,7 @@ def test_ia(Simulator, plt, seed):
 
 def test_thresholding_array(Simulator, plt, seed):
     with nengo.Network(seed=seed) as m:
-        thresholding = ThresholdingArray(50, 4, 0.2, function=lambda x: x > 0.)
+        thresholding = Thresholding(50, 4, 0.2, function=lambda x: x > 0.)
         in_node = nengo.Node([0.8, 0.5, 0.2, -0.1], label='input')
         nengo.Connection(in_node, thresholding.input)
 
@@ -84,7 +84,7 @@ def test_thresholding_array(Simulator, plt, seed):
 
 def test_thresholding_array_output_shift(Simulator, plt, seed):
     with nengo.Network(seed=seed) as m:
-        thresholding = ThresholdingArray(50, 2, 0.5)
+        thresholding = Thresholding(50, 2, 0.5)
         in_node = nengo.Node([0.7, 0.4])
         nengo.Connection(in_node, thresholding.input)
         p = nengo.Probe(thresholding.output, synapse=0.03)

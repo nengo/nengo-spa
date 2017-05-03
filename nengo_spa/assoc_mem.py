@@ -6,7 +6,7 @@ See :doc:`examples/associative_memory` for an introduction and examples.
 import nengo
 import numpy as np
 from nengo_spa.module import Module
-from nengo_spa.selection import IA, ThresholdingArray, WTA
+from nengo_spa.selection import IA, Thresholding, WTA
 from nengo_spa.vocab import VocabularyOrDimParam
 from nengo.utils.network import with_self
 
@@ -129,7 +129,7 @@ class AssociativeMemory(Module):
                 (1, self.selection.output.size_out)) / min_activation_value)
 
 
-class IaAssocMem(AssociativeMemory):
+class IAAssocMem(AssociativeMemory):
     """Associative memory based on the `IA` network.
 
     See `AssociativeMemory` and `IA` for more information.
@@ -138,7 +138,7 @@ class IaAssocMem(AssociativeMemory):
             self, input_vocab, output_vocab=None, input_keys=None,
             output_keys=None, n_neurons=50, label=None, seed=None,
             add_to_container=None, vocabs=None, **selection_net_args):
-        super(IaAssocMem, self).__init__(
+        super(IAAssocMem, self).__init__(
             selection_net=IA,
             input_vocab=input_vocab, output_vocab=output_vocab,
             input_keys=input_keys, output_keys=output_keys,
@@ -150,9 +150,9 @@ class IaAssocMem(AssociativeMemory):
 
 
 class ThresholdingAssocMem(AssociativeMemory):
-    """Associative memory based on `ThresholdingArray`.
+    """Associative memory based on `Thresholding`.
 
-    See `AssociativeMemory` and `ThresholdingArray` for more information.
+    See `AssociativeMemory` and `Thresholding` for more information.
     """
     def __init__(
             self, threshold, input_vocab, output_vocab=None, input_keys=None,
@@ -160,7 +160,7 @@ class ThresholdingAssocMem(AssociativeMemory):
             add_to_container=None, vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
         super(ThresholdingAssocMem, self).__init__(
-            selection_net=ThresholdingArray,
+            selection_net=Thresholding,
             input_vocab=input_vocab, output_vocab=output_vocab,
             input_keys=input_keys, output_keys=output_keys,
             n_neurons=n_neurons, label=label, seed=seed,
@@ -168,7 +168,7 @@ class ThresholdingAssocMem(AssociativeMemory):
             **selection_net_args)
 
 
-class WtaAssocMem(AssociativeMemory):
+class WTAAssocMem(AssociativeMemory):
     """Associative memory based on the `WTA` network.
 
     See `AssociativeMemory` and `WTA` for more information.
@@ -178,7 +178,7 @@ class WtaAssocMem(AssociativeMemory):
             output_keys=None, n_neurons=50, label=None, seed=None,
             add_to_container=None, vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
-        super(WtaAssocMem, self).__init__(
+        super(WTAAssocMem, self).__init__(
             selection_net=WTA,
             input_vocab=input_vocab, output_vocab=output_vocab,
             input_keys=input_keys, output_keys=output_keys,

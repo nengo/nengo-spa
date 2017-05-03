@@ -2,7 +2,7 @@ import nengo
 import numpy as np
 import nengo_spa as spa
 from nengo_spa import Vocabulary
-from nengo_spa.assoc_mem import ThresholdingAssocMem, WtaAssocMem
+from nengo_spa.assoc_mem import ThresholdingAssocMem, WTAAssocMem
 from nengo_spa.utils import similarity
 
 
@@ -101,7 +101,7 @@ def test_am_wta(Simulator, plt, seed, rng):
             return '0.8 * A + B'
 
     with spa.Module('model', seed=seed) as m:
-        m.am = WtaAssocMem(
+        m.am = WTAAssocMem(
             threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
         m.stimulus = spa.Input()
         m.stimulus.am = input_func

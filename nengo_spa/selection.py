@@ -62,9 +62,9 @@ def IA(
         Input to reset the accumulators.
     output : Node
         The outputs of the network.
-    accumulators : ThresholdingArray
+    accumulators : Thresholding
         The layer 1 accumulators.
-    thresholding : ThresholdingArray
+    thresholding : Thresholding
         The layer 2 thresholding ensembles.
     """
     n_accum_neurons = int(accum_neuron_ratio * n_neurons)
@@ -76,9 +76,9 @@ def IA(
         feedback_timescale)
 
     with nengo.Network(**kwargs) as net:
-        net.accumulators = ThresholdingArray(
+        net.accumulators = Thresholding(
             n_accum_neurons, n_ensembles, threshold=0., radius=radius)
-        net.thresholding = ThresholdingArray(
+        net.thresholding = Thresholding(
             n_thresholding_neurons, n_ensembles, threshold=accum_threshold,
             radius=radius, function=lambda x: x > accum_threshold)
 
@@ -104,7 +104,7 @@ def IA(
     return net
 
 
-def ThresholdingArray(
+def Thresholding(
         n_neurons, n_ensembles, threshold, intercept_width=0.15, function=None,
         radius=1., **kwargs):
     """Array of thresholding ensembles.
@@ -174,7 +174,7 @@ def WTA(n_neurons, n_ensembles, inhibit_scale=1.0, inhibit_synapse=0.005,
     inhibit_synapse : Synapse or float, optional (Default: 0.005)
         Synapse on the recurrent connection for lateral inhibition.
     kwargs : dict
-        Arguments passed on to `ThresholdingArray`.
+        Arguments passed on to `Thresholding`.
 
     Attributes
     ----------
@@ -186,7 +186,7 @@ def WTA(n_neurons, n_ensembles, inhibit_scale=1.0, inhibit_synapse=0.005,
         The raw thresholded value (before applying *function* or correcting
         for the shift produced by the thresholding).
     """
-    net = ThresholdingArray(n_neurons, n_ensembles, **kwargs)
+    net = Thresholding(n_neurons, n_ensembles, **kwargs)
     with net:
         nengo.Connection(
             net.thresholded, net.input,
