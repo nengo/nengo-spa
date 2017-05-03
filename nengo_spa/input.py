@@ -48,8 +48,8 @@ class Input(nengo.Network):
 
     Parameters
     ----------
-    network : spa.Module, optional (Default: the current SPA network)
-        Module that this network provides input for.
+    network : spa.Network, optional (Default: the current SPA network)
+        Network that this instance provides input for.
     kwargs
         Keyword arguments passed through to ``nengo.Network``.
     """
