@@ -1,4 +1,5 @@
 from nengo.config import Config
+from nengo.exceptions import ValidationError
 from nengo.params import Parameter
 
 
