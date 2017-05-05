@@ -40,6 +40,9 @@ setup(
                 "Nengo",
     long_description="TODO",
     zip_safe=False,
+    setup_requires=['pytest-runner'] if testing else [] + [
+        'numpy>=1.7',
+    ],
     install_requires=[
         'nengo>=2.4',
         'numpy>=1.7',
