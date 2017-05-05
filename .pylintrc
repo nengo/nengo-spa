@@ -1,7 +1,12 @@
 [MESSAGES CONTROL]
 
 disable = all
-enable = W0231
+enable = anomalous-backslash-in-string,
+         bad-super-call,
+         dangerous-default-value,
+         line-too-long,
+         super-init-not-called,
+         unused-import,
 
 
 [REPORTS]
