@@ -41,9 +41,15 @@ setup(
     long_description="TODO",
     zip_safe=False,
     install_requires=[
-        "nengo>=2.3.1",
+        'nengo>=2.4',
+        'numpy>=1.7',
     ],
+    extras_require={
+        'prob_cleanup': ['scipy'],
+    },
     tests_require=[
+        'jupyter',
+        'matplotlib>=1.4',
         'pytest>=2.3',
     ],
     entry_points={
