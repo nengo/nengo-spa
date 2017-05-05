@@ -8,16 +8,18 @@ include MANIFEST.in
 
 # Directories to include
 graft docs
-graft examples
+graft nengo_spa/examples
 
 # Subdirectories to exclude, if they exist
 prune docs/_build
 prune dist
+prune examples
 
-# Patterns to exclude from any directory
-global-exclude *.git*
+prune .*
+prune .git
+prune .tox
+
 global-exclude *.ipynb_checkpoints*
-global-exclude *.tox*
 
 # Exclude all bytecode
 global-exclude *.pyc *.pyo *.pyd

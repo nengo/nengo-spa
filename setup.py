@@ -39,7 +39,8 @@ setup(
     description="An implementation of the Semantic Pointer Architecture for "
                 "Nengo",
     long_description="TODO",
-    zip_safe=False,
+    zip_safe=True,
+    include_package_data=True,
     setup_requires=['pytest-runner'] if testing else [] + [
         'numpy>=1.7',
     ],
