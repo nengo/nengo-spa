@@ -48,7 +48,7 @@ def test_no_feedback_run(Simulator, seed):
     state, vocab = model.get_network_output('state')
 
     with model:
-        p = nengo.Probe(state, 'output', synapse=0.03)
+        p = nengo.Probe(state, 'output', synapse=0.05)
 
     with Simulator(model) as sim:
         sim.run(0.5)
@@ -93,7 +93,7 @@ def test_memory_run(Simulator, seed, plt):
     # value should peak above 1.0, then decay down to near 1.0
     assert np.mean(similarity[(t > 0.05) & (t < 0.1)]) > 1.2
     assert np.mean(similarity[(t > 0.2) & (t < 0.3)]) > 0.8
-    assert np.mean(similarity[t > 0.49]) > 0.7
+    assert np.mean(similarity[t > 0.49]) > 0.6
 
 
 def test_memory_run_decay(Simulator, plt, seed):

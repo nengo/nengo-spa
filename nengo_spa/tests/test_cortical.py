@@ -27,9 +27,9 @@ def test_connect(Simulator, seed):
         sim.run(0.2)
 
     match = np.dot(sim.data[p2], vocab.parse('A').v)
-    assert match[199] > 0.9
+    assert match[199] > 0.8
     match = np.dot(sim.data[p3], vocab.parse('~A').v)
-    assert match[199] > 0.9
+    assert match[199] > 0.8
 
 
 def test_transform(Simulator, seed):
@@ -167,16 +167,16 @@ def test_convolution(Simulator, plt, seed):
 
     # Ideal answer: A*B = [0,0,0,1,0]
     assert np.allclose(np.mean(sim.data[pAB][-10:], axis=0),
-                       np.array([0, 0, 0, 1, 0]), atol=0.16)
+                       np.array([0, 0, 0, 1, 0]), atol=0.2)
 
     # Ideal answer: A*~B = [0,0,0,0,1]
     assert np.allclose(np.mean(sim.data[pABinv][-10:], axis=0),
-                       np.array([0, 0, 0, 0, 1]), atol=0.16)
+                       np.array([0, 0, 0, 0, 1]), atol=0.2)
 
     # Ideal answer: ~A*B = [0,1,0,0,0]
     assert np.allclose(np.mean(sim.data[pAinvB][-10:], axis=0),
-                       np.array([0, 1, 0, 0, 0]), atol=0.16)
+                       np.array([0, 1, 0, 0, 0]), atol=0.2)
 
     # Ideal answer: ~A*~B = [0,0,1,0,0]
     assert np.allclose(np.mean(sim.data[pAinvBinv][-10:], axis=0),
-                       np.array([0, 0, 1, 0, 0]), atol=0.16)
+                       np.array([0, 0, 1, 0, 0]), atol=0.2)

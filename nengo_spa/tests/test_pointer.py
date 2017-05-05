@@ -92,7 +92,7 @@ def test_convolution(rng):
     assert np.allclose(a.convolve(b).v, ans)
     assert np.allclose(c.v, ans)
     assert np.allclose((a * identity).v, a.v)
-    assert (a * b * ~b).compare(a) > 0.65
+    assert (a * b * ~b).compare(a) > 0.6
 
 
 def test_multiply():
@@ -130,7 +130,7 @@ def test_distance(rng):
     a = SemanticPointer(50, rng=rng)
     b = SemanticPointer(50, rng=rng)
     assert a.distance(a) < 1e-5
-    assert a.distance(b) > 0.9
+    assert a.distance(b) > 0.85
 
 
 def test_invert():

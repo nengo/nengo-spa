@@ -99,7 +99,7 @@ def test_thresholding_array_output_shift(Simulator, plt, seed):
     plt.xlabel("Time")
     plt.ylabel("Output")
 
-    assert_allclose(sim.data[p][t > 0.15, 0], 0.7, atol=0.05)
+    assert_allclose(sim.data[p][t > 0.15, 0], 0.7, atol=0.1)
     assert_allclose(sim.data[p][:, 1], 0.)
 
 
@@ -145,9 +145,9 @@ def test_wta(Simulator, plt, seed):
     plt.ylabel("Thresholded")
     plt.ylim(0., 1.1)
 
-    assert np.all(sim.data[out_p][more_a, 0] > 0.9)
+    assert np.all(sim.data[out_p][more_a, 0] > 0.8)
     assert np.all(sim.data[out_p][more_a, 1] < 0.1)
-    assert np.all(sim.data[out_p][more_b, 1] > 0.9)
+    assert np.all(sim.data[out_p][more_b, 1] > 0.8)
     assert np.all(sim.data[out_p][more_b, 0] < 0.1)
     assert np.all(sim.data[thresholded_p][more_a, 0] > 0.6)
     assert np.all(sim.data[thresholded_p][more_a, 1:] < 0.001)
