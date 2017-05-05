@@ -166,7 +166,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
     plt.ylabel("Output")
 
     assert np.all(similarity(sim.data[out_p][below_th], [vocab['D'].v]) > 0.9)
-    assert np.all(similarity(sim.data[out_p][above_th], [vocab['D'].v]) < 0.1)
+    assert np.all(similarity(sim.data[out_p][above_th], [vocab['D'].v]) < 0.15)
     assert np.all(similarity(sim.data[out_p][above_th], [vocab['A'].v]) > 0.9)
 
 

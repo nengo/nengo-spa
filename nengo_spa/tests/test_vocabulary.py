@@ -131,14 +131,14 @@ def test_transform(recwarn, rng):
     # Expected: np.dot(t, C.v) ~= v2.parse('C')
     t = v1.transform_to(v2)
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.95
+    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
     assert v2.parse('C+B').compare(np.dot(t, C.v + B.v)) > 0.9
 
     # Test transform from v1 to v2 (only 'A' and 'B')
     t = v1.transform_to(v2, keys=['A', 'B'])
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.95
-    assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.95
+    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
+    assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.9
 
     # Test warns on missing keys
     v1.populate('D')
@@ -148,7 +148,7 @@ def test_transform(recwarn, rng):
 
     # Test populating missing keys
     t = v1.transform_to(v2, populate=True)
-    assert v2.parse('D').compare(np.dot(t, D.v)) > 0.95
+    assert v2.parse('D').compare(np.dot(t, D.v)) > 0.9
 
     # Test ignores missing keys in source vocab
     v2.populate('E')
