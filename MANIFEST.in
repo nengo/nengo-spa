@@ -1,6 +1,5 @@
 global-include *.py
 include *.rst
-include *.sh
 include *.txt
 include *.yml
 
@@ -8,10 +7,8 @@ include *.yml
 include MANIFEST.in
 
 # Directories to include
-graft benchmarks
 graft docs
 graft examples
-graft nengo-data
 
 # Subdirectories to exclude, if they exist
 prune docs/_build
