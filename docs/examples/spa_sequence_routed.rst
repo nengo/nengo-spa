@@ -2,4 +2,4 @@
 SPA Sequence Routed example
 ***************************
 
-.. notebook:: ../../examples/spa/spa_sequence_routed.ipynb
+.. notebook:: ../../nengo_spa/examples/spa_sequence_routed.ipynb

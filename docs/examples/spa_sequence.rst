@@ -2,4 +2,4 @@
 SPA Sequence example
 ********************
 
-.. notebook:: ../../examples/spa/spa_sequence.ipynb
+.. notebook:: ../../nengo_spa/examples/spa_sequence.ipynb
