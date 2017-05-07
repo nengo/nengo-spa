@@ -1,19 +1,17 @@
-*****************************
-Semantic Pointer Architecture
-*****************************
+*********
+Nengo SPA
+*********
 
 .. default-role:: obj
 
+Nengo SPA is an implementation of the Semantic Pointer Architecture for Nengo.
 The `Semantic Pointer Architecture
 <http://compneuro.uwaterloo.ca/research/spa/semantic-pointer-architecture.html>`_
 provides an approach to building cognitive models
 implemented with large-scale spiking neural networks.
 
-Nengo includes a ``nengo.spa`` module that provides
-a simple interface for building models with
-the Semantic Pointer Architecture.
 See the following examples for demonstrations
-of how ``nengo.spa`` works.
+of how ``nengo_spa`` works.
 
 .. toctree::
 

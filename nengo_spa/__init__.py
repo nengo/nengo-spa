@@ -16,4 +16,6 @@ from .vocab import Vocabulary, VocabularyMap
 from nengo_spa import networks
 from nengo_spa import version
 
+__copyright__ = "2013-2018, Applied Brain Research"
+__license__ = "Free for non-commercial use; see LICENSE.rst"
 __version__ = version.version
