@@ -38,7 +38,7 @@ setup(
     license="Free for non-commercial use",
     description="An implementation of the Semantic Pointer Architecture for "
                 "Nengo",
-    long_description="TODO",
+    long_description=read('README.rst', 'CHANGES.rst'),
     zip_safe=True,
     include_package_data=True,
     setup_requires=['pytest-runner'] if testing else [] + [
