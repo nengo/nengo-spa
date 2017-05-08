@@ -61,7 +61,7 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     error = rmse(result, sim.data[res_p][-1]) / (magnitude ** 2)
     error_bad = rmse(result, sim.data[res_p_bad][-1]) / (magnitude ** 2)
 
-    assert error < 0.1
+    assert error < 0.2
     assert error_bad > 0.1
 
 
@@ -69,6 +69,8 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
 def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
     a = rng.normal(scale=np.sqrt(1./dims), size=dims)
     b = rng.normal(scale=np.sqrt(1./dims), size=dims)
+    a /= np.linalg.norm(a)
+    b /= np.linalg.norm(b)
     result = circconv(a, b)
 
     model = nengo.Network(label="circular conv", seed=seed)
@@ -86,4 +88,4 @@ def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
 
     error = rmse(result, sim.data[res_p][-1])
 
-    assert error < 0.1
+    assert error < 0.2
