@@ -1,5 +1,3 @@
-import numpy as np
-
 import nengo
 from nengo.exceptions import ValidationError
 from nengo.networks.ensemblearray import EnsembleArray
