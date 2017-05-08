@@ -49,8 +49,8 @@ def test_run(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    error = rmse(vocab.parse("B*A").v, sim.data[p][-1])
+    error = rmse(vocab.parse("(B*A).normalized()").v, sim.data[p][-1])
     assert error < 0.1
 
-    error = rmse(vocab.parse("A*A").v, sim.data[p][100])
+    error = rmse(vocab.parse("(A*A).normalized()").v, sim.data[p][100])
     assert error < 0.1

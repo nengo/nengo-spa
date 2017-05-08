@@ -31,14 +31,14 @@ def test_neurons():
     assert model.state.state_ensembles.ensembles[0].n_neurons == 2
 
 
-def test_no_feedback_run(Simulator, seed):
+def test_no_feedback_run(Simulator, plt, seed):
     with spa.Network(seed=seed) as model:
         model.state = spa.State(vocab=32, feedback=0.0)
 
         def state_input(t):
-            if 0 <= t < 0.2:
+            if 0 <= t < 0.3:
                 return 'A'
-            elif 0.2 <= t < 0.4:
+            elif 0.2 <= t < 0.6:
                 return 'B'
             else:
                 return '0'
@@ -51,15 +51,16 @@ def test_no_feedback_run(Simulator, seed):
         p = nengo.Probe(state, 'output', synapse=0.05)
 
     with Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.8)
 
     data = np.dot(sim.data[p], vocab.vectors.T)
-    assert data[200, 0] > 0.9
-    assert data[200, 1] < 0.2
-    assert data[400, 0] < 0.2
-    assert data[400, 1] > 0.9
-    assert data[499, 0] < 0.2
-    assert data[499, 1] < 0.2
+    plt.plot(sim.trange(), data)
+    assert data[299, 0] > 0.9
+    assert data[299, 1] < 0.2
+    assert data[599, 0] < 0.2
+    assert data[599, 1] > 0.9
+    assert data[799, 0] < 0.2
+    assert data[799, 1] < 0.2
 
 
 def test_memory_run(Simulator, seed, plt):
@@ -91,9 +92,9 @@ def test_memory_run(Simulator, seed, plt):
     plt.xlabel("Time (s)")
 
     # value should peak above 1.0, then decay down to near 1.0
-    assert np.mean(similarity[(t > 0.05) & (t < 0.1)]) > 1.2
-    assert np.mean(similarity[(t > 0.2) & (t < 0.3)]) > 0.8
-    assert np.mean(similarity[t > 0.49]) > 0.6
+    assert np.mean(similarity[(t > 0.05) & (t < 0.1)]) > 1.0
+    assert np.mean(similarity[(t > 0.2) & (t < 0.3)]) > 0.7
+    assert np.mean(similarity[t > 0.49]) > 0.5
 
 
 def test_memory_run_decay(Simulator, plt, seed):
