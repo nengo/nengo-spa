@@ -31,8 +31,13 @@ class Compare(Network):
         self.neurons_per_dimension = neurons_per_dimension
 
         with self:
-            self.product = nengo.networks.Product(
-                self.neurons_per_dimension, self.vocab.dimensions)
+            with nengo.Config(nengo.Ensemble) as cfg:
+                cfg[nengo.Ensemble].eval_points = nengo.dists.CosineSimilarity(
+                    self.vocab.dimensions + 2)
+                cfg[nengo.Ensemble].intercepts = nengo.dists.CosineSimilarity(
+                    self.vocab.dimensions + 2)
+                self.product = nengo.networks.Product(
+                    self.neurons_per_dimension, self.vocab.dimensions)
             self.output = nengo.Node(size_in=1, label='output')
             nengo.Connection(self.product.output, self.output,
                              transform=np.ones((1, self.vocab.dimensions)))

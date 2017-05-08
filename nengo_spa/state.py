@@ -65,8 +65,8 @@ class State(Network):
                 self.neurons_per_dimension * self.subdimensions,
                 dimensions // self.subdimensions,
                 ens_dimensions=self.subdimensions,
-                radius=np.sqrt(float(self.subdimensions) / dimensions),
-                #  TODO radius
+                eval_points=nengo.dists.CosineSimilarity(dimensions + 2),
+                intercepts=nengo.dists.CosineSimilarity(dimensions + 2),
                 label='state')
 
             if self.feedback is not None and self.feedback != 0.0:
