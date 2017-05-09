@@ -26,10 +26,10 @@ class AssociativeMemory(Network):
         network needs to have an *input* attribute to which the utilities for
         each choice are connected and an *output* attribute from which a
         connection will be created to read the selected output(s).
-    input_vocab: list or Vocabulary
-        The vocabulary (or list of vectors) to match.
-    output_vocab: list or Vocabulary, optional (Default: None)
-        The vocabulary (or list of vectors) to be produced for each match. If
+    input_vocab: Vocabulary
+        The vocabulary to match.
+    output_vocab: Vocabulary, optional (Default: None)
+        The vocabulary to be produced for each match. If
         None, the associative memory will act like an autoassociative memory
         (cleanup memory).
     input_keys : list, optional (Default: None)
