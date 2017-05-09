@@ -147,7 +147,7 @@ class State(Network):
     feedback_synapse = NumberParam(
         'feedback_synapse', default=.1, readonly=True)
     represent_identity = BoolParam(
-        'represent_identity', default=False, readonly=True)
+        'represent_identity', default=True, readonly=True)
 
     def __init__(self, vocab=Default, subdimensions=Default,
                  neurons_per_dimension=Default, feedback=Default,
