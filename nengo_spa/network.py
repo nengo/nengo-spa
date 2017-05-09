@@ -67,6 +67,8 @@ class Network(nengo.Network, SupportDefaultsMixin):
 
         self._stimuli = None
 
+        self._initialized = True
+
     @property
     def config(self):
         return _AutoConfig(self._config)
@@ -78,12 +80,21 @@ class Network(nengo.Network, SupportDefaultsMixin):
             self._stimuli = Input(self)
         return self._stimuli
 
+    def __setstate__(self, state):
+        if '_initialized' in state:
+            del state['_initialized']
+        super(Network, self).__setstate__(state)
+        setattr(self, '_initialized', True)
+
     def __setattr__(self, key, value):
         """A setattr that handles SPA networks being added specially.
 
         This is so that we can use the variable name for the Network as
         the name that all of the SPA system will use to access that network.
         """
+        if not hasattr(self, '_initialized'):
+            return super(Network, self).__setattr__(key, value)
+
         if isinstance(value, Network):
             if hasattr(self, key) and isinstance(getattr(self, key), Network):
                 raise SpaNetworkError(
