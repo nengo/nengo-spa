@@ -4,8 +4,8 @@ import nengo
 from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
 from nengo_spa.network import Network
-from nengo_spa.scalar import Scalar
-from nengo_spa.state import State
+from nengo_spa.modules.scalar import Scalar
+from nengo_spa.modules.state import State
 from nengo.synapses import Lowpass, SynapseParam
 
 

@@ -77,17 +77,16 @@ Operator precedence is defined as follows from highest to lowest priority:
 3 Sum
 ``
 """
-
 import warnings
 from collections import defaultdict
 
 import numpy as np
 
 import nengo
-from nengo_spa.bind import Bind
-from nengo_spa.compare import Compare
+from nengo_spa.modules.bind import Bind
+from nengo_spa.modules.compare import Compare
 from nengo_spa.pointer import SemanticPointer
-from nengo_spa.product import Product as ProductModule
+from nengo_spa.modules.product import Product as ProductModule
 from nengo_spa.exceptions import SpaNetworkError, SpaParseError, SpaTypeError
 
 
