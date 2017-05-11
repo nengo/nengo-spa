@@ -10,7 +10,7 @@ from nengo_spa.modules.product import Product
 from nengo_spa.modules.scalar import Scalar
 from nengo_spa.modules.state import State
 from nengo_spa.modules.thalamus import Thalamus
-from nengo_spa.utils import similarity
+from nengo_spa.examine import similarity
 from nengo_spa.vocab import Vocabulary, VocabularyMap
 
 from nengo_spa import networks

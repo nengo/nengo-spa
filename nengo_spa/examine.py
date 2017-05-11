@@ -1,4 +1,5 @@
-"""These are helper functions to simplify some operations in the SPA."""
+"""Functions to examine data and vectors produced by SPA."""
+
 from itertools import combinations
 
 import numpy as np

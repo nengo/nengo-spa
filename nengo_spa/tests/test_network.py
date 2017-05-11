@@ -4,7 +4,7 @@ import pytest
 import nengo
 import nengo_spa as spa
 from nengo_spa.exceptions import SpaNetworkError, SpaTypeError
-from nengo_spa.utils import similarity
+from nengo_spa.examine import similarity
 from nengo_spa.vocab import VocabularyMap
 
 

@@ -3,7 +3,7 @@ import re
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from nengo_spa.utils import pairs, similarity, text
+from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.vocab import Vocabulary
 
 
