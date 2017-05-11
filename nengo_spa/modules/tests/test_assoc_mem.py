@@ -3,7 +3,7 @@ import numpy as np
 import nengo_spa as spa
 from nengo_spa import Vocabulary
 from nengo_spa.modules.assoc_mem import ThresholdingAssocMem, WTAAssocMem
-from nengo_spa.utils import similarity
+from nengo_spa.examine import similarity
 
 
 filtered_step_fn = lambda x: np.maximum(1. - np.exp(-15. * x), 0.)
