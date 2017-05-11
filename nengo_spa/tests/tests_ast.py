@@ -3,7 +3,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.actions import Parser
-from nengo_spa.spa_ast import (
+from nengo_spa.ast import (
     Action, ApproxInverse, DotProduct, Effect, Effects, Negative, Module,
     Product, Sink, Sum, Symbol, TAction, TEffect, TEffects, TScalar,
     TVocabulary)
