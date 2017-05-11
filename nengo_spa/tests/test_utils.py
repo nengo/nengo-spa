@@ -2,9 +2,8 @@ import re
 
 import numpy as np
 from numpy.testing import assert_almost_equal
-import pytest
 
-from nengo_spa.utils import pairs, prob_cleanup, similarity, text
+from nengo_spa.utils import pairs, similarity, text
 from nengo_spa.vocab import Vocabulary
 
 
@@ -69,15 +68,3 @@ def test_text(rng):
 
     assert text([0]*64, v) == '0.00F'
     assert text(v['D'].v, v) == '1.00D'
-
-
-def test_prob_cleanup(rng):
-    pytest.importorskip('scipy')
-
-    assert 1.0 > prob_cleanup(0.7, 64, 10000) > 0.9999
-    assert 0.9999 > prob_cleanup(0.6, 64, 10000) > 0.999
-    assert 0.99 > prob_cleanup(0.5, 64, 1000) > 0.9
-
-    assert 0.999 > prob_cleanup(0.4, 128, 1000) > 0.997
-    assert 0.99 > prob_cleanup(0.4, 128, 10000) > 0.97
-    assert 0.9 > prob_cleanup(0.4, 128, 100000) > 0.8

@@ -4,7 +4,6 @@ from itertools import combinations
 import numpy as np
 
 import nengo.utils.numpy as npext
-from nengo.dists import CosineSimilarity
 from nengo.exceptions import ValidationError
 from nengo_spa.pointer import SemanticPointer
 from nengo.utils.compat import is_iterable
@@ -120,18 +119,3 @@ def text(v, vocab, minimum_count=1, maximum_count=None,
             break
 
     return join.join(['%0.2f%s' % (sim, key) for (sim, key) in r])
-
-
-def prob_cleanup(similarity, dimensions, vocab_size):
-    """Estimate the chance of successful cleanup.
-
-    This returns the chance that, out of vocab_size randomly chosen
-    vectors, at least one of them will be closer to a particular
-    vector than the value given by compare. To use this, compare
-    your noisy vector with the ideal vector, pass that value in as
-    the similarity parameter, and set ``vocab_size`` to be the number of
-    competing vectors.
-
-    Requires SciPy.
-    """
-    return CosineSimilarity(dimensions).cdf(similarity) ** vocab_size
