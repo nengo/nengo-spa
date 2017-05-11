@@ -5,3 +5,4 @@ vocabularies and are completely independent of SPA specifics.
 """
 
 from .circularconvolution import CircularConvolution
+from .identity_ensemble_array import IdentityEnsembleArray
