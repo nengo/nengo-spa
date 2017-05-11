@@ -3,7 +3,7 @@ import numpy as np
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
 from nengo_spa.exceptions import SpaNetworkError
-from nengo_spa.input import Input
+from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 from nengo.utils.compat import iteritems
 import nengo_spa
