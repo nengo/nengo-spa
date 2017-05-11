@@ -12,3 +12,17 @@ of networks created in this way.
 Note that SPA modules can be used as standalone networks without using
 nengo_spa features.
 """
+
+from .assoc_mem import (
+    AssociativeMemory,
+    IAAssocMem,
+    ThresholdingAssocMem,
+    WTAAssocMem)
+from .basalganglia import BasalGanglia
+from .bind import Bind
+from .compare import Compare
+from .input import Input
+from .product import Product
+from .scalar import Scalar
+from .state import State
+from .thalamus import Thalamus
