@@ -2,11 +2,10 @@
 
 See :doc:`examples/associative_memory` for an introduction and examples.
 """
-
 import nengo
 import numpy as np
 from nengo_spa.network import Network
-from nengo_spa.selection import IA, Thresholding, WTA
+from nengo_spa.networks.selection import IA, Thresholding, WTA
 from nengo_spa.vocab import VocabularyOrDimParam
 from nengo.utils.network import with_self
 
