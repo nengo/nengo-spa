@@ -4,6 +4,26 @@ import nengo
 import nengo_spa as spa
 
 
+def test_basic(Simulator, plt, seed):
+    with nengo.Network(seed=seed) as model:
+        bg = spa.BasalGanglia(action_count=5, seed=seed)
+        input = nengo.Node([0.8, 0.4, 0.4, 0.4, 0.4], label="input")
+        nengo.Connection(input, bg.input, synapse=None)
+        p = nengo.Probe(bg.output, synapse=0.01)
+
+    with Simulator(model) as sim:
+        sim.run(0.2)
+
+    t = sim.trange()
+    output = np.mean(sim.data[p][t > 0.1], axis=0)
+
+    plt.plot(t, sim.data[p])
+    plt.ylabel("Output")
+
+    assert output[0] > -0.1
+    assert np.all(output[1:] < -0.8)
+
+
 def test_basal_ganglia(Simulator, seed, plt):
     model = spa.Network(seed=seed)
 
