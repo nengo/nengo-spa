@@ -1,5 +1,4 @@
 """Selection networks that pick one or more options among multiple choices."""
-
 import nengo
 import numpy as np
 
