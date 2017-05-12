@@ -1,4 +1,11 @@
 import nengo
+from nengo.config import Default
+from nengo.exceptions import ValidationError
+from nengo.params import Parameter
+from nengo.utils.compat import is_string
+
+from nengo_spa.network import Network
+from nengo_spa.vocab import VocabularyOrDimParam
 
 
 def make_parse_func(func, vocab):
@@ -10,81 +17,55 @@ def make_parse_func(func, vocab):
     return parse_func
 
 
-class _HierachicalInputProxy(object):
-    def __init__(self, parent, name):
-        self.__dict__['parent'] = parent
-        self.__dict__['name'] = name
+class SpOutputParam(Parameter):
+    def coerce(self, node, output):
+        output = super(SpOutputParam, self).coerce(node, output)
 
-    def __getattr__(self, name):
-        return _HierachicalInputProxy(self.parent, self.name + '.' + name)
-
-    def __setattr__(self, name, value):
-        setattr(self.parent, self.name + '.' + name, value)
-
-
-class Input(nengo.Network):
-    """A SPA network for providing external inputs to other networks.
-
-    The parameters passed to this network indicate the network input name
-    and the function to execute to generate inputs to that network.
-    The functions should always return strings, which will then be parsed
-    by the relevant vocabulary. For example::
-
-        def input1(t):
-            if t < 0.1:
-                return 'A'
-            else:
-                return '0'
-
-        spa_net.input = spa.Input(vision=input1, task='X')
-
-    will create two inputs:
-
-    1. an input to the ``vision`` network, which for the first 0.1 seconds
-       is the value associated with the ``'A'`` semantic pointer and then
-       a vector of all zeros, and
-    2. an input to the ``task`` network which is always the value associated
-       with the ``'X'`` semantic pointer.
-
-    Parameters
-    ----------
-    network : spa.Network, optional (Default: the current SPA network)
-        Network that this instance provides input for.
-    kwargs
-        Keyword arguments passed through to ``nengo.Network``.
-    """
-
-    def __init__(self, network=None, **kwargs):
-        super(Input, self).__init__(**kwargs)
-        self.input_nodes = {}
-
-        if network is None:
-            network = nengo.Network.context[-1]
-        self.network = network
-
-        self._initialized = True
-
-    def __connect(self, name, expr):
-        target, vocab = self.network.get_network_input(name)
-        if callable(expr):
-            val = make_parse_func(expr, vocab)
+        if output is None:
+            return output
+        elif isinstance(output, nengo.Process):
+            raise NotImplementedError()
+        elif callable(output):
+            return output
+        elif is_string(output):
+            return output
         else:
-            val = vocab.parse(expr).v
+            raise ValidationError("Invalid output type {!r}".format(
+                type(output)), attr=self.name, obj=node)
+
+    @classmethod
+    def to_vector_output(cls, output, vocab):
+        if output is None:
+            return None
+        elif isinstance(output, nengo.Process):
+            raise NotImplementedError()
+        elif callable(output):
+            return make_parse_func(output, vocab)
+        elif is_string(output):
+            return vocab.parse(output).v
+        else:
+            raise ValueError("Invalid output type {!r}".format(type(output)))
+
+
+class Input(Network):
+    """A SPA network for providing external inputs to other networks."""
+
+    sp_output = SpOutputParam(
+        'sp_output', optional=False, default=None, readonly=True)
+    vocab = VocabularyOrDimParam(
+        'vocab', optional=False, default=None, readonly=True)
+
+    def __init__(self, sp_output=Default, vocab=Default, **kwargs):
+        super(Input, self).__init__(**kwargs)
+
+        self.sp_output = sp_output
+        self.vocab = vocab
 
         with self:
-            node = nengo.Node(val, label='input_%s' % name)
-        self.input_nodes[name] = node
+            self.node = nengo.Node(
+                SpOutputParam.to_vector_output(self.sp_output, self.vocab),
+                size_out=self.vocab.dimensions)
+            self.output = self.node
 
-        with self.network:
-            nengo.Connection(node, target, synapse=None)
-
-    def __setattr__(self, name, value):
-        if not getattr(self, '_initialized') or name in self.__dict__:
-            super(Input, self).__setattr__(name, value)
-        else:
-            self.__connect(name, value)
-
-    def __getattr__(self, name):
-        if name == '_initialized':
-            return self.__dict__.get('_initialized', False)
-        return _HierachicalInputProxy(self, name)
+        self.inputs = dict()
+        self.outputs = dict(default=(self.output, self.vocab))

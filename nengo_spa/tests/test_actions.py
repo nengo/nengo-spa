@@ -20,8 +20,7 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
                 return 'B'
             else:
                 return 'C'
-        model.input = spa.Input()
-        model.input.ctrl = input_func
+        model.input = spa.Input(input_func, vocab=16)
 
         model.state = spa.State(label='state')
         model.buff1 = spa.State(label='buff1')
@@ -35,6 +34,7 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         nengo.Connection(node2, model.buff2.input)
 
         actions = spa.Actions(
+            'ctrl = input',
             'state = buff1',
             'dot(ctrl, A) --> buff3=buff1',
             'dot(ctrl, B) --> buff3=buff2',
@@ -81,11 +81,12 @@ def test_dot_product(Simulator, seed, plt):
         model.state_b = spa.State(d)
         model.result = spa.Scalar()
 
-        model.stimulus = spa.Input()
-        model.stimulus.state_a = 'A'
-        model.stimulus.state_b = lambda t: 'A' if t <= 0.3 else 'B'
+        model.stimulus = spa.Input(lambda t: 'A' if t <= 0.3 else 'B', vocab=d)
 
-        actions = spa.Actions('result = dot(state_a, state_b)')
+        actions = spa.Actions(
+            'state_a = A',
+            'state_b = stimulus',
+            'result = dot(state_a, state_b)')
         actions.build()
 
         p = nengo.Probe(model.result.output, synapse=0.03)

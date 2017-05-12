@@ -32,18 +32,6 @@ def test_basal_ganglia(Simulator, seed, plt):
         model.motor = spa.State(vocab=16)
         model.compare = spa.Compare(vocab=16)
 
-        # test all acceptable condition formats
-        model.bg, _, _ = spa.Actions(
-            '0.5 --> motor=A',
-            'dot(vision, CAT) --> motor=B',
-            'dot(vision*CAT, DOG) --> motor=C',
-            '2*dot(vision, CAT*0.5) --> motor=D',
-            'dot(vision, CAT) + 0.5 - dot(vision,CAT) --> motor=E',
-            'dot(vision, PARROT) + compare --> motor=F',
-            '0.5*dot(vision, MOUSE) + 0.5*compare --> motor=G',
-            '( dot(vision, MOUSE) - compare ) * 0.5 --> motor=H'
-        ).build()
-
         def input(t):
             if t < 0.1:
                 return '0'
@@ -57,10 +45,24 @@ def test_basal_ganglia(Simulator, seed, plt):
                 return 'MOUSE'
             else:
                 return '0'
-        model.input = spa.Input()
-        model.input.vision = input
-        model.input.compare.input_a = 'SHOOP'
-        model.input.compare.input_b = 'SHOOP'
+        model.input = spa.Input(input, vocab=16)
+
+        # test all acceptable condition formats
+        model.bg, _, _ = spa.Actions(
+            '0.5 --> motor=A',
+            'dot(vision, CAT) --> motor=B',
+            'dot(vision*CAT, DOG) --> motor=C',
+            '2*dot(vision, CAT*0.5) --> motor=D',
+            'dot(vision, CAT) + 0.5 - dot(vision,CAT) --> motor=E',
+            'dot(vision, PARROT) + compare --> motor=F',
+            '0.5*dot(vision, MOUSE) + 0.5*compare --> motor=G',
+            '( dot(vision, MOUSE) - compare ) * 0.5 --> motor=H',
+
+            'vision = input',
+            'compare.input_a = SHOOP',
+            'compare.input_b = SHOOP'
+        ).build()
+
         p = nengo.Probe(model.bg.input, 'output', synapse=0.03)
 
     with Simulator(model) as sim:

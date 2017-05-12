@@ -2,8 +2,8 @@ import numpy as np
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
+
 from nengo_spa.exceptions import SpaNameError
-from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
 
@@ -57,13 +57,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
     @property
     def config(self):
         return _AutoConfig(self._config)
-
-    # FIXME remove?
-    @property
-    def stimuli(self):
-        if self._stimuli is None:
-            self._stimuli = Input(self)
-        return self._stimuli
 
     def get_spa_network(self, name, strip_output=False):
         """Return the SPA network for the given name.

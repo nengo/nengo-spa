@@ -11,10 +11,11 @@ def test_connect(Simulator, seed):
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
         model.buffer3 = spa.State(vocab=16)
-        spa.Actions('buffer2=buffer1', 'buffer3=~buffer1').build()
-
-        model.input = spa.Input()
-        model.input.buffer1 = 'A'
+        spa.Actions(
+            'buffer1 = A',
+            'buffer2=buffer1',
+            'buffer3=~buffer1'
+        ).build()
 
     output2, vocab = model.get_network_output('buffer2')
     output3, vocab = model.get_network_output('buffer3')
@@ -36,9 +37,7 @@ def test_transform(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
-        spa.Actions('buffer2=buffer1*B').build()
-        model.input = spa.Input()
-        model.input.buffer1 = 'A'
+        spa.Actions('buffer1 = A', 'buffer2=buffer1*B').build()
 
     output, vocab = model.get_network_output('buffer2')
 
@@ -57,9 +56,10 @@ def test_translate(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=32)
-        model.input = spa.Input()
-        model.input.buffer1 = 'A'
-        spa.Actions('buffer2=translate(buffer1, populate=True)').build()
+        spa.Actions(
+            'buffer1 = A',
+            'buffer2=translate(buffer1, populate=True)'
+        ).build()
 
     output, vocab = model.get_network_output('buffer2')
 
