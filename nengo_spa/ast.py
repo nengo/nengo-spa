@@ -46,9 +46,10 @@ In the following we provide the grammar of SPA actions for reference:
 Scalar: <any Python expression evaluating to a single number != 0>
 Symbol: <valid Python identifier starting with a capital letter>
 Zero: '0'
+One: '1'
 Module: <valid Python identifier> | <valid Python identifier> '.' Module
-Source: S'(' Source ')' | Scalar | Symbol | Zero | Module | BinaryOperation |
-        UnaryOperation | DotProduct
+Source: S'(' Source ')' | Scalar | Symbol | Zero | One | Module |
+        BinaryOperation | UnaryOperation | DotProduct
 BinaryOperation: Product | Sum | Difference
 Product: Source '*' Source
 Sum: Source '+' Source
@@ -71,7 +72,7 @@ Note that `Difference` ``a - b`` will be represented as `a + (-b)` in the AST.
 Operator precedence is defined as follows from highest to lowest priority:
 
 ``
-0 Scalar, Symbol, Zero, Module, DotProduct, Reinterpret, Translate
+0 Scalar, Symbol, Zero, One, Module, DotProduct, Reinterpret, Translate
 1 UnaryOperation
 2 Product
 3 Sum
@@ -80,9 +81,10 @@ Operator precedence is defined as follows from highest to lowest priority:
 import warnings
 from collections import defaultdict
 
+import nengo
 import numpy as np
 
-import nengo
+from nengo_spa import pointer
 from nengo_spa.modules.bind import Bind
 from nengo_spa.modules.compare import Compare
 from nengo_spa.pointer import SemanticPointer
@@ -279,6 +281,8 @@ def ensure_node(obj):
     if not isinstance(obj, Node):
         if obj is 0:
             obj = Zero()
+        elif obj is 1:
+            obj = One()
         else:
             obj = Scalar(obj)
     return obj
@@ -490,10 +494,37 @@ class Zero(Source):
         if self.type == TScalar:
             return 0
         else:
-            return SemanticPointer(np.zeros(self.type.vocab.dimensions))
+            return pointer.Zero(self.type.vocab.dimensions)
 
     def __str__(self):
         return "0"
+
+
+class One(Source):
+    """One which can act as scalar or identity vector."""
+
+    def __init__(self):
+        super(One, self).__init__(staticity=Node.Staticity.FIXED)
+
+    def infer_types(self, root_network, context_type):
+        if context_type is None:
+            self.type = TScalar
+        elif context_type == TScalar or isinstance(context_type, TVocabulary):
+            self.type = context_type
+        else:
+            raise SpaTypeError("Invalid type.")
+
+    def construct(self, context):
+        return construct_bias(self, self.evaluate(), context)
+
+    def evaluate(self):
+        if self.type == TScalar:
+            return 1
+        else:
+            return pointer.Identity(self.type.vocab.dimensions)
+
+    def __str__(self):
+        return "1"
 
 
 class Module(Source):
