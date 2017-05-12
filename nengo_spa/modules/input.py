@@ -9,16 +9,26 @@ from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
-def make_parse_func(func, vocab):
-    """Create a function that calls func and parses the output in vocab."""
+class SpArrayExtractor(object):
+    # TODO is there a better place for this class?
+    def __init__(self, vocab):
+        self.vocab = vocab
 
-    def parse_func(t):
-        value = func(t)
+    def __call__(self, value):
         if is_string(value):
-            value = vocab.parse(value)
+            value = self.vocab.parse(value)
         if isinstance(value, SemanticPointer):
             value = value.v
         return value
+
+
+def make_parse_func(fn, vocab):
+    """Create a function that calls func and parses the output in vocab."""
+
+    extractor = SpArrayExtractor(vocab)
+
+    def parse_func(t):
+        return extractor(fn(t))
 
     return parse_func
 
@@ -48,7 +58,7 @@ class SpOutputParam(Parameter):
         elif callable(output):
             return make_parse_func(output, vocab)
         elif is_string(output):
-            return vocab.parse(output).v
+            return SpArrayExtractor(vocab)(output)
         else:
             raise ValueError("Invalid output type {!r}".format(type(output)))
 
