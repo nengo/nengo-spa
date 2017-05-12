@@ -32,7 +32,9 @@ def test_time_varying(Simulator, seed):
             if t < 0.1:
                 return 'A'
             elif t < 0.2:
-                return 'B'
+                return model.buffer.vocab.parse('B')
+            elif t < 0.3:
+                return model.buffer.vocab.parse('C').v
             else:
                 return '0'
 
@@ -51,4 +53,6 @@ def test_time_varying(Simulator, seed):
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse('B'), skip=0.18, duration=0.02)
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('0'), skip=0.28, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse('C'), skip=0.28, duration=0.02)
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('0'), skip=0.38, duration=0.02)

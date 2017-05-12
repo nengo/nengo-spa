@@ -5,6 +5,7 @@ from nengo.params import Parameter
 from nengo.utils.compat import is_string
 
 from nengo_spa.network import Network
+from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
@@ -12,7 +13,12 @@ def make_parse_func(func, vocab):
     """Create a function that calls func and parses the output in vocab."""
 
     def parse_func(t):
-        return vocab.parse(func(t)).v
+        value = func(t)
+        if is_string(value):
+            value = vocab.parse(value)
+        if isinstance(value, SemanticPointer):
+            value = value.v
+        return value
 
     return parse_func
 
