@@ -36,8 +36,7 @@ def test_spa_verification(seed, plt):
     # building a normal model that shouldn't raise a warning
     with model:
         model.buf = spa.State(d)
-        model.input_node = spa.Input()
-        model.input_node.buf = 'B'
+        spa.Actions('buf = B').build()
         # make sure errors aren't fired for non-spa networks
         prod = nengo.networks.Product(10, 2)  # noqa: F841
         model.int_val = 1
@@ -138,9 +137,7 @@ def test_hierarchical(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions('out = comm_channel').build()
-        model.stimulus = spa.Input()
-        model.stimulus.comm_channel = 'A'
+        spa.Actions('comm_channel = A', 'out = comm_channel').build()
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -185,9 +182,10 @@ def test_hierarchical_actions(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions('out = comm_channel.state_out').build()
-        model.stimulus = spa.Input()
-        model.stimulus.comm_channel.state_in = 'A'
+        spa.Actions(
+            'comm_channel.state_in = A',
+            'out = comm_channel.state_out'
+        ).build()
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -244,9 +242,8 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     with spa.Network() as model:
         model.a = spa.State(vocab=v1)
         model.b = spa.State(vocab=v2)
-        spa.Actions('b = {}'.format(method), vocabs={'v2': v2}).build()
-        model.stimulus = spa.Input()
-        model.stimulus.a = 'A'
+        spa.Actions(
+            'a = A', 'b = {}'.format(method), vocabs={'v2': v2}).build()
         p = nengo.Probe(model.b.output, synapse=0.03)
 
     with Simulator(model) as sim:

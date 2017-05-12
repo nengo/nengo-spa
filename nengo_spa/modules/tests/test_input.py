@@ -1,29 +1,32 @@
-import numpy as np
+import nengo
 
 import nengo_spa as spa
+from nengo_spa.testing import sp_close
 
 
-def test_fixed():
-    with spa.Network() as model:
+def test_fixed(Simulator, seed):
+    with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
-        model.input = spa.Input()
-        model.input.buffer1 = 'A'
-        model.input.buffer2 = 'B'
+        model.input1 = spa.Input('A', vocab=16)
+        model.input2 = spa.Input('B', vocab=8)
+        spa.Actions('buffer1 = input1', 'buffer2 = input2').build()
+        p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
+        p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.1)
 
     input1, vocab1 = model.get_network_input('buffer1')
     input2, vocab2 = model.get_network_input('buffer2')
 
-    assert np.allclose(model.input.input_nodes['buffer1'].output,
-                       vocab1.parse('A').v)
-    assert np.allclose(model.input.input_nodes['buffer2'].output,
-                       vocab2.parse('B').v)
+    assert sp_close(sim.trange(), sim.data[p1], vocab1.parse('A'), skip=0.08)
+    assert sp_close(sim.trange(), sim.data[p2], vocab2.parse('B'), skip=0.08)
 
 
-def test_time_varying():
-    with spa.Network() as model:
+def test_time_varying(Simulator, seed):
+    with spa.Network(seed=seed) as model:
         model.buffer = spa.State(vocab=16)
-        model.buffer2 = spa.State(vocab=16)
 
         def input(t):
             if t < 0.1:
@@ -33,61 +36,19 @@ def test_time_varying():
             else:
                 return '0'
 
-        model.input = spa.Input()
-        model.input.buffer = input
-        model.input.buffer2 = 'B'
+        model.input = spa.Input(input, vocab=16)
+        spa.Actions('buffer = input').build()
+
+        p = nengo.Probe(model.buffer.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
 
     input, vocab = model.get_network_input('buffer')
 
-    assert np.allclose(model.input.input_nodes['buffer'].output(t=0),
-                       vocab.parse('A').v)
-    assert np.allclose(model.input.input_nodes['buffer'].output(t=0.1),
-                       vocab.parse('B').v)
-    assert np.allclose(model.input.input_nodes['buffer'].output(t=0.2),
-                       np.zeros(16))
-
-
-def test_predefined_vocabs():
-    D = 64
-
-    with spa.Network() as model:
-        model.vocab1 = spa.Vocabulary(D)
-        model.vocab1.populate('A; B; C')
-
-        model.vocab2 = spa.Vocabulary(D)
-        model.vocab2.populate('A; B; C')
-
-        model.buffer1 = spa.State(vocab=model.vocab1)
-        model.buffer2 = spa.State(vocab=model.vocab2)
-
-        def input(t):
-            if t < 0.1:
-                return 'A'
-            elif t < 0.2:
-                return 'B'
-            else:
-                return 'C'
-
-        model.input = spa.Input()
-        model.input.buffer1 = input
-        model.input.buffer2 = input
-
-    a1 = model.input.input_nodes['buffer1'].output(t=0.0)
-    b1 = model.input.input_nodes['buffer1'].output(t=0.1)
-    c1 = model.input.input_nodes['buffer1'].output(t=0.2)
-
-    a2 = model.input.input_nodes['buffer2'].output(t=0.0)
-    b2 = model.input.input_nodes['buffer2'].output(t=0.1)
-    c2 = model.input.input_nodes['buffer2'].output(t=0.2)
-
-    assert np.allclose(a1, model.vocab1.parse('A').v)
-    assert np.allclose(b1, model.vocab1.parse('B').v)
-    assert np.allclose(c1, model.vocab1.parse('C').v)
-
-    assert np.allclose(a2, model.vocab2.parse('A').v)
-    assert np.allclose(b2, model.vocab2.parse('B').v)
-    assert np.allclose(c2, model.vocab2.parse('C').v)
-
-    assert np.dot(a1, a2) < 0.95
-    assert np.dot(b1, b2) < 0.95
-    assert np.dot(c1, c2) < 0.95
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('A'), skip=0.08, duration=0.02)
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('B'), skip=0.18, duration=0.02)
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('0'), skip=0.28, duration=0.02)

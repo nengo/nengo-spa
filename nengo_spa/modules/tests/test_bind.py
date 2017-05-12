@@ -37,9 +37,8 @@ def test_run(Simulator, seed):
             else:
                 return 'B'
 
-        model.input = spa.Input()
-        model.input.bind.input_a = inputA
-        model.input.bind.input_b = 'A'
+        model.input = spa.Input(inputA, vocab=vocab)
+        spa.Actions('bind.input_a = input', 'bind.input_b = A').build()
 
     bind, vocab = model.get_network_output('bind')
 

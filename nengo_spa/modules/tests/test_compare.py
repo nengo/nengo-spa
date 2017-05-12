@@ -31,9 +31,11 @@ def test_run(Simulator, seed):
             else:
                 return 'B'
 
-        model.input = spa.Input()
-        model.input.compare.input_a = inputA
-        model.input.compare.input_b = 'A'
+        model.input = spa.Input(inputA, vocab=16)
+        spa.Actions(
+            'compare.input_a = input',
+            'compare.input_b = A'
+        ).build()
 
     compare, vocab = model.get_network_output('compare')
 
