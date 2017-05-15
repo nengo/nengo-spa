@@ -155,14 +155,14 @@ def test_dot_product():
     assert ast == DotProduct(Symbol('A'), Module('state'))
     assert str(ast) == 'dot(A, state)'
 
-    ast.infer_types(model, TVocabulary(model.state.vocabs[d]))
+    ast.infer_types(model, TScalar)
     assert ast.type == TScalar
 
     ast = Parser().parse_expr('2 * dot(A, state) + 1')
     assert ast == Sum(Product(2, DotProduct(Symbol('A'), Module('state'))), 1)
     assert str(ast) == '2 * dot(A, state) + 1'
 
-    ast.infer_types(model, TVocabulary(model.state.vocabs[d]))
+    ast.infer_types(model, TScalar)
     assert ast.type == TScalar
 
 
