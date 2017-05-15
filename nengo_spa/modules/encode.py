@@ -1,7 +1,7 @@
 import nengo
 from nengo.config import Default
 from nengo.exceptions import ValidationError
-from nengo.params import Parameter
+from nengo.params import IntParam, Parameter
 from nengo.utils.compat import is_string
 
 from nengo_spa.network import Network
@@ -27,8 +27,8 @@ def make_parse_func(fn, vocab):
 
     extractor = SpArrayExtractor(vocab)
 
-    def parse_func(t):
-        return extractor(fn(t))
+    def parse_func(*args):
+        return extractor(fn(*args))
 
     return parse_func
 
@@ -70,18 +70,23 @@ class Encode(Network):
         'function', optional=False, default=None, readonly=True)
     vocab = VocabularyOrDimParam(
         'vocab', optional=False, default=None, readonly=True)
+    size_in = IntParam(
+        'size_in', low=0, optional=True, default=None, readonly=True)
 
-    def __init__(self, sp_output=Default, vocab=Default, **kwargs):
+    def __init__(
+            self, sp_output=Default, vocab=Default, size_in=Default, **kwargs):
         super(Encode, self).__init__(**kwargs)
 
         self.function = sp_output
         self.vocab = vocab
+        self.size_in = size_in
 
         with self:
             self.node = nengo.Node(
                 EncodeFunctionParam.to_vector_output(
                     self.function, self.vocab),
-                size_out=self.vocab.dimensions)
+                size_in=self.size_in, size_out=self.vocab.dimensions)
+            self.input = self.node
             self.output = self.node
 
         self.inputs = dict()
