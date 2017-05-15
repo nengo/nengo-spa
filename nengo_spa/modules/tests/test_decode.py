@@ -1,4 +1,5 @@
 import nengo
+import numpy as np
 from numpy.testing import assert_almost_equal
 
 import nengo_spa as spa
@@ -26,3 +27,31 @@ def test_decode(Simulator, seed):
         sim.run(0.01)
 
     assert output_fn.called
+
+
+def test_with_output(Simulator, seed):
+    def decode_fn(t, v, vocab):
+        return [t]
+
+    with spa.Network(seed=seed) as model:
+        model.decode = Decode(decode_fn, vocab=16)
+        p = nengo.Probe(model.decode.output)
+
+    with Simulator(model) as sim:
+        sim.run(0.01)
+
+    assert_almost_equal(np.squeeze(sim.data[p]), sim.trange())
+
+
+def test_size_out(Simulator, seed):
+    def decode_fn(t, v, vocab):
+        return [t]
+
+    with spa.Network(seed=seed) as model:
+        model.decode = Decode(decode_fn, vocab=16, size_out=1)
+        p = nengo.Probe(model.decode.output)
+
+    with Simulator(model) as sim:
+        sim.run(0.01)
+
+    assert_almost_equal(np.squeeze(sim.data[p]), sim.trange())

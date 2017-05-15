@@ -1,7 +1,7 @@
 import nengo
 from nengo.config import Default
 from nengo.exceptions import ValidationError
-from nengo.params import Parameter
+from nengo.params import IntParam, Parameter
 from nengo.utils.stdlib import checked_call
 
 from nengo_spa.network import Network
@@ -34,8 +34,11 @@ class Decode(Network):
         'function', optional=False, default=None, readonly=True)
     vocab = VocabularyOrDimParam(
         'vocab', optional=False, default=None, readonly=True)
+    size_out = IntParam(
+        'size_out', low=0, optional=True, default=None, readonly=True)
 
-    def __init__(self, function=Default, vocab=Default, **kwargs):
+    def __init__(
+            self, function=Default, vocab=Default, size_out=Default, **kwargs):
         super(Decode, self).__init__(**kwargs)
 
         # Vocab needs to be set before function which accesses vocab for
@@ -46,8 +49,9 @@ class Decode(Network):
         with self:
             self.node = nengo.Node(
                 make_sp_func(self.function, self.vocab),
-                size_in=self.vocab.dimensions)
+                size_in=self.vocab.dimensions, size_out=self.size_out)
             self.input = self.node
+            self.output = self.node
 
         self.inputs = dict(default=(self.input, self.vocab))
         self.outputs = dict()
