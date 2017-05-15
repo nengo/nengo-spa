@@ -42,7 +42,7 @@ def test_am_basic(Simulator, plt, seed, rng):
 
     assert np.all(similarity(sim.data[in_p][t > 0.15], vocab)[:, 0] > 0.99)
     assert np.all(similarity(sim.data[out_p][t > 0.15], vocab)[:, 0] > 0.95)
-    assert np.all(similarity(sim.data[out_p][t > 0.15], vocab)[:, 1:] < 0.1)
+    assert np.all(similarity(sim.data[out_p][t > 0.15], vocab)[:, 1:] < 0.15)
 
 
 def test_am_threshold(Simulator, plt, seed, rng):
