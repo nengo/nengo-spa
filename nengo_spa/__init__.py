@@ -7,11 +7,13 @@ from nengo_spa.modules import (
     BasalGanglia,
     Bind,
     Compare,
+    Decode,
     Encode,
     Product,
     Scalar,
     State,
-    Thalamus)
+    Thalamus,
+    Transcode)
 from nengo_spa.network import Network
 from nengo_spa.vocab import Vocabulary, VocabularyMap
 

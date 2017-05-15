@@ -21,8 +21,10 @@ from .assoc_mem import (
 from .basalganglia import BasalGanglia
 from .bind import Bind
 from .compare import Compare
+from .decode import Decode
 from .encode import Encode
 from .product import Product
 from .scalar import Scalar
 from .state import State
 from .thalamus import Thalamus
+from .transcode import Transcode
