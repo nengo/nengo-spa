@@ -31,7 +31,7 @@ def test_run(Simulator, seed):
             else:
                 return 'B'
 
-        model.input = spa.Input(inputA, vocab=16)
+        model.input = spa.Encode(inputA, vocab=16)
         spa.Actions(
             'compare.input_a = input',
             'compare.input_b = A'
