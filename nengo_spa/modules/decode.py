@@ -15,7 +15,7 @@ def make_sp_func(fn, vocab):
     return sp_func
 
 
-class FunctionParam(Parameter):
+class DecodeFunctionParam(Parameter):
     def coerce(self, obj, value):
         if not callable(value):
             raise ValidationError("Not callable.", attr=self.name, obj=obj)
@@ -23,20 +23,20 @@ class FunctionParam(Parameter):
             value, 0., SemanticPointer(obj.vocab.dimensions), obj.vocab)
         if not invoked:
             raise ValidationError(
-                "Output function %r is expected to accept exactly 3 "
+                "Decode function %r is expected to accept exactly 3 "
                 "arguments: time as a float, a SemanticPointer, and a "
                 "Vocabulary.", attr=self.name, obj=node)
-        return super(FunctionParam, self).coerce(obj, value)
+        return super(DecodeFunctionParam, self).coerce(obj, value)
 
 
-class Output(Network):
-    function = FunctionParam(
+class Decode(Network):
+    function = DecodeFunctionParam(
         'function', optional=False, default=None, readonly=True)
     vocab = VocabularyOrDimParam(
         'vocab', optional=False, default=None, readonly=True)
 
     def __init__(self, function=Default, vocab=Default, **kwargs):
-        super(Output, self).__init__(**kwargs)
+        super(Decode, self).__init__(**kwargs)
 
         # Vocab needs to be set before function which accesses vocab for
         # validation.

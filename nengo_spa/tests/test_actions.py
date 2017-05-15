@@ -20,7 +20,7 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
                 return 'B'
             else:
                 return 'C'
-        model.input = spa.Input(input_func, vocab=16)
+        model.input = spa.Encode(input_func, vocab=16)
 
         model.state = spa.State(label='state')
         model.buff1 = spa.State(label='buff1')
@@ -81,7 +81,7 @@ def test_dot_product(Simulator, seed, plt):
         model.state_b = spa.State(d)
         model.result = spa.Scalar()
 
-        model.stimulus = spa.Input(lambda t: 'A' if t <= 0.3 else 'B', vocab=d)
+        model.stimulus = spa.Encode(lambda t: 'A' if t <= 0.3 else 'B', vocab=d)
 
         actions = spa.Actions(
             'state_a = A',

@@ -45,7 +45,7 @@ def test_basal_ganglia(Simulator, seed, plt):
                 return 'MOUSE'
             else:
                 return '0'
-        model.input = spa.Input(input, vocab=16)
+        model.input = spa.Encode(input, vocab=16)
 
         # test all acceptable condition formats
         model.bg, _, _ = spa.Actions(

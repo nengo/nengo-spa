@@ -2,10 +2,10 @@ import nengo
 from numpy.testing import assert_almost_equal
 
 import nengo_spa as spa
-from nengo_spa.modules.output import Output
+from nengo_spa.modules.decode import Decode
 
 
-def test_output(Simulator, seed):
+def test_decode(Simulator, seed):
     class OutputFn(object):
         def __init__(self):
             self.called = False
@@ -19,7 +19,7 @@ def test_output(Simulator, seed):
 
     with spa.Network(seed=seed) as model:
         model.config[nengo.Connection].synapse = nengo.Lowpass(0.)
-        model.output = Output(output_fn, vocab=16)
+        model.output = Decode(output_fn, vocab=16)
         spa.Actions('output = A').build()
 
     with Simulator(model) as sim:

@@ -44,7 +44,7 @@ def test_no_feedback_run(Simulator, plt, seed):
                 return 'B'
             else:
                 return '0'
-        model.state_input = spa.Input(state_input, vocab=32)
+        model.state_input = spa.Encode(state_input, vocab=32)
         spa.Actions('state = state_input').build()
 
     state, vocab = model.get_network_output('state')
@@ -76,7 +76,7 @@ def test_memory_run(Simulator, seed, plt):
             else:
                 return '0'
 
-        model.state_input = spa.Input(state_input, vocab=32)
+        model.state_input = spa.Encode(state_input, vocab=32)
         spa.Actions('memory = state_input').build()
 
     memory, vocab = model.get_network_output('memory')
@@ -110,7 +110,7 @@ def test_memory_run_decay(Simulator, plt, seed):
             else:
                 return '0'
 
-        model.state_input = spa.Input(state_input, vocab=32)
+        model.state_input = spa.Encode(state_input, vocab=32)
         spa.Actions('memory = state_input').build()
 
     memory, vocab = model.get_network_output('memory')

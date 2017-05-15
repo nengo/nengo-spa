@@ -33,9 +33,9 @@ def make_parse_func(fn, vocab):
     return parse_func
 
 
-class SpOutputParam(Parameter):
+class EncodeFunctionParam(Parameter):
     def coerce(self, node, output):
-        output = super(SpOutputParam, self).coerce(node, output)
+        output = super(EncodeFunctionParam, self).coerce(node, output)
 
         if output is None:
             return output
@@ -63,23 +63,24 @@ class SpOutputParam(Parameter):
             raise ValueError("Invalid output type {!r}".format(type(output)))
 
 
-class Input(Network):
+class Encode(Network):
     """A SPA network for providing external inputs to other networks."""
 
-    sp_output = SpOutputParam(
-        'sp_output', optional=False, default=None, readonly=True)
+    function = EncodeFunctionParam(
+        'function', optional=False, default=None, readonly=True)
     vocab = VocabularyOrDimParam(
         'vocab', optional=False, default=None, readonly=True)
 
     def __init__(self, sp_output=Default, vocab=Default, **kwargs):
-        super(Input, self).__init__(**kwargs)
+        super(Encode, self).__init__(**kwargs)
 
-        self.sp_output = sp_output
+        self.function = sp_output
         self.vocab = vocab
 
         with self:
             self.node = nengo.Node(
-                SpOutputParam.to_vector_output(self.sp_output, self.vocab),
+                EncodeFunctionParam.to_vector_output(
+                    self.function, self.vocab),
                 size_out=self.vocab.dimensions)
             self.output = self.node
 
