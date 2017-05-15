@@ -21,3 +21,16 @@ def test_transcode(Simulator, seed):
 
     assert sp_close(sim.trange(), sim.data[p],
                     model.transcode.output_vocab.parse('B'))
+
+
+def test_passthrough(Simulator, seed):
+    with spa.Network(seed=seed) as model:
+        model.passthrough = Transcode(input_vocab=16, output_vocab=16)
+        spa.Actions('passthrough = A').build()
+        p = nengo.Probe(model.passthrough.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.2)
+
+    assert sp_close(sim.trange(), sim.data[p],
+                    model.passthrough.output_vocab.parse('A'), skip=0.18)
