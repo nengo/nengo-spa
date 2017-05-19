@@ -59,7 +59,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(
             threshold=0.5, input_vocab=vocab, output_vocab=vocab2,
-            function=filtered_step_fn)
+            function=filtered_step_fn, mapping='by-key')
         m.stimulus = spa.Input()
         m.stimulus.am = input_func
 
@@ -182,11 +182,12 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
 
     in_keys = ['A', 'A*B']
     out_keys = ['C*D', 'C+D']
+    mapping = dict(zip(in_keys, out_keys))
 
     with spa.Network(seed=seed) as model:
         model.am = ThresholdingAssocMem(
             threshold=0.3, input_vocab=vocab_in, output_vocab=vocab_out,
-            input_keys=in_keys, output_keys=out_keys)
+            mapping=mapping)
 
         model.inp = spa.Input()
         model.inp.am = lambda t: 'A' if t < 0.1 else 'A*B'

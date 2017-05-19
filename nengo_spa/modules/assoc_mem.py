@@ -3,11 +3,13 @@
 See :doc:`examples/associative_memory` for an introduction and examples.
 """
 import nengo
+from nengo.exceptions import ValidationError
+from nengo.utils.network import with_self
 import numpy as np
+
 from nengo_spa.network import Network
 from nengo_spa.networks.selection import IA, Thresholding, WTA
 from nengo_spa.vocab import VocabularyOrDimParam
-from nengo.utils.network import with_self
 
 
 class AssociativeMemory(Network):
@@ -31,10 +33,12 @@ class AssociativeMemory(Network):
         The vocabulary to be produced for each match. If
         None, the associative memory will act like an autoassociative memory
         (cleanup memory).
-    input_keys : list, optional (Default: None)
-        A list of strings that correspond to the input vectors.
-    output_keys : list, optional (Default: None)
-        A list of strings that correspond to the output vectors.
+    mapping: dict or str, optional (Default: None)
+        A dictionary that defines the mapping from Semantic Pointers in the
+        input vocabulary to Semantic Pointers in the output vocabulary. If set
+        to the string ``'by-key'``, the mapping will be done based on the keys
+        of the to vocabularies. If *None*, the associative memory will be
+        autoassociative (cleanup memory).
     n_neurons : int
         Number of neurons to represent each choice, passed on to the
         *selection_net*.
@@ -54,27 +58,28 @@ class AssociativeMemory(Network):
         'output_vocab', default=None, readonly=True)
 
     def __init__(
-            self, selection_net, input_vocab, output_vocab=None,
-            input_keys=None, output_keys=None, n_neurons=50,
-            label=None, seed=None, add_to_container=None, vocabs=None,
-            **selection_net_args):
+            self, selection_net, input_vocab, output_vocab=None, mapping=None,
+            n_neurons=50, label=None, seed=None, add_to_container=None,
+            vocabs=None, **selection_net_args):
         super(AssociativeMemory, self).__init__(
             label=label, seed=seed, add_to_container=add_to_container,
             vocabs=vocabs)
 
         if output_vocab is None:
             output_vocab = input_vocab
+        elif mapping is None:
+            raise ValidationError(
+                "The mapping argument needs to be provided if an output "
+                "vocabulary is given.", attr='mapping', obj=self)
         self.input_vocab = input_vocab
         self.output_vocab = output_vocab
 
-        if input_keys is None:
-            input_keys = self.input_vocab.keys()
-            input_vectors = self.input_vocab.vectors
-        else:
-            input_vectors = [input_vocab.parse(key).v for key in input_keys]
+        if mapping is None or mapping == 'by-key':
+            mapping = {k: k for k in self.input_vocab.keys()}
 
-        if output_keys is None:
-            output_keys = input_keys
+        input_keys = mapping.keys()
+        input_vectors = [input_vocab.parse(key).v for key in input_keys]
+        output_keys = [mapping[k] for k in input_keys]
         output_vectors = [output_vocab.parse(key).v for key in output_keys]
 
         input_vectors = np.asarray(input_vectors)
@@ -134,14 +139,13 @@ class IAAssocMem(AssociativeMemory):
     See `AssociativeMemory` and `IA` for more information.
     """
     def __init__(
-            self, input_vocab, output_vocab=None, input_keys=None,
-            output_keys=None, n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
+            self, input_vocab, output_vocab=None, mapping=None,
+            n_neurons=50, label=None, seed=None, add_to_container=None,
+            vocabs=None, **selection_net_args):
         super(IAAssocMem, self).__init__(
             selection_net=IA,
             input_vocab=input_vocab, output_vocab=output_vocab,
-            input_keys=input_keys, output_keys=output_keys,
-            n_neurons=n_neurons, label=label, seed=seed,
+            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
             **selection_net_args)
         self.input_reset = self.selection.input_reset
@@ -154,15 +158,14 @@ class ThresholdingAssocMem(AssociativeMemory):
     See `AssociativeMemory` and `Thresholding` for more information.
     """
     def __init__(
-            self, threshold, input_vocab, output_vocab=None, input_keys=None,
-            output_keys=None, n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
+            self, threshold, input_vocab, output_vocab=None, mapping=None,
+            n_neurons=50, label=None, seed=None, add_to_container=None,
+            vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
         super(ThresholdingAssocMem, self).__init__(
             selection_net=Thresholding,
             input_vocab=input_vocab, output_vocab=output_vocab,
-            input_keys=input_keys, output_keys=output_keys,
-            n_neurons=n_neurons, label=label, seed=seed,
+            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
             **selection_net_args)
 
@@ -173,14 +176,13 @@ class WTAAssocMem(AssociativeMemory):
     See `AssociativeMemory` and `WTA` for more information.
     """
     def __init__(
-            self, threshold, input_vocab, output_vocab=None, input_keys=None,
-            output_keys=None, n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
+            self, threshold, input_vocab, output_vocab=None, mapping=None,
+            n_neurons=50, label=None, seed=None, add_to_container=None,
+            vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
         super(WTAAssocMem, self).__init__(
             selection_net=WTA,
             input_vocab=input_vocab, output_vocab=output_vocab,
-            input_keys=input_keys, output_keys=output_keys,
-            n_neurons=n_neurons, label=label, seed=seed,
+            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
             **selection_net_args)
