@@ -163,12 +163,9 @@ class BasalGanglia(Network):
             # Best, if we have SciPy
             config[nengo.Connection].solver = nengo.solvers.NnlsL2nz()
         except ImportError:
-            # Warn if we can't use the better decoder solver.
-            if (nengo.Connection not in self.general_config.params or
-                    'solver' not in self.general_config[nengo.Connection]):
-                warnings.warn("SciPy is not installed, so BasalGanglia will "
-                              "use the default decoder solver. Installing "
-                              "SciPy may improve BasalGanglia performance.")
+            warnings.warn("SciPy is not installed, so BasalGanglia will "
+                          "use the default decoder solver. Installing "
+                          "SciPy may improve BasalGanglia performance.")
 
         ea_params = {'n_neurons': self.n_neurons_per_ensemble,
                      'n_ensembles': self.action_count}
