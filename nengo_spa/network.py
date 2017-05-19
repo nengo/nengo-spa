@@ -166,9 +166,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
         except KeyError:
             raise SpaNetworkError("Could not find network input %r." % name)
 
-    def get_input_vocab(self, name):
-        return self.get_network_input(name)[1]
-
     def get_network_output(self, name):
         """Return the object to connect into for the given name.
 
@@ -190,9 +187,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
                     raise KeyError
         except KeyError:
             raise SpaNetworkError("Could not find network output %r." % name)
-
-    def get_output_vocab(self, name):
-        return self.get_network_output(name)[1]
 
     def similarity(self, data, probe, vocab=None):
         """Return the similarity between the probed data and corresponding
