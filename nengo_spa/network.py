@@ -5,7 +5,6 @@ from nengo.config import Config, SupportDefaultsMixin
 from nengo_spa.exceptions import SpaNetworkError
 from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
-from nengo.utils.compat import iteritems
 import nengo_spa
 
 
@@ -105,18 +104,9 @@ class Network(nengo.Network, SupportDefaultsMixin):
         super(Network, self).__setattr__(key, value)
 
         if isinstance(value, Network):
-            self.__set_spa_network(key, value)
-
-    def __set_spa_network(self, key, net):
-        if net.label is None:
-            net.label = key
-        self._spa_networks[key] = net
-        for k, (obj, v) in iteritems(net.inputs):
-            if isinstance(v, int):
-                net.inputs[k] = (obj, self.vocabs.get_or_create(v))
-        for k, (obj, v) in iteritems(net.outputs):
-            if isinstance(v, int):
-                net.outputs[k] = (obj, self.vocabs.get_or_create(v))
+            if value.label is None:
+                value.label = key
+            self._spa_networks[key] = value
 
     def get_spa_network(self, name, strip_output=False):
         """Return the SPA network for the given name.
