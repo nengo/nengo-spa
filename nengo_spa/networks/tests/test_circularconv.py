@@ -65,7 +65,7 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     assert error_bad > 0.1
 
 
-@pytest.mark.parametrize('dims', [4, 32])
+@pytest.mark.parametrize('dims', [8, 32])
 def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
     a = rng.normal(scale=np.sqrt(1./dims), size=dims)
     b = rng.normal(scale=np.sqrt(1./dims), size=dims)
