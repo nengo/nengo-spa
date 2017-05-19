@@ -49,8 +49,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
         self.vocabs = vocabs
         self.config[Network].vocabs = vocabs
 
-        self._spa_networks = {}
-
         self.inputs = {}
         self.outputs = {}
 
@@ -90,13 +88,10 @@ class Network(nengo.Network, SupportDefaultsMixin):
                     "Cannot re-assign network-attribute %s to %s. SPA "
                     "network-attributes can only be assigned once."
                     % (key, value))
-
-        super(Network, self).__setattr__(key, value)
-
-        if isinstance(value, Network):
             if value.label is None:
                 value.label = key
-            self._spa_networks[key] = value
+
+        super(Network, self).__setattr__(key, value)
 
     def get_spa_network(self, name, strip_output=False):
         """Return the SPA network for the given name.
@@ -121,11 +116,11 @@ class Network(nengo.Network, SupportDefaultsMixin):
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._spa_networks[head].get_spa_network(
+                return getattr(self, head).get_spa_network(
                     tail, strip_output=strip_output)
             else:
-                if name in self._spa_networks:
-                    return self._spa_networks[name]
+                if hasattr(self, name):
+                    return getattr(self, name)
                 elif strip_output and (
                         name in self.inputs or name in self.outputs):
                     return self
@@ -144,13 +139,12 @@ class Network(nengo.Network, SupportDefaultsMixin):
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._spa_networks[head].get_network_input(tail)
+                return getattr(self, head).get_network_input(tail)
             else:
                 if name in self.inputs:
                     return self.inputs[name]
-                elif name in self._spa_networks:
-                    return self._spa_networks[name].get_network_input(
-                        'default')
+                elif hasattr(self, name):
+                    return getattr(self, name).get_network_input('default')
                 else:
                     raise KeyError
         except KeyError:
@@ -166,13 +160,12 @@ class Network(nengo.Network, SupportDefaultsMixin):
             components = name.split('.', 1)
             if len(components) > 1:
                 head, tail = components
-                return self._spa_networks[head].get_network_output(tail)
+                return getattr(self, head).get_network_output(tail)
             else:
                 if name in self.outputs:
                     return self.outputs[name]
-                elif name in self._spa_networks:
-                    return self._spa_networks[name].get_network_output(
-                        'default')
+                elif hasattr(self, name):
+                    return getattr(self, name).get_network_output('default')
                 else:
                     raise KeyError
         except KeyError:
