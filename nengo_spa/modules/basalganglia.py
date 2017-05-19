@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 
 import nengo
-from nengo_spa.config import ConfigParam
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
 from nengo_spa.network import Network
@@ -92,19 +91,13 @@ class BasalGanglia(Network):
         An amount by which to bias all dimensions of the input node.
         Biasing the input node is important for ensuring that all input
         dimensions are positive and easily comparable.
-    general_config : config, optional (Default: None)
-        General configuration to be used when specific parameters are not
-        overwritten with `ampa_config` or `gaba_config`.
-    ampa_config : config, optional (Default: None)
-        Configuration for connections corresponding to biological connections
+    ampa_synapse : Synapse, optional (Default: Lowpass(0.002))
+        Synapse for connections corresponding to biological connections
         to AMPA receptors (i.e., connections from STN to to GPi and GPe).
-        If None, a default configuration using a 2 ms lowpass synapse
-        will be used.
-    gaba_config : config, optional (Default: None)
-        Configuration for connections corresponding to biological connections
+    gaba_synapse : Synapse, optional (Default: Lowpass(0.008))
+        Synapse for connections corresponding to biological connections
         to GABA receptors (i.e., connections from StrD1 to GPi, StrD2 to GPe,
-        and GPe to GPi and STN). If None, a default configuration using an
-        8 ms lowpass synapse will be used.
+        and GPe to GPi and STN).
     kwargs
         Passed through the ``spa.Network``.
 
@@ -140,30 +133,25 @@ class BasalGanglia(Network):
     """
 
     input_synapse = SynapseParam('input_synapse', default=Lowpass(0.002))
+    ampa_synapse = SynapseParam('ampa_synapse', default=Lowpass(0.002))
+    gaba_synapse = SynapseParam('gaba_synapse', default=Lowpass(0.008))
     n_neurons_per_ensemble = IntParam(
         'n_neurons_per_ensemble', default=100, low=1, readonly=True)
     output_weight = NumberParam('output_weight', default=-3., readonly=True)
     input_bias = NumberParam('input_bias', default=0., readonly=True)
-    general_config = ConfigParam(
-        'general_config', default=None, optional=True, readonly=True)
-    ampa_config = ConfigParam(
-        'ampa_config', default=None, optional=True, readonly=True)
-    gaba_config = ConfigParam(
-        'gaba_config', default=None, optional=True, readonly=True)
 
     def __init__(
             self, action_count, n_neurons_per_ensemble=Default,
-            output_weight=Default, input_bias=Default, general_config=Default,
-            ampa_config=Default, gaba_config=Default, **kwargs):
+            output_weight=Default, input_bias=Default, ampa_synapse=Default,
+            gaba_synapse=Default, **kwargs):
         super(BasalGanglia, self).__init__(**kwargs)
 
         self.action_count = action_count
         self.n_neurons_per_ensemble = n_neurons_per_ensemble
         self.output_weight = output_weight
         self.input_bias = input_bias
-        self.general_config = general_config
-        self.ampa_config = ampa_config
-        self.gaba_config = gaba_config
+        self.ampa_synapse = ampa_synapse
+        self.gaba_synapse = gaba_synapse
 
         self.input_connections = {}
         # Affects all ensembles / connections in the BG
@@ -182,15 +170,10 @@ class BasalGanglia(Network):
                               "use the default decoder solver. Installing "
                               "SciPy may improve BasalGanglia performance.")
 
-        gaba_default = nengo.Config(nengo.Connection)
-        gaba_default[nengo.Connection].synapse = nengo.Lowpass(0.008)
-        ampa_default = nengo.Config(nengo.Connection)
-        ampa_default[nengo.Connection].synapse = nengo.Lowpass(0.002)
-
         ea_params = {'n_neurons': self.n_neurons_per_ensemble,
                      'n_ensembles': self.action_count}
 
-        with self, config, self.general_config:
+        with self, config:
             self.strD1 = EnsembleArray(
                 label="Striatal D1 neurons",
                 intercepts=nengo.dists.Uniform(Weights.e, 1), **ea_params)
@@ -228,7 +211,9 @@ class BasalGanglia(Network):
             # connect the striatum to the GPi and GPe (inhibitory)
             strD1_output = self.strD1.add_output('func_str', Weights.str_func)
             strD2_output = self.strD2.add_output('func_str', Weights.str_func)
-            with gaba_default, self.gaba_config:
+            self.gaba = nengo.Network("GABAergic connections")
+            self.gaba.config[nengo.Connection].synapse = self.gaba_synapse
+            with self.gaba:
                 nengo.Connection(strD1_output, self.gpi.input,
                                  transform=-Weights.wm)
                 nengo.Connection(strD2_output, self.gpe.input,
@@ -237,13 +222,15 @@ class BasalGanglia(Network):
             # connect the STN to GPi and GPe (broad and excitatory)
             tr = Weights.wp * np.ones((self.action_count, self.action_count))
             stn_output = self.stn.add_output('func_stn', Weights.stn_func)
-            with ampa_default, self.ampa_config:
+            self.ampa = nengo.Network("AMPAergic connectiions")
+            self.ampa.config[nengo.Connection].synapse = self.ampa_synapse
+            with self.ampa:
                 nengo.Connection(stn_output, self.gpi.input, transform=tr)
                 nengo.Connection(stn_output, self.gpe.input, transform=tr)
 
             # connect the GPe to GPi and STN (inhibitory)
             gpe_output = self.gpe.add_output('func_gpe', Weights.gpe_func)
-            with gaba_default, self.gaba_config:
+            with self.gaba:
                 nengo.Connection(
                     gpe_output, self.gpi.input, transform=-Weights.we)
                 nengo.Connection(
