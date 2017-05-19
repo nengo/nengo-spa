@@ -7,13 +7,6 @@ from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
 
-def get_current_spa_network():
-    for net in reversed(Network.context):
-        if isinstance(net, Network):
-            return net
-    return None
-
-
 class _AutoConfig(object):
     def __init__(self, cfg):
         self._cfg = cfg
@@ -55,8 +48,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
                 vocabs = VocabularyMap(rng=rng)
         self.vocabs = vocabs
         self.config[Network].vocabs = vocabs
-
-        self.__dict__['_parent_spa_network'] = get_current_spa_network()
 
         self._spa_networks = {}
 
