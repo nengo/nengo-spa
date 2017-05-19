@@ -223,14 +223,12 @@ class Actions(object):
         with root_network:
             if needs_bg and bg is None:
                 bg = BasalGanglia(action_count=len(self.actions))
-                root_network.bg = bg
             if needs_bg and thalamus is None:
                 thalamus = Thalamus(action_count=len(self.actions))
                 for i, a in enumerate(self.actions):
                     thalamus.actions.ensembles[i].label = (
                         'action[{}]: {}'.format(i, a.effects))
                 thalamus.connect_bg(bg)
-                root_network.thalamus = thalamus
 
         self.construction_context = ConstructionContext(
             root_network, bg=bg, thalamus=thalamus)
@@ -238,7 +236,7 @@ class Actions(object):
             for action in self.actions:
                 action.infer_types(root_network, None)
             # Infer types for all actions before doing any construction, so
-            # that # all semantic pointers are added to the respective
+            # that all semantic pointers are added to the respective
             # vocabularies so that the translate transform are identical.
             for action in self.actions:
                 action.construct(self.construction_context)

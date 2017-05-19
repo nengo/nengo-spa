@@ -33,7 +33,7 @@ def test_basal_ganglia(Simulator, seed, plt):
         model.compare = spa.Compare(vocab=16)
 
         # test all acceptable condition formats
-        spa.Actions(
+        model.bg, _, _ = spa.Actions(
             '0.5 --> motor=A',
             'dot(vision, CAT) --> motor=B',
             'dot(vision*CAT, DOG) --> motor=C',
