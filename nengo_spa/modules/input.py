@@ -59,8 +59,7 @@ class Input(nengo.Network):
         self.input_nodes = {}
 
         if network is None:
-            from nengo_spa.network import get_current_spa_network
-            network = get_current_spa_network()
+            network = nengo.Network.context[-1]
         self.network = network
 
         self._initialized = True
