@@ -5,7 +5,6 @@ from nengo.config import Config, SupportDefaultsMixin
 from nengo_spa.exceptions import SpaNetworkError
 from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
-import nengo_spa
 
 
 def get_current_spa_network():
@@ -187,18 +186,3 @@ class Network(nengo.Network, SupportDefaultsMixin):
                     raise KeyError
         except KeyError:
             raise SpaNetworkError("Could not find network output %r." % name)
-
-    def similarity(self, data, probe, vocab=None):
-        """Return the similarity between the probed data and corresponding
-        vocabulary.
-
-        Parameters
-        ----------
-        data: ProbeDict
-            Collection of simulation data returned by sim.run() function call.
-        probe: Probe
-            Probe with desired data.
-        """
-        if vocab is None:
-            vocab = self.vocabs[data[probe].shape[1]]
-        return nengo_spa.similarity(data[probe], vocab)
