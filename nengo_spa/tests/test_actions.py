@@ -97,7 +97,7 @@ def test_dot_product(Simulator, seed, plt):
 
     t = sim.trange()
     assert np.mean(sim.data[p][(t > 0.1) & (t <= 0.3)]) > 0.8
-    assert np.mean(sim.data[p][t > 0.4]) < 0.1
+    assert np.mean(sim.data[p][t > 0.4]) < 0.15
 
 
 class TestExceptions():
