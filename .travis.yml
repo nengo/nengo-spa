@@ -2,7 +2,10 @@ language: c
 sudo: false
 notifications:
   email:
-    - jan@hyper-world.de
+    recipients:
+      - jan@hyper-world.de
+    on_success: change
+    on_failure: change
 
 env:
   global:
