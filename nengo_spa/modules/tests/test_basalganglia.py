@@ -81,7 +81,7 @@ def test_basal_ganglia(Simulator, seed, plt):
     # Motor B
     assert sim.data[p][t == 0.2, 1] > 0.8
     # Motor C
-    assert sim.data[p][t == 0.3, 2] > 0.6
+    assert sim.data[p][t == 0.3, 2] > 0.5
 
     # Motor B should be the same as Motor D
     assert np.allclose(sim.data[p][:, 1], sim.data[p][:, 3])
