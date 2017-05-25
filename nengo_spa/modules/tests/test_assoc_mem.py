@@ -1,5 +1,8 @@
 import nengo
+from nengo.exceptions import ValidationError
 import numpy as np
+import pytest
+
 import nengo_spa as spa
 from nengo_spa import Vocabulary
 from nengo_spa.modules.assoc_mem import ThresholdingAssocMem, WTAAssocMem
@@ -227,3 +230,11 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     assert np.mean(similarity(sim.data[out_p][t_item2],
                               vocab_out.parse(out_keys[1]).v,
                               normalize=True)) > 0.9
+
+
+def test_invalid_mapping_string():
+    with spa.Network() as model:
+        with pytest.raises(ValidationError):
+            model.am = ThresholdingAssocMem(
+                threshold=0.3, input_vocab=16, output_vocab=32,
+                mapping='invalid')
