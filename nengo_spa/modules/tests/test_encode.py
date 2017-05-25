@@ -28,7 +28,7 @@ def test_time_varying(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer = spa.State(vocab=16)
 
-        def input(t):
+        def stimulus(t):
             if t < 0.1:
                 return 'A'
             elif t < 0.2:
@@ -38,15 +38,15 @@ def test_time_varying(Simulator, seed):
             else:
                 return '0'
 
-        model.input = spa.Encode(input, vocab=16)
-        spa.Actions('buffer = input').build()
+        model.encode = spa.Encode(stimulus, vocab=16)
+        spa.Actions('buffer = encode').build()
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    input, vocab = model.get_network_input('buffer')
+    vocab = model.buffer.vocab
 
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse('A'), skip=0.08, duration=0.02)
@@ -62,12 +62,12 @@ def test_with_input(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer = spa.State(vocab=16)
 
-        def input(t, x):
+        def stimulus(t, x):
             return x[0] * model.buffer.vocab.parse('A')
 
         ctrl = nengo.Node(lambda t: t > 0.2)
 
-        model.encode = spa.Encode(input, vocab=16, size_in=1)
+        model.encode = spa.Encode(stimulus, vocab=16, size_in=1)
         nengo.Connection(ctrl, model.encode.input)
         spa.Actions('buffer = encode').build()
 
