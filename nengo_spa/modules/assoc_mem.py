@@ -4,6 +4,7 @@ See :doc:`examples/associative_memory` for an introduction and examples.
 """
 import nengo
 from nengo.exceptions import ValidationError
+from nengo.utils.compat import is_string
 from nengo.utils.network import with_self
 import numpy as np
 
@@ -76,6 +77,10 @@ class AssociativeMemory(Network):
 
         if mapping is None or mapping == 'by-key':
             mapping = {k: k for k in self.input_vocab.keys()}
+        elif is_string(mapping):
+            raise ValidationError(
+                "The mapping argument must be a dictionary, the string "
+                "'by-key' or None.", attr='mapping', obj=self)
 
         input_keys = mapping.keys()
         input_vectors = [input_vocab.parse(key).v for key in input_keys]
