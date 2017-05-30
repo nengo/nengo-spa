@@ -2,7 +2,7 @@ import numpy as np
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo_spa.exceptions import SpaConstructionError, SpaNameError
+from nengo_spa.exceptions import SpaNameError
 from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
@@ -83,11 +83,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
             return super(Network, self).__setattr__(key, value)
 
         if isinstance(value, Network):
-            if hasattr(self, key) and isinstance(getattr(self, key), Network):
-                raise SpaConstructionError(
-                    "Cannot re-assign network-attribute %s to %s. SPA "
-                    "network-attributes can only be assigned once."
-                    % (key, value))
             if value.label is None:
                 value.label = key
 

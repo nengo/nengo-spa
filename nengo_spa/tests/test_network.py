@@ -3,8 +3,7 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import (
-    SpaConstructionError, SpaNameError, SpaTypeError)
+from nengo_spa.exceptions import SpaNameError, SpaTypeError
 from nengo_spa.examine import similarity
 from nengo_spa.vocab import VocabularyMap
 
@@ -45,11 +44,6 @@ def test_spa_verification(seed, plt):
 
         # reassignment is fine for non-networks
         model.int_val = 2
-
-    # reassignment of networks should throw an error
-    with pytest.raises(SpaConstructionError):
-        with model:
-            model.buf = spa.State(d, feedback=1)
 
 
 def test_spa_network_exception():
