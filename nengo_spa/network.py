@@ -2,7 +2,7 @@ import numpy as np
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo_spa.exceptions import SpaNetworkError
+from nengo_spa.exceptions import SpaConstructionError, SpaNameError
 from nengo_spa.modules.input import Input
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
@@ -84,7 +84,7 @@ class Network(nengo.Network, SupportDefaultsMixin):
 
         if isinstance(value, Network):
             if hasattr(self, key) and isinstance(getattr(self, key), Network):
-                raise SpaNetworkError(
+                raise SpaConstructionError(
                     "Cannot re-assign network-attribute %s to %s. SPA "
                     "network-attributes can only be assigned once."
                     % (key, value))
@@ -96,7 +96,7 @@ class Network(nengo.Network, SupportDefaultsMixin):
     def get_spa_network(self, name, strip_output=False):
         """Return the SPA network for the given name.
 
-        Raises :class:`SpaNetworkError` if the network cannot be found.
+        Raises :class:`SpaConstructionError` if the network cannot be found.
 
         Parameters
         ----------
@@ -112,22 +112,24 @@ class Network(nengo.Network, SupportDefaultsMixin):
         :class:`Network`
             Requested network.
         """
-        try:
-            components = name.split('.', 1)
-            if len(components) > 1:
-                head, tail = components
+        components = name.split('.', 1)
+        if len(components) > 1:
+            head, tail = components
+            try:
                 return getattr(self, head).get_spa_network(
                     tail, strip_output=strip_output)
+            except AttributeError:
+                raise SpaNameError(head, 'network')
+            except SpaNameError as err:
+                raise SpaNameError(head + '.' + err.name, err.kind)
+        else:
+            if hasattr(self, name):
+                return getattr(self, name)
+            elif strip_output and (
+                    name in self.inputs or name in self.outputs):
+                return self
             else:
-                if hasattr(self, name):
-                    return getattr(self, name)
-                elif strip_output and (
-                        name in self.inputs or name in self.outputs):
-                    return self
-                else:
-                    raise KeyError
-        except KeyError:
-            raise SpaNetworkError("Could not find network %r." % name)
+                raise SpaNameError(name, 'network')
 
     def get_network_input(self, name):
         """Return the object to connect into for the given name.
@@ -135,20 +137,22 @@ class Network(nengo.Network, SupportDefaultsMixin):
         The name will be either the same as a spa network, or of the form
         <network_name>.<input_name>.
         """
-        try:
-            components = name.split('.', 1)
-            if len(components) > 1:
-                head, tail = components
+        components = name.split('.', 1)
+        if len(components) > 1:
+            head, tail = components
+            try:
                 return getattr(self, head).get_network_input(tail)
+            except AttributeError:
+                raise SpaNameError(head, 'network input')
+            except SpaNameError as err:
+                raise SpaNameError(head + '.' + err.name, err.kind)
+        else:
+            if name in self.inputs:
+                return self.inputs[name]
+            elif hasattr(self, name):
+                return self.get_network_input(name + '.default')
             else:
-                if name in self.inputs:
-                    return self.inputs[name]
-                elif hasattr(self, name):
-                    return getattr(self, name).get_network_input('default')
-                else:
-                    raise KeyError
-        except KeyError:
-            raise SpaNetworkError("Could not find network input %r." % name)
+                raise SpaNameError(name, 'network input')
 
     def get_network_output(self, name):
         """Return the object to connect into for the given name.
@@ -156,17 +160,19 @@ class Network(nengo.Network, SupportDefaultsMixin):
         The name will be either the same as a spa network, or of the form
         <network_name>.<output_name>.
         """
-        try:
-            components = name.split('.', 1)
-            if len(components) > 1:
-                head, tail = components
+        components = name.split('.', 1)
+        if len(components) > 1:
+            head, tail = components
+            try:
                 return getattr(self, head).get_network_output(tail)
+            except AttributeError:
+                raise SpaNameError(head, 'network output')
+            except SpaNameError as err:
+                raise SpaNameError(head + '.' + err.name, err.kind)
+        else:
+            if name in self.outputs:
+                return self.outputs[name]
+            elif hasattr(self, name):
+                return self.get_network_output(name + '.default')
             else:
-                if name in self.outputs:
-                    return self.outputs[name]
-                elif hasattr(self, name):
-                    return getattr(self, name).get_network_output('default')
-                else:
-                    raise KeyError
-        except KeyError:
-            raise SpaNetworkError("Could not find network output %r." % name)
+                raise SpaNameError(name, 'network output')

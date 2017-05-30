@@ -3,7 +3,7 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaNetworkError
+from nengo_spa.exceptions import SpaNameError
 
 
 def test_connect(Simulator, seed):
@@ -75,10 +75,12 @@ def test_translate(Simulator, seed):
 
 def test_errors():
     # buffer2 does not exist
-    with pytest.raises(SpaNetworkError):
+    with pytest.raises(SpaNameError) as excinfo:
         with spa.Network() as model:
             model.buffer = spa.State(vocab=16)
             spa.Actions('buffer2=buffer').build()
+
+    assert excinfo.value.name == 'buffer2'
 
 
 def test_direct(Simulator, seed):
