@@ -87,7 +87,7 @@ from nengo_spa.modules.bind import Bind
 from nengo_spa.modules.compare import Compare
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.modules.product import Product as ProductModule
-from nengo_spa.exceptions import SpaNetworkError, SpaParseError, SpaTypeError
+from nengo_spa.exceptions import SpaConstructionError, SpaParseError, SpaTypeError
 
 
 class ConstructionContext(object):
@@ -1047,7 +1047,7 @@ class Action(Node):
 
     def construct(self, context):
         if context.bg is None or context.thalamus is None:
-            raise SpaNetworkError(
+            raise SpaConstructionError(
                 "Conditional actions require basal ganglia and thalamus.")
 
         # construct bg utility

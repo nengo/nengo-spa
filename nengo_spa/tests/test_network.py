@@ -3,7 +3,8 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaNetworkError, SpaTypeError
+from nengo_spa.exceptions import (
+    SpaConstructionError, SpaNameError, SpaTypeError)
 from nengo_spa.examine import similarity
 from nengo_spa.vocab import VocabularyMap
 
@@ -46,7 +47,7 @@ def test_spa_verification(seed, plt):
         model.int_val = 2
 
     # reassignment of networks should throw an error
-    with pytest.raises(ValueError):
+    with pytest.raises(SpaConstructionError):
         with model:
             model.buf = spa.State(d, feedback=1)
 
@@ -74,8 +75,9 @@ def test_spa_get():
         model.compare = spa.Compare(D)
 
     assert model.get_spa_network('buf1') is model.buf1
-    with pytest.raises(SpaNetworkError):
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_spa_network('buf1.default')
+    assert excinfo.value.name == 'buf1.default'
     assert model.get_spa_network('buf2') is model.buf2
     assert model.get_network_input('buf1')[0] is model.buf1.input
     assert model.get_network_input('buf1.default')[0] is model.buf1.input
@@ -86,16 +88,30 @@ def test_spa_get():
     assert model.get_network_input(
         'compare.input_b')[0] is model.compare.input_b
 
-    with pytest.raises(SpaNetworkError):
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_spa_network('dummy')
-    with pytest.raises(SpaNetworkError):
+    assert excinfo.value.name == 'dummy'
+    assert excinfo.value.kind == 'network'
+
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('dummy')
-    with pytest.raises(SpaNetworkError):
+    assert excinfo.value.name == 'dummy'
+    assert excinfo.value.kind == 'network input'
+
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_network_output('dummy')
-    with pytest.raises(SpaNetworkError):
+    assert excinfo.value.name == 'dummy'
+    assert excinfo.value.kind == 'network output'
+
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('buf1.A')
-    with pytest.raises(SpaNetworkError):
+    assert excinfo.value.name == 'buf1.A'
+    assert excinfo.value.kind == 'network input'
+
+    with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('compare')
+    assert excinfo.value.name == 'compare.default'
+    assert excinfo.value.kind == 'network input'
 
 
 def test_spa_vocab():

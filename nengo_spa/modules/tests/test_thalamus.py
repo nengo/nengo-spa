@@ -2,7 +2,7 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaNetworkError
+from nengo_spa.exceptions import SpaNameError
 
 import numpy as np
 
@@ -218,10 +218,12 @@ def test_nondefault_routing(Simulator, seed):
 
 def test_errors():
     # motor does not exist
-    with pytest.raises(SpaNetworkError):
+    with pytest.raises(SpaNameError) as excinfo:
         with spa.Network() as model:
             model.vision = spa.State(vocab=16)
             spa.Actions('0.5 --> motor=A').build()
+
+    assert excinfo.value.name == 'motor'
 
 
 def test_constructed_objects_are_accessible():
