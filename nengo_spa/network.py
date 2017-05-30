@@ -131,28 +131,31 @@ class Network(nengo.Network, SupportDefaultsMixin):
             else:
                 raise SpaNameError(name, 'network')
 
+    def _get_network_connector(self, name, kind):
+        components = name.rsplit('.', 1)
+        if len(components) > 1:
+            head, tail = components
+            net = self.get_spa_network(head)
+        else:
+            net = self
+            tail = name
+
+        try:
+            if tail not in getattr(net, kind + 's'):
+                net = net.get_spa_network(tail)
+                tail = 'default'
+
+            return getattr(net, kind + 's')[tail]
+        except (SpaNameError, KeyError):
+            raise SpaNameError(name, 'network ' + kind)
+
     def get_network_input(self, name):
         """Return the object to connect into for the given name.
 
         The name will be either the same as a spa network, or of the form
         <network_name>.<input_name>.
         """
-        components = name.split('.', 1)
-        if len(components) > 1:
-            head, tail = components
-            try:
-                return getattr(self, head).get_network_input(tail)
-            except AttributeError:
-                raise SpaNameError(head, 'network input')
-            except SpaNameError as err:
-                raise SpaNameError(head + '.' + err.name, err.kind)
-        else:
-            if name in self.inputs:
-                return self.inputs[name]
-            elif hasattr(self, name):
-                return self.get_network_input(name + '.default')
-            else:
-                raise SpaNameError(name, 'network input')
+        return self._get_network_connector(name, 'input')
 
     def get_network_output(self, name):
         """Return the object to connect into for the given name.
@@ -160,19 +163,4 @@ class Network(nengo.Network, SupportDefaultsMixin):
         The name will be either the same as a spa network, or of the form
         <network_name>.<output_name>.
         """
-        components = name.split('.', 1)
-        if len(components) > 1:
-            head, tail = components
-            try:
-                return getattr(self, head).get_network_output(tail)
-            except AttributeError:
-                raise SpaNameError(head, 'network output')
-            except SpaNameError as err:
-                raise SpaNameError(head + '.' + err.name, err.kind)
-        else:
-            if name in self.outputs:
-                return self.outputs[name]
-            elif hasattr(self, name):
-                return self.get_network_output(name + '.default')
-            else:
-                raise SpaNameError(name, 'network output')
+        return self._get_network_connector(name, 'output')

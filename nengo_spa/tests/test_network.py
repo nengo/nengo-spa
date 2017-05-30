@@ -110,7 +110,7 @@ def test_spa_get():
 
     with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('compare')
-    assert excinfo.value.name == 'compare.default'
+    assert excinfo.value.name == 'compare'
     assert excinfo.value.kind == 'network input'
 
 
