@@ -35,6 +35,13 @@ Release History
   (`#30 <https://github.com/nengo/nengo/pull/30>`_,
   `#23 <https://github.com/nengo/nengo/issues/23>`_)
 
+**Fixed**
+
+- Improved a number of error messages.
+  (`#35 <https://github.com/nengo/nengo/pull/35>`_,
+  `#32 <https://github.com/nengo/nengo/issues/32>`_,
+  `#34 <https://github.com/nengo/nengo/issues/34>`_)
+
 
 0.1.1 (May 19, 2017)
 ====================
