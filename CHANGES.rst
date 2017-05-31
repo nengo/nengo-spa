@@ -23,6 +23,18 @@ Release History
 0.2 (unreleased)
 ================
 
+**Changed**
+
+- Replaced *input_keys* and *output_keys* arguments of associative memories
+  with a single *mapping* argument.
+  (`#29 <https://github.com/nengo/nengo/pull/29>`_,
+  `#8 <https://github.com/nengo/nengo/issues/8>`_)
+- Replaced *ampa_config* and *gaba_config* parameters of the
+  *BasalGanglia* with *ampa_synapse* and *gaba_synapse* parameters.
+  Removed the *general_config* parameter.
+  (`#30 <https://github.com/nengo/nengo/pull/30>`_,
+  `#23 <https://github.com/nengo/nengo/issues/23>`_)
+
 
 0.1.1 (May 19, 2017)
 ====================
