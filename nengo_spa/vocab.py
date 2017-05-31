@@ -171,9 +171,10 @@ class Vocabulary(Mapping):
         # pointers as needed.
         try:
             value = eval(text, {}, self)
-        except NameError:
+        except NameError as err:
             raise SpaParseError(
-                "Semantic pointers must start with a capital letter.")
+                "Error parsing expression {expr!r} with {vocab}: {msg}".format(
+                    expr=text, vocab=self, msg=str(err)))
 
         if is_number(value):
             value *= Identity(self.dimensions)
