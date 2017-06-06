@@ -70,6 +70,8 @@ Release History
   target vocabulary when ``populate=False``.
   (`#62 <https://github.com/nengo/nengo_spa/pull/62>`_,
   `#56 <https://github.com/nengo/nengo_spa/issues/56>`_)
+- Allow empty string as argument to `Vocabulary.populate`.
+  (`#73 <https://github.com/nengo_spa/nengo/pull/73>`_)
 
 
 0.2 (June 22, 2017)

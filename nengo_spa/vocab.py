@@ -150,6 +150,9 @@ class Vocabulary(Mapping):
         self._vectors = np.vstack([self._vectors, p.v])
 
     def populate(self, pointers):
+        if len(pointers.strip()) <= 0:
+            return  # Do nothing (and don't fail) for empty string.
+
         for p_expr in pointers.split(';'):
             assign_split = p_expr.split('=', 1)
             modifier_split = p_expr.split('.', 1)

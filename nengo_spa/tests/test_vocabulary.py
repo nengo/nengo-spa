@@ -22,6 +22,10 @@ def test_add(rng):
 def test_populate(rng):
     v = Vocabulary(64, rng=rng)
 
+    v.populate('')
+    v.populate(' \r\n\t')
+    assert len(v) == 0
+
     v.populate('A')
     assert 'A' in v
 
