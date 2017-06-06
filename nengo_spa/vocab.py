@@ -125,8 +125,9 @@ class Vocabulary(Mapping):
         """
         if not valid_sp_regex.match(key):
             raise SpaParseError(
-                "Invalid Semantic Pointer name. Valid names are valid "
-                "Python 2 identifiers beginning with a capital letter.")
+                "Invalid Semantic Pointer name {!r}. Valid names are valid "
+                "Python 2 identifiers beginning with a capital letter.".format(
+                    key))
         if not isinstance(p, pointer.SemanticPointer):
             p = pointer.SemanticPointer(p)
 
