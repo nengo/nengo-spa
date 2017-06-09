@@ -136,6 +136,16 @@ def test_convolution(Simulator, plt, seed):
         pAinvB = nengo.Probe(model.outAinvB.output, synapse=0.03)
         pAinvBinv = nengo.Probe(model.outAinvBinv.output, synapse=0.03)
 
+    for state in [
+            model.inA,
+            model.inB,
+            model.outAB,
+            model.outABinv,
+            model.outAinvB,
+            model.outAinvBinv]:
+        for e in state.all_ensembles:
+            e.radius = 1.
+
     with Simulator(model) as sim:
         sim.run(0.2)
 
@@ -169,16 +179,16 @@ def test_convolution(Simulator, plt, seed):
 
     # Ideal answer: A*B = [0,0,0,1,0]
     assert np.allclose(np.mean(sim.data[pAB][-10:], axis=0),
-                       np.array([0, 0, 0, 1, 0]), atol=0.2)
+                       np.array([0, 0, 0, 1, 0]), atol=0.25)
 
     # Ideal answer: A*~B = [0,0,0,0,1]
     assert np.allclose(np.mean(sim.data[pABinv][-10:], axis=0),
-                       np.array([0, 0, 0, 0, 1]), atol=0.2)
+                       np.array([0, 0, 0, 0, 1]), atol=0.25)
 
     # Ideal answer: ~A*B = [0,1,0,0,0]
     assert np.allclose(np.mean(sim.data[pAinvB][-10:], axis=0),
-                       np.array([0, 1, 0, 0, 0]), atol=0.2)
+                       np.array([0, 1, 0, 0, 0]), atol=0.25)
 
     # Ideal answer: ~A*~B = [0,0,1,0,0]
     assert np.allclose(np.mean(sim.data[pAinvBinv][-10:], axis=0),
-                       np.array([0, 0, 1, 0, 0]), atol=0.2)
+                       np.array([0, 0, 1, 0, 0]), atol=0.25)
