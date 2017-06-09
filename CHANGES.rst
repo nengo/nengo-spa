@@ -41,6 +41,9 @@ Release History
   (`#35 <https://github.com/nengo/nengo/pull/35>`_,
   `#32 <https://github.com/nengo/nengo/issues/32>`_,
   `#34 <https://github.com/nengo/nengo/issues/34>`_)
+- Improved accuracy by fixing choice of evaluation point and intercept
+  distributions.
+  (`#39 <https://github.com/nengo/nengo_spa/pull/39>`_)
 
 
 0.1.1 (May 19, 2017)
