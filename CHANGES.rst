@@ -27,20 +27,20 @@ Release History
 
 - Replaced *input_keys* and *output_keys* arguments of associative memories
   with a single *mapping* argument.
-  (`#29 <https://github.com/nengo/nengo/pull/29>`_,
-  `#8 <https://github.com/nengo/nengo/issues/8>`_)
+  (`#29 <https://github.com/nengo/nengo_spa/pull/29>`_,
+  `#8 <https://github.com/nengo/nengo_spa/issues/8>`_)
 - Replaced *ampa_config* and *gaba_config* parameters of the
   *BasalGanglia* with *ampa_synapse* and *gaba_synapse* parameters.
   Removed the *general_config* parameter.
-  (`#30 <https://github.com/nengo/nengo/pull/30>`_,
-  `#23 <https://github.com/nengo/nengo/issues/23>`_)
+  (`#30 <https://github.com/nengo/nengo_spa/pull/30>`_,
+  `#23 <https://github.com/nengo/nengo_spa/issues/23>`_)
 
 **Fixed**
 
 - Improved a number of error messages.
-  (`#35 <https://github.com/nengo/nengo/pull/35>`_,
-  `#32 <https://github.com/nengo/nengo/issues/32>`_,
-  `#34 <https://github.com/nengo/nengo/issues/34>`_)
+  (`#35 <https://github.com/nengo/nengo_spa/pull/35>`_,
+  `#32 <https://github.com/nengo/nengo_spa/issues/32>`_,
+  `#34 <https://github.com/nengo/nengo_spa/issues/34>`_)
 - Improved accuracy by fixing choice of evaluation point and intercept
   distributions.
   (`#39 <https://github.com/nengo/nengo_spa/pull/39>`_)
