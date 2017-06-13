@@ -82,7 +82,7 @@ class Vocabulary(Mapping):
         for _ in range(attempts):
             p = pointer.SemanticPointer(self.dimensions, rng=self.rng)
             if transform is not None:
-                p = eval('p.' + transform, {'p': p}, self)
+                p = eval('p.' + transform, dict(self), {'p': p})
             if len(self) == 0:
                 best_p = p
                 break
@@ -112,6 +112,14 @@ class Vocabulary(Mapping):
 
     def __getitem__(self, key):
         """Return the semantic pointer with the requested name."""
+        # __tracebackhide__ is used in py.test to hide stack frames from the
+        # traceback. That means py.test might try to look up this attribute
+        # in a test which will result in an exception hiding the actual
+        # exception. By raising a KeyError we indicate that there is no
+        # __tracebackhide__ attribute on this object and preserve the relevant
+        # exception.
+        if key == '__tracebackhide__':
+            raise KeyError()
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
         return self.pointers[key]
