@@ -77,27 +77,28 @@ class Vocabulary(Mapping):
         candidate pointer with lowest maximum cosine with all existing
         pointers is returned.
         """
-        if len(self) == 0:
-            best_p = pointer.SemanticPointer(self.dimensions, rng=self.rng)
-        else:
-            best_p = None
-            best_sim = np.inf
-            for _ in range(attempts):
-                p = pointer.SemanticPointer(self.dimensions, rng=self.rng)
-                if transform is not None:
-                    p = eval('p.' + transform, {'p': p}, self)
+        best_p = None
+        best_sim = np.inf
+        for _ in range(attempts):
+            p = pointer.SemanticPointer(self.dimensions, rng=self.rng)
+            if transform is not None:
+                p = eval('p.' + transform, {'p': p}, self)
+            if len(self) == 0:
+                best_p = p
+                break
+            else:
                 p_sim = np.max(np.dot(self._vectors, p.v))
                 if p_sim < best_sim:
                     best_p = p
                     best_sim = p_sim
                     if p_sim < self.max_similarity:
                         break
-            else:
-                warnings.warn(
-                    'Could not create a semantic pointer with '
-                    'max_similarity=%1.2f (D=%d, M=%d)'
-                    % (self.max_similarity, self.dimensions,
-                       len(self.pointers)))
+        else:
+            warnings.warn(
+                'Could not create a semantic pointer with '
+                'max_similarity=%1.2f (D=%d, M=%d)'
+                % (self.max_similarity, self.dimensions,
+                   len(self.pointers)))
         return best_p
 
     def __contains__(self, key):
