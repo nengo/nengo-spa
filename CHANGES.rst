@@ -44,6 +44,9 @@ Release History
 - Improved accuracy by fixing choice of evaluation point and intercept
   distributions.
   (`#39 <https://github.com/nengo/nengo_spa/pull/39>`_)
+- Correctly apply transforms on first vector in vocabularies on on non-strict
+  vocabularies.
+  (`#43 <https://github.com/nengo/nengo_spa/pull/43>)
 
 
 0.1.1 (May 19, 2017)

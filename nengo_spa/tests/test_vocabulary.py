@@ -71,6 +71,14 @@ def test_populate_with_transform_on_first_vector(rng):
     assert np.allclose(v['A'].v, v['A'].unitary().v)
 
 
+def test_populate_with_transform_on_nonstrict_vocab(rng):
+    v = Vocabulary(64, rng=rng, strict=False)
+
+    v.populate('A.unitary()')
+    assert 'A' in v
+    assert np.allclose(v['A'].v, v['A'].unitary().v)
+
+
 def test_parse(rng):
     v = Vocabulary(64, rng=rng)
     v.populate('A; B; C')
