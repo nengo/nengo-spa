@@ -23,6 +23,12 @@ Release History
 0.2 (unreleased)
 ================
 
+**Added**
+
+- Tutorial explaining what has changed in nengo_spa compared to the legacy SPA
+  implementation.
+  (`#46 <https://github.com/nengo/nengo_spa/pull/46>`_)
+
 **Changed**
 
 - Replaced *input_keys* and *output_keys* arguments of associative memories
