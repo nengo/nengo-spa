@@ -18,12 +18,15 @@ _pytest.capture.DontReadFromInput.encoding = "utf-8"
 _pytest.capture.DontReadFromInput.write = lambda: None
 _pytest.capture.DontReadFromInput.flush = lambda: None
 
-too_slow = ['question',
-            'question_control',
-            'question_memory',
-            'spa_parser',
-            'spa_sequence',
-            'spa_sequence_routed']
+too_slow = [
+    'intro_coming_from_legacy_spa',
+    'question',
+    'question_control',
+    'question_memory',
+    'spa_parser',
+    'spa_sequence',
+    'spa_sequence_routed',
+]
 
 all_examples, slow_examples, fast_examples = [], [], []
 
