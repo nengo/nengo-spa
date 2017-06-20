@@ -3,7 +3,7 @@
   :alt: Travis-CI build status
 
 .. image:: https://ci.appveyor.com/api/projects/status/5blofvbh8305w75g?svg=true
-  :target: https://ci.appveyor.com/project/nengo/nengo_spa
+  :target: https://ci.appveyor.com/project/jgosmann/nengo-spa
   :alt: AppVeyor build status
 
 .. image:: https://img.shields.io/codecov/c/github/nengo/nengo_spa/master.svg
