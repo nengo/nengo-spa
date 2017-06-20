@@ -1,12 +1,14 @@
 import codecs
 import os
-from pkg_resources import resource_isdir, resource_listdir, resource_stream
-
-import pytest
-import _pytest.capture
+from pkg_resources import resource_stream
 
 from nengo.utils.ipython import read_nb
 from nengo.utils.stdlib import execfile
+import pytest
+import _pytest.capture
+
+from nengo_spa.resources import resource_walk
+
 
 # Monkeypatch _pytest.capture.DontReadFromInput
 #  If we don't do this, importing IPython will choke as it reads the current
@@ -29,22 +31,6 @@ too_slow = [
 ]
 
 all_examples, slow_examples, fast_examples = [], [], []
-
-
-def resource_walk(package_or_requirement, resource_name):
-    queue = [resource_name]
-    while len(queue) > 0:
-        dirpath = queue.pop()
-        dirnames = []
-        filenames = []
-        for name in resource_listdir(package_or_requirement, dirpath):
-            fullpath = os.path.join(dirpath, name)
-            if resource_isdir(package_or_requirement, fullpath):
-                dirnames.append(name)
-                queue.append(fullpath)
-            else:
-                filenames.append(name)
-        yield dirpath, dirnames, filenames
 
 
 def load_example(example):
