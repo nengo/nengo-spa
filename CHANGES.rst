@@ -28,6 +28,10 @@ Release History
 - Tutorial explaining what has changed in nengo_spa compared to the legacy SPA
   implementation.
   (`#46 <https://github.com/nengo/nengo_spa/pull/46>`_)
+- Examples can be extracted with ``python -m nengo_spa extract-examples
+  <destination>``.
+  (`#49 <https://github.com/nengo/nengo_spa/pull/49>`_,
+  `#7 <https://github.com/nengo/nengo_spa/issues/7>`_)
 
 **Changed**
 
