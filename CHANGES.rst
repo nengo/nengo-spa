@@ -23,6 +23,13 @@ Release History
 0.2.1 (unreleased)
 ==================
 
+**Fixed**
+
+- Fix some operations changing the dimensionality of semantic pointers with an
+  odd initial dimensionality.
+  (`#52 <https://github.com/nengo/nengo_spa/issues/52>`_,
+  `#53 <https://github.com/nengo/nengo_spa/pull/53>`_)
+
 
 0.2 (June 22, 2017)
 ===================

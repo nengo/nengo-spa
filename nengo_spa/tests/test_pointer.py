@@ -54,8 +54,9 @@ def test_str():
     assert str(a) == '[ 1.  1.]'
 
 
-def test_make_unitary(rng):
-    a = SemanticPointer(100, rng=rng)
+@pytest.mark.parametrize('d', [65, 100])
+def test_make_unitary(d, rng):
+    a = SemanticPointer(d, rng=rng)
     b = a.unitary()
     assert a is not b
     assert np.allclose(1, b.length())
@@ -78,15 +79,16 @@ def test_add_sub():
     assert np.allclose((a + b).v, (a - (-b)).v)
 
 
-def test_convolution(rng):
-    a = SemanticPointer(64, rng=rng)
-    b = SemanticPointer(64, rng=rng)
-    identity = SemanticPointer(np.eye(64)[0])
+@pytest.mark.parametrize('d', [64, 65])
+def test_convolution(d, rng):
+    a = SemanticPointer(d, rng=rng)
+    b = SemanticPointer(d, rng=rng)
+    identity = SemanticPointer(np.eye(d)[0])
 
     c = a.copy()
     c *= b
 
-    ans = np.fft.irfft(np.fft.rfft(a.v) * np.fft.rfft(b.v))
+    ans = np.fft.irfft(np.fft.rfft(a.v) * np.fft.rfft(b.v), n=d)
 
     assert np.allclose((a * b).v, ans)
     assert np.allclose(a.convolve(b).v, ans)

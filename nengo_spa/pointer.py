@@ -40,7 +40,8 @@ class SemanticPointer(object):
         fft_real = fft_val.real
         fft_norms = np.sqrt(fft_imag ** 2 + fft_real ** 2)
         fft_unit = fft_val / fft_norms
-        return SemanticPointer(np.array((np.fft.ifft(fft_unit)).real))
+        return SemanticPointer(np.array((np.fft.ifft(
+            fft_unit, n=len(self))).real))
 
     def copy(self):
         """Return another semantic pointer with the same data."""
@@ -98,7 +99,9 @@ class SemanticPointer(object):
 
     def convolve(self, other):
         """Return the circular convolution of two SemanticPointers."""
-        x = np.fft.irfft(np.fft.rfft(self.v) * np.fft.rfft(other.v))
+        assert len(self) == len(other)
+        n = len(self)
+        x = np.fft.irfft(np.fft.rfft(self.v) * np.fft.rfft(other.v), n=n)
         return SemanticPointer(data=x)
 
     def get_convolution_matrix(self):
