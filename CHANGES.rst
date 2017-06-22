@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-0.2 (unreleased)
-================
+0.2 (June 22, 2017)
+===================
 
 **Added**
 
@@ -56,7 +56,7 @@ Release History
   (`#39 <https://github.com/nengo/nengo_spa/pull/39>`_)
 - Correctly apply transforms on first vector in vocabularies on on non-strict
   vocabularies.
-  (`#43 <https://github.com/nengo/nengo_spa/pull/43>)
+  (`#43 <https://github.com/nengo/nengo_spa/pull/43>`_)
 
 
 0.1.1 (May 19, 2017)

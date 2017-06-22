@@ -19,7 +19,7 @@ prune .*
 prune .git
 prune .tox
 
-global-exclude *.ipynb_checkpoints*
+prune nengo_spa/examples/.ipynb_checkpoints
 
 # Exclude all bytecode
 global-exclude *.pyc *.pyo *.pyd
