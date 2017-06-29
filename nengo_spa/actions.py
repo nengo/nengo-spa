@@ -1,4 +1,7 @@
 """Parsing of SPA actions."""
+
+from itertools import chain
+
 from nengo.exceptions import NetworkContextError, SpaParseError
 from nengo.network import Network
 from nengo_spa.modules.basalganglia import BasalGanglia
@@ -221,8 +224,13 @@ class Actions(object):
         if name is not None:
             self.named_actions[name] = ast
 
+    @property
+    def bg_actions(self):
+        return [a for a in chain(self.actions, self.named_actions.values())
+                if isinstance(a, Action)]
+
     def build(self):
-        needs_bg = len(self.actions) > 0
+        needs_bg = len(self.bg_actions) > 0
 
         if len(Network.context) <= 0:
             raise NetworkContextError(
@@ -238,6 +246,8 @@ class Actions(object):
                     thalamus.actions.ensembles[i].label = (
                         'action[{}]: {}'.format(i, a.effects))
                 thalamus.connect_bg(bg)
+            else:
+                bg = thalamus = None
 
         self.construction_context = ConstructionContext(
             root_network, bg=bg, thalamus=thalamus)

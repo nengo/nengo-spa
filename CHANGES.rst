@@ -36,6 +36,10 @@ Release History
   odd initial dimensionality.
   (`#52 <https://github.com/nengo/nengo_spa/issues/52>`_,
   `#53 <https://github.com/nengo/nengo_spa/pull/53>`_)
+- When building actions the basal ganglia and thalamus will only be created
+  when actually required.
+  (`#60 <https://github.com/nengo/nengo_spa/pull/60>`_,
+  `#42 <https://github.com/nengo/nengo_spa/issues/42>`_)
 
 
 0.2 (June 22, 2017)

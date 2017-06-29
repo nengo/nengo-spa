@@ -188,3 +188,13 @@ def test_provides_access_to_constructed_objects_of_effect():
             else:
                 raise AssertionError("Unexpected object constructed for Bind.")
         assert n_connections == 2 and n_bind == 1
+
+
+def test_bg_and_thalamus_only_created_when_required():
+    with spa.Network() as model:
+        model.state1 = spa.State(16)
+        model.state2 = spa.State(16)
+        actions = spa.Actions(('state1 = state2',))
+
+    assert actions.bg is None
+    assert actions.thalamus is None
