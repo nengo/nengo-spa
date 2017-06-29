@@ -32,10 +32,10 @@ def test_run(Simulator, seed):
                 return 'B'
 
         model.input = spa.Encode(inputA, vocab=16)
-        spa.Actions(
+        spa.Actions((
             'compare.input_a = input',
             'compare.input_b = A'
-        ).build()
+        ))
 
     compare, vocab = model.get_network_output('compare')
 

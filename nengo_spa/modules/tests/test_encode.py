@@ -10,7 +10,7 @@ def test_fixed(Simulator, seed):
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
         model.input1 = spa.Encode('A', vocab=16)
         model.input2 = spa.Encode('B', vocab=8)
-        spa.Actions('buffer1 = input1', 'buffer2 = input2').build()
+        spa.Actions(('buffer1 = input1', 'buffer2 = input2'))
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
 
@@ -39,7 +39,7 @@ def test_time_varying(Simulator, seed):
                 return '0'
 
         model.encode = spa.Encode(stimulus, vocab=16)
-        spa.Actions('buffer = encode').build()
+        spa.Actions(('buffer = encode',))
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
 
@@ -69,7 +69,7 @@ def test_with_input(Simulator, seed):
 
         model.encode = spa.Encode(stimulus, vocab=16, size_in=1)
         nengo.Connection(ctrl, model.encode.input)
-        spa.Actions('buffer = encode').build()
+        spa.Actions(('buffer = encode',))
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
 

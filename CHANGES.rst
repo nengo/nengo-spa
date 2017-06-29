@@ -23,6 +23,13 @@ Release History
 0.2.1 (unreleased)
 ==================
 
+**Changed**
+
+- Actions will be build automatically without an explicit call to ``build()``.
+  (`#59 <https://github.com/nengo/nengo_spa/pull/59>`_,
+  `#45 <https://github.com/nengo/nengo_spa/issues/45>`_,
+  `#55 <https://github.com/nengo/nengo_spa/issues/55>`_)
+
 **Fixed**
 
 - Fix some operations changing the dimensionality of semantic pointers with an
