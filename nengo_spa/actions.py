@@ -211,7 +211,7 @@ class Actions(object):
         if name is not None:
             self.named_actions[name] = ast
 
-    def build(self, bg=None, thalamus=None):
+    def build(self):
         needs_bg = len(self.actions) > 0
 
         if len(Network.context) <= 0:
@@ -221,9 +221,8 @@ class Actions(object):
         root_network = Network.context[-1]
 
         with root_network:
-            if needs_bg and bg is None:
+            if needs_bg:
                 bg = BasalGanglia(action_count=len(self.actions))
-            if needs_bg and thalamus is None:
                 thalamus = Thalamus(action_count=len(self.actions))
                 for i, a in enumerate(self.actions):
                     thalamus.actions.ensembles[i].label = (
