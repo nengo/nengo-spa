@@ -18,7 +18,7 @@ class SpaCommunicationChannel(spa.Network):
             self.state_in = spa.State(dimensions)
             self.state_out = spa.State(dimensions)
 
-            spa.Actions('state_out = state_in').build()
+            spa.Actions(('state_out = state_in',))
 
         self.inputs = dict(
             default=self.state_in.inputs['default'],
@@ -36,7 +36,7 @@ def test_spa_verification(seed, plt):
     # building a normal model that shouldn't raise a warning
     with model:
         model.buf = spa.State(d)
-        spa.Actions('buf = B').build()
+        spa.Actions(('buf = B',))
         # make sure errors aren't fired for non-spa networks
         prod = nengo.networks.Product(10, 2)  # noqa: F841
         model.int_val = 1
@@ -137,7 +137,7 @@ def test_hierarchical(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions('comm_channel = A', 'out = comm_channel').build()
+        spa.Actions(('comm_channel = A', 'out = comm_channel'))
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -182,10 +182,10 @@ def test_hierarchical_actions(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions(
+        spa.Actions((
             'comm_channel.state_in = A',
             'out = comm_channel.state_out'
-        ).build()
+        ))
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -223,7 +223,7 @@ def test_no_magic_vocab_transform():
         model.a = spa.State(vocab=v1)
         model.b = spa.State(vocab=v2)
         with pytest.raises(SpaTypeError):
-            spa.Actions('b = a').build()
+            spa.Actions(('b = a',))
 
 
 @pytest.mark.parametrize('d1,d2,method,lookup', [
@@ -242,8 +242,8 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     with spa.Network() as model:
         model.a = spa.State(vocab=v1)
         model.b = spa.State(vocab=v2)
-        spa.Actions(
-            'a = A', 'b = {}'.format(method), vocabs={'v2': v2}).build()
+        spa.Actions((
+            'a = A', 'b = {}'.format(method)), vocabs={'v2': v2})
         p = nengo.Probe(model.b.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -262,7 +262,7 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
 def test_copy_spa(RefSimulator):
     with spa.Network() as original:
         original.state = spa.State(16)
-        spa.Actions("state = A").build()
+        spa.Actions(('state = A',))
 
     cp = original.copy()
 

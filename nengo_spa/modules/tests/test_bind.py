@@ -38,7 +38,7 @@ def test_run(Simulator, seed):
                 return 'B'
 
         model.input = spa.Encode(inputA, vocab=vocab)
-        spa.Actions('bind.input_a = input', 'bind.input_b = A').build()
+        spa.Actions(('bind.input_a = input', 'bind.input_b = A'))
 
     bind, vocab = model.get_network_output('bind')
 

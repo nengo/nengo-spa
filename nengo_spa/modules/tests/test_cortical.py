@@ -11,11 +11,11 @@ def test_connect(Simulator, seed):
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
         model.buffer3 = spa.State(vocab=16)
-        spa.Actions(
+        spa.Actions((
             'buffer1 = A',
             'buffer2=buffer1',
             'buffer3=~buffer1'
-        ).build()
+        ))
 
     output2, vocab = model.get_network_output('buffer2')
     output3, vocab = model.get_network_output('buffer3')
@@ -37,7 +37,7 @@ def test_transform(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=32)
         model.buffer2 = spa.State(vocab=32)
-        spa.Actions('buffer1 = A', 'buffer2=buffer1*B').build()
+        spa.Actions(('buffer1 = A', 'buffer2=buffer1*B',))
 
     output, vocab = model.get_network_output('buffer2')
 
@@ -56,10 +56,10 @@ def test_translate(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=32)
-        spa.Actions(
+        spa.Actions((
             'buffer1 = A',
             'buffer2=translate(buffer1, populate=True)'
-        ).build()
+        ))
 
     output, vocab = model.get_network_output('buffer2')
 
@@ -78,7 +78,7 @@ def test_errors():
     with pytest.raises(SpaNameError) as excinfo:
         with spa.Network() as model:
             model.buffer = spa.State(vocab=16)
-            spa.Actions('buffer2=buffer').build()
+            spa.Actions(('buffer2=buffer',))
 
     assert excinfo.value.name == 'buffer2'
 
@@ -89,8 +89,8 @@ def test_direct(Simulator, seed):
         model.buffer1.vocab.populate('A; B; C')
         model.buffer2 = spa.State(vocab=32)
         model.buffer2.vocab.populate('A; B; C')
-        spa.Actions(
-            'buffer1=A', 'buffer2=B', 'buffer1=C, buffer2=C').build()
+        spa.Actions((
+            'buffer1=A', 'buffer2=B', 'buffer1=C, buffer2=C'))
 
     output1, vocab1 = model.get_network_output('buffer1')
     output2, vocab2 = model.get_network_output('buffer2')
@@ -122,12 +122,12 @@ def test_convolution(Simulator, plt, seed):
         model.outAinvB = spa.State()
         model.outAinvBinv = spa.State()
 
-        spa.Actions(
+        spa.Actions((
             'outAB = inA * inB',
             'outABinv = inA * ~inB',
             'outAinvB = ~inA * inB',
             'outAinvBinv = ~inA * ~inB',
-            ).build()
+        ))
         nengo.Connection(nengo.Node([0, 1, 0, 0, 0]), model.inA.input)
         nengo.Connection(nengo.Node([0, 0, 1, 0, 0]), model.inB.input)
 

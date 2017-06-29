@@ -22,7 +22,7 @@ def test_am_basic(Simulator, plt, seed, rng):
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.3, input_vocab=vocab,
                                     function=filtered_step_fn)
-        spa.Actions('am = A').build()
+        spa.Actions(('am = A',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -63,7 +63,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
             threshold=0.5, input_vocab=vocab, output_vocab=vocab2,
             function=filtered_step_fn, mapping='by-key')
         m.stimulus = spa.Encode(input_func, vocab=vocab)
-        spa.Actions('am = stimulus').build()
+        spa.Actions(('am = stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -106,7 +106,7 @@ def test_am_wta(Simulator, plt, seed, rng):
         m.am = WTAAssocMem(
             threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
         m.stimulus = spa.Encode(input_func, vocab=vocab)
-        spa.Actions('am = stimulus').build()
+        spa.Actions(('am = stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -146,7 +146,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
                                     function=filtered_step_fn)
         m.am.add_default_output('D', 0.5)
         m.stimulus = spa.Encode(input_func, vocab=vocab)
-        spa.Actions('am = stimulus').build()
+        spa.Actions(('am = stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -193,7 +193,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
 
         model.inp = spa.Encode(
             lambda t: 'A' if t < 0.1 else 'A*B', vocab=vocab_in)
-        spa.Actions('am = inp').build()
+        spa.Actions(('am = inp',))
 
         in_p = nengo.Probe(model.am.input)
         out_p = nengo.Probe(model.am.output, synapse=0.03)

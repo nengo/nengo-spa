@@ -48,7 +48,7 @@ def test_basal_ganglia(Simulator, seed, plt):
         model.input = spa.Encode(input, vocab=16)
 
         # test all acceptable condition formats
-        model.bg, _, _ = spa.Actions(
+        actions = spa.Actions((
             '0.5 --> motor=A',
             'dot(vision, CAT) --> motor=B',
             'dot(vision*CAT, DOG) --> motor=C',
@@ -61,7 +61,8 @@ def test_basal_ganglia(Simulator, seed, plt):
             'vision = input',
             'compare.input_a = SHOOP',
             'compare.input_b = SHOOP'
-        ).build()
+        ))
+        model.bg = actions.bg
 
         p = nengo.Probe(model.bg.input, 'output', synapse=0.03)
 
@@ -94,7 +95,7 @@ def test_basal_ganglia(Simulator, seed, plt):
 def test_scalar_product():
     with spa.Network() as model:
         model.scalar = spa.Scalar()
-        spa.Actions('scalar*scalar --> scalar=1').build()
+        spa.Actions(('scalar*scalar --> scalar=1',))
     # just testing network construction without exception here
 
 
@@ -104,7 +105,7 @@ def test_constructed_input_connections_are_accessible():
         model.state1 = spa.State()
         model.state2 = spa.State()
 
-        actions = spa.Actions('dot(state1, A) --> state2 = A')
+        actions = spa.Actions(('dot(state1, A) --> state2 = A',), build=False)
         bg, thalamus, _ = actions.build()
 
         assert isinstance(bg.input_connections[0], nengo.Connection)

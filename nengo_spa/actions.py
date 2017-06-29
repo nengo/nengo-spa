@@ -174,25 +174,35 @@ class Actions(object):
     names in the action rules.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self, actions=None, named_actions=None, vocabs=None, build=True):
         super(Actions, self).__init__()
+
+        if actions is None:
+            actions = []
+        if named_actions is None:
+            named_actions = {}
 
         self.actions = []
         self.named_actions = {}
 
+        self.bg = None
+        self.thalamus = None
+        self.connstructed = None
+
         self.construction_context = None
 
-        self.parse(*args, **kwargs)
+        self.parse(actions, named_actions, vocabs)
+        if build:
+            self.bg, self.thalamus, self.connstructed = self.build()
 
-    def parse(self, *args, **kwargs):
-        vocabs = kwargs.pop('vocabs', None)
-
-        sorted_kwargs = sorted(kwargs.items())
+    def parse(self, actions, named_actions, vocabs=None):
+        named_actions = sorted(named_actions.items())
 
         parser = Parser(vocabs=vocabs)
-        for action in args:
+        for action in actions:
             self._parse_and_add(parser, action)
-        for name, action in sorted_kwargs:
+        for name, action in named_actions:
             self._parse_and_add(parser, action, name=name)
 
     def __len__(self):

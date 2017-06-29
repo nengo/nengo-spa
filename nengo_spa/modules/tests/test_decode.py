@@ -21,7 +21,7 @@ def test_decode(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.config[nengo.Connection].synapse = nengo.Lowpass(0.)
         model.output = Decode(output_fn, vocab=16)
-        spa.Actions('output = A').build()
+        spa.Actions(('output = A',))
 
     with Simulator(model) as sim:
         sim.run(0.01)

@@ -13,7 +13,7 @@ def test_transcode(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.transcode = Transcode(
             transcode_fn, input_vocab=16, output_vocab=16)
-        spa.Actions('transcode = A').build()
+        spa.Actions(('transcode = A',))
         p = nengo.Probe(model.transcode.output, synapse=None)
 
     with Simulator(model) as sim:
@@ -26,7 +26,7 @@ def test_transcode(Simulator, seed):
 def test_passthrough(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.passthrough = Transcode(input_vocab=16, output_vocab=16)
-        spa.Actions('passthrough = A').build()
+        spa.Actions(('passthrough = A',))
         p = nengo.Probe(model.passthrough.output, synapse=0.03)
 
     with Simulator(model) as sim:
