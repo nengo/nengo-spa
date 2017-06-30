@@ -2,7 +2,9 @@ import warnings
 
 import nengo
 from nengo.exceptions import ValidationError
+from nengo.utils.compat import is_iterable
 from nengo.utils.network import with_self
+import numpy as np
 
 
 class IdentityEnsembleArray(nengo.Network):
@@ -47,29 +49,30 @@ class IdentityEnsembleArray(nengo.Network):
             self.input = nengo.Node(size_in=dimensions)
             self.output = nengo.Node(size_in=dimensions)
 
-            first = nengo.Ensemble(neurons_per_dimension, 1)
-            nengo.Connection(self.input[0], first, synapse=None)
-            nengo.Connection(first, self.output[0], synapse=None)
+            self.first = nengo.Ensemble(neurons_per_dimension, 1)
+            nengo.Connection(self.input[0], self.first, synapse=None)
+            nengo.Connection(self.first, self.output[0], synapse=None)
 
             if subdimensions > 1:
-                second = nengo.Ensemble(
+                self.second = nengo.Ensemble(
                     neurons_per_dimension * (subdimensions - 1),
                     subdimensions - 1,
                     eval_points=cos_sim_dist, intercepts=cos_sim_dist)
                 nengo.Connection(
-                    self.input[1:subdimensions], second, synapse=None)
+                    self.input[1:subdimensions], self.second, synapse=None)
                 nengo.Connection(
-                    second, self.output[1:subdimensions], synapse=None)
+                    self.second, self.output[1:subdimensions], synapse=None)
 
             if dimensions > subdimensions:
-                remainder = nengo.networks.EnsembleArray(
+                self.remainder = nengo.networks.EnsembleArray(
                     neurons_per_dimension * subdimensions,
                     dimensions // subdimensions - 1, subdimensions,
                     eval_points=cos_sim_dist, intercepts=cos_sim_dist)
                 nengo.Connection(
-                    self.input[subdimensions:], remainder.input, synapse=None)
+                    self.input[subdimensions:], self.remainder.input,
+                    synapse=None)
                 nengo.Connection(
-                    remainder.output, self.output[subdimensions:],
+                    self.remainder.output, self.output[subdimensions:],
                     synapse=None)
 
     @with_self
@@ -106,3 +109,43 @@ class IdentityEnsembleArray(nengo.Network):
             i += ens.n_neurons
 
         return self.neuron_input
+
+    @with_self
+    def add_output(self, name, function, synapse=None, **conn_kwargs):
+        if is_iterable(function):
+            function = list(function)
+            if (len(function) != 3 and
+                    len(function) != self.remainder.n_ensembles + 2):
+                raise ValidationError(
+                    "Must provide one function per ensemble or one function "
+                    "each for the first ensemble, the second ensembles, and "
+                    "all remaining ensembles.")
+            first_fn = function[0]
+            second_fn = function[1]
+            remainder_fn = function[2:]
+        else:
+            first_fn = second_fn = remainder_fn = function
+
+        first_size = np.asarray(first_fn(np.zeros(self.first.dimensions))).size
+        second_size = np.asarray(
+            second_fn(np.zeros(self.second.dimensions))).size
+        remainder_start = first_size + second_size
+
+        remainder_fn_out = self.remainder.add_output(name, remainder_fn)
+        remainder_size = remainder_fn_out.size_out
+
+        output = nengo.Node(
+            size_in=first_size + second_size + remainder_size, label=name)
+        setattr(self, name, output)
+
+        nengo.Connection(
+            self.first, output[:first_size], function=first_fn,
+            synapse=synapse, **conn_kwargs)
+        nengo.Connection(
+            self.second, output[first_size:remainder_start],
+            function=second_fn, synapse=synapse, **conn_kwargs)
+        nengo.Connection(
+            remainder_fn_out, output[remainder_start:], synapse=synapse,
+            **conn_kwargs)
+
+        return output
