@@ -237,7 +237,7 @@ class Vocabulary(Mapping):
                         "argument to silence this warning or "
                         "`populate=True` to automatically add missing "
                         "keys to the target vocabulary."))
-                elif populate:
+                if populate:
                     other.populate(k)
                 else:
                     continue

@@ -61,6 +61,10 @@ Release History
   when actually required.
   (`#60 <https://github.com/nengo/nengo_spa/pull/60>`_,
   `#42 <https://github.com/nengo/nengo_spa/issues/42>`_)
+- The vocabulary translate mechanism will properly ignore missing keys in the
+  target vocabulary when ``populate=False``.
+  (`#62 <https://github.com/nengo/nengo_spa/pull/62>`_,
+  `#56 <https://github.com/nengo/nengo_spa/issues/56>`_)
 
 
 0.2 (June 22, 2017)
