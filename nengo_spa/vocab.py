@@ -225,26 +225,25 @@ class Vocabulary(Mapping):
         """
         if keys is None:
             keys = self._keys
+        keys = set(keys)
 
-        t = np.zeros((other.dimensions, self.dimensions), dtype=float)
-        for k in keys:
-            if k not in other:
-                if populate is None:
-                    warnings.warn(NengoWarning(
-                        "The transform_to source vocabulary has keys not "
-                        "existent in the target vocabulary. These will "
-                        "be ignored. Use the `populate=False` keyword "
-                        "argument to silence this warning or "
-                        "`populate=True` to automatically add missing "
-                        "keys to the target vocabulary."))
-                if populate:
-                    other.populate(k)
-                else:
-                    continue
-            a = self[k].v
-            b = other[k].v
-            t += np.outer(b, a)
-        return t
+        missing_keys = set(k for k in keys if k not in other)
+
+        if len(missing_keys) > 0:
+            if populate is None:
+                warnings.warn(NengoWarning(
+                    "The transform_to source vocabulary has keys not existent "
+                    "in the target vocabulary. These will be ignored. Use the "
+                    "`populate=False` keyword argument to silence this "
+                    "warning or `populate=True` to automatically add missing "
+                    "keys to the target vocabulary."))
+            elif populate:
+                other.populate(';'.join(missing_keys))
+                missing_keys = set()
+
+        from_vocab = self.create_subset(keys - missing_keys).vectors
+        to_vocab = other.create_subset(keys - missing_keys).vectors
+        return np.dot(to_vocab.T, from_vocab)
 
     def create_subset(self, keys):
         """Returns the subset of this vocabulary.
