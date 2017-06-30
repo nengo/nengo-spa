@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from nengo.exceptions import NengoWarning, ValidationError
+import nengo.solvers
+from nengo.utils.testing import warns
 import numpy as np
 import pytest
 
-from nengo.exceptions import NengoWarning, ValidationError
 from nengo_spa import Vocabulary, VocabularyMap
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
-from nengo.utils.testing import warns
 
 
 def test_add(rng):
@@ -133,7 +134,8 @@ def test_capital(rng):
         v.parse('A+B+C+a')
 
 
-def test_transform(recwarn, rng):
+@pytest.mark.parametrize('solver', [None, nengo.solvers.Lstsq()])
+def test_transform(recwarn, rng, solver):
     v1 = Vocabulary(32, strict=False, rng=rng)
     v2 = Vocabulary(64, strict=False, rng=rng)
     v1.populate('A; B; C')
@@ -146,13 +148,13 @@ def test_transform(recwarn, rng):
     # Expected: np.dot(t, A.v) ~= v2.parse('A')
     # Expected: np.dot(t, B.v) ~= v2.parse('B')
     # Expected: np.dot(t, C.v) ~= v2.parse('C')
-    t = v1.transform_to(v2)
+    t = v1.transform_to(v2, solver=solver)
 
     assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
     assert v2.parse('C+B').compare(np.dot(t, C.v + B.v)) > 0.9
 
     # Test transform from v1 to v2 (only 'A' and 'B')
-    t = v1.transform_to(v2, keys=['A', 'B'])
+    t = v1.transform_to(v2, keys=['A', 'B'], solver=solver)
 
     assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
     assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.9
@@ -161,15 +163,15 @@ def test_transform(recwarn, rng):
     v1.populate('D')
     D = v1['D']
     with warns(NengoWarning):
-        v1.transform_to(v2)
+        v1.transform_to(v2, solver=solver)
 
     # Test populating missing keys
-    t = v1.transform_to(v2, populate=True)
+    t = v1.transform_to(v2, populate=True, solver=solver)
     assert v2.parse('D').compare(np.dot(t, D.v)) > 0.9
 
     # Test ignores missing keys in source vocab
     v2.populate('E')
-    v1.transform_to(v2, populate=True)
+    v1.transform_to(v2, populate=True, solver=solver)
     assert 'E' not in v1
 
 

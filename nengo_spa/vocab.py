@@ -206,7 +206,7 @@ class Vocabulary(Mapping):
             v = v.v
         return np.dot(self._vectors, v)
 
-    def transform_to(self, other, populate=None, keys=None):
+    def transform_to(self, other, populate=None, keys=None, solver=None):
         """Create a linear transform from one Vocabulary to another.
 
         This is simply the sum of the outer products of the corresponding
@@ -243,7 +243,10 @@ class Vocabulary(Mapping):
 
         from_vocab = self.create_subset(keys - missing_keys).vectors
         to_vocab = other.create_subset(keys - missing_keys).vectors
-        return np.dot(to_vocab.T, from_vocab)
+        if solver is None:
+            return np.dot(to_vocab.T, from_vocab)
+        else:
+            return solver(from_vocab, to_vocab)[0].T
 
     def create_subset(self, keys):
         """Returns the subset of this vocabulary.
