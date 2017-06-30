@@ -23,6 +23,14 @@ Release History
 0.2.1 (unreleased)
 ==================
 
+**Added**
+
+- Add ``add_output`` and ``add_neuron_output`` methods to
+  ``IdentityEnsembleArray`` to provide the full API that is provided by the
+  regular Nengo ``EnsembleArray``.
+  (`#61 <https://github.com/nengo/nengo_spa/pull/61>`_,
+  `#28 <https://github.com/nengo/nengo_spa/issues/28>`_)
+
 **Changed**
 
 - Actions will be build automatically without an explicit call to ``build()``.

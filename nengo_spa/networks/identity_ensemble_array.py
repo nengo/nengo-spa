@@ -43,6 +43,7 @@ class IdentityEnsembleArray(nengo.Network):
         self.subdimensions = subdimensions
 
         self.neuron_input = None
+        self.neuron_output = None
 
         cos_sim_dist = nengo.dists.CosineSimilarity(dimensions + 2)
         with self:
@@ -109,6 +110,32 @@ class IdentityEnsembleArray(nengo.Network):
             i += ens.n_neurons
 
         return self.neuron_input
+
+    @with_self
+    def add_neuron_output(self):
+        if self.neuron_output is not None:
+            warnings.warn("neuron_output already exists. Returning.")
+            return self.neuron_output
+
+        if any(isinstance(e.neuron_type, nengo.Direct)
+               for e in self.all_ensembles):
+            raise ValidationError(
+                "Ensembles use Direct neuron type. "
+                "Cannot get neuron output from Direct neurons.",
+                attr='all_ensembles[i].neuron_type', obj=self)
+
+        self.neuron_output = nengo.Node(
+            size_in=self.neurons_per_dimension * self.dimensions,
+            label="neuron_output")
+
+        i = 0
+        for ens in self.all_ensembles:
+            nengo.Connection(
+                ens.neurons, self.neuron_output[i:(i + ens.n_neurons)],
+                synapse=None)
+            i += ens.n_neurons
+
+        return self.neuron_output
 
     @with_self
     def add_output(self, name, function, synapse=None, **conn_kwargs):

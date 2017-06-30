@@ -1,5 +1,6 @@
 import nengo
 import numpy as np
+from numpy.testing import assert_almost_equal
 import pytest
 
 from nengo_spa.networks.identity_ensemble_array import IdentityEnsembleArray
@@ -71,3 +72,28 @@ def test_add_output_multiple_fn(Simulator, seed, rng, plt):
 
     plt.plot(sim.trange(), np.dot(sim.data[p], expected.v))
     assert sp_close(sim.trange(), sim.data[p], expected, skip=0.2, atol=0.3)
+
+
+def test_neuron_connections(Simulator, seed, rng):
+    d = 8
+    pointer = SemanticPointer(d, rng=rng)
+
+    with nengo.Network(seed=seed) as model:
+        ea = IdentityEnsembleArray(15, d, 4)
+        input_node = nengo.Node(pointer.v)
+        nengo.Connection(input_node, ea.input)
+
+        bias = nengo.Node(1)
+        neuron_in = ea.add_neuron_input()
+        assert ea.neuron_input is neuron_in
+        nengo.Connection(
+            bias, neuron_in, transform=-3. * np.ones((neuron_in.size_in, 1)))
+
+        neuron_out = ea.add_neuron_output()
+        assert ea.neuron_output is neuron_out
+        p = nengo.Probe(neuron_out)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert_almost_equal(sim.data[p][sim.trange() > 0.1], 0.)
