@@ -59,7 +59,8 @@ ApproxInverse: '~' Source
 Negative: '-' Source
 DotProduct: 'dot(' Source ',' Source ')'
 Reinterpret: 'reinterpret(' Source (',' VocabArg)? ')'
-Translate: 'translate(' Source (',' VocabArg)? ')'
+Translate: 'translate(' Source (',' TranslateArg)* ')'
+TranslateArg : <valid Python identifier> '=' <valid Python argument> | VocabArg
 VocabArg: 'vocab='? (Module | <valid Python identifier>)
 Sink: <valid Python identifier> | <valid Python identifier> '.' Sink
 Effect: Sink '=' Source
@@ -899,12 +900,13 @@ class Reinterpret(Source):
 
 
 class Translate(Source):
-    def __init__(self, source, vocab=None, populate=None):
+    def __init__(self, source, vocab=None, populate=None, solver=None):
         source = ensure_node(source)
         super(Translate, self).__init__(staticity=source.staticity)
         self.source = source
         self.vocab = vocab
         self.populate = populate
+        self.solver = solver
 
     def infer_types(self, root_network, context_type):
         if self.vocab is None:
@@ -926,7 +928,7 @@ class Translate(Source):
 
     def construct(self, context):
         tr = self.source.type.vocab.transform_to(
-            self.type.vocab, populate=self.populate)
+            self.type.vocab, populate=self.populate, solver=self.solver)
         artifacts = self.source.construct(context)
         return [a.add_transform(tr) for a in artifacts]
 

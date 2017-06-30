@@ -34,6 +34,11 @@ Release History
   Nengo networks.
   (`#65 <https://github.com/nengo/nengo_spa/pull/65>`_,
   `#26 <https://github.com/nengo/nengo_spa/issues/26>`_)
+- Add a ``solver`` argument to the action rule's ``translate`` to use a solver
+  instead of an outer product to obtain the transformation matrix which can
+  give slightly better results.
+  (`#56 <https://github.com/nengo/nengo_spa/pull/56>`_,
+  `#57 <https://github.com/nengo/nengo_spa/issues/57>`_)
 
 **Changed**
 
