@@ -33,18 +33,18 @@ def test_thalamus_basic(Simulator, plt, seed):
 
 @pytest.mark.slow
 def test_thalamus(Simulator, plt, seed):
-    model = spa.Network(seed=seed)
-
-    with model:
-        model.vision = spa.State(vocab=16, neurons_per_dimension=80)
-        model.vision2 = spa.State(vocab=16, neurons_per_dimension=80)
-        model.motor = spa.State(vocab=16, neurons_per_dimension=80)
-        model.motor2 = spa.State(vocab=32, neurons_per_dimension=80)
+    with spa.Network(seed=seed) as m:
+        m.vision = spa.State(vocab=16, neurons_per_dimension=80)
+        m.vision2 = spa.State(vocab=16, neurons_per_dimension=80)
+        m.motor = spa.State(vocab=16, neurons_per_dimension=80)
+        m.motor2 = spa.State(vocab=32, neurons_per_dimension=80)
 
         spa.Actions((
-            'dot(vision, A) --> motor=A, motor2=translate(vision*vision2)',
-            'dot(vision, B) --> motor=vision, motor2=translate(vision*A*~B)',
-            'dot(vision, ~A) --> motor=~vision, '
+            'dot(m.vision, A) --> m.motor = A,'
+            'm.motor2 = translate(m.vision * m.vision2)',
+            'dot(m.vision, B) --> m.motor = m.vision,'
+            'motor2=translate(mvision*A*~B)',
+            'dot(m.vision, ~A) --> m.motor = ~m.vision, '
             'motor2=translate(~vision*vision2)'
         ))
 
@@ -57,20 +57,18 @@ def test_thalamus(Simulator, plt, seed):
                 return '~A'
             else:
                 return '0'
-        model.input = spa.Transcode(input_f, output_vocab=16)
-        spa.Actions(('vision = input', 'vision2 = B * ~A'))
+        m.input = spa.Transcode(input_f, output_vocab=16)
+        spa.Actions(('m.vision = m.input', 'm.vision2 = B * ~A'))
 
-        input, vocab = model.get_network_input('motor')
-        input2, vocab2 = model.get_network_input('motor2')
-        p = nengo.Probe(input, 'output', synapse=0.03)
-        p2 = nengo.Probe(input2, 'output', synapse=0.03)
+        p = nengo.Probe(m.motor.output, synapse=0.03)
+        p2 = nengo.Probe(m.motor2.output, synapse=0.03)
 
-    with Simulator(model) as sim:
+    with Simulator(m) as sim:
         sim.run(0.5)
 
     t = sim.trange()
-    data = vocab.dot(sim.data[p].T)
-    data2 = vocab2.dot(sim.data[p2].T)
+    data = m.motor.vocab.dot(sim.data[p].T)
+    data2 = m.motor2.vocab2.dot(sim.data[p2].T)
 
     plt.subplot(2, 1, 1)
     plt.plot(t, data.T)
@@ -121,10 +119,10 @@ def test_routing(Simulator, seed, plt):
         nengo.Connection(node2, model.buff2.input)
 
         spa.Actions((
-            'ctrl = input',
-            'dot(ctrl, A) --> buff3=buff1',
-            'dot(ctrl, B) --> buff3=buff2',
-            'dot(ctrl, C) --> buff3=buff1*buff2',
+            'model.ctrl = model.input',
+            'dot(model.ctrl, A) --> model.buff3 = model.buff1',
+            'dot(model.ctrl, B) --> model.buff3 = model.buff2',
+            'dot(model.ctrl, C) --> model.buff3 = model.buff1 * model.buff2',
         ))
 
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -160,18 +158,19 @@ def test_routing_recurrency_compilation(Simulator, seed, plt):
     with model:
         model.buff1 = spa.State(label='buff1')
         model.buff2 = spa.State(label='buff2')
-        spa.Actions(('0.5 --> buff2=buff1, buff1=buff2',))
+        spa.Actions((
+            '0.5 --> model.buff2 = model.buff1, model.buff1 = model.buff2',))
 
     with Simulator(model) as sim:
         assert sim
 
 
 def test_nondefault_routing(Simulator, seed):
-    model = spa.Network(seed=seed)
-    model.config[spa.State].vocab = 3
-    model.config[spa.State].subdimensions = 3
-    with model:
-        model.ctrl = spa.State(16, subdimensions=16, label='ctrl')
+    m = spa.Network(seed=seed)
+    m.config[spa.State].vocab = 3
+    m.config[spa.State].subdimensions = 3
+    with m:
+        m.ctrl = spa.State(16, subdimensions=16, label='ctrl')
 
         def input_func(t):
             if t < 0.2:
@@ -180,28 +179,28 @@ def test_nondefault_routing(Simulator, seed):
                 return 'B'
             else:
                 return 'C'
-        model.input = spa.Transcode(input_func, output_vocab=16)
+        m.input = spa.Transcode(input_func, output_vocab=16)
 
-        model.buff1 = spa.State(label='buff1')
-        model.buff2 = spa.State(label='buff2')
-        model.cmp = spa.Compare(3)
+        m.buff1 = spa.State(label='buff1')
+        m.buff2 = spa.State(label='buff2')
+        m.cmp = spa.Compare(3)
 
         node1 = nengo.Node([0, 1, 0])
         node2 = nengo.Node([0, 0, 1])
 
-        nengo.Connection(node1, model.buff1.input)
-        nengo.Connection(node2, model.buff2.input)
+        nengo.Connection(node1, m.buff1.input)
+        nengo.Connection(node2, m.buff2.input)
 
         spa.Actions((
-            'ctrl = input',
-            'dot(ctrl, A) --> cmp.input_a=buff1, cmp.input_b=buff1',
-            'dot(ctrl, B) --> cmp.input_a=buff1, cmp.input_b=buff2',
-            'dot(ctrl, C) --> cmp.input_a=buff2, cmp.input_b=buff2',
+            'm.ctrl = m.input',
+            'dot(m.ctrl, A) --> m.cmp.input_a=m.buff1, m.cmp.input_b=m.buff1',
+            'dot(m.ctrl, B) --> m.cmp.input_a=m.buff1, m.cmp.input_b=m.buff2',
+            'dot(m.ctrl, C) --> m.cmp.input_a=m.buff2, m.cmp.input_b=m.buff2',
         ))
 
-        compare_probe = nengo.Probe(model.cmp.output, synapse=0.03)
+        compare_probe = nengo.Probe(m.cmp.output, synapse=0.03)
 
-    with Simulator(model) as sim:
+    with Simulator(m) as sim:
         sim.run(0.6)
 
     similarity = sim.data[compare_probe]
@@ -220,9 +219,9 @@ def test_errors():
     with pytest.raises(SpaNameError) as excinfo:
         with spa.Network() as model:
             model.vision = spa.State(vocab=16)
-            spa.Actions(('0.5 --> motor=A',))
+            spa.Actions(('0.5 --> model.motor = A',))
 
-    assert excinfo.value.name == 'motor'
+    assert excinfo.value.name == 'model.motor'
 
 
 def test_constructed_objects_are_accessible():
@@ -233,8 +232,8 @@ def test_constructed_objects_are_accessible():
         model.state3 = spa.State()
 
         actions = spa.Actions((
-            'dot(state1, A) --> state2 = state3',
-            '0.5 --> state2 = B'), build=False)
+            'dot(model.state1, A) --> model.state2 = model.state3',
+            '0.5 --> model.state2 = B'), build=False)
         bg, thalamus, _ = actions.build()
 
         print(thalamus.fixed_connections)

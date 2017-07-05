@@ -37,6 +37,11 @@ Release History
 
 **Changed**
 
+- Actions rules do not require module to be assigned to the model any longer.
+  They will access exactly the same variables as are available in the
+  surrounding Python code. This means that existing action rules need to be
+  changed to reference the correct names.
+  (`#63 <https://github.com/nengo/nengo_spa/pull/63>`_)
 - Actions will be build automatically without an explicit call to ``build()``.
   (`#59 <https://github.com/nengo/nengo_spa/pull/59>`_,
   `#45 <https://github.com/nengo/nengo_spa/issues/45>`_,

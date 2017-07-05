@@ -82,11 +82,13 @@ import warnings
 from collections import defaultdict
 
 import nengo
+from nengo.base import NengoObject
 import numpy as np
 
 from nengo_spa import pointer
 from nengo_spa.modules.bind import Bind
 from nengo_spa.modules.compare import Compare
+from nengo_spa.network import Network
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.modules.product import Product as ProductModule
 from nengo_spa.exceptions import SpaConstructionError, SpaParseError, SpaTypeError
@@ -143,12 +145,11 @@ class ConstructionContext(object):
 
     @property
     def sink_network(self):
-        return self.root_network.get_spa_network(
-            self.sink.name, strip_output=True)
+        return Network.get_input_network(self.sink.obj)
 
     @property
     def sink_input(self):
-        return self.root_network.get_network_input(self.sink.name)
+        return self.sink.obj, Network.get_input_vocab(self.sink.obj)
 
     def add_constructed(self, ast_node, *objects):
         self.constructed[ast_node].extend(objects)
@@ -533,26 +534,37 @@ class Module(Source):
     This will provide potentially time varying input. This class is not used
     for networks that act as sink.
     """
-    def __init__(self, name):
+    def __init__(self, name, obj):
         super(Module, self).__init__(staticity=Node.Staticity.TRANSFORM_ONLY)
         self.name = name
+        self._obj = obj
+
+    @property
+    def obj(self):
+        if not isinstance(self._obj, NengoObject):
+            return getattr(self._obj, 'output')
+        else:
+            return self._obj
 
     def infer_types(self, root_network, context_type):
-        vocab = root_network.get_network_output(self.name)[1]
+        vocab = Network.get_output_vocab(self.obj)
         if vocab is None:
             self.type = TScalar
         else:
             self.type = TVocabulary(vocab)
 
     def construct(self, context):
-        return [Artifact(
-            context.root_network.get_network_output(self.name)[0])]
+        return [Artifact(self.obj)]
 
     def evaluate(self):
         raise ValueError("Module cannot be statically evaluated.")
 
     def __getattr__(self, name):
-        return Module(self.name + '.' + name)
+        attr = getattr(self._obj, name)
+        if isinstance(attr, Network):
+            return Module(self.name + '.' + name, attr)
+        else:
+            return attr
 
     def __str__(self):
         return self.name
@@ -1018,12 +1030,20 @@ class Effects(Node):
 class Sink(Node):
     """SPA network that acts as sink identified by its name."""
 
-    def __init__(self, name):
+    def __init__(self, name, obj):
         super(Sink, self).__init__(staticity=Node.Staticity.DYNAMIC)
         self.name = name
+        self._obj = obj
+
+    @property
+    def obj(self):
+        if not isinstance(self._obj, NengoObject):
+            return getattr(self._obj, 'input')
+        else:
+            return self._obj
 
     def infer_types(self, root_network, context_type):
-        vocab = root_network.get_network_input(self.name)[1]
+        vocab = Network.get_input_vocab(self.obj)
         if vocab is None:
             self.type = TScalar
         else:
@@ -1037,6 +1057,13 @@ class Sink(Node):
 
     def __str__(self):
         return self.name
+
+    def __getattr__(self, name):
+        attr = getattr(self._obj, name)
+        if isinstance(attr, Network):
+            return Sink(self.name + '.' + name, attr)
+        else:
+            return attr
 
 
 class Action(Node):
@@ -1105,8 +1132,7 @@ class Action(Node):
         # connect up
         for effect in self.effects.effects:
             if effect.fixed:
-                sink = context.root_network.get_network_input(
-                    effect.sink.name)[0]
+                sink = effect.sink.obj
                 tr = value_to_transform(effect.source.evaluate())
                 context.thalamus.connect_fixed(self.index, sink, transform=tr)
             else:

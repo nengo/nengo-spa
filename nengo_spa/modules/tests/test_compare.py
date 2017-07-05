@@ -3,21 +3,16 @@ import nengo_spa as spa
 
 
 def test_basic():
-    with spa.Network() as model:
-        model.compare = spa.Compare(vocab=16)
+    with spa.Network():
+        compare = spa.Compare(vocab=16)
 
-    inputA = model.get_network_input('compare.input_a')
-    inputB = model.get_network_input('compare.input_b')
-    output = model.get_network_output('compare')
-    # all nodes should be acquired correctly
-    assert inputA[0] is model.compare.input_a
-    assert inputB[0] is model.compare.input_b
-    assert output[0] is model.compare.output
+    vocab_a = spa.Network.get_input_vocab(compare.input_a)
+    vocab_b = spa.Network.get_input_vocab(compare.input_b)
     # all inputs should share the same vocab
-    assert inputA[1] is inputB[1]
-    assert inputA[1].dimensions == 16
+    assert vocab_a is vocab_b
+    assert vocab_a.dimensions == 16
     # output should have no vocab
-    assert output[1] is None
+    assert spa.Network.get_output_vocab(compare.output) is None
 
 
 def test_run(Simulator, seed):
@@ -33,14 +28,12 @@ def test_run(Simulator, seed):
 
         model.input = spa.Transcode(inputA, output_vocab=16)
         spa.Actions((
-            'compare.input_a = input',
-            'compare.input_b = A'
+            'model.compare.input_a = model.input',
+            'model.compare.input_b = A'
         ))
 
-    compare, vocab = model.get_network_output('compare')
-
     with model:
-        p = nengo.Probe(compare, 'output', synapse=0.03)
+        p = nengo.Probe(model.compare.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)

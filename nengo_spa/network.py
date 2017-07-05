@@ -35,6 +35,7 @@ class Network(nengo.Network, SupportDefaultsMixin):
     vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
 
     _input_vocabs = weakref.WeakKeyDictionary()
+    _input_networks = weakref.WeakKeyDictionary()
     _output_vocabs = weakref.WeakKeyDictionary()
 
     def __init__(
@@ -59,23 +60,26 @@ class Network(nengo.Network, SupportDefaultsMixin):
     def config(self):
         return _AutoConfig(self._config)
 
-    @classmethod
-    def declare_input(cls, obj, vocab):
-        if obj in cls._input_vocabs:
+    def declare_input(self, obj, vocab):
+        if obj in self._input_vocabs:
             raise ValueError('Object {} already declared as input.'.format(
                 obj))
-        cls._input_vocabs[obj] = vocab
+        self._input_vocabs[obj] = vocab
+        self._input_networks[obj] = self
 
-    @classmethod
-    def declare_output(cls, obj, vocab):
-        if obj in cls._output_vocabs:
+    def declare_output(self, obj, vocab):
+        if obj in self._output_vocabs:
             raise ValueError('Object {} already declared as output.'.format(
                 obj))
-        cls._output_vocabs[obj] = vocab
+        self._output_vocabs[obj] = vocab
 
     @classmethod
     def get_input_vocab(cls, obj):
         return cls._input_vocabs[obj]
+
+    @classmethod
+    def get_input_network(cls, obj):
+        return cls._input_networks[obj]
 
     @classmethod
     def get_output_vocab(cls, obj):

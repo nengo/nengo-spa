@@ -22,7 +22,7 @@ def test_am_basic(Simulator, plt, seed, rng):
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.3, input_vocab=vocab,
                                     function=filtered_step_fn)
-        spa.Actions(('am = A',))
+        spa.Actions(('m.am = A',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -63,7 +63,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
             threshold=0.5, input_vocab=vocab, output_vocab=vocab2,
             function=filtered_step_fn, mapping='by-key')
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        spa.Actions(('am = stimulus',))
+        spa.Actions(('m.am = m.stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -106,7 +106,7 @@ def test_am_wta(Simulator, plt, seed, rng):
         m.am = WTAAssocMem(
             threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        spa.Actions(('am = stimulus',))
+        spa.Actions(('m.am = m.stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -146,7 +146,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
                                     function=filtered_step_fn)
         m.am.add_default_output('D', 0.5)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        spa.Actions(('am = stimulus',))
+        spa.Actions(('m.am = m.stimulus',))
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -186,19 +186,19 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     out_keys = ['C*D', 'C+D']
     mapping = dict(zip(in_keys, out_keys))
 
-    with spa.Network(seed=seed) as model:
-        model.am = ThresholdingAssocMem(
+    with spa.Network(seed=seed) as m:
+        m.am = ThresholdingAssocMem(
             threshold=0.3, input_vocab=vocab_in, output_vocab=vocab_out,
             mapping=mapping)
 
-        model.inp = spa.Transcode(
+        m.inp = spa.Transcode(
             lambda t: 'A' if t < 0.1 else 'A*B', output_vocab=vocab_in)
-        spa.Actions(('am = inp',))
+        spa.Actions(('m.am = m.inp',))
 
-        in_p = nengo.Probe(model.am.input)
-        out_p = nengo.Probe(model.am.output, synapse=0.03)
+        in_p = nengo.Probe(m.am.input)
+        out_p = nengo.Probe(m.am.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with nengo.Simulator(m) as sim:
         sim.run(0.2)
 
     # Specify t ranges
@@ -233,8 +233,8 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
 
 
 def test_invalid_mapping_string():
-    with spa.Network() as model:
+    with spa.Network():
         with pytest.raises(ValidationError):
-            model.am = ThresholdingAssocMem(
+            ThresholdingAssocMem(
                 threshold=0.3, input_vocab=16, output_vocab=32,
                 mapping='invalid')
