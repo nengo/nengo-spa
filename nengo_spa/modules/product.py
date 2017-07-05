@@ -27,7 +27,7 @@ class Product(Network):
         self.input_a = self.product.input_a
         self.input_b = self.product.input_b
         self.output = self.product.output
-        self.inputs = dict(
-            input_a=(self.input_a, None),
-            input_b=(self.input_b, None))
-        self.outputs = dict(default=(self.output, None))
+
+        self.declare_input(self.input_a, None)
+        self.declare_input(self.input_b, None)
+        self.declare_output(self.output, None)

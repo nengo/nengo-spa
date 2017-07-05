@@ -19,15 +19,14 @@ class SpaCommunicationChannel(spa.Network):
         with self:
             self.state_in = spa.State(dimensions)
             self.state_out = spa.State(dimensions)
+            self.secondary = spa.State(dimensions)
 
             spa.Actions(('state_out = state_in',))
 
-        self.inputs = dict(
-            default=self.state_in.inputs['default'],
-            secondary=self.state_in.inputs['default'])
-        self.outputs = dict(
-            default=self.state_out.outputs['default'],
-            secondary=self.state_out.outputs['default'])
+        self.input = self.state_in.input
+        self.input_secondary = self.secondary.input
+        self.output = self.state_out.output
+        self.output_secondary = self.secondary.output
 
 
 def test_spa_verification(seed, plt):
@@ -75,9 +74,9 @@ def test_spa_get():
     assert excinfo.value.name == 'buf1.default'
     assert model.get_spa_network('buf2') is model.buf2
     assert model.get_network_input('buf1')[0] is model.buf1.input
-    assert model.get_network_input('buf1.default')[0] is model.buf1.input
+    assert model.get_network_input('buf1.input')[0] is model.buf1.input
     assert model.get_network_output('buf1')[0] is model.buf1.output
-    assert model.get_network_output('buf1.default')[0] is model.buf1.output
+    assert model.get_network_output('buf1.output')[0] is model.buf1.output
     assert model.get_network_input(
         'compare.input_a')[0] is model.compare.input_a
     assert model.get_network_input(
@@ -91,17 +90,17 @@ def test_spa_get():
     with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('dummy')
     assert excinfo.value.name == 'dummy'
-    assert excinfo.value.kind == 'network input'
+    assert excinfo.value.kind == 'network'
 
     with pytest.raises(SpaNameError) as excinfo:
         model.get_network_output('dummy')
     assert excinfo.value.name == 'dummy'
-    assert excinfo.value.kind == 'network output'
+    assert excinfo.value.kind == 'network'
 
     with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('buf1.A')
     assert excinfo.value.name == 'buf1.A'
-    assert excinfo.value.kind == 'network input'
+    assert excinfo.value.kind == 'network'
 
     with pytest.raises(SpaNameError) as excinfo:
         model.get_network_input('compare')
@@ -164,17 +163,20 @@ def test_hierarichal_network_name_resolution():
         model.get_spa_network('comm_channel.state_in') is
         model.comm_channel.state_in)
     assert (
-        model.get_network_input('comm_channel.state_in') is
-        model.comm_channel.state_in.inputs['default'])
+        model.get_network_input('comm_channel.state_in') ==
+        (model.comm_channel.state_in.input, model.comm_channel.state_in.vocab))
     assert (
-        model.get_network_input('comm_channel.secondary') is
-        model.comm_channel.inputs['secondary'])
+        model.get_network_input('comm_channel.input_secondary') ==
+        (model.comm_channel.input_secondary,
+         model.comm_channel.secondary.vocab))
     assert (
-        model.get_network_output('comm_channel.state_out') is
-        model.comm_channel.state_out.outputs['default'])
+        model.get_network_output('comm_channel.state_out') ==
+        (model.comm_channel.state_out.output,
+         model.comm_channel.state_out.vocab))
     assert (
-        model.get_network_output('comm_channel.secondary') is
-        model.comm_channel.outputs['secondary'])
+        model.get_network_output('comm_channel.output_secondary') ==
+        (model.comm_channel.output_secondary,
+         model.comm_channel.secondary.vocab))
 
 
 def test_hierarchical_actions(Simulator, seed, plt):

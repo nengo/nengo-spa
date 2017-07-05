@@ -1,7 +1,8 @@
-import numpy as np
+import weakref
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
+import numpy as np
 
 from nengo_spa.exceptions import SpaNameError
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
@@ -33,6 +34,9 @@ class Network(nengo.Network, SupportDefaultsMixin):
 
     vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
 
+    _input_vocabs = weakref.WeakKeyDictionary()
+    _output_vocabs = weakref.WeakKeyDictionary()
+
     def __init__(
             self, label=None, seed=None, add_to_container=None, vocabs=None):
         super(Network, self).__init__(label, seed, add_to_container)
@@ -49,14 +53,33 @@ class Network(nengo.Network, SupportDefaultsMixin):
         self.vocabs = vocabs
         self.config[Network].vocabs = vocabs
 
-        self.inputs = {}
-        self.outputs = {}
-
         self._stimuli = None
 
     @property
     def config(self):
         return _AutoConfig(self._config)
+
+    @classmethod
+    def declare_input(cls, obj, vocab):
+        if obj in cls._input_vocabs:
+            raise ValueError('Object {} already declared as input.'.format(
+                obj))
+        cls._input_vocabs[obj] = vocab
+
+    @classmethod
+    def declare_output(cls, obj, vocab):
+        if obj in cls._output_vocabs:
+            raise ValueError('Object {} already declared as output.'.format(
+                obj))
+        cls._output_vocabs[obj] = vocab
+
+    @classmethod
+    def get_input_vocab(cls, obj):
+        return cls._input_vocabs[obj]
+
+    @classmethod
+    def get_output_vocab(cls, obj):
+        return cls._output_vocabs[obj]
 
     def get_spa_network(self, name, strip_output=False):
         """Return the SPA network for the given name.
@@ -96,31 +119,21 @@ class Network(nengo.Network, SupportDefaultsMixin):
             else:
                 raise SpaNameError(name, 'network')
 
-    def _get_network_connector(self, name, kind):
-        components = name.rsplit('.', 1)
-        if len(components) > 1:
-            head, tail = components
-            net = self.get_spa_network(head)
-        else:
-            net = self
-            tail = name
-
-        try:
-            if tail not in getattr(net, kind + 's'):
-                net = net.get_spa_network(tail)
-                tail = 'default'
-
-            return getattr(net, kind + 's')[tail]
-        except (SpaNameError, KeyError):
-            raise SpaNameError(name, 'network ' + kind)
-
     def get_network_input(self, name):
         """Return the object to connect into for the given name.
 
         The name will be either the same as a spa network, or of the form
         <network_name>.<input_name>.
         """
-        return self._get_network_connector(name, 'input')
+        obj = self.get_spa_network(name)
+        try:
+            return obj, self.get_input_vocab(obj)
+        except KeyError:
+            try:
+                obj = getattr(obj, 'input')
+                return obj, self.get_input_vocab(obj)
+            except (AttributeError, KeyError):
+                raise SpaNameError(name, 'network input')
 
     def get_network_output(self, name):
         """Return the object to connect into for the given name.
@@ -128,7 +141,15 @@ class Network(nengo.Network, SupportDefaultsMixin):
         The name will be either the same as a spa network, or of the form
         <network_name>.<output_name>.
         """
-        return self._get_network_connector(name, 'output')
+        obj = self.get_spa_network(name)
+        try:
+            return obj, self.get_output_vocab(obj)
+        except KeyError:
+            try:
+                obj = getattr(obj, 'output')
+                return obj, self.get_output_vocab(obj)
+            except (AttributeError, KeyError):
+                raise SpaNameError(name, 'network output')
 
 
 def create_inhibit_node(net, strength=2., **kwargs):

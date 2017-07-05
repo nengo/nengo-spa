@@ -24,5 +24,5 @@ class Scalar(Network):
 
         self.input = self.scalar
         self.output = self.scalar
-        self.inputs = dict(default=(self.input, None))
-        self.outputs = dict(default=(self.output, None))
+        self.declare_input(self.input, None)
+        self.declare_output(self.output, None)

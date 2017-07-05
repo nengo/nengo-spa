@@ -104,8 +104,8 @@ class AssociativeMemory(Network):
             nengo.Connection(
                 self.selection.output, self.output, transform=output_vectors.T)
 
-        self.inputs = dict(default=(self.input, self.input_vocab))
-        self.outputs = dict(default=(self.output, self.output_vocab))
+        self.declare_input(self.input, self.input_vocab)
+        self.declare_output(self.output, self.output_vocab)
 
     @with_self
     def add_default_output(self, key, min_activation_value, n_neurons=50):

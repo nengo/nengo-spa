@@ -86,5 +86,5 @@ class State(Network):
 
         self.input = self.state_ensembles.input
         self.output = self.state_ensembles.output
-        self.inputs = dict(default=(self.input, self.vocab))
-        self.outputs = dict(default=(self.output, self.vocab))
+        self.declare_input(self.input, self.vocab)
+        self.declare_output(self.output, self.vocab)
