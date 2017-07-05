@@ -4,7 +4,6 @@ import nengo
 from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
-from nengo_spa.exceptions import SpaNameError
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
 
@@ -84,76 +83,6 @@ class Network(nengo.Network, SupportDefaultsMixin):
     @classmethod
     def get_output_vocab(cls, obj):
         return cls._output_vocabs[obj]
-
-    def get_spa_network(self, name, strip_output=False):
-        """Return the SPA network for the given name.
-
-        Raises :class:`SpaConstructionError` if the network cannot be found.
-
-        Parameters
-        ----------
-        name : str
-            Name of the network to retrieve.
-        strip_output : bool, optional
-            If ``True``, the network name is allowed to be followed by the name
-            of an input or output that will be stripped (so the network with
-            that input or output will be returned).
-
-        Returns
-        -------
-        :class:`Network`
-            Requested network.
-        """
-        components = name.split('.', 1)
-        if len(components) > 1:
-            head, tail = components
-            try:
-                return getattr(self, head).get_spa_network(
-                    tail, strip_output=strip_output)
-            except AttributeError:
-                raise SpaNameError(head, 'network')
-            except SpaNameError as err:
-                raise SpaNameError(head + '.' + err.name, err.kind)
-        else:
-            if hasattr(self, name):
-                return getattr(self, name)
-            elif strip_output and (
-                    name in self.inputs or name in self.outputs):
-                return self
-            else:
-                raise SpaNameError(name, 'network')
-
-    def get_network_input(self, name):
-        """Return the object to connect into for the given name.
-
-        The name will be either the same as a spa network, or of the form
-        <network_name>.<input_name>.
-        """
-        obj = self.get_spa_network(name)
-        try:
-            return obj, self.get_input_vocab(obj)
-        except KeyError:
-            try:
-                obj = getattr(obj, 'input')
-                return obj, self.get_input_vocab(obj)
-            except (AttributeError, KeyError):
-                raise SpaNameError(name, 'network input')
-
-    def get_network_output(self, name):
-        """Return the object to connect into for the given name.
-
-        The name will be either the same as a spa network, or of the form
-        <network_name>.<output_name>.
-        """
-        obj = self.get_spa_network(name)
-        try:
-            return obj, self.get_output_vocab(obj)
-        except KeyError:
-            try:
-                obj = getattr(obj, 'output')
-                return obj, self.get_output_vocab(obj)
-            except (AttributeError, KeyError):
-                raise SpaNameError(name, 'network output')
 
 
 def create_inhibit_node(net, strength=2., **kwargs):

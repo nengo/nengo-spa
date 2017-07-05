@@ -4,7 +4,7 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaNameError, SpaTypeError
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.examine import similarity
 from nengo_spa.network import create_inhibit_node
 from nengo_spa.vocab import VocabularyMap
@@ -44,54 +44,6 @@ def test_spa_verification(seed, plt):
 
         # reassignment is fine for non-networks
         model.int_val = 2
-
-
-def test_spa_get():
-    D = 16
-    model = spa.Network()
-    with model:
-        model.buf1 = spa.State(D)
-        model.buf2 = spa.State(D)
-        model.compare = spa.Compare(D)
-
-    assert model.get_spa_network('buf1') is model.buf1
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_spa_network('buf1.default')
-    assert excinfo.value.name == 'buf1.default'
-    assert model.get_spa_network('buf2') is model.buf2
-    assert model.get_network_input('buf1')[0] is model.buf1.input
-    assert model.get_network_input('buf1.input')[0] is model.buf1.input
-    assert model.get_network_output('buf1')[0] is model.buf1.output
-    assert model.get_network_output('buf1.output')[0] is model.buf1.output
-    assert model.get_network_input(
-        'compare.input_a')[0] is model.compare.input_a
-    assert model.get_network_input(
-        'compare.input_b')[0] is model.compare.input_b
-
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_spa_network('dummy')
-    assert excinfo.value.name == 'dummy'
-    assert excinfo.value.kind == 'network'
-
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_network_input('dummy')
-    assert excinfo.value.name == 'dummy'
-    assert excinfo.value.kind == 'network'
-
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_network_output('dummy')
-    assert excinfo.value.name == 'dummy'
-    assert excinfo.value.kind == 'network'
-
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_network_input('buf1.A')
-    assert excinfo.value.name == 'buf1.A'
-    assert excinfo.value.kind == 'network'
-
-    with pytest.raises(SpaNameError) as excinfo:
-        model.get_network_input('compare')
-    assert excinfo.value.name == 'compare'
-    assert excinfo.value.kind == 'network input'
 
 
 def test_spa_vocab():
@@ -140,30 +92,6 @@ def test_hierarchical(Simulator, seed, plt):
     plt.ylabel("Similarity")
 
     assert np.mean(similarity(sim.data[p][t], v)) > 0.8
-
-
-def test_hierarichal_network_name_resolution():
-    with spa.Network() as model:
-        model.comm_channel = SpaCommunicationChannel(16)
-
-    assert (
-        model.get_spa_network('comm_channel.state_in') is
-        model.comm_channel.state_in)
-    assert (
-        model.get_network_input('comm_channel.state_in') ==
-        (model.comm_channel.state_in.input, model.comm_channel.state_in.vocab))
-    assert (
-        model.get_network_input('comm_channel.input_secondary') ==
-        (model.comm_channel.input_secondary,
-         model.comm_channel.secondary.vocab))
-    assert (
-        model.get_network_output('comm_channel.state_out') ==
-        (model.comm_channel.state_out.output,
-         model.comm_channel.state_out.vocab))
-    assert (
-        model.get_network_output('comm_channel.output_secondary') ==
-        (model.comm_channel.output_secondary,
-         model.comm_channel.secondary.vocab))
 
 
 def test_hierarchical_actions(Simulator, seed, plt):
