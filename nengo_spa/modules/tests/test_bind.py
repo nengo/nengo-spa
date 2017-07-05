@@ -7,20 +7,15 @@ from nengo.utils.numpy import rmse
 
 
 def test_basic():
-    with spa.Network() as model:
-        model.bind = spa.Bind(vocab=16)
+    with spa.Network():
+        bind = spa.Bind(vocab=16)
 
-    inputA = model.get_network_input('bind.input_a')
-    inputB = model.get_network_input('bind.input_b')
-    output = model.get_network_output('bind')
-    # all nodes should be acquired correctly
-    assert inputA[0] is model.bind.input_a
-    assert inputB[0] is model.bind.input_b
-    assert output[0] is model.bind.output
     # all inputs and outputs should share the same vocab
-    assert inputA[1] is inputB[1]
-    assert inputA[1].dimensions == 16
-    assert output[1].dimensions == 16
+    vocab_a = spa.Network.get_input_vocab(bind.input_a)
+    vocab_b = spa.Network.get_input_vocab(bind.input_b)
+    assert vocab_a is vocab_b
+    assert vocab_a.dimensions == 16
+    assert vocab_b.dimensions == 16
 
 
 def test_run(Simulator, seed):
@@ -38,12 +33,10 @@ def test_run(Simulator, seed):
                 return 'B'
 
         model.input = spa.Transcode(inputA, output_vocab=vocab)
-        spa.Actions(('bind.input_a = input', 'bind.input_b = A'))
-
-    bind, vocab = model.get_network_output('bind')
+        spa.Actions(('model.bind.input_a = model.input', 'model.bind.input_b = A'))
 
     with model:
-        p = nengo.Probe(bind, 'output', synapse=0.03)
+        p = nengo.Probe(model.bind.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)

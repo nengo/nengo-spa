@@ -1,15 +1,19 @@
 """Parsing of SPA actions."""
 
+import inspect
 from itertools import chain
 
-from nengo.exceptions import NetworkContextError, SpaParseError
-from nengo.network import Network
-from nengo_spa.modules.basalganglia import BasalGanglia
-from nengo_spa.modules.thalamus import Thalamus
+from nengo.exceptions import NetworkContextError
+from nengo.network import Network as NengoNetwork
+from nengo.utils.compat import is_integer
+
 from nengo_spa.ast import (
     Action, ConstructionContext, DotProduct, Effect, Effects, Module,
     Reinterpret, Sink, Symbol, Translate)
-from nengo.utils.compat import is_integer
+from nengo_spa.exceptions import SpaNameError, SpaParseError
+from nengo_spa.modules.basalganglia import BasalGanglia
+from nengo_spa.modules.thalamus import Thalamus
+from nengo_spa.network import Network as SpaNetwork
 
 
 class Parser(object):
@@ -17,8 +21,11 @@ class Parser(object):
 
     Parameters
     ----------
-    vocabs : dict
-        Vocabularies to make accessible in the parsed action rules.
+    locals_ : int or dict, optional
+        Dictionary of locals to resolve names during parsing. When given an
+        integer instead of a dictionary, the locals dictionary that many frames
+        up the stack will be used. For example, when given ``1``, the locals
+        dictionary of the calling function will be used.
     """
 
     builtins = {
@@ -26,10 +33,13 @@ class Parser(object):
         'reinterpret': Reinterpret,
         'translate': Translate}
 
-    def __init__(self, vocabs=None):
-        if vocabs is None:
-            vocabs = {}
-        self.vocabs = vocabs
+    def __init__(self, locals_=1):
+        if is_integer(locals_):
+            frame = inspect.currentframe()
+            for _ in range(locals_):
+                frame = frame.f_back
+            locals_ = frame.f_locals
+        self.locals = locals_
 
     def parse_action(self, action, index=0, name=None, strict=True):
         """Parse an SPA action.
@@ -136,8 +146,14 @@ class Parser(object):
             sink, source = effect.split('=', 1)
         except ValueError:
             raise SpaParseError("Not an effect; assignment missing")
+
+        sink = sink.strip()
+        try:
+            obj = eval(sink, dict(self.locals), globals())
+        except (AttributeError, NameError):
+            raise SpaNameError(sink, 'network input')
         return Effect(
-            Sink(sink.strip()), self.parse_expr(source), channeled=channeled)
+            Sink(sink, obj), self.parse_expr(source), channeled=channeled)
 
     def parse_expr(self, expr):
         """Parse an SPA expression.
@@ -155,15 +171,21 @@ class Parser(object):
 
     def __getitem__(self, key):
         if key == '__tracebackhide__':  # gives better tracebacks in py.test
-            return False
-        if key in self.vocabs:
-            return self.vocabs[key]
-        if key in self.builtins:
-            return self.builtins[key]
-        if key[0].isupper():
-            return Symbol(key)
+            item = False
+        elif key in self.builtins:
+            item = self.builtins[key]
+        elif key in self.locals:
+            item = self.locals[key]
+        elif key in globals():
+            item = globals()[key]
+        elif key[0].isupper():
+            item = Symbol(key)
         else:
-            return Module(key)
+            raise SpaNameError(key, 'name')
+
+        if isinstance(item, SpaNetwork):
+            item = Module(key, item)
+        return item
 
 
 class Actions(object):
@@ -178,13 +200,16 @@ class Actions(object):
     """
 
     def __init__(
-            self, actions=None, named_actions=None, vocabs=None, build=True):
+            self, actions=None, named_actions=None, locals_=1, build=True):
         super(Actions, self).__init__()
 
         if actions is None:
             actions = []
         if named_actions is None:
             named_actions = {}
+
+        if is_integer(locals_):
+            locals_ += 1
 
         self.actions = []
         self.named_actions = {}
@@ -195,14 +220,19 @@ class Actions(object):
 
         self.construction_context = None
 
-        self.parse(actions, named_actions, vocabs)
+        self.parse(actions, named_actions, locals_=locals_)
         if build:
             self.bg, self.thalamus, self.connstructed = self.build()
 
-    def parse(self, actions, named_actions, vocabs=None):
+    def parse(self, actions, named_actions, locals_=None):
         named_actions = sorted(named_actions.items())
 
-        parser = Parser(vocabs=vocabs)
+        if locals_ is None:
+            locals_ = 1
+        if is_integer(locals_):
+            locals_ += 1
+
+        parser = Parser(locals_=locals_)
         for action in actions:
             self._parse_and_add(parser, action)
         for name, action in named_actions:
@@ -232,11 +262,11 @@ class Actions(object):
     def build(self):
         needs_bg = len(self.bg_actions) > 0
 
-        if len(Network.context) <= 0:
+        if len(NengoNetwork.context) <= 0:
             raise NetworkContextError(
                 "Actions.build can only be called inside a ``with network:`` "
                 "block.")
-        root_network = Network.context[-1]
+        root_network = NengoNetwork.context[-1]
 
         with root_network:
             if needs_bg:

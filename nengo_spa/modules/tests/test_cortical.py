@@ -12,24 +12,21 @@ def test_connect(Simulator, seed):
         model.buffer2 = spa.State(vocab=16)
         model.buffer3 = spa.State(vocab=16)
         spa.Actions((
-            'buffer1 = A',
-            'buffer2=buffer1',
-            'buffer3=~buffer1'
+            'model.buffer1 = A',
+            'model.buffer2 = model.buffer1',
+            'model.buffer3 = ~model.buffer1'
         ))
 
-    output2, vocab = model.get_network_output('buffer2')
-    output3, vocab = model.get_network_output('buffer3')
-
     with model:
-        p2 = nengo.Probe(output2, 'output', synapse=0.03)
-        p3 = nengo.Probe(output3, 'output', synapse=0.03)
+        p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
+        p3 = nengo.Probe(model.buffer3.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    match = np.dot(sim.data[p2], vocab.parse('A').v)
+    match = np.dot(sim.data[p2], model.buffer2.vocab.parse('A').v)
     assert match[199] > 0.8
-    match = np.dot(sim.data[p3], vocab.parse('~A').v)
+    match = np.dot(sim.data[p3], model.buffer3.vocab.parse('~A').v)
     assert match[199] > 0.8
 
 
@@ -37,17 +34,16 @@ def test_transform(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=32)
         model.buffer2 = spa.State(vocab=32)
-        spa.Actions(('buffer1 = A', 'buffer2=buffer1*B',))
-
-    output, vocab = model.get_network_output('buffer2')
+        spa.Actions((
+            'model.buffer1 = A', 'model.buffer2 = model.buffer1 * B',))
 
     with model:
-        p = nengo.Probe(output, 'output', synapse=0.03)
+        p = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    match = np.dot(sim.data[p], vocab.parse('A*B').v)
+    match = np.dot(sim.data[p], model.buffer2.vocab.parse('A*B').v)
     assert match[199] > 0.7
 
 
@@ -57,19 +53,17 @@ def test_translate(Simulator, seed):
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=32)
         spa.Actions((
-            'buffer1 = A',
-            'buffer2=translate(buffer1, populate=True)'
+            'model.buffer1 = A',
+            'model.buffer2 = translate(model.buffer1, populate=True)'
         ))
 
-    output, vocab = model.get_network_output('buffer2')
-
     with model:
-        p = nengo.Probe(output, 'output', synapse=0.03)
+        p = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    match = np.dot(sim.data[p], vocab.parse('A').v)
+    match = np.dot(sim.data[p], model.buffer2.vocab.parse('A').v)
     assert match[199] > 0.8
 
 
@@ -77,10 +71,10 @@ def test_errors():
     # buffer2 does not exist
     with pytest.raises(SpaNameError) as excinfo:
         with spa.Network() as model:
-            model.buffer = spa.State(vocab=16)
-            spa.Actions(('buffer2=buffer',))
+            model.buffer1 = spa.State(vocab=16)
+            spa.Actions(('model.buffer2 = model.buffer',))
 
-    assert excinfo.value.name == 'buffer2'
+    assert excinfo.value.name == 'model.buffer2'
 
 
 def test_direct(Simulator, seed):
@@ -90,20 +84,18 @@ def test_direct(Simulator, seed):
         model.buffer2 = spa.State(vocab=32)
         model.buffer2.vocab.populate('A; B; C')
         spa.Actions((
-            'buffer1=A', 'buffer2=B', 'buffer1=C, buffer2=C'))
-
-    output1, vocab1 = model.get_network_output('buffer1')
-    output2, vocab2 = model.get_network_output('buffer2')
+            'model.buffer1 = A', 'model.buffer2 = B', 'model.buffer1 = C',
+            'model.buffer2 = C'))
 
     with model:
-        p1 = nengo.Probe(output1, 'output', synapse=0.03)
-        p2 = nengo.Probe(output2, 'output', synapse=0.03)
+        p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
+        p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    match1 = np.dot(sim.data[p1], vocab1.parse('A+C').v)
-    match2 = np.dot(sim.data[p2], vocab2.parse('B+C').v)
+    match1 = np.dot(sim.data[p1], model.buffer1.vocab.parse('A+C').v)
+    match2 = np.dot(sim.data[p2], model.buffer2.vocab.parse('B+C').v)
     # both values should be near 1.0 since buffer1 is driven to both A and C
     # and buffer2 is driven to both B and C.
     assert match1[199] > 0.75
@@ -123,10 +115,10 @@ def test_convolution(Simulator, plt, seed):
         model.outAinvBinv = spa.State()
 
         spa.Actions((
-            'outAB = inA * inB',
-            'outABinv = inA * ~inB',
-            'outAinvB = ~inA * inB',
-            'outAinvBinv = ~inA * ~inB',
+            'model.outAB = model.inA * model.inB',
+            'model.outABinv = model.inA * ~model.inB',
+            'model.outAinvB = ~model.inA * model.inB',
+            'model.outAinvBinv = ~model.inA * ~model.inB',
         ))
         nengo.Connection(nengo.Node([0, 1, 0, 0, 0]), model.inA.input)
         nengo.Connection(nengo.Node([0, 0, 1, 0, 0]), model.inB.input)

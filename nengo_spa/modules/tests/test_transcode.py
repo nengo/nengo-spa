@@ -15,18 +15,18 @@ def test_fixed(Simulator, seed):
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
         model.input1 = spa.Transcode('A', output_vocab=16)
         model.input2 = spa.Transcode('B', output_vocab=8)
-        spa.Actions(('buffer1 = input1', 'buffer2 = input2'))
+        spa.Actions((
+            'model.buffer1 = model.input1', 'model.buffer2 = model.input2'))
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.1)
 
-    input1, vocab1 = model.get_network_input('buffer1')
-    input2, vocab2 = model.get_network_input('buffer2')
-
-    assert sp_close(sim.trange(), sim.data[p1], vocab1.parse('A'), skip=0.08)
-    assert sp_close(sim.trange(), sim.data[p2], vocab2.parse('B'), skip=0.08)
+    assert sp_close(sim.trange(), sim.data[p1], model.buffer1.vocab.parse('A'),
+                    skip=0.08)
+    assert sp_close(sim.trange(), sim.data[p2], model.buffer2.vocab.parse('B'),
+                    skip=0.08)
 
 
 def test_time_varying_encode(Simulator, seed):
@@ -44,7 +44,7 @@ def test_time_varying_encode(Simulator, seed):
                 return '0'
 
         model.encode = spa.Transcode(stimulus, output_vocab=16)
-        spa.Actions(('buffer = encode',))
+        spa.Actions(('model.buffer = model.encode',))
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
 
@@ -65,23 +65,23 @@ def test_time_varying_encode(Simulator, seed):
 
 def test_encode_with_input(Simulator, seed):
     with spa.Network(seed=seed) as model:
-        model.buffer = spa.State(vocab=16)
+        buffer = spa.State(vocab=16)
 
         def stimulus(t, x):
-            return x[0] * model.buffer.vocab.parse('A')
+            return x[0] * buffer.vocab.parse('A')
 
         ctrl = nengo.Node(lambda t: t > 0.2)
 
-        model.encode = spa.Transcode(stimulus, output_vocab=16, size_in=1)
-        nengo.Connection(ctrl, model.encode.input)
+        encode = spa.Transcode(stimulus, output_vocab=16, size_in=1)
+        nengo.Connection(ctrl, encode.input)
         spa.Actions(('buffer = encode',))
 
-        p = nengo.Probe(model.buffer.output, synapse=0.03)
+        p = nengo.Probe(buffer.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.4)
 
-    vocab = model.buffer.vocab
+    vocab = buffer.vocab
     assert sp_close(sim.trange(), sim.data[p], vocab.parse('0'), duration=0.2)
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse('A'), skip=.38, duration=0.02)
@@ -93,29 +93,29 @@ def test_transcode(Simulator, seed):
         return 'B'
 
     with spa.Network(seed=seed) as model:
-        model.transcode = Transcode(
+        transcode = Transcode(
             transcode_fn, input_vocab=16, output_vocab=16)
         spa.Actions(('transcode = A',))
-        p = nengo.Probe(model.transcode.output, synapse=None)
+        p = nengo.Probe(transcode.output, synapse=None)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
     assert sp_close(sim.trange(), sim.data[p],
-                    model.transcode.output_vocab.parse('B'))
+                    transcode.output_vocab.parse('B'))
 
 
 def test_passthrough(Simulator, seed):
     with spa.Network(seed=seed) as model:
-        model.passthrough = Transcode(input_vocab=16, output_vocab=16)
+        passthrough = Transcode(input_vocab=16, output_vocab=16)
         spa.Actions(('passthrough = A',))
-        p = nengo.Probe(model.passthrough.output, synapse=0.03)
+        p = nengo.Probe(passthrough.output, synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
     assert sp_close(sim.trange(), sim.data[p],
-                    model.passthrough.output_vocab.parse('A'), skip=0.18)
+                    passthrough.output_vocab.parse('A'), skip=0.18)
 
 
 def test_decode(Simulator, seed):
@@ -133,7 +133,7 @@ def test_decode(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.config[nengo.Connection].synapse = nengo.Lowpass(0.)
         model.output = Transcode(output_fn, input_vocab=16)
-        spa.Actions(('output = A',))
+        spa.Actions(('model.output = A',))
 
     with Simulator(model) as sim:
         sim.run(0.01)
