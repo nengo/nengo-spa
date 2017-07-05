@@ -45,7 +45,6 @@ class Compare(Network):
         self.input_a = self.product.input_a
         self.input_b = self.product.input_b
 
-        self.inputs = dict(
-            input_a=(self.input_a, self.vocab),
-            input_b=(self.input_b, self.vocab))
-        self.outputs = dict(default=(self.output, None))
+        self.declare_input(self.input_a, self.vocab)
+        self.declare_input(self.input_b, self.vocab)
+        self.declare_output(self.output, None)

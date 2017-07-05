@@ -153,6 +153,6 @@ class Transcode(Network):
             self.output = self.node
 
         if self.input_vocab is not None:
-            self.inputs = dict(default=(self.input, self.input_vocab))
+            self.declare_input(self.input, self.input_vocab)
         if self.output_vocab is not None:
-            self.outputs = dict(default=(self.output, self.output_vocab))
+            self.declare_output(self.output, self.output_vocab)

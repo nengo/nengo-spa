@@ -51,7 +51,6 @@ class Bind(Network):
         self.input_b = self.cc.input_b
         self.output = self.cc.output
 
-        self.inputs = dict(
-            input_a=(self.input_a, self.vocab),
-            input_b=(self.input_b, self.vocab))
-        self.outputs = dict(default=(self.output, self.vocab))
+        self.declare_input(self.input_a, self.vocab)
+        self.declare_input(self.input_b, self.vocab)
+        self.declare_output(self.output, self.vocab)
