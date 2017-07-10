@@ -14,7 +14,7 @@ from nengo_spa.modules import (
     State,
     Thalamus,
     Transcode)
-from nengo_spa.network import Network
+from nengo_spa.network import create_inhibit_node, Network
 from nengo_spa.vocab import Vocabulary, VocabularyMap
 
 

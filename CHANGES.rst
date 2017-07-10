@@ -30,6 +30,10 @@ Release History
   regular Nengo ``EnsembleArray``.
   (`#61 <https://github.com/nengo/nengo_spa/pull/61>`_,
   `#28 <https://github.com/nengo/nengo_spa/issues/28>`_)
+- Add ``create_inhibit_node`` function to create nodes that inhibit complete
+  Nengo networks.
+  (`#65 <https://github.com/nengo/nengo_spa/pull/65>`_,
+  `#26 <https://github.com/nengo/nengo_spa/issues/26>`_)
 
 **Changed**
 
