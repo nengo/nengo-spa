@@ -1,10 +1,12 @@
 import numpy as np
+from numpy.testing import assert_allclose
 import pytest
 
 import nengo
 import nengo_spa as spa
 from nengo_spa.exceptions import SpaNameError, SpaTypeError
 from nengo_spa.examine import similarity
+from nengo_spa.network import create_inhibit_node
 from nengo_spa.vocab import VocabularyMap
 
 
@@ -269,3 +271,22 @@ def test_copy_spa(RefSimulator):
     # Check that it still builds.
     with RefSimulator(cp):
         pass
+
+
+def test_create_inhibit_node(Simulator, plt):
+    with nengo.Network() as model:
+        ea = nengo.networks.EnsembleArray(10, 10)
+        bias = nengo.Node(1)
+        inhibit_node = create_inhibit_node(ea)
+        nengo.Connection(bias, inhibit_node)
+        nengo.Connection(
+            bias, ea.input, transform=np.ones((ea.n_ensembles, 1)))
+        p = nengo.Probe(ea.output, synapse=0.01)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    plt.plot(sim.trange(), sim.data[p])
+    plt.xlabel("Time [s]")
+
+    assert_allclose(sim.data[p][sim.trange() > 0.1], 0., atol=1e-3)
