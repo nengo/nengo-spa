@@ -2,8 +2,8 @@
   :target: https://travis-ci.org/nengo/nengo_spa
   :alt: Travis-CI build status
 
-.. image:: https://ci.appveyor.com/api/projects/status/5blofvbh8305w75g?svg=true
-  :target: https://ci.appveyor.com/project/jgosmann/nengo-spa
+.. image:: https://ci.appveyor.com/api/projects/status/5blofvbh8305w75g/branch/master?svg=true
+  :target: https://ci.appveyor.com/project/jgosmann/nengo-spa/branch/master
   :alt: AppVeyor build status
 
 .. image:: https://img.shields.io/codecov/c/github/nengo/nengo_spa/master.svg
