@@ -7,8 +7,6 @@ from nengo_spa.modules import (
     BasalGanglia,
     Bind,
     Compare,
-    Decode,
-    Encode,
     Product,
     Scalar,
     State,

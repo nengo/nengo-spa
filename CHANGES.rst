@@ -41,6 +41,10 @@ Release History
   (`#59 <https://github.com/nengo/nengo_spa/pull/59>`_,
   `#45 <https://github.com/nengo/nengo_spa/issues/45>`_,
   `#55 <https://github.com/nengo/nengo_spa/issues/55>`_)
+- Consolidated the functionality of ``Encode`` and ``Decode`` into
+  ``Transcode``.
+  (`#67 <https://github.com/nengo/nengo_spa/pull/67>`_,
+  `#58 <https://github.com/nengo/nengo_spa/issues/58>`_)
 
 **Fixed**
 

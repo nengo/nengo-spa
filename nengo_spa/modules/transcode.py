@@ -1,7 +1,7 @@
 import nengo
 from nengo.config import Default
 from nengo.exceptions import ValidationError
-from nengo.params import Parameter
+from nengo.params import IntParam, Parameter
 from nengo.utils.compat import is_string
 from nengo.utils.stdlib import checked_call
 import numpy as np
@@ -41,11 +41,6 @@ def make_parse_func(fn, vocab):
 
 
 class TranscodeFunctionParam(Parameter):
-    def __init__(self, name, sp_input=True, sp_output=True, *args, **kwargs):
-        super(TranscodeFunctionParam, self).__init__(name, *args, **kwargs)
-        self.sp_input = sp_input
-        self.sp_output = sp_output
-
     def coerce(self, obj, fn):
         fn = super(TranscodeFunctionParam, self).coerce(obj, fn)
 
@@ -53,7 +48,7 @@ class TranscodeFunctionParam(Parameter):
             return fn
         elif callable(fn):
             return self.coerce_callable(obj, fn)
-        elif not self.sp_input and is_string(fn):
+        elif not obj.input_vocab and is_string(fn):
             return fn
         else:
             raise ValidationError("Invalid output type {!r}".format(
@@ -61,7 +56,7 @@ class TranscodeFunctionParam(Parameter):
 
     def coerce_callable(self, obj, fn):
         t = 0.
-        if self.sp_input:
+        if obj.input_vocab is not None:
             args = (t, SemanticPointer(obj.input_vocab.dimensions),
                     obj.input_vocab)
         elif obj.size_in is not None:
@@ -70,8 +65,9 @@ class TranscodeFunctionParam(Parameter):
             args = (t,)
 
         _, invoked = checked_call(fn, *args)
+        fn(*args)
         if not invoked:
-            if self.sp_input:
+            if obj.input_vocab is not None:
                 raise ValidationError(
                     "Transcode function %r is expected to accept exactly 3 "
                     "arguments: time as a float, a SemanticPointer, and a "
@@ -103,29 +99,55 @@ class Transcode(Network):
     function = TranscodeFunctionParam(
         'function', optional=True, default=None, readonly=True)
     input_vocab = VocabularyOrDimParam(
-        'input_vocab', optional=False, default=None, readonly=True)
+        'input_vocab', optional=True, default=None, readonly=True)
     output_vocab = VocabularyOrDimParam(
-        'output_vocab', optional=False, default=None, readonly=True)
+        'output_vocab', optional=True, default=None, readonly=True)
+    size_in = IntParam(
+        'size_in', optional=True, default=None, readonly=True)
+    size_out = IntParam(
+        'size_out', optional=True, default=None, readonly=True)
 
     def __init__(
             self, function=Default, input_vocab=Default, output_vocab=Default,
-            **kwargs):
+            size_in=Default, size_out=Default, **kwargs):
         super(Transcode, self).__init__(**kwargs)
 
         # Vocabs need to be set before function which accesses vocab for
         # validation.
         self.input_vocab = input_vocab
         self.output_vocab = output_vocab
+        self.size_in = size_in
+        self.size_out = size_out
+
+        if self.input_vocab is not None and self.size_in is not None:
+            raise ValidationError(
+                "The input_vocab and size_in arguments are mutually "
+                "exclusive.", 'size_in', self)
+        if self.output_vocab is not None and self.size_out is not None:
+            raise ValidationError(
+                "The output_vocab and size_out arguments are mutually "
+                "exclusive.", 'size_in', self)
+
         self.function = function
+
+        node_size_in = (self.input_vocab.dimensions
+                        if self.input_vocab is not None else self.size_in)
+        node_size_out = (self.output_vocab.dimensions
+                         if self.output_vocab is not None else self.size_out)
+        if self.function is None:
+            if node_size_in is None:
+                node_size_in = self.output_vocab.dimensions
+            node_size_out = None
 
         with self:
             self.node = nengo.Node(
                 TranscodeFunctionParam.to_node_output(
                     self.function, self.input_vocab, self.output_vocab),
-                size_in=self.input_vocab.dimensions,
-                size_out=self.output_vocab.dimensions)
+                size_in=node_size_in, size_out=node_size_out)
             self.input = self.node
             self.output = self.node
 
-        self.inputs = dict(default=(self.input, self.input_vocab))
-        self.outputs = dict(default=(self.output, self.output_vocab))
+        if self.input_vocab is not None:
+            self.inputs = dict(default=(self.input, self.input_vocab))
+        if self.output_vocab is not None:
+            self.outputs = dict(default=(self.output, self.output_vocab))
