@@ -8,8 +8,8 @@ def test_fixed(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
-        model.input1 = spa.Encode('A', vocab=16)
-        model.input2 = spa.Encode('B', vocab=8)
+        model.input1 = spa.Transcode('A', output_vocab=16)
+        model.input2 = spa.Transcode('B', output_vocab=8)
         spa.Actions(('buffer1 = input1', 'buffer2 = input2'))
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
@@ -38,7 +38,7 @@ def test_time_varying(Simulator, seed):
             else:
                 return '0'
 
-        model.encode = spa.Encode(stimulus, vocab=16)
+        model.encode = spa.Transcode(stimulus, output_vocab=16)
         spa.Actions(('buffer = encode',))
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
@@ -67,7 +67,7 @@ def test_with_input(Simulator, seed):
 
         ctrl = nengo.Node(lambda t: t > 0.2)
 
-        model.encode = spa.Encode(stimulus, vocab=16, size_in=1)
+        model.encode = spa.Transcode(stimulus, output_vocab=16, size_in=1)
         nengo.Connection(ctrl, model.encode.input)
         spa.Actions(('buffer = encode',))
 
