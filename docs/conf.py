@@ -26,6 +26,8 @@ extensions = [
     'nengo.utils.docutils',
 ]
 
+default_role = 'py:obj'
+
 # -- sphinx.ext.autodoc
 autoclass_content = 'both'  # class and __init__ docstrings are concatenated
 autodoc_default_flags = ['members']
