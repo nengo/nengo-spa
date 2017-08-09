@@ -119,6 +119,11 @@ class Transcode(Network):
         self.size_in = size_in
         self.size_out = size_out
 
+        if self.input_vocab is None and self.output_vocab is None:
+            raise ValidationError(
+                "At least one of input_vocab and output_vocab needs to be "
+                "set. If neither the input nor the output is a Semantic "
+                "Pointer, use a basic nengo.Node instead.", self)
         if self.input_vocab is not None and self.size_in is not None:
             raise ValidationError(
                 "The input_vocab and size_in arguments are mutually "

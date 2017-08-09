@@ -1,6 +1,8 @@
 import nengo
+from nengo.exceptions import ValidationError
 import numpy as np
 from numpy.testing import assert_almost_equal
+import pytest
 
 import nengo_spa as spa
 from nengo_spa.modules.transcode import Transcode
@@ -165,3 +167,11 @@ def test_decode_size_out(Simulator, seed):
         sim.run(0.01)
 
     assert_almost_equal(np.squeeze(sim.data[p]), sim.trange())
+
+
+def test_exception_when_no_vocabularies_are_given():
+    with spa.Network():
+        with pytest.raises(ValidationError):
+            Transcode('A')
+        with pytest.raises(ValidationError):
+            Transcode(lambda t: 'A')
