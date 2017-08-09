@@ -2,8 +2,6 @@
 Nengo SPA
 *********
 
-.. default-role:: obj
-
 Nengo SPA is an implementation of the Semantic Pointer Architecture for Nengo.
 The `Semantic Pointer Architecture
 <http://compneuro.uwaterloo.ca/research/spa/semantic-pointer-architecture.html>`_
