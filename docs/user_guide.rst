@@ -100,5 +100,16 @@ If we want to know the color of the square, we can unbind the *square* vector:
 TODO: link to more in depth discussion of circular convolution (including
 unitary vectors etc); mention alternate binding approaches?
 
+
+Spaun
+^^^^^
+
+TODO
+
+
 Introduction to Nengo SPA
 -------------------------
+
+
+Writing modules
+---------------
