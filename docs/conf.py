@@ -20,9 +20,9 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'numpydoc',
     'nengo.utils.docutils',
 ]
 
@@ -40,8 +40,6 @@ intersphinx_mapping = {
 
 # -- sphinx.ext.todo
 todo_include_todos = True
-# -- numpydoc config
-numpydoc_show_class_members = False
 
 # -- sphinx
 exclude_patterns = ['_build']
