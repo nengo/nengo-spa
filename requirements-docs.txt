@@ -1,3 +1,2 @@
 sphinx
-numpydoc>=0.6
 sphinx_rtd_theme
