@@ -27,6 +27,7 @@ extensions = [
 ]
 
 default_role = 'py:obj'
+numfig = True
 
 # -- sphinx.ext.autodoc
 autoclass_content = 'both'  # class and __init__ docstrings are concatenated
