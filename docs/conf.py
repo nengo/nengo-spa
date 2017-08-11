@@ -24,6 +24,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'nengo.utils.docutils',
+    'nbsphinx',
 ]
 
 default_role = 'py:obj'
@@ -41,6 +42,10 @@ intersphinx_mapping = {
 
 # -- sphinx.ext.todo
 todo_include_todos = True
+
+# -- nbsphinx
+nbsphinx_allow_errors = True  # FIXME set to false and fix errors
+nbsphinx_timeout = 300
 
 # -- sphinx
 exclude_patterns = ['_build']
