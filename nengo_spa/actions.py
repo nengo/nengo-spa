@@ -33,13 +33,13 @@ class Parser(object):
         'reinterpret': Reinterpret,
         'translate': Translate}
 
-    def __init__(self, locals_=1):
-        if is_integer(locals_):
-            frame = inspect.currentframe()
-            for _ in range(locals_):
-                frame = frame.f_back
-            locals_ = frame.f_locals
-        self.locals = locals_
+    def __init__(self, stacklevel=1):
+        frame = inspect.currentframe()
+        for _ in range(stacklevel):
+            frame = frame.f_back
+        self.locals = frame.f_locals
+        self.globals = frame.f_globals
+        self.py_builtins = frame.f_builtins
 
     def parse_action(self, action, index=0, name=None, strict=True):
         """Parse an SPA action.
@@ -176,8 +176,10 @@ class Parser(object):
             item = self.builtins[key]
         elif key in self.locals:
             item = self.locals[key]
-        elif key in globals():
-            item = globals()[key]
+        elif key in self.globals:
+            item = self.globals[key]
+        elif key in self.py_builtins:
+            item = self.py_builtins[key]
         elif key[0].isupper():
             item = Symbol(key)
         else:
@@ -200,16 +202,13 @@ class Actions(object):
     """
 
     def __init__(
-            self, actions=None, named_actions=None, locals_=1, build=True):
+            self, actions=None, named_actions=None, stacklevel=1, build=True):
         super(Actions, self).__init__()
 
         if actions is None:
             actions = []
         if named_actions is None:
             named_actions = {}
-
-        if is_integer(locals_):
-            locals_ += 1
 
         self.actions = []
         self.named_actions = {}
@@ -220,19 +219,14 @@ class Actions(object):
 
         self.construction_context = None
 
-        self.parse(actions, named_actions, locals_=locals_)
+        self.parse(actions, named_actions, stacklevel=stacklevel + 1)
         if build:
             self.bg, self.thalamus, self.connstructed = self.build()
 
-    def parse(self, actions, named_actions, locals_=None):
+    def parse(self, actions, named_actions, stacklevel=1):
         named_actions = sorted(named_actions.items())
 
-        if locals_ is None:
-            locals_ = 1
-        if is_integer(locals_):
-            locals_ += 1
-
-        parser = Parser(locals_=locals_)
+        parser = Parser(stacklevel=stacklevel + 1)
         for action in actions:
             self._parse_and_add(parser, action)
         for name, action in named_actions:
