@@ -33,7 +33,7 @@ def test_no_feedback_run(Simulator, plt, seed):
             else:
                 return '0'
         state_input = spa.Transcode(state_input, output_vocab=32)
-        spa.Actions(('state = state_input',))
+        spa.Actions('state_input -> state')
 
     with model:
         p = nengo.Probe(state.output, synapse=0.05)
@@ -62,7 +62,7 @@ def test_memory_run(Simulator, seed, plt):
                 return '0'
 
         state_input = spa.Transcode(state_input, output_vocab=32)
-        spa.Actions(('memory = state_input',))
+        spa.Actions('state_input -> memory')
 
     with model:
         p = nengo.Probe(memory.output, synapse=0.03)
@@ -94,7 +94,7 @@ def test_memory_run_decay(Simulator, plt, seed):
                 return '0'
 
         state_input = spa.Transcode(state_input, output_vocab=32)
-        spa.Actions(('memory = state_input',))
+        spa.Actions('state_input -> memory')
 
     with model:
         p = nengo.Probe(memory.output, synapse=0.03)
@@ -114,7 +114,7 @@ def test_represent_identity(Simulator, seed):
     d = 32
     with spa.Network(seed=seed) as model:
         memory = spa.State(d, represent_identity=True)
-        spa.Actions(('memory = 1',))
+        spa.Actions('1 -> memory')
         p = nengo.Probe(memory.output, synapse=0.03)
 
     with Simulator(model) as sim:

@@ -2,7 +2,6 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaNameError
 
 import numpy as np
 
@@ -39,14 +38,15 @@ def test_thalamus(Simulator, plt, seed):
         m.motor = spa.State(vocab=16, neurons_per_dimension=80)
         m.motor2 = spa.State(vocab=32, neurons_per_dimension=80)
 
-        spa.Actions((
-            'dot(m.vision, A) --> m.motor = A,'
-            'm.motor2 = translate(m.vision * m.vision2)',
-            'dot(m.vision, B) --> m.motor = m.vision,'
-            'motor2=translate(mvision*A*~B)',
-            'dot(m.vision, ~A) --> m.motor = ~m.vision, '
-            'motor2=translate(~vision*vision2)'
-        ))
+        spa.Actions('''
+            ifmax dot(m.vision, A): A -> m.motor
+            elifmax dot(m.vision, B): m.vision -> m.motor
+            elifmax dot(m.vision, ~A): ~m.vision -> m.motor
+            always:
+                translate(m.vision * m.vision2) -> m.motor2
+                translate(mvision*A*~B) -> m.motor2
+                translate(~vision*vision2) -> m.motor2
+        ''')
 
         def input_f(t):
             if t < 0.1:
@@ -118,12 +118,13 @@ def test_routing(Simulator, seed, plt):
         nengo.Connection(node1, model.buff1.input)
         nengo.Connection(node2, model.buff2.input)
 
-        spa.Actions((
-            'model.ctrl = model.input',
-            'dot(model.ctrl, A) --> model.buff3 = model.buff1',
-            'dot(model.ctrl, B) --> model.buff3 = model.buff2',
-            'dot(model.ctrl, C) --> model.buff3 = model.buff1 * model.buff2',
-        ))
+        spa.Actions('''
+            model.input -> model.ctrl
+            ifmax dot(model.ctrl, A): model.buff1 -> model.buff3
+            elifmax dot(model.ctrl, B): model.buff2 -> model.buff3
+            elifmax dot(model.ctrl, C):
+                model.buff1 * model.buff2 -> model.buff3
+        ''')
 
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
 
@@ -158,8 +159,11 @@ def test_routing_recurrency_compilation(Simulator, seed, plt):
     with model:
         model.buff1 = spa.State(label='buff1')
         model.buff2 = spa.State(label='buff2')
-        spa.Actions((
-            '0.5 --> model.buff2 = model.buff1, model.buff1 = model.buff2',))
+        spa.Actions('''
+            ifmax 0.5:
+                model.buff1 -> model.buff2
+                model.buff2 -> model.buff1
+        ''')
 
     with Simulator(model) as sim:
         assert sim
@@ -191,12 +195,18 @@ def test_nondefault_routing(Simulator, seed):
         nengo.Connection(node1, m.buff1.input)
         nengo.Connection(node2, m.buff2.input)
 
-        spa.Actions((
-            'm.ctrl = m.input',
-            'dot(m.ctrl, A) --> m.cmp.input_a=m.buff1, m.cmp.input_b=m.buff1',
-            'dot(m.ctrl, B) --> m.cmp.input_a=m.buff1, m.cmp.input_b=m.buff2',
-            'dot(m.ctrl, C) --> m.cmp.input_a=m.buff2, m.cmp.input_b=m.buff2',
-        ))
+        spa.Actions('''
+            m.input -> m.ctrl
+            ifmax dot(m.ctrl, A):
+                m.buff1 -> m.cmp.input_a
+                m.buff1 -> m.cmp.input_b
+            elifmax dot(m.ctrl, B):
+                m.buff1 -> m.cmp.input_a
+                m.buff2 -> m.cmp.input_b
+            elifmax dot(m.ctrl, C):
+                m.buff2 -> m.cmp.input_a
+                m.buff2 -> m.cmp.input_b
+        ''')
 
         compare_probe = nengo.Probe(m.cmp.output, synapse=0.03)
 
@@ -216,12 +226,10 @@ def test_nondefault_routing(Simulator, seed):
 
 def test_errors():
     # motor does not exist
-    with pytest.raises(SpaNameError) as excinfo:
+    with pytest.raises(AttributeError):
         with spa.Network() as model:
             model.vision = spa.State(vocab=16)
-            spa.Actions(('0.5 --> model.motor = A',))
-
-    assert excinfo.value.name == 'model.motor'
+            spa.Actions('ifmax 0.5: A -> model.motor')
 
 
 def test_constructed_objects_are_accessible():
@@ -231,13 +239,13 @@ def test_constructed_objects_are_accessible():
         model.state2 = spa.State()
         model.state3 = spa.State()
 
-        actions = spa.Actions((
-            'dot(model.state1, A) --> model.state2 = model.state3',
-            '0.5 --> model.state2 = B'), build=False)
-        bg, thalamus, _ = actions.build()
+        actions = spa.Actions('''
+            ifmax dot(model.state1, A): model.state3 -> model.state2
+            elifmax 0.5: B -> model.state2
+        ''')
+        bg = actions[0].bg
+        thalamus = actions[0].thalamus
 
-        print(thalamus.fixed_connections)
-        print(thalamus.gate_out_connections)
         assert isinstance(thalamus.gates[0], nengo.Ensemble)
         assert isinstance(thalamus.gate_in_connections[0], nengo.Connection)
         assert isinstance(thalamus.gate_out_connections[0], nengo.Connection)
