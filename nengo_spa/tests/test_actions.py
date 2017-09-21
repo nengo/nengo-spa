@@ -33,13 +33,16 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         nengo.Connection(node1, model.buff1.input)
         nengo.Connection(node2, model.buff2.input)
 
-        spa.Actions((
-            'model.ctrl = model.input',
-            'model.state = model.buff1',
-            'dot(model.ctrl, A) --> model.buff3 = model.buff1',
-            'dot(model.ctrl, B) --> model.buff3 = model.buff2',
-            'dot(model.ctrl, C) --> model.buff3 = model.buff1 * model.buff2'
-        ))
+        spa.Actions('''
+            model.input -> model.ctrl
+            model.buff1 -> model.state
+            ifmax dot(model.ctrl, A):
+                model.buff1 -> model.buff3
+            elifmax dot(model.ctrl, B):
+                model.buff2 -> model.buff3
+            elifmax dot(model.ctrl, C):
+                model.buff1 * model.buff2 -> model.buff3
+        ''')
 
         state_probe = nengo.Probe(model.state.output, synapse=0.03)
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -84,11 +87,11 @@ def test_dot_product(Simulator, seed, plt):
         model.stimulus = spa.Transcode(
             lambda t: 'A' if t <= 0.3 else 'B', output_vocab=d)
 
-        spa.Actions((
-            'model.state_a = A',
-            'model.state_b = model.stimulus',
-            'model.result = dot(model.state_a, model.state_b)'
-        ))
+        spa.Actions('''
+            A -> model.state_a
+            model.stimulus -> model.state_b
+            dot(model.state_a, model.state_b) -> model.result
+        ''')
 
         p = nengo.Probe(model.result.output, synapse=0.03)
 
@@ -115,49 +118,49 @@ class TestExceptions():
     def test_invalid_types_in_binary_operation(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                spa.Actions(('model.state_c = model.state_a + model.state_b',))
+                spa.Actions('model.state_a + model.state_b -> model.state_c')
 
     def test_approx_inverse_of_scalar(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                spa.Actions(('model.state_c = ~model.scalar',))
+                spa.Actions('~model.scalar -> model.state_c')
 
     def test_dot_product_incompatiple_vocabs(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 spa.Actions(
-                    ('model.scalar = dot(model.state_a, model.state_b)',))
+                    'dot(model.state_a, model.state_b) -> model.scalar')
 
     def test_dot_product_first_argument_invalid(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 spa.Actions(
-                    ('model.scalar = dot(model.scalar, model.state_b)',))
+                    'dot(model.scalar, model.state_b) -> model.scalar')
 
     def test_dot_product_second_argument_invalid(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 spa.Actions(
-                    ('model.scalar = dot(model.state_a, model.scalar)',))
+                    'dot(model.state_a, model.scalar) -> model.scalar')
 
     @pytest.mark.parametrize('method', ['reinterpret', 'translate'])
     def test_cast_type_inference_not_possible(self, model, method):
         with model:
             with pytest.raises(SpaTypeError):
-                spa.Actions(('model.scalar = dot({}(model.state_a), A)'.format(
-                    method),))
+                spa.Actions('dot({}(model.state_a), A) -> model.scalar'.format(
+                    method))
 
     @pytest.mark.parametrize('method', ['reinterpret', 'translate'])
     def test_cast_scalar(self, model, method):
         with model:
             with pytest.raises(SpaTypeError):
                 spa.Actions(
-                    ('model.state_a = {}(model.scalar)'.format(method),))
+                    '{}(model.scalar) -> model.state_a'.format(method))
 
     def test_reinterpret_non_matching_dimensions(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                spa.Actions(('model.state_a = reinterpret(model.state_b)',))
+                spa.Actions('reinterpret(model.state_b) -> model.state_a')
 
 
 def test_access_actions():
@@ -167,14 +170,20 @@ def test_access_actions():
         m.b = spa.State(d)
         m.c = spa.State(d)
         m.d = spa.State(d)
-    actions = spa.Actions(
-        ('m.a = m.b', 'm.b = m.c'), {'named': 'm.c = m.d'}, build=False)
+        actions = spa.Actions('''
+            m.b -> m.a
+            m.c -> m.b
+            always as 'named':
+                m.d -> m.c
+            ''')
 
     assert len(actions) == 3
     assert str(actions[0]) == 'm.b -> m.a'
     assert str(actions[1]) == 'm.c -> m.b'
-    assert str(actions[2]) == 'm.d -> m.c'
-    assert str(actions['named']) == 'm.d -> m.c'
+    assert str(actions[2]) == '''always as 'named':
+    m.d -> m.c'''
+    assert str(actions['named']) == '''always as 'named':
+    m.d -> m.c'''
 
 
 def test_provides_access_to_constructed_objects_of_effect():
@@ -184,16 +193,14 @@ def test_provides_access_to_constructed_objects_of_effect():
         model.b = spa.State()
         model.c = spa.State()
 
-        actions = spa.Actions(('model.c = model.a * model.b',), build=False)
-        bg, thalamus, constructed = actions.build()
+        actions = spa.Actions('model.a * model.b -> model.c')
 
-        assert len(actions[0].effects[0].constructed) == 1
-        assert isinstance(
-            actions[0].effects[0].constructed[0], nengo.Connection)
-        assert len(actions[0].effects[0].source.constructed) == 3
+        assert len(actions[0].constructed) == 1
+        assert isinstance(actions[0].constructed[0], nengo.Connection)
+        assert len(actions[0].source.constructed) == 3
         n_connections = 0
         n_bind = 0
-        for obj in actions[0].effects[0].source.constructed:
+        for obj in actions[0].source.constructed:
             if isinstance(obj, nengo.Connection):
                 n_connections += 1
             elif isinstance(obj, spa.Bind):
@@ -201,13 +208,3 @@ def test_provides_access_to_constructed_objects_of_effect():
             else:
                 raise AssertionError("Unexpected object constructed for Bind.")
         assert n_connections == 2 and n_bind == 1
-
-
-def test_bg_and_thalamus_only_created_when_required():
-    with spa.Network() as model:
-        model.state1 = spa.State(16)
-        model.state2 = spa.State(16)
-        actions = spa.Actions(('model.state1 = model.state2',))
-
-    assert actions.bg is None
-    assert actions.thalamus is None

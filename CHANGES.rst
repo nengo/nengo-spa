@@ -47,6 +47,9 @@ Release History
   surrounding Python code. This means that existing action rules need to be
   changed to reference the correct names.
   (`#63 <https://github.com/nengo/nengo_spa/pull/63>`_)
+- The action rule syntax changed significantly.
+  (`#54 <https://github.com/nengo_spa/nengo/issues/54>`_,
+  `#72 <https://github.com/nengo_spa/nengo/pull/72>`_)
 - Actions will be build automatically without an explicit call to ``build()``.
   (`#59 <https://github.com/nengo/nengo_spa/pull/59>`_,
   `#45 <https://github.com/nengo/nengo_spa/issues/45>`_,

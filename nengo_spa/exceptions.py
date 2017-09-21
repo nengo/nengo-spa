@@ -6,7 +6,7 @@ class SpaConstructionError(SpaException):
     """An error in the construction of SPA action rules."""
 
 
-class SpaNameError(SpaException, ValueError):
+class SpaNameError(NameError):
     """An error in finding a network, input, or output.
 
     Parameters
@@ -25,13 +25,10 @@ class SpaNameError(SpaException, ValueError):
     """
 
     def __init__(self, name, kind):
-        super(SpaNameError, self).__init__()
+        super(SpaNameError, self).__init__(
+            "Could not find {kind} {name!r}.".format(kind=kind, name=name))
         self.name = name
         self.kind = kind
-
-    def __str__(self):
-        return "Could not find {kind} {name!r}.".format(
-            kind=self.kind, name=self.name)
 
 
 class SpaParseError(SpaException, ValueError):

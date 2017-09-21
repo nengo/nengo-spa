@@ -27,10 +27,10 @@ def test_run(Simulator, seed):
                 return 'B'
 
         model.input = spa.Transcode(inputA, output_vocab=16)
-        spa.Actions((
-            'model.compare.input_a = model.input',
-            'model.compare.input_b = A'
-        ))
+        spa.Actions('''
+            model.input -> model.compare.input_a
+            A -> model.compare.input_b
+        ''')
 
     with model:
         p = nengo.Probe(model.compare.output, synapse=0.03)
