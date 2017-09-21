@@ -1,213 +1,23 @@
-"""Abstract syntax trees for SPA actions.
+"""Definition of AST nodes."""
 
-SPA actions are parsed into an abstract syntax tree (AST) representing the
-structure of the action expressions. In the first step, this syntax tree is
-independent of the actual model; it only represents the syntactic information.
-
-For the construction of the AST the Python eval function is used (by modifiying
-the name lookup in the globals dictionary). Because of this all Python code
-not involving identifiers will be statically evaluated before insertion into
-the syntax tree (e.g., '2 * 3 + 1' will be inserted as ``Scalar(7)``).
-
-Each node in the syntax tree will evaluate to a specific type. The most
-important types are ``TScalar`` for expressions evaluating to a scalar and
-:class:`TVocabulary` for expressions evaluating to a semantic pointer. This
-latter type describes the vocabulary the semantic pointer belongs to and
-different vocabularies give different types. This ensures that only semantic
-pointers of a matching vocabulary are assigned.
-
-To determine the type of each node an actual model has to be provided. This is
-because names of semantic pointers are not associated with a vocabulary and it
-needs to be inferred from some actual SPA network for which we have to be able
-to resolve the names of those networks. There are a few basic rules for this
-type inference:
-
-1. If something with unknown vocabulary is assigned to a network, that
-   network's vocabulary provides the type.
-2. If a binary operation has an operand with unknown vocabulary it is
-   determined from the other operand.
-
-Once all the types have been determined, the AST can be used to construct
-Nengo objects to perform the operations represented with the AST. In this
-process each node in the syntax tree can create :class:`Artifact`s. These
-give generated Nengo objects to be connected to the appropriate places
-including the transform that should be used on the connection. This is
-necessary because at the time most objects are constructed we only know this
-constructed object and the transform, but not what it is supposed to connect
-to. So the final connection will be done by some other node in the syntax tree.
-
-To avoid confusion with the normal Nengo build process, we use the term
-'construct' here.
-
-
-In the following we provide the grammar of SPA actions for reference:
-
-``
-Scalar: <any Python expression evaluating to a single number != 0>
-Symbol: <valid Python identifier starting with a capital letter>
-Zero: '0'
-One: '1'
-Module: <valid Python identifier> | <valid Python identifier> '.' Module
-Source: S'(' Source ')' | Scalar | Symbol | Zero | One | Module |
-        BinaryOperation | UnaryOperation | DotProduct
-BinaryOperation: Product | Sum | Difference
-Product: Source '*' Source
-Sum: Source '+' Source
-Difference: Source '-' Source
-UnaryOperation: ApproxInverse | Negative
-ApproxInverse: '~' Source
-Negative: '-' Source
-DotProduct: 'dot(' Source ',' Source ')'
-Reinterpret: 'reinterpret(' Source (',' VocabArg)? ')'
-Translate: 'translate(' Source (',' TranslateArg)* ')'
-TranslateArg : <valid Python identifier> '=' <valid Python argument> | VocabArg
-VocabArg: 'vocab='? (Module | <valid Python identifier>)
-Sink: <valid Python identifier> | <valid Python identifier> '.' Sink
-Effect: Sink '=' Source
-Effects: Effect | Effect ',' Effects
-Action: Source '-->' Effects
-``
-
-Note that `Difference` ``a - b`` will be represented as `a + (-b)` in the AST.
-
-Operator precedence is defined as follows from highest to lowest priority:
-
-``
-0 Scalar, Symbol, Zero, One, Module, DotProduct, Reinterpret, Translate
-1 UnaryOperation
-2 Product
-3 Sum
-``
-"""
 import warnings
-from collections import defaultdict
 
 import nengo
 from nengo.base import NengoObject
 import numpy as np
 
 from nengo_spa import pointer
+from nengo_spa.compiler.ast_types import (
+    TAction, TActionSet, TScalar, TEffect, TEffects, TVocabulary)
+from nengo_spa.modules.basalganglia import BasalGanglia
 from nengo_spa.modules.bind import Bind
 from nengo_spa.modules.compare import Compare
+from nengo_spa.modules.thalamus import Thalamus
 from nengo_spa.network import Network
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.modules.product import Product as ProductModule
-from nengo_spa.exceptions import SpaConstructionError, SpaParseError, SpaTypeError
-
-
-class ConstructionContext(object):
-    """Context in which SPA actions are constructed.
-
-    This primarily provides the SPA networks used to construct certain
-    components. All attributes except `root_network` may be ``None`` if these
-    are not provided in the current construction context.
-
-    Attributes
-    ----------
-    root_network : :class:`spa.Module`
-        The root network the encapsulated all of the constructed structures.
-    bg : :class:`spa.BasalGanglia`
-        Module to manage the basal ganglia part of action selection.
-    thalamus : :class:`spa.Thalamus`
-        Module to manage the thalamus part of action selection.
-    sink : :class:`Sink`
-        Node in the AST where some result will be send to.
-    active_net : class:`nengo.Network`
-        Network to add constructed components to.
-    """
-    __slots__ = [
-        'root_network', 'bg', 'thalamus', 'bias', 'sink', 'active_net',
-        'constructed']
-
-    def __init__(
-            self, root_network, bg=None, thalamus=None,
-            sink=None, active_net=None, constructed=None):
-        self.root_network = root_network
-        self.bg = bg
-        self.thalamus = thalamus
-        self.bias = None
-        self.sink = sink
-        if active_net is None:
-            active_net = root_network
-        self.active_net = active_net
-        if constructed is None:
-            constructed = defaultdict(list)
-        self.constructed = constructed
-
-    def subcontext(self, sink=None, active_net=None):
-        if sink is None:
-            sink = self.sink
-        if active_net is None:
-            active_net = self.active_net
-        return self.__class__(
-            root_network=self.root_network, bg=self.bg,
-            thalamus=self.thalamus, sink=sink, active_net=active_net,
-            constructed=self.constructed)
-
-    @property
-    def sink_network(self):
-        return Network.get_input_network(self.sink.obj)
-
-    @property
-    def sink_input(self):
-        return self.sink.obj, Network.get_input_vocab(self.sink.obj)
-
-    def add_constructed(self, ast_node, *objects):
-        self.constructed[ast_node].extend(objects)
-
-
-class Type(object):
-    """Describes a type.
-
-    Each part of the AST evaluates to some type.
-    """
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.name)
-
-    def __str__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self.name)
-
-    def __eq__(self, other):
-        return self.__class__ is other.__class__ and self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
-
-
-TAction = Type('TAction')
-TScalar = Type('TScalar')
-TEffect = Type('TEffect')
-TEffects = Type('TEffects')
-
-
-class TVocabulary(Type):
-    """Each vocabulary is treated as its own type.
-
-    All vocabulary types constitute a type class.
-    """
-    def __init__(self, vocab):
-        super(TVocabulary, self).__init__('TVocabulary')
-        self.vocab = vocab
-
-    def __repr__(self):
-        return '{}({!r}, {!r})'.format(
-            self.__class__.__name__, self.name, self.vocab)
-
-    def __str__(self):
-        return '{}<{}>'.format(self.name, self.vocab)
-
-    def __hash__(self):
-        return super(TVocabulary, self).__hash__() ^ hash(self.vocab)
-
-    def __eq__(self, other):
-        return (super(TVocabulary, self).__eq__(other) and
-                self.vocab is other.vocab)
+from nengo_spa.exceptions import (
+    SpaConstructionError, SpaParseError, SpaTypeError)
 
 
 class Artifact(object):
@@ -262,7 +72,7 @@ def construct_bias(ast_node, value, context):
     with context.active_net:
         if context.bias is None:
             context.bias = nengo.Node([1], label="bias")
-            context.add_constructed(ast_node, context.bias)
+    ast_node.constructed.append(context.bias)
     if isinstance(value, SemanticPointer):
         value = value.v
     transform = np.array([value]).T
@@ -321,6 +131,7 @@ class Node(object):
         self.staticity = staticity
         self.precedence = precedence
         self.type = None
+        self.constructed = []
 
     @property
     def fixed(self):
@@ -599,13 +410,13 @@ class BinaryNode(Source):
     def _connect_binary_operation(self, context, net):
         with context.root_network:
             for artifact in self.lhs.construct(context):
-                context.add_constructed(
-                    self, nengo.Connection(
+                self.constructed.append(
+                    nengo.Connection(
                         artifact.nengo_source, net.input_a,
                         transform=artifact.transform))
             for artifact in self.rhs.construct(context):
-                context.add_constructed(
-                    self, nengo.Connection(
+                self.constructed.append(
+                    nengo.Connection(
                         artifact.nengo_source, net.input_b,
                         transform=artifact.transform))
 
@@ -706,7 +517,7 @@ class Product(BinaryOperation):
             else:
                 raise NotImplementedError(
                     "Dynamic scaling of semantic pointer not implemented.")
-        context.add_constructed(self, net)
+        self.constructed.append(net)
 
         self._connect_binary_operation(context, net)
         return [Artifact(net.output)]
@@ -848,7 +659,7 @@ class DotProduct(BinaryNode):
         with context.active_net:
             net = Compare(self.lhs.type.vocab, label=str(self))
             self._connect_binary_operation(context, net)
-        context.add_constructed(self, net)
+        self.constructed.append(net)
         return [Artifact(net.output)]
 
     def evaluate(self):
@@ -994,7 +805,7 @@ class Effect(Node):
 
         artifacts = self.source.construct(context)
         for artifact in artifacts:
-            context.add_constructed(self, connect_fn(
+            self.constructed.append(connect_fn(
                 artifact.nengo_source, target, transform=artifact.transform))
         return []
 
@@ -1002,16 +813,17 @@ class Effect(Node):
         raise ValueError("Effects cannot be statically evaluated.")
 
     def __str__(self):
-        return '{} = {}'.format(self.sink, self.source)
+        return '{source} -> {sink}'.format(source=self.source, sink=self.sink)
 
 
 class Effects(Node):
     """Multiple effects."""
-    def __init__(self, *effects):
+    def __init__(self, effects, name=None):
         super(Effects, self).__init__(
             staticity=max(e.staticity for e in effects))
         self.type = TEffects
         self.effects = effects
+        self.name = name
 
     def infer_types(self, root_network, context_type):
         for e in self.effects:
@@ -1026,7 +838,12 @@ class Effects(Node):
         raise ValueError("Effects cannot be statically evaluated.")
 
     def __str__(self):
-        return ', '.join(str(e) for e in self.effects)
+        if self.name is None:
+            return "\n".join(str(e) for e in self.effects)
+        else:
+            return (
+                "always as {!r}:\n    ".format(self.name) +
+                "\n     ".join(str(e) for e in self.effects))
 
 
 class Sink(Node):
@@ -1146,4 +963,56 @@ class Action(Node):
         raise NotImplementedError("Cannot evaluate conditional actions.")
 
     def __str__(self):
-        return '{} --> {}'.format(self.condition, self.effects)
+        if self.name is not None:
+            name_str = " as {!r}".format(self.name)
+        else:
+            name_str = ""
+        if len(self.effects.effects) > 0:
+            effect_str = "".join(
+                "\n    " + line for line in str(self.effects).split("\n"))
+        else:
+            effect_str = "\n    pass"
+        return 'ifmax {utility}{name}:{effects}\n'.format(
+            utility=self.condition, name=name_str, effects=effect_str)
+
+
+class ActionSet(Node):
+    def __init__(self, actions):
+        super(ActionSet, self).__init__(staticity=Node.Staticity.DYNAMIC)
+        self.type = TActionSet
+        self.actions = actions
+        self.bg = None
+        self.thalamus = None
+
+    def infer_types(self, root_network, context_type):
+        for action in self.actions:
+            action.infer_types(root_network, context_type)
+
+    def construct(self, context):
+        action_count = len(self.actions)
+        if action_count <= 0:
+            return
+
+        with context.root_network:
+            self.bg = BasalGanglia(action_count=action_count)
+            self.thalamus = Thalamus(action_count=action_count)
+            for i, a in enumerate(self.actions):
+                self.thalamus.actions.ensembles[i].label = (
+                    'action[{}]: {}'.format(i, a.effects))
+            self.thalamus.connect_bg(self.bg)
+            self.constructed.append(self.bg)
+            self.constructed.append(self.thalamus)
+
+        for action in self.actions:
+            action.construct(context.subcontext(
+                bg=self.bg, thalamus=self.thalamus))
+
+        return []
+
+    def evaluate(self):
+        raise NotImplementedError("Cannot evaluate action sets.")
+
+    def __str__(self):
+        action_strings = [str(action) for action in self.actions]
+        return "".join(
+            action_strings[:1] + ["el" + x for x in action_strings[1:]])

@@ -7,8 +7,9 @@ from nengo.exceptions import NetworkContextError
 from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_integer
 
-from nengo_spa.ast import (
-    Action, ConstructionContext, DotProduct, Effect, Effects, Module,
+from nengo_spa.compiler.ast import ConstructionContext
+from nengo_spa.compiler.ast_nodes import (
+    Action, DotProduct, Effect, Effects, Module,
     Reinterpret, Sink, Symbol, Translate)
 from nengo_spa.exceptions import SpaNameError, SpaParseError
 from nengo_spa.modules.basalganglia import BasalGanglia
@@ -124,8 +125,8 @@ class Parser(object):
             else:
                 raise SpaParseError("Unmatched: " + top)
 
-        return Effects(*[self.parse_effect(effect, channeled=channeled)
-                         for effect in parsed])
+        return Effects([self.parse_effect(effect, channeled=channeled)
+                        for effect in parsed])
 
     def parse_effect(self, effect, channeled=False):
         """Parse single SPA effect.
@@ -284,4 +285,4 @@ class Actions(object):
             for action in self.actions:
                 action.construct(self.construction_context)
 
-        return bg, thalamus, self.construction_context.constructed
+        return bg, thalamus, self.actions
