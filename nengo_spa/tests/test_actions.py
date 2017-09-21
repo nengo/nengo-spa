@@ -171,10 +171,10 @@ def test_access_actions():
         ('m.a = m.b', 'm.b = m.c'), {'named': 'm.c = m.d'}, build=False)
 
     assert len(actions) == 3
-    assert str(actions[0]) == 'm.a = m.b'
-    assert str(actions[1]) == 'm.b = m.c'
-    assert str(actions[2]) == 'm.c = m.d'
-    assert str(actions['named']) == 'm.c = m.d'
+    assert str(actions[0]) == 'm.b -> m.a'
+    assert str(actions[1]) == 'm.c -> m.b'
+    assert str(actions[2]) == 'm.d -> m.c'
+    assert str(actions['named']) == 'm.d -> m.c'
 
 
 def test_provides_access_to_constructed_objects_of_effect():
@@ -187,13 +187,13 @@ def test_provides_access_to_constructed_objects_of_effect():
         actions = spa.Actions(('model.c = model.a * model.b',), build=False)
         bg, thalamus, constructed = actions.build()
 
-        assert len(constructed[actions[0].effects[0]]) == 1
+        assert len(actions[0].effects[0].constructed) == 1
         assert isinstance(
-            constructed[actions[0].effects[0]][0], nengo.Connection)
-        assert len(constructed[actions[0].effects[0].source]) == 3
+            actions[0].effects[0].constructed[0], nengo.Connection)
+        assert len(actions[0].effects[0].source.constructed) == 3
         n_connections = 0
         n_bind = 0
-        for obj in constructed[actions[0].effects[0].source]:
+        for obj in actions[0].effects[0].source.constructed:
             if isinstance(obj, nengo.Connection):
                 n_connections += 1
             elif isinstance(obj, spa.Bind):
