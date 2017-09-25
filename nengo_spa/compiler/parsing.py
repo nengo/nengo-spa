@@ -17,6 +17,9 @@ class RuleMismatchError(Exception):
         super(RuleMismatchError, self).__init__(
             "Could not apply rule '{}'. Expected '{}', but found '{}'.".format(
                 rule, expected, found))
+        self.rule = rule
+        self.expected = expected
+        self.found = found
 
 
 class MatchToken(object):
@@ -142,7 +145,7 @@ class Terminal(Rule):
 
     def read(self, tokens):
         if not self.accept(tokens):
-            raise RuleMismatchError(self, self, tokens.peek())
+            raise RuleMismatchError(self, self, tokens.peek()[0])
         return [next(tokens)]
 
     def __eq__(self, other):
@@ -213,7 +216,7 @@ class Either(Rule):
             if rule.accept(tokens):
                 return rule.read(tokens)
         else:
-            raise RuleMismatchError(self, self, tokens.peek())
+            raise RuleMismatchError(self, self, tokens.peek()[0])
 
     def __or__(self, other):
         return Either(*(self.rules + (other,)))
@@ -276,7 +279,7 @@ class AtLeastOne(Rule):
 
     def read(self, tokens):
         if not self.accept(tokens):
-            raise RuleMismatchError(self, self.rule, tokens.peek())
+            raise RuleMismatchError(self, self.rule, tokens.peek()[0])
         match = []
         while self.accept(tokens):
             match.extend(self.rule.read(tokens))

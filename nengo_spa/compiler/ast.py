@@ -62,7 +62,6 @@ from nengo_spa.compiler.ast_nodes import (
     Action, ActionSet, DotProduct, Effect, Effects, Module, Reinterpret, Sink,
     Symbol, Translate)
 from nengo_spa.compiler.parsing import MatchToken
-from nengo_spa.exceptions import SpaNameError
 from nengo_spa.network import Network as SpaNetwork
 
 
@@ -172,7 +171,7 @@ class ActionsScope(object):
         elif key[0].isupper():
             item = Symbol(key)
         else:
-            raise SpaNameError(key, 'name')
+            raise KeyError(key)
 
         if isinstance(item, SpaNetwork):
             item = Module(key, item)
