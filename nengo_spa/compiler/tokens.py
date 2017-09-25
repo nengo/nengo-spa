@@ -11,6 +11,8 @@ import sys
 from token import tok_name
 from tokenize import (
     untokenize,
+    TokenError,
+    ERRORTOKEN,
     ENDMARKER,
     NAME,
     NUMBER,

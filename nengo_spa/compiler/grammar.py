@@ -66,8 +66,8 @@ class _ExprRule(Rule):
 
     DELIMETERS = (
         connect_l2r, Terminal(string=';'), effect_line_delimiter,
-        Terminal(type=tk.DEDENT), Terminal(string=':'),
-        Terminal(type=tk.NAME, string='as'))
+        Terminal(type=tk.INDENT), Terminal(type=tk.DEDENT),
+        Terminal(string=':'), Terminal(type=tk.NAME, string='as'))
     NESTING = {'{': '}', '(': ')', '[': ']'}
 
     def accept(self, tokens):
