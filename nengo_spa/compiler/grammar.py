@@ -46,6 +46,12 @@ if sys.version_info[0] < 3:
             except StopIteration:
                 raise RuleMismatchError(self, self, (tk.ENDMARKER, '', None))
 
+        def __str__(self):
+            return "'->'"
+
+        def __repr__(self):
+            return "ConnectL2R()"
+
     connect_l2r = ConnectL2R()
 else:
     connect_l2r = Terminal(type=tk.OP, string='->')

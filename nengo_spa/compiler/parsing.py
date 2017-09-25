@@ -68,7 +68,7 @@ class MatchToken(object):
             if hasattr(token, name) else token[cls.arg2idx[name]]
             for name in match_on})
 
-    def __repr__(self):
+    def __str__(self):
         return 'MatchToken({})'.format(
             ', '.join('{}={!r}'.format(k, v) for k, v in self.kwargs.items()))
 
@@ -145,9 +145,17 @@ class Terminal(Rule):
             raise RuleMismatchError(self, self, tokens.peek())
         return [next(tokens)]
 
-    def __str__(self):
+    def __repr__(self):
         return 'Terminal({{{}}})'.format(', '.join(
             k + ': ' + str(v) for k, v in self.kwargs.items()))
+
+    def __str__(self):
+        if 'string' in self.kwargs:
+            return repr(self.kwargs['string'])
+        elif 'type' in self.kwargs:
+            return str(tokens.tok_name[self.kwargs['type']])
+        else:
+            return repr(self)
 
 
 class Chain(Rule):
@@ -169,6 +177,9 @@ class Chain(Rule):
 
     def __add__(self, other):
         return Chain(*(self.rules + (other,)))
+
+    def __repr__(self):
+        return '(' + ' '.join(repr(r) for r in self.rules) + ')'
 
     def __str__(self):
         return '(' + ' '.join(str(r) for r in self.rules) + ')'
@@ -201,6 +212,9 @@ class Either(Rule):
     def __or__(self, other):
         return Either(*(self.rules + (other,)))
 
+    def __repr__(self):
+        return '(' + ' | '.join(repr(r) for r in self.rules) + ')'
+
     def __str__(self):
         return '(' + ' | '.join(str(r) for r in self.rules) + ')'
 
@@ -225,6 +239,9 @@ class Maybe(Rule):
             return self.rule.read(tokens)
         else:
             return []
+
+    def __repr__(self):
+        return '({!r})?'.format(self.rule)
 
     def __str__(self):
         return '({})?'.format(self.rule)
@@ -253,6 +270,9 @@ class AtLeastOne(Rule):
             match.extend(self.rule.read(tokens))
         return match
 
+    def __repr__(self):
+        return '({!r})+'.format(self.rule)
+
     def __str__(self):
         return '({})+'.format(self.rule)
 
@@ -278,6 +298,9 @@ class AnyNumber(Rule):
             match.extend(self.rule.read(tokens))
         return match
 
+    def __repr__(self):
+        return '({!r})*'.format(self.rule)
+
     def __str__(self):
         return '({})*'.format(self.rule)
 
@@ -297,6 +320,9 @@ class Group(Rule):
     def read(self, tokens):
         return [(self.name, self.rule.read(tokens))]
 
+    def __repr__(self):
+        return 'Group({!r}, {!r})'.format(self.name, self.rule)
+
     def __str__(self):
         return self.name
 
@@ -314,6 +340,9 @@ class Peek(Rule):
         if not self.accept(tokens):
             raise RuleMismatchError(self, self.rule, tokens.peek()[0])
         return []
+
+    def __repr__(self):
+        return 'Peek({!r})'.format(self.rule)
 
     def __str__(self):
         return 'Peek({})'.format(self.rule)
