@@ -29,6 +29,9 @@ def test_terminal():
     with pytest.raises(parsing.RuleMismatchError):
         terminal.read(tokens)
 
+    assert parsing.Terminal(string='foo') == parsing.Terminal(string='foo')
+    assert parsing.Terminal(string='foo') != parsing.Terminal(string='bar')
+
 
 @pytest.mark.parametrize('rule', [
     parsing.Either(
@@ -49,6 +52,12 @@ def test_either(rule):
     assert not rule.accept(tokens)
     with pytest.raises(parsing.RuleMismatchError):
         rule.read(tokens)
+
+    assert rule == parsing.Either(
+        parsing.Terminal(type=tk.NAME, string='foo'),
+        parsing.Terminal(type=tk.NAME, string='bar'))
+    assert rule != parsing.Either(
+        parsing.Terminal(type=tk.NAME, string='foo'))
 
 
 def test_either_chaining_gathers_rules_in_single_object():
@@ -74,6 +83,12 @@ def test_chain(rule):
     with pytest.raises(parsing.RuleMismatchError):
         rule.read(tokens)
 
+    assert rule == parsing.Chain(
+        parsing.Terminal(type=tk.NAME, string='foo'),
+        parsing.Terminal(type=tk.NAME, string='bar'))
+    assert rule != parsing.Chain(
+        parsing.Terminal(type=tk.NAME, string='foo'))
+
 
 def test_chaining_gathers_rules_in_single_object():
     rules = [parsing.Terminal() for _ in range(3)]
@@ -90,6 +105,11 @@ def test_maybe():
     assert maybe.accept(tokens)
     assert maybe.read(tokens) == []
 
+    assert maybe == parsing.Maybe(
+        parsing.Terminal(type=tk.NAME, string='foobar'))
+    assert maybe != parsing.Maybe(
+        parsing.Terminal(type=tk.NAME, string='foo'))
+
 
 @pytest.mark.parametrize('code', ['foobar', 'foo bar'])
 def test_at_least_one(code):
@@ -105,6 +125,9 @@ def test_at_least_one(code):
     with pytest.raises(parsing.RuleMismatchError):
         at_least_one.read(tokens)
 
+    assert at_least_one == parsing.AtLeastOne(parsing.Terminal(type=tk.NAME))
+    assert at_least_one != parsing.AtLeastOne(parsing.Terminal(type=tk.STRING))
+
 
 @pytest.mark.parametrize('code', ['', 'foobar', 'foo bar'])
 def test_any_number(code):
@@ -117,6 +140,9 @@ def test_any_number(code):
     if expected == ['']:
         expected = []
     assert [x[1] for x in parse] == expected
+
+    assert any_number == parsing.AnyNumber(parsing.Terminal(type=tk.NAME))
+    assert any_number != parsing.AnyNumber(parsing.Terminal(type=tk.STRING))
 
 
 def test_group():
@@ -134,6 +160,12 @@ def test_group():
     assert parse[1][0][0] == 'child'
     assert len(parse[1][0][1]) == 2
 
+    # testing the equality operator
+    assert grammar == parsing.Group('parent', parsing.Group(
+        'child', parsing.AnyNumber(parsing.Terminal(type=tk.NAME))))
+    assert grammar != parsing.Group('foo', parsing.Group(
+        'child', parsing.AnyNumber(parsing.Terminal(type=tk.NAME))))
+
 
 def test_peek():
     tokens = peekable_tokens('foo')
@@ -143,3 +175,6 @@ def test_peek():
     assert grammar.read(tokens) == []
     assert grammar.accept(tokens)
     assert grammar.read(tokens) == []
+
+    assert grammar == parsing.Peek(parsing.Terminal(type=tk.NAME))
+    assert grammar != parsing.Peek(parsing.Terminal(type=tk.STRING))

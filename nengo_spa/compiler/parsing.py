@@ -145,6 +145,9 @@ class Terminal(Rule):
             raise RuleMismatchError(self, self, tokens.peek())
         return [next(tokens)]
 
+    def __eq__(self, other):
+        return isinstance(other, Terminal) and self.kwargs == other.kwargs
+
     def __repr__(self):
         return 'Terminal({{{}}})'.format(', '.join(
             k + ': ' + str(v) for k, v in self.kwargs.items()))
@@ -177,6 +180,9 @@ class Chain(Rule):
 
     def __add__(self, other):
         return Chain(*(self.rules + (other,)))
+
+    def __eq__(self, other):
+        return isinstance(other, Chain) and self.rules == other.rules
 
     def __repr__(self):
         return '(' + ' '.join(repr(r) for r in self.rules) + ')'
@@ -212,6 +218,9 @@ class Either(Rule):
     def __or__(self, other):
         return Either(*(self.rules + (other,)))
 
+    def __eq__(self, other):
+        return isinstance(other, Either) and self.rules == other.rules
+
     def __repr__(self):
         return '(' + ' | '.join(repr(r) for r in self.rules) + ')'
 
@@ -239,6 +248,9 @@ class Maybe(Rule):
             return self.rule.read(tokens)
         else:
             return []
+
+    def __eq__(self, other):
+        return isinstance(other, Maybe) and self.rule == other.rule
 
     def __repr__(self):
         return '({!r})?'.format(self.rule)
@@ -270,6 +282,9 @@ class AtLeastOne(Rule):
             match.extend(self.rule.read(tokens))
         return match
 
+    def __eq__(self, other):
+        return isinstance(other, AtLeastOne) and self.rule == other.rule
+
     def __repr__(self):
         return '({!r})+'.format(self.rule)
 
@@ -298,6 +313,9 @@ class AnyNumber(Rule):
             match.extend(self.rule.read(tokens))
         return match
 
+    def __eq__(self, other):
+        return isinstance(other, AnyNumber) and self.rule == other.rule
+
     def __repr__(self):
         return '({!r})*'.format(self.rule)
 
@@ -320,6 +338,12 @@ class Group(Rule):
     def read(self, tokens):
         return [(self.name, self.rule.read(tokens))]
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, Group) and
+            self.name == other.name and
+            self.rule == other.rule)
+
     def __repr__(self):
         return 'Group({!r}, {!r})'.format(self.name, self.rule)
 
@@ -340,6 +364,9 @@ class Peek(Rule):
         if not self.accept(tokens):
             raise RuleMismatchError(self, self.rule, tokens.peek()[0])
         return []
+
+    def __eq__(self, other):
+        return isinstance(other, Peek) and self.rule == other.rule
 
     def __repr__(self):
         return 'Peek({!r})'.format(self.rule)
