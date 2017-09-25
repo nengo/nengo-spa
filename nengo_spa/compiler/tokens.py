@@ -8,6 +8,7 @@ Used to provide a common interface across Python versions.
 import sys
 
 
+from token import tok_name
 from tokenize import (
     untokenize,
     ENDMARKER,
