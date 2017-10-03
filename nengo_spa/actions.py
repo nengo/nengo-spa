@@ -16,6 +16,11 @@ from nengo_spa.compiler import tokens
 
 
 class AstAccessor(Sequence):
+    """Provides access to the root AST nodes of build action rules.
+
+    Nodes can either be accessed by their ordinal position in the action rules
+    or by the name provided in the action rules.
+    """
     def __init__(self, ast):
         self.ast = ast
         self.by_name = {
