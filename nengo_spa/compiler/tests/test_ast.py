@@ -14,6 +14,10 @@ from nengo_spa.compiler.ast_types import (
 
 
 def bare_tokens(expr):
+    """Tokenizes *expr* without tokens for encoding and endmarker.
+
+    Helpful for constructing parts of parse trees in the tests.
+    """
     return [
         tk for tk in tokens.tokenize(BytesIO(expr.encode()).readline)
         if tk[0] != tokens.ENCODING and tk[0] != tokens.ENDMARKER]

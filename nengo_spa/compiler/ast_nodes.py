@@ -977,6 +977,11 @@ class Action(Node):
 
 
 class ActionSet(Node):
+    """A set of actions implemented by one basal ganglia and thalamus.
+
+    If multiple *ActionSets* exist, each creates their own basal ganglia and
+    thalamus.
+    """
     def __init__(self, actions):
         super(ActionSet, self).__init__(staticity=Node.Staticity.DYNAMIC)
         self.type = TActionSet

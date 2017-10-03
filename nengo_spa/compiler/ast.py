@@ -120,6 +120,10 @@ class ConstructionContext(object):
         self.active_net = active_net
 
     def subcontext(self, bg=None, thalamus=None, sink=None, active_net=None):
+        """Creates a subcontext.
+
+        All omitted arguments will be initialized from the parent context.
+        """
         if bg is None:
             bg = self.bg
         if thalamus is None:
@@ -232,6 +236,18 @@ class AstBuilder(object):
         return [Sink(expr.strip(), obj)]
 
     def _untokenize_expr(self, parse_tree):
+        """Converts a sequence of tokens back into Python code.
+
+        Parameters
+        ----------
+        parse_tree : sequence
+            A list of tokens (a leaf in the parse tree).
+
+        Returns
+        -------
+        str
+            String of Python code constructed from the tokens.
+        """
         expr = tokens.untokenize(
             ([] if self._encoding is None else [
                 (tokens.ENCODING, self._encoding)]) +

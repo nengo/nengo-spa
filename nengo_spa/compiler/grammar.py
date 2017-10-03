@@ -37,6 +37,11 @@ def parse(code):
 effect_line_delimiter = Terminal(type=tk.NEWLINE) | Terminal(type=tk.ENDMARKER)
 if sys.version_info[0] < 3:
     class ConnectL2R(Rule):
+        """Rule accepting the -> operator.
+
+        Consists out of two tokens in Python 2 and thus needs a special
+        implementation with a look-ahead of 2.
+        """
         def accept(self, tokens):
             return [t[1] for t in tokens.peek(n=2)] == ['-', '>']
 
@@ -54,6 +59,7 @@ if sys.version_info[0] < 3:
 
     connect_l2r = ConnectL2R()
 else:
+    # In Python 3 '->' is actually an operator (for type annotations)
     connect_l2r = Terminal(type=tk.OP, string='->')
 
 
@@ -146,6 +152,7 @@ class MainBlock(Rule):
     def read(self, tokens):
         match = []
         if Terminal(type=tk.INDENT).accept(tokens):
+            # Main block is a block of multiple lines of Python
             match.extend(Terminal(type=tk.INDENT).read(tokens))
             while action.accept(tokens):
                 match.extend(action.read(tokens))
@@ -153,6 +160,7 @@ class MainBlock(Rule):
                     Terminal(type=tk.NEWLINE).read(tokens)
             match.extend(Terminal(type=tk.DEDENT).read(tokens))
         else:
+            # Main block is just a single line of Python without indentation
             match = AtLeastOne(action).read(tokens)
         return match
 
