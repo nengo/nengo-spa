@@ -44,7 +44,7 @@ class Artifact(object):
         return Artifact(self.nengo_source, np.dot(tr, self.transform))
 
 
-def infer_vocab(root_network, *nodes):
+def infer_vocab(*nodes):
     """Return the first vocabulary type that can be inferred for one of the
     `nodes`.
 
@@ -59,7 +59,7 @@ def infer_vocab(root_network, *nodes):
     """
     for node in nodes:
         try:
-            node.infer_types(root_network, None)
+            node.infer_types(None)
             if isinstance(node.type, TVocabulary):
                 return node.type
         except SpaTypeError:
@@ -151,7 +151,7 @@ class Node(object):
         return (self.__class__ is other.__class__ and
                 self.__dict__ == other.__dict__)
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         """Run type inference on this node and its children.
 
         Will raise a :class:`nengo.exceptions.SpaTypeError` if invalid,
@@ -161,8 +161,6 @@ class Node(object):
 
         Parameters
         ----------
-        root_network : :class:`spa.Module`
-            The root_network used to resolve names.
         context_type : :class:`Type`
             The type of the context of this node. Allows to infer the type
             from the context if the node has no definitive type on its own.
@@ -221,7 +219,7 @@ class Source(Node):
     def __rmul__(self, other):
         return Product(other, self)
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         raise NotImplementedError()
 
     def construct(self, context):
@@ -238,7 +236,7 @@ class Scalar(Source):
         self.value = value
         self.type = TScalar
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         pass
 
     def construct(self, context):
@@ -266,7 +264,7 @@ class Symbol(Source):
             raise SpaParseError(
                 "Semantic pointers must begin with a capital letter.")
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if not isinstance(context_type, TVocabulary):
             raise SpaTypeError("Invalid type.")
         self.type = context_type
@@ -292,7 +290,7 @@ class Zero(Source):
     def __init__(self):
         super(Zero, self).__init__(staticity=Node.Staticity.FIXED)
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if context_type is None:
             self.type = TScalar
         elif context_type == TScalar or isinstance(context_type, TVocabulary):
@@ -319,7 +317,7 @@ class One(Source):
     def __init__(self):
         super(One, self).__init__(staticity=Node.Staticity.FIXED)
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if context_type is None:
             self.type = TScalar
         elif context_type == TScalar or isinstance(context_type, TVocabulary):
@@ -358,7 +356,7 @@ class Module(Source):
         else:
             return self._obj
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         vocab = Network.get_output_vocab(self.obj)
         if vocab is None:
             self.type = TScalar
@@ -401,7 +399,7 @@ class BinaryNode(Source):
         self.lhs = lhs
         self.rhs = rhs
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         raise NotImplementedError()
 
     def construct(self, context):
@@ -441,12 +439,12 @@ class BinaryOperation(BinaryNode):
         self.operator = operator
         self.allow_scalar = allow_scalar
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if context_type is None:
-            context_type = infer_vocab(root_network, self.lhs, self.rhs)
+            context_type = infer_vocab(self.lhs, self.rhs)
 
-        self.lhs.infer_types(root_network, context_type)
-        self.rhs.infer_types(root_network, context_type)
+        self.lhs.infer_types(context_type)
+        self.rhs.infer_types(context_type)
 
         if self.lhs.type == self.rhs.type:
             self.type = self.lhs.type
@@ -562,8 +560,8 @@ class UnaryOperation(Source):
         self.source = source
         self.operator = operator
 
-    def infer_types(self, root_network, context_type):
-        self.source.infer_types(root_network, context_type)
+    def infer_types(self, context_type):
+        self.source.infer_types(context_type)
         self.type = self.source.type
 
     def construct(self, context):
@@ -580,8 +578,8 @@ class ApproxInverse(UnaryOperation):
     def __init__(self, source):
         super(ApproxInverse, self).__init__(source, '~')
 
-    def infer_types(self, root_network, context_type):
-        super(ApproxInverse, self).infer_types(root_network, context_type)
+    def infer_types(self, context_type):
+        super(ApproxInverse, self).infer_types(context_type)
         if not isinstance(self.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot apply approximate inverse to '{}' which is not of "
@@ -625,10 +623,10 @@ class DotProduct(BinaryNode):
         super(DotProduct, self).__init__(lhs, rhs, staticity)
         self.type = TScalar
 
-    def infer_types(self, root_network, context_type):
-        context_type = infer_vocab(root_network, self.lhs, self.rhs)
-        self.lhs.infer_types(root_network, context_type)
-        self.rhs.infer_types(root_network, context_type)
+    def infer_types(self, context_type):
+        context_type = infer_vocab(self.lhs, self.rhs)
+        self.lhs.infer_types(context_type)
+        self.rhs.infer_types(context_type)
         if not isinstance(self.lhs.type, TVocabulary):
             raise SpaTypeError(
                 "First argument of dot product '{}' is not of type "
@@ -676,11 +674,11 @@ class Reinterpret(Source):
         self.source = source
         self.vocab = vocab
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if self.vocab is None:
             self.type = context_type
         elif isinstance(self.vocab, Module):
-            self.vocab.infer_types(root_network, None)
+            self.vocab.infer_types(None)
             self.type = self.vocab.type
         else:
             self.type = TVocabulary(self.vocab)
@@ -688,7 +686,7 @@ class Reinterpret(Source):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
-        self.source.infer_types(root_network, None)
+        self.source.infer_types(None)
         if not isinstance(self.source.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot reinterpret '{}' because it is not of type "
@@ -719,11 +717,11 @@ class Translate(Source):
         self.populate = populate
         self.solver = solver
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if self.vocab is None:
             self.type = context_type
         elif isinstance(self.vocab, Module):
-            self.vocab.infer_types(root_network, None)
+            self.vocab.infer_types(None)
             self.type = self.vocab.type
         else:
             self.type = TVocabulary(self.vocab)
@@ -731,7 +729,7 @@ class Translate(Source):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
-        self.source.infer_types(root_network, None)
+        self.source.infer_types(None)
         if not isinstance(self.source.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot translate '{}' because it is not of type "
@@ -777,11 +775,11 @@ class Effect(Node):
         self.channeled = channeled
         self.channel = None
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if context_type is not None:
             raise ValueError("Effect only allows a context_type of None.")
-        self.sink.infer_types(root_network, None)
-        self.source.infer_types(root_network, self.sink.type)
+        self.sink.infer_types(None)
+        self.source.infer_types(self.sink.type)
         if self.sink.type != self.source.type:
             raise SpaTypeError("Cannot assign {} to {} in '{}'".format(
                 self.source.type, self.sink.type, self))
@@ -825,9 +823,9 @@ class Effects(Node):
         self.effects = effects
         self.name = name
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         for e in self.effects:
-            e.infer_types(root_network, context_type)
+            e.infer_types(context_type)
 
     def construct(self, context):
         for effect in self.effects:
@@ -861,7 +859,7 @@ class Sink(Node):
         else:
             return self._obj
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         vocab = Network.get_input_vocab(self.obj)
         if vocab is None:
             self.type = TScalar
@@ -912,15 +910,15 @@ class Action(Node):
         warnings.warn(DeprecationWarning("Use the effects attribute instead."))
         return self.effects
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         if isinstance(self.condition, Node):
-            self.condition.infer_types(root_network, context_type)
+            self.condition.infer_types(context_type)
             if self.condition.type != TScalar:
                 raise SpaTypeError(
                     "Condition '{}' does not evaluate to a scalar.".format(
                         self.condition))
 
-        self.effects.infer_types(root_network, None)
+        self.effects.infer_types(None)
 
     def construct(self, context):
         if context.bg is None or context.thalamus is None:
@@ -989,9 +987,9 @@ class ActionSet(Node):
         self.bg = None
         self.thalamus = None
 
-    def infer_types(self, root_network, context_type):
+    def infer_types(self, context_type):
         for action in self.actions:
-            action.infer_types(root_network, context_type)
+            action.infer_types(context_type)
 
     def construct(self, context):
         action_count = len(self.actions)

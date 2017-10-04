@@ -77,7 +77,7 @@ def Actions(actions, stacklevel=1):
     ast = build_ast(parse_tree, stacklevel + 1)
 
     for top_node in ast:
-        top_node.infer_types(root_network, None)
+        top_node.infer_types(None)
     construction_context = ConstructionContext(root_network)
     for top_node in ast:
         top_node.construct(construction_context)

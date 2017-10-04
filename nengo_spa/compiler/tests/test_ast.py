@@ -35,33 +35,33 @@ def test_symbol():
     assert str(node) == 'A'
 
     vocab_type = TVocabulary(spa.Vocabulary(16, strict=False))
-    node.infer_types(None, vocab_type)
+    node.infer_types(vocab_type)
     assert node.type == vocab_type
 
     ast = AstBuilder().build_expr(bare_tokens('A'))
     with pytest.raises(SpaTypeError):
-        ast[0].infer_types(None, TScalar)
+        ast[0].infer_types(TScalar)
 
 
 def test_spa_network():
     d = 16
-    with spa.Network() as model:
+    with spa.Network():
         state = spa.State(d)
 
     ast = AstBuilder().build_expr(bare_tokens('state'))
     assert ast == [Module('state', state)]
     assert str(ast[0]) == 'state'
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == state.vocabs[d]
 
-    with spa.Network() as model:
+    with spa.Network():
         with spa.Network() as network:
             network.state = spa.State(d)
 
     ast = AstBuilder().build_expr(bare_tokens('network.state'))
     assert ast == [Module('network.state', network.state)]
     assert str(ast[0]) == 'network.state'
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == network.state.vocabs[d]
 
 
@@ -71,7 +71,7 @@ def test_scalar_multiplication():
     assert str(ast[0]) == '2 * A'
 
     vocab_type = TVocabulary(spa.Vocabulary(16, strict=False))
-    ast[0].infer_types(None, vocab_type)
+    ast[0].infer_types(vocab_type)
     assert ast[0].type == vocab_type
 
     ast = AstBuilder().build_expr(bare_tokens('A * 2'))
@@ -79,25 +79,25 @@ def test_scalar_multiplication():
     assert str(ast[0]) == 'A * 2'
 
     vocab_type = TVocabulary(spa.Vocabulary(16, strict=False))
-    ast[0].infer_types(None, vocab_type)
+    ast[0].infer_types(vocab_type)
     assert ast[0].type == vocab_type
 
     d = 16
-    with spa.Network() as model:
+    with spa.Network():
         state = spa.State(d)
 
     ast = AstBuilder().build_expr(bare_tokens('2 * state'))
     assert ast == [Product(2, Module('state', state))]
     assert str(ast[0]) == '2 * state'
 
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == state.vocabs[d]
 
     ast = AstBuilder().build_expr(bare_tokens('state * 2'))
     assert ast == [Product(Module('state', state), 2)]
     assert str(ast[0]) == 'state * 2'
 
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == state.vocabs[d]
 
 
@@ -108,11 +108,11 @@ def test_binary_operations(symbol, klass):
     assert str(ast[0]) == 'A {} B'.format(symbol)
 
     vocab_type = TVocabulary(spa.Vocabulary(16, strict=False))
-    ast[0].infer_types(None, vocab_type)
+    ast[0].infer_types(vocab_type)
     assert ast[0].type == vocab_type
 
     d = 16
-    with spa.Network() as model:
+    with spa.Network():
         state = spa.State(d)
         state2 = spa.State(d)
 
@@ -120,14 +120,14 @@ def test_binary_operations(symbol, klass):
     assert ast == [klass(Module('state', state), Symbol('B'))]
     assert str(ast[0]) == 'state {} B'.format(symbol)
 
-    ast[0].infer_types(model, TVocabulary(state.vocabs[d]))
+    ast[0].infer_types(TVocabulary(state.vocabs[d]))
     assert ast[0].type.vocab == state.vocabs[d]
 
     ast = AstBuilder().build_expr(bare_tokens('A {} state'.format(symbol)))
     assert ast == [klass(Symbol('A'), Module('state', state))]
     assert str(ast[0]) == 'A {} state'.format(symbol)
 
-    ast[0].infer_types(model, TVocabulary(state.vocabs[d]))
+    ast[0].infer_types(TVocabulary(state.vocabs[d]))
     assert ast[0].type.vocab == state.vocabs[d]
 
     ast = AstBuilder().build_expr(bare_tokens(
@@ -135,7 +135,7 @@ def test_binary_operations(symbol, klass):
     assert ast == [klass(Module('state', state), Module('state2', state2))]
     assert str(ast[0]) == 'state {} state2'.format(symbol)
 
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == state.vocabs[d]
 
 
@@ -147,31 +147,31 @@ def test_unary(symbol, klass):
     assert str(ast[0]) == symbol + 'A'
 
     vocab_type = TVocabulary(spa.Vocabulary(16, strict=False))
-    ast[0].infer_types(None, vocab_type)
+    ast[0].infer_types(vocab_type)
     assert ast[0].type == vocab_type
 
     d = 16
-    with spa.Network() as model:
+    with spa.Network():
         state = spa.State(d)
 
     ast = AstBuilder().build_expr(bare_tokens(symbol + 'state'))
     assert ast == [klass(Module('state', state))]
     assert str(ast[0]) == symbol + 'state'
 
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].type.vocab == state.vocabs[d]
 
 
 def test_dot_product():
     d = 16
-    with spa.Network() as model:
+    with spa.Network():
         state = spa.State(d)
 
     ast = AstBuilder().build_expr(bare_tokens('dot(A, state)'))
     assert ast == [DotProduct(Symbol('A'), Module('state', state))]
     assert str(ast[0]) == 'dot(A, state)'
 
-    ast[0].infer_types(model, TScalar)
+    ast[0].infer_types(TScalar)
     assert ast[0].type == TScalar
 
     ast = AstBuilder().build_expr(bare_tokens('2 * dot(A, state) + 1'))
@@ -179,7 +179,7 @@ def test_dot_product():
         'state', state))), 1)]
     assert str(ast[0]) == '2 * dot(A, state) + 1'
 
-    ast[0].infer_types(model, TScalar)
+    ast[0].infer_types(TScalar)
     assert ast[0].type == TScalar
 
 
@@ -391,7 +391,7 @@ def test_complex_epressions():
         Symbol('B'), Module('m.state', m.state)))))]
     assert str(ast[0]) == '~(A + -(B * m.state))'
 
-    ast[0].infer_types(m, TVocabulary(m.state.vocabs[d]))
+    ast[0].infer_types(TVocabulary(m.state.vocabs[d]))
     assert ast[0].type.vocab == m.state.vocabs[d]
 
     ast = AstBuilder().build_expr(bare_tokens(
@@ -418,7 +418,7 @@ def test_zero_vector():
         ('expr', bare_tokens('0')),
         ('sink', bare_tokens('model.state')),
     ])
-    ast[0].infer_types(model, None)
+    ast[0].infer_types(None)
     assert ast[0].source.type.vocab == model.state.vocabs[d]
 
 
