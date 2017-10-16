@@ -33,6 +33,9 @@ def test_thalamus_basic(Simulator, plt, seed):
 @pytest.mark.slow
 def test_thalamus(Simulator, plt, seed):
     with spa.Network(seed=seed) as m:
+        m.vocabs.get_or_create(16).populate("A; B")
+        m.vocabs.get_or_create(32).populate("A; B")
+
         m.vision = spa.State(vocab=16, neurons_per_dimension=80)
         m.vision2 = spa.State(vocab=16, neurons_per_dimension=80)
         m.motor = spa.State(vocab=16, neurons_per_dimension=80)
@@ -44,8 +47,8 @@ def test_thalamus(Simulator, plt, seed):
             elifmax dot(m.vision, ~A): ~m.vision -> m.motor
             always:
                 translate(m.vision * m.vision2) -> m.motor2
-                translate(mvision*A*~B) -> m.motor2
-                translate(~vision*vision2) -> m.motor2
+                translate(m.vision*A*~B) -> m.motor2
+                translate(~m.vision*m.vision2) -> m.motor2
         ''')
 
         def input_f(t):
@@ -58,7 +61,7 @@ def test_thalamus(Simulator, plt, seed):
             else:
                 return '0'
         m.input = spa.Transcode(input_f, output_vocab=16)
-        spa.Actions(('m.vision = m.input', 'm.vision2 = B * ~A'))
+        spa.Actions('m.input -> m.vision; B * ~A -> m.vision2')
 
         p = nengo.Probe(m.motor.output, synapse=0.03)
         p2 = nengo.Probe(m.motor2.output, synapse=0.03)
@@ -68,7 +71,7 @@ def test_thalamus(Simulator, plt, seed):
 
     t = sim.trange()
     data = m.motor.vocab.dot(sim.data[p].T)
-    data2 = m.motor2.vocab2.dot(sim.data[p2].T)
+    data2 = m.motor2.vocab.dot(sim.data[p2].T)
 
     plt.subplot(2, 1, 1)
     plt.plot(t, data.T)
@@ -79,17 +82,17 @@ def test_thalamus(Simulator, plt, seed):
     assert data[0, t == 0.1] > 0.8
     assert data[1, t == 0.1] < 0.2
     assert data2[0, t == 0.1] < 0.35
-    assert data2[1, t == 0.1] > 0.4
+    assert data2[1, t == 0.1] > 0.3
     # Action 2
     assert data[0, t == 0.3] < 0.2
     assert data[1, t == 0.3] > 0.8
-    assert data2[0, t == 0.3] > 0.5
+    assert data2[0, t == 0.3] > 0.4
     assert data2[1, t == 0.3] < 0.3
     # Action 3
     assert data[0, t == 0.5] > 0.8
     assert data[1, t == 0.5] < 0.2
     assert data2[0, t == 0.5] < 0.5
-    assert data2[1, t == 0.5] > 0.4
+    assert data2[1, t == 0.5] > 0.3
 
 
 def test_routing(Simulator, seed, plt):

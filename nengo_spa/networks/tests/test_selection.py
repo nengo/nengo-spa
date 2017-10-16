@@ -23,7 +23,7 @@ def test_ia(Simulator, plt, seed):
         in_p = nengo.Probe(in_node)
         reset_p = nengo.Probe(reset_node)
         accum_p = nengo.Probe(ia.accumulators.output, synapse=0.01)
-        out_p = nengo.Probe(ia.output, synapse=0.03)
+        out_p = nengo.Probe(ia.output, synapse=0.05)
 
     with Simulator(m) as sim:
         sim.run(0.9)
