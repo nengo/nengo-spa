@@ -213,7 +213,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     plt.subplot(2, 1, 1)
     plt.plot(t, similarity(sim.data[in_p], vocab_in))
     plt.ylabel("Input: " + ', '.join(in_keys))
-    plt.legend(vocab_in.keys, loc='best')
+    plt.legend(vocab_in.keys(), loc='best')
     plt.ylim(top=1.1)
     plt.subplot(2, 1, 2)
     for t_item, c, k in zip([t_item1, t_item2], ['b', 'g'], out_keys):
