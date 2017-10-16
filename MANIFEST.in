@@ -23,3 +23,6 @@ prune nengo_spa/examples/.ipynb_checkpoints
 
 # Exclude all bytecode
 global-exclude *.pyc *.pyo *.pyd
+
+# Exclude VIM swp files
+global-exclude *.swp
