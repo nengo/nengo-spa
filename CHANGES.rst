@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-0.2.1 (unreleased)
-==================
+0.3.0 (October 16, 2017)
+========================
 
 **Added**
 
