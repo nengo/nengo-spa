@@ -29,23 +29,6 @@ class SpaCommunicationChannel(spa.Network):
         self.output_secondary = self.secondary.output
 
 
-def test_spa_verification(seed, plt):
-    d = 16
-
-    model = spa.Network(seed=seed)
-
-    # building a normal model that shouldn't raise a warning
-    with model:
-        model.buf = spa.State(d)
-        spa.Actions('B -> model.buf')
-        # make sure errors aren't fired for non-spa networks
-        prod = nengo.networks.Product(10, 2)  # noqa: F841
-        model.int_val = 1
-
-        # reassignment is fine for non-networks
-        model.int_val = 2
-
-
 def test_spa_vocab():
     # create a model without a vocab and check that it is empty
     model = spa.Network()
