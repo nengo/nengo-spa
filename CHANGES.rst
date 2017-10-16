@@ -37,7 +37,7 @@ Release History
 - Add a ``solver`` argument to the action rule's ``translate`` to use a solver
   instead of an outer product to obtain the transformation matrix which can
   give slightly better results.
-  (`#56 <https://github.com/nengo/nengo_spa/pull/56>`_,
+  (`#62 <https://github.com/nengo/nengo_spa/pull/62>`_,
   `#57 <https://github.com/nengo/nengo_spa/issues/57>`_)
 
 **Changed**
