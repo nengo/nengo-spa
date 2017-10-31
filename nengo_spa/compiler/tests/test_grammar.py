@@ -217,6 +217,24 @@ def effect_tree(source, target):
         ]),
         MatchToken(type=tokens.DEDENT),
     ]),
+    ('''
+        # comment
+        always:
+            pass''', [  # check leading comments
+        MatchToken(type=tokens.NL),
+        MatchToken(type=tokens.COMMENT),
+        MatchToken(type=tokens.NL),
+        MatchToken(type=tokens.INDENT),
+        ('always', [
+            MatchToken(type=tokens.NAME, string='always'),
+            MatchToken(string=':'),
+            MatchToken(type=tokens.NEWLINE),
+            MatchToken(type=tokens.INDENT),
+            MatchToken(type=tokens.NAME, string='pass'),
+            MatchToken(type=tokens.DEDENT),
+        ]),
+        MatchToken(type=tokens.DEDENT),
+    ]),
 ])
 def test_grammar(code, parse_tree):
     actual = parse(code)
