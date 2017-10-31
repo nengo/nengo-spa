@@ -172,9 +172,10 @@ class MainBlock(Rule):
 
 if sys.version_info[0] < 3:
     actions = (
-        AnyNumber(Terminal(type=tk.NL)) +
+        AnyNumber(Terminal(type=tk.NL) | Terminal(type=tk.COMMENT)) +
         MainBlock() + Terminal(type=tk.ENDMARKER))
 else:
     actions = (
-        Terminal(type=tk.ENCODING) + AnyNumber(Terminal(type=tk.NL)) +
+        Terminal(type=tk.ENCODING) +
+        AnyNumber(Terminal(type=tk.NL) | Terminal(type=tk.COMMENT)) +
         MainBlock() + Terminal(type=tk.ENDMARKER))
