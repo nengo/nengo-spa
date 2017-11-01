@@ -27,7 +27,10 @@ Release History
 
 - Allow leading comments in actions rules.
   (`#81 <https://github.com/nengo/nengo_spa/issues/81>`_,
-  `#85 <https://github.com/nengo/nengo/pull/85>`_)
+  `#85 <https://github.com/nengo/nengo_spa/pull/85>`_)
+- Gave the basal ganglia a default label.
+  (`#84 <https://github.com/nengo/nengo_spa/issues/84>`_,
+  `#88 <https://github.com/nengo/nengo_spa/pull/88>`_)
 
 
 0.3.0 (October 16, 2017)
