@@ -144,6 +144,7 @@ class BasalGanglia(Network):
             self, action_count, n_neurons_per_ensemble=Default,
             output_weight=Default, input_bias=Default, ampa_synapse=Default,
             gaba_synapse=Default, **kwargs):
+        kwargs.setdefault('label', "Basal ganglia")
         super(BasalGanglia, self).__init__(**kwargs)
 
         self.action_count = action_count
