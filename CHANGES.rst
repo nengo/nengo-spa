@@ -23,6 +23,11 @@ Release History
 0.3.1 (unreleased)
 ==================
 
+**Fixed**
+
+- Allow leading comments in actions rules.
+  (`#81 <https://github.com/nengo/nengo_spa/issues/81>`_,
+  `#85 <https://github.com/nengo/nengo/pull/85>`_)
 
 
 0.3.0 (October 16, 2017)
