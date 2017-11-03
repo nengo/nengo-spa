@@ -782,8 +782,11 @@ class Effect(Node):
     def infer_types(self, context_type):
         if context_type is not None:
             raise ValueError("Effect only allows a context_type of None.")
-        self.sink.infer_types(None)
-        self.source.infer_types(self.sink.type)
+        try:
+            self.sink.infer_types(None)
+            self.source.infer_types(self.sink.type)
+        except SpaTypeError as err:
+            raise SpaTypeError('In effect "{}": {}'.format(self, err))
         if self.sink.type != self.source.type:
             raise SpaTypeError("Cannot assign {} to {} in '{}'".format(
                 self.source.type, self.sink.type, self))
