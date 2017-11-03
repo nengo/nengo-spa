@@ -38,6 +38,8 @@ Release History
 - Gave the basal ganglia a default label.
   (`#84 <https://github.com/nengo/nengo_spa/issues/84>`_,
   `#88 <https://github.com/nengo/nengo_spa/pull/88>`_)
+- Fixed warning produce by the ``create_inhibit_node`` function.
+  (`#90 <https://github.com/nengo/nengo_spa/pull/90>`_)
 
 
 0.3.0 (October 16, 2017)

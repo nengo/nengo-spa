@@ -104,7 +104,7 @@ def create_inhibit_node(net, strength=2., **kwargs):
         Node that can be connected to to provide an inhibitory signal to the
         network.
     """
-    inhibit_node = nengo.Node(size_in=1, size_out=1)
+    inhibit_node = nengo.Node(size_in=1)
     for e in net.all_ensembles:
         nengo.Connection(
             inhibit_node, e.neurons,
