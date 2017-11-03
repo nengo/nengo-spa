@@ -357,7 +357,11 @@ class Module(Source):
             return self._obj
 
     def infer_types(self, context_type):
-        vocab = Network.get_output_vocab(self.obj)
+        try:
+            vocab = Network.get_output_vocab(self.obj)
+        except KeyError:
+            raise SpaTypeError("{} {} is not declared as output.".format(
+                self.name, self.obj))
         if vocab is None:
             self.type = TScalar
         else:
@@ -860,7 +864,11 @@ class Sink(Node):
             return self._obj
 
     def infer_types(self, context_type):
-        vocab = Network.get_input_vocab(self.obj)
+        try:
+            vocab = Network.get_input_vocab(self.obj)
+        except KeyError:
+            raise SpaTypeError("{} {} is not declared as input.".format(
+                self.name, self.obj))
         if vocab is None:
             self.type = TScalar
         else:
