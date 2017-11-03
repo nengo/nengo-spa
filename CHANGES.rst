@@ -23,6 +23,13 @@ Release History
 0.3.1 (unreleased)
 ==================
 
+**Changed**
+
+- Clearer error message as a ``SpaTypeError`` something is used as input/output
+  in an action rule without being declared as such.
+  (`#82 <https://github.com/nengo/nengo_spa/issues/82>`_,
+  `#89 <https://github.com/nengo/nengo_spa/pull/89>`_)
+
 **Fixed**
 
 - Allow leading comments in actions rules.
