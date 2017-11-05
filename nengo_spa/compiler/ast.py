@@ -255,7 +255,7 @@ class AstBuilder(object):
             [(tokens.ENDMARKER, '')])
         if self._encoding is not None:
             expr = expr.decode(self._encoding)
-        expr = re.sub(r'\\?\s+', '', expr)
+        expr = re.sub(r'\\?\s+', ' ', expr)
         return expr
 
     def build_effect(self, parse_tree):

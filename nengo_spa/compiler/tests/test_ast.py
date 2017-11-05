@@ -438,3 +438,12 @@ def test_vocab_transform_in_multiplication():
 
     ast = AstBuilder().build_expr(bare_tokens('reinterpret(model.state) * 2'))
     assert str(ast[0]) == 'reinterpret(model.state) * 2'
+
+
+def test_missing_operator():
+    d = 16
+    with spa.Network() as model:
+        model.state = spa.State(d)
+
+    with pytest.raises(SyntaxError):
+        AstBuilder().build_expr(bare_tokens('A B'))
