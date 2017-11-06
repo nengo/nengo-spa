@@ -115,7 +115,7 @@ class SemanticPointer(Fixed):
     def __rmul__(self, other):
         """Multiplication of two SemanticPointers is circular convolution.
 
-        If mutliplied by a scaler, we do normal multiplication.
+        If multiplied by a scalar, we do normal multiplication.
         """
         return self.__mul__(other)
 
@@ -163,7 +163,7 @@ class SemanticPointer(Fixed):
     def compare(self, other):
         """Return the similarity between two SemanticPointers.
 
-        This is the normalized dotproduct, or (equivalently), the cosine of
+        This is the normalized dot product, or (equivalently), the cosine of
         the angle between the two vectors.
         """
         if isinstance(other, SemanticPointer):
