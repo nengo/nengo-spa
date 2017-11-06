@@ -316,7 +316,7 @@ class VocabularyMap(Mapping):
         if vocab.dimensions in self._vocabs:
             warnings.warn("Duplicate vocabularies with dimension %d. "
                           "Using the last entry in the vocab list with "
-                          "that dimensionality." % (vocab.dimensions))
+                          "that dimensionality." % vocab.dimensions)
         self._vocabs[vocab.dimensions] = vocab
 
     def __delitem__(self, dimensions):
