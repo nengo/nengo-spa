@@ -20,15 +20,18 @@ class Vocabulary(Mapping):
 
     The Vocabulary can also act as a dictionary, with keys as the names
     of the semantic pointers and values as the `.SemanticPointer` objects
-    themselves. If it is asked for a pointer that does not exist, one will
-    be automatically created.
+    themselves.
 
     Parameters
     -----------
     dimensions : int
         Number of dimensions for each semantic pointer.
     strict : bool, optional (Default: True)
-        TODO
+        Whether to automatically create missing semantic pointers. If a
+        non-strict vocabulary is asked for a pointer that does not exist within
+        the vocabulary, the missing pointer will be automatically added to the
+        vocabulary. A strict vocabulary will throw an error if asked for a
+        pointer that does not exist in the vocabulary.
     max_similarity : float, optional (Default: 0.1)
         When randomly generating pointers, ensure that the cosine of the
         angle between the new pointer and all existing pointers is less
@@ -156,6 +159,14 @@ class Vocabulary(Mapping):
         self._vectors = np.vstack([self._vectors, p.v])
 
     def populate(self, pointers):
+        """Generate semantic pointers given an expression.
+
+        Parameters
+        ----------
+        pointers : string
+            The expression defining the semantic pointers to
+            add to the vocabulary.
+        """
         if len(pointers.strip()) <= 0:
             return  # Do nothing (and don't fail) for empty string.
 
@@ -225,12 +236,17 @@ class Vocabulary(Mapping):
         ----------
         other : Vocabulary
             The other vocabulary to translate into.
+        populate : Boolean (Default: None)
+            Whether to add the missing keys from the original vocabulary
+            to the new target vocabulary.
         keys : list, optional (Default: None)
             If None, any term that exists in just one of the Vocabularies
             will be created in the other Vocabulary and included. Otherwise,
             the transformation will only consider terms in this list. Any
             terms in this list that do not exist in the Vocabularies will
             be created.
+        solver: callable (Default: None)
+            Function to map one vocabulary to the other.
         """
         if keys is None:
             keys = self._keys
@@ -265,8 +281,8 @@ class Vocabulary(Mapping):
 
         Parameters
         ----------
-        keys : list
-            List of semantic pointer names to be copied over to the
+        keys : list or set
+            List or set of semantic pointer names to be copied over to the
             new vocabulary.
         """
         # Make new Vocabulary object
