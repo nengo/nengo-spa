@@ -20,8 +20,11 @@ Release History
    - Fixed
 
 
-0.3.2 (unreleased)
+0.4.0 (unreleased)
 ==================
+
+This release increases the minimum required Nengo version to Nengo 2.5
+(previously Nengo 2.4).
 
 **Added**
 
@@ -39,6 +42,9 @@ Release History
   do not have any effect.
   (`#101 <https://github.com/nengo/nengo_spa/issues/101>`_,
   `#103 <https://github.com/nengo/nengo_spa/pull/103>`_)
+- Validation of ``VocabOrDimParam`` and ``VocabularyMapParam``.
+  (`#95 <https://github.com/nengo/nengo_spa/issues/95>`_,
+  `#98 <https://github.com/nengo/nengo_spa/pull/98>`_)
 
 
 0.3.1 (November 7, 2017)

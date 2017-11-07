@@ -9,6 +9,7 @@ import pytest
 from nengo_spa import Vocabulary, VocabularyMap
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
+from nengo_spa.vocab import VocabularyMapParam, VocabularyOrDimParam
 
 
 def test_add(rng):
@@ -251,3 +252,46 @@ def test_vocabulary_set(rng):
     assert vs[16] is new
     assert new.dimensions == 16
     assert new.rng is rng
+
+
+def test_vocabulary_map_param():
+    class Test(object):
+        vocab_map = VocabularyMapParam('vocab_map', readonly=False)
+
+    obj = Test()
+    vm = VocabularyMap()
+    v16 = Vocabulary(16)
+    v32 = Vocabulary(32)
+
+    obj.vocab_map = vm
+    assert obj.vocab_map is vm
+
+    obj.vocab_map = [v16, v32]
+    assert obj.vocab_map[16] is v16
+    assert obj.vocab_map[32] is v32
+
+    with pytest.raises(ValidationError):
+        obj.vocab_map = 'incompatible'
+
+
+def test_vocabulary_or_dim_param():
+    v16 = Vocabulary(16)
+    v32 = Vocabulary(32)
+
+    class Test(object):
+        vocabs = VocabularyMap([v16])
+        vocab = VocabularyOrDimParam('vocab', readonly=False)
+
+    obj = Test()
+
+    obj.vocab = v32
+    assert obj.vocab is v32
+
+    obj.vocab = 16
+    assert obj.vocab is v16
+
+    with pytest.raises(ValidationError):
+        obj.vocab = 'incompatible'
+
+    with pytest.raises(ValidationError):
+        obj.vocab = 0
