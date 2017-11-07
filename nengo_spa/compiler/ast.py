@@ -104,12 +104,11 @@ class ConstructionContext(object):
         Network to add constructed components to.
     """
     __slots__ = [
-        'root_network', 'bg', 'thalamus', 'bias', 'sink', 'active_net',
-        'constructed']
+        'root_network', 'bg', 'thalamus', 'bias', 'sink', 'active_net']
 
     def __init__(
             self, root_network, bg=None, thalamus=None,
-            sink=None, active_net=None, constructed=None):
+            sink=None, active_net=None):
         self.root_network = root_network
         self.bg = bg
         self.thalamus = thalamus
