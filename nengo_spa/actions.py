@@ -41,6 +41,19 @@ class AstAccessor(Sequence):
     def keys(self):
         return self.by_name.keys()
 
+    def _attr_list(self, attr):
+        objs = []
+        for act_set in self.ast:
+            if hasattr(act_set, attr):
+                objs.append(getattr(act_set, attr))
+        return objs
+
+    def all_bgs(self):
+        return self._attr_list("bg")
+
+    def all_thals(self):
+        return self._attr_list("thalamus")
+
 
 def Actions(actions, stacklevel=1):
     """Compiles action rules in a SPA network.
