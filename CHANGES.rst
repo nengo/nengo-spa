@@ -42,7 +42,10 @@ Release History
   (`#90 <https://github.com/nengo/nengo_spa/pull/90>`_)
 - Prevent whitespace from being completely removed in action rules.
   (`#92 <https://github.com/nengo/nengo_spa/issues/92`_,
-  `#93 <https://github.com/nengo/nengo_spa/pull/93)
+  `#93 <https://github.com/nengo/nengo_spa/pull/93`_)
+- Have the ``intercept_width`` argument of ``IA`` actually take effect.
+  (`#94 <https://github.com/nengo/nengo_spa/issues/94>`_,
+  `#97 <https://github.com/nengo/nengo_spa/pull/97>`_)
 
 
 0.3.0 (October 16, 2017)

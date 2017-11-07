@@ -76,10 +76,12 @@ def IA(
 
     with nengo.Network(**kwargs) as net:
         net.accumulators = Thresholding(
-            n_accum_neurons, n_ensembles, threshold=0., radius=radius)
+            n_accum_neurons, n_ensembles, threshold=0.,
+            intercept_width=intercept_width, radius=radius)
         net.thresholding = Thresholding(
             n_thresholding_neurons, n_ensembles, threshold=accum_threshold,
-            radius=radius, function=lambda x: x > accum_threshold)
+            intercept_width=intercept_width, radius=radius,
+            function=lambda x: x > accum_threshold)
 
         nengo.Connection(
             net.accumulators.output, net.accumulators.input,
