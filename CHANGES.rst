@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-0.3.1 (unreleased)
-==================
+0.3.1 (November 7, 2017)
+========================
 
 **Changed**
 
@@ -41,8 +41,8 @@ Release History
 - Fixed warning produce by the ``create_inhibit_node`` function.
   (`#90 <https://github.com/nengo/nengo_spa/pull/90>`_)
 - Prevent whitespace from being completely removed in action rules.
-  (`#92 <https://github.com/nengo/nengo_spa/issues/92`_,
-  `#93 <https://github.com/nengo/nengo_spa/pull/93`_)
+  (`#92 <https://github.com/nengo/nengo_spa/issues/92>`_,
+  `#93 <https://github.com/nengo/nengo_spa/pull/93>`_)
 - Have the ``intercept_width`` argument of ``IA`` actually take effect.
   (`#94 <https://github.com/nengo/nengo_spa/issues/94>`_,
   `#97 <https://github.com/nengo/nengo_spa/pull/97>`_)
