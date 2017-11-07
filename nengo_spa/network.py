@@ -194,6 +194,24 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     def config(self):
         return _AutoConfig(self._config)
 
+        """Creates an input for use in an Actions object.
+
+        Parameters
+        ----------
+        obj : nengo.base.NengoObject
+            Nengo object to use as an input to the network.
+        vocab: Vocabulary
+            Vocabulary to assign to the input.
+        """
+        """Creates an output for use in an Actions object.
+
+        Parameters
+        ----------
+        obj : nengo.base.NengoObject
+            Nengo object to use as an output to the network.
+        vocab : Vocabulary
+            Vocabulary to assign to the output.
+        """
     @classmethod
     def get_input_vocab(cls, obj):
         return input_vocab_registry[obj]
