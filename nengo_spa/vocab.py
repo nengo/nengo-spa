@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 
 import nengo
-from nengo.exceptions import NengoWarning, ValidationError
+from nengo.exceptions import ConfigError, NengoWarning, ValidationError
 from nengo_spa import pointer
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
@@ -332,12 +332,12 @@ class VocabularyMap(Mapping):
 class VocabularyMapParam(nengo.params.Parameter):
     """Can be a mapping from dimensions to vocabularies."""
 
-    def validate(self, instance, vocab_set):
-        super(VocabularyMapParam, self).validate(instance, vocab_set)
+    def coerce(self, instance, vocab_set):
+        vocab_set = super(VocabularyMapParam, self).coerce(instance, vocab_set)
 
         if vocab_set is not None and not isinstance(vocab_set, VocabularyMap):
             try:
-                VocabularyMap(vocab_set)
+                vocab_set = VocabularyMap(vocab_set)
             except ValueError:
                 raise ValidationError(
                     "Must be of type 'VocabularyMap' or compatible "
@@ -346,17 +346,19 @@ class VocabularyMapParam(nengo.params.Parameter):
 
         return vocab_set
 
-    def __set__(self, instance, value):
-        if not isinstance(value, VocabularyMap):
-            value = VocabularyMap(value)
-        super(VocabularyMapParam, self).__set__(instance, value)
-
 
 class VocabularyOrDimParam(nengo.params.Parameter):
     """Can be a vocabulary or integer denoting a dimensionality."""
 
-    def validate(self, instance, value):
-        super(VocabularyOrDimParam, self).validate(instance, value)
+    # TODO replace this method by `coerce_defaults = False` and bump the
+    # minimum required Nengo version to >2.6.0.
+    def set_default(self, obj, value):
+        if not self.configurable:
+            raise ConfigError("Parameter '%s' is not configurable." % self)
+        self._defaults[obj] = value
+
+    def coerce(self, instance, value):
+        value = super(VocabularyOrDimParam, self).coerce(instance, value)
 
         if value is not None:
             if is_integer(value):
@@ -364,12 +366,9 @@ class VocabularyOrDimParam(nengo.params.Parameter):
                     raise ValidationError(
                         "Vocabulary dimensionality must be at least 1.",
                         attr=self.name, obj=instance)
+                value = instance.vocabs.get_or_create(value)
             elif not isinstance(value, Vocabulary):
                 raise ValidationError(
                     "Must be of type 'Vocabulary' or an integer (got type %r)."
                     % type(value).__name__, attr=self.name, obj=instance)
-
-    def __set__(self, instance, value):
-        if is_integer(value):
-            value = instance.vocabs.get_or_create(value)
-        super(VocabularyOrDimParam, self).__set__(instance, value)
+        return value

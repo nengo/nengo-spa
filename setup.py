@@ -45,7 +45,7 @@ setup(
         'numpy>=1.7',
     ],
     install_requires=[
-        'nengo>=2.4',
+        'nengo>=2.5',
         'numpy>=1.7',
     ],
     extras_require={
