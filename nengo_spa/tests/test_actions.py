@@ -186,6 +186,40 @@ def test_access_actions():
     m.d -> m.c'''
 
 
+def test_access_thal_and_bg_objects():
+    d = 16
+
+    with spa.Network() as m:
+        m.a = spa.Scalar()
+        m.b = spa.Scalar()
+
+        m.c = spa.Scalar()
+        m.d = spa.Scalar()
+
+        actions = spa.Actions('''
+            ifmax m.a:
+                0 -> m.c
+            ifmax m.b:
+                1 -> m.c
+
+            m.c -> m.d
+            ''')
+
+    assert actions.all_bgs() == [actions[0].bg, actions[1].bg]
+    assert actions.all_thals() == [actions[0].thalamus, actions[1].thalamus]
+
+    with spa.Network() as m:
+        m.a = spa.State(d)
+        m.b = spa.State(d)
+
+        actions = spa.Actions('''
+            m.a -> m.b
+            ''')
+
+    assert len(actions.all_bgs()) == 0
+    assert len(actions.all_thals()) == 0
+
+
 def test_provides_access_to_constructed_objects_of_effect():
     with spa.Network() as model:
         model.config[spa.State].vocab = 16

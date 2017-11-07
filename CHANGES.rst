@@ -23,6 +23,12 @@ Release History
 0.3.2 (unreleased)
 ==================
 
+**Added**
+
+- Add ``all_bgs`` and ``all_thals`` methods to
+  ``AstAccessor`` to enable easy access to these objects.
+  (`#61 <https://github.com/nengo/nengo_spa/pull/99>`_,
+  `#28 <https://github.com/nengo/nengo_spa/issues/80>`_)
 
 
 0.3.1 (November 7, 2017)
