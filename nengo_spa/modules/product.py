@@ -5,13 +5,13 @@ from nengo_spa.network import Network
 
 
 class Product(Network):
-    """A SPA network capable of multiplying two scalars.
+    """Multiplies two scalars.
 
     Parameters
     ----------
     n_neurons : int, optional (Default: 200)
         Number of neurons to use in product computation.
-    kwargs
+    kwargs : dict
         Keyword arguments passed through to ``spa.Network``.
     """
 

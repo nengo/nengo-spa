@@ -5,12 +5,14 @@ from nengo_spa.network import Network
 
 
 class Scalar(Network):
-    """A SPA network capable of representing a single scalar.
+    """Represents a single scalar.
 
     Parameters
     ----------
     n_neurons : int, optional (Default: 50)
         Number of neurons to represent the scalar.
+    kwargs : dict
+        Keyword arguments passed through to ``spa.Network``.
     """
 
     n_neurons = IntParam('n_neurons', default=50, low=1, readonly=True)
