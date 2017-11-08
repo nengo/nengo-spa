@@ -236,6 +236,45 @@ def effect_tree(source, target):
         ]),
         MatchToken(type=tokens.DEDENT),
     ]),
+    ('''
+        ifmax 0.5: # comment
+            # comment
+            pass
+            # comment
+
+        elifmax 0.5:
+            pass''', [
+        MatchToken(type=tokens.NL),
+        MatchToken(type=tokens.INDENT),
+        ('max_action', [
+            ('ifmax', [
+                MatchToken(type=tokens.NAME, string='ifmax'),
+                ('utility', [('expr', bare_tokens("0.5"))]),
+                MatchToken(string=':'),
+                MatchToken(type=tokens.COMMENT),
+                MatchToken(type=tokens.NEWLINE),
+                MatchToken(type=tokens.COMMENT, string='# comment'),
+                MatchToken(type=tokens.NL),
+                MatchToken(type=tokens.INDENT),
+                MatchToken(type=tokens.NAME, string='pass'),
+                MatchToken(type=tokens.NEWLINE),
+                MatchToken(type=tokens.COMMENT, string='# comment'),
+                MatchToken(type=tokens.NL),
+                MatchToken(type=tokens.NL),
+                MatchToken(type=tokens.DEDENT),
+            ]),
+            ('elifmax', [
+                MatchToken(type=tokens.NAME, string='elifmax'),
+                ('utility', [('expr', bare_tokens("0.5"))]),
+                MatchToken(string=':'),
+                MatchToken(type=tokens.NEWLINE),
+                MatchToken(type=tokens.INDENT),
+                MatchToken(type=tokens.NAME, string='pass'),
+                MatchToken(type=tokens.DEDENT),
+            ]),
+        ]),
+        MatchToken(type=tokens.DEDENT),
+    ]),
 ])
 def test_grammar(code, parse_tree):
     actual = parse(code)
