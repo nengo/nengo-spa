@@ -27,8 +27,8 @@ Release History
 
 - Add ``all_bgs`` and ``all_thals`` methods to
   ``AstAccessor`` to enable easy access to these objects.
-  (`#61 <https://github.com/nengo/nengo_spa/pull/99>`_,
-  `#28 <https://github.com/nengo/nengo_spa/issues/80>`_)
+  (`#61 <https://github.com/nengo/nengo_spa/pull/99>`__,
+  `#28 <https://github.com/nengo/nengo_spa/issues/80>`__)
 
 **Fixed**
 
@@ -39,6 +39,9 @@ Release History
   do not have any effect.
   (`#101 <https://github.com/nengo/nengo_spa/issues/101>`_,
   `#103 <https://github.com/nengo/nengo_spa/pull/103>`_)
+- Allow comments at various places in actions rules.
+  (`#102 <https://github.com/nengo/nengo_spa/issues/102>`_,
+  `#104 <https://github.com/nengo/nengo_spa/pull/104>`_)
 
 
 0.3.1 (November 7, 2017)

@@ -102,6 +102,8 @@ sink = Group('sink', Terminal(type=tk.NAME) + AnyNumber(
     Terminal(string='.') + Terminal(type=tk.NAME)))
 
 nl = Terminal(type=tk.NEWLINE) + AnyNumber(Terminal(type=tk.NL))
+comment_lines = AnyNumber(
+    Terminal(type=tk.COMMENT) + AtLeastOne(Terminal(type=tk.NL)))
 
 effect = (
     Terminal(type=tk.NAME, string='pass') |
@@ -111,10 +113,11 @@ effect_line = (
     AnyNumber(Terminal(string=';') + effect) +
     Maybe(Terminal(type=tk.COMMENT)) +
     Peek(nl | Terminal(type=tk.ENDMARKER) | Terminal(type=tk.DEDENT)) +
-    Maybe(nl))
+    Maybe(nl) + comment_lines)
 effect_lines = AtLeastOne(effect_line)
 
 block = (
+    comment_lines +
     Terminal(type=tk.INDENT) + effect_lines +
     Terminal(type=tk.DEDENT))
 
@@ -123,7 +126,7 @@ name = Group(
 
 nameable = (
     Maybe(name) +
-    Terminal(string=':') +
+    Terminal(string=':') + Maybe(Terminal(type=tk.COMMENT)) +
     ((nl + block) | effect_line))
 
 ifmax = Group(
