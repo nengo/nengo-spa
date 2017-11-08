@@ -23,6 +23,11 @@ Release History
 0.3.2 (unreleased)
 ==================
 
+**Removed**
+
+- Removed the ``always`` and ``as 'name'`` syntax from the action rules.
+  (`#87 <https://github.com/nengo/nengo_spa/issues/87>`_,
+  `#100 <https://github.com/nengo/nengo_spa/pull/100>`_)
 
 
 0.3.1 (November 7, 2017)
