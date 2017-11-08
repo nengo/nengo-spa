@@ -7,7 +7,7 @@ from nengo_spa.vocab import VocabularyOrDimParam
 
 
 class Compare(Network):
-    """A SPA network for computing the dot product of two inputs.
+    """Computes the dot product of two inputs.
 
     Parameters
     ----------
@@ -16,7 +16,7 @@ class Compare(Network):
         the default vocabulary of that dimensionality will be used.
     neurons_per_dimension : int, optional (Default: 200)
         Number of neurons to use in each product computation.
-    kwargs
+    kwargs : dict
         Keyword arguments passed through to ``spa.Network``.
     """
 

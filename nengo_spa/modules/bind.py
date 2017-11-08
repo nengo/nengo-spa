@@ -6,7 +6,7 @@ from nengo_spa.vocab import VocabularyOrDimParam
 
 
 class Bind(Network):
-    """A network for binding together two inputs.
+    """Network for binding together two inputs.
 
     Binding is done with circular convolution. For more details on how
     this is computed, see the underlying `~.network.CircularConvolution`
@@ -24,7 +24,7 @@ class Bind(Network):
         the first input (``invert_a``) or the second input (``invert_b``).
         Flipping the second input will make the network perform circular
         correlation instead of circular convolution.
-    kwargs
+    kwargs : dict
         Keyword arguments passed through to ``spa.Network``.
     """
 
