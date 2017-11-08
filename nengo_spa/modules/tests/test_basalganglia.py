@@ -56,10 +56,9 @@ def test_basal_ganglia(Simulator, seed, plt):
             elifmax 0.5 * dot(m.vision, MOUSE) + 0.5 * m.compare: G -> m.motor
             elifmax (dot(m.vision, MOUSE) - m.compare) * 0.5: H -> m.motor
 
-            always:
-                m.encode -> m.vision
-                SHOOP -> m.compare.input_a
-                SHOOP -> m.compare.input_b
+            m.encode -> m.vision
+            SHOOP -> m.compare.input_a
+            SHOOP -> m.compare.input_b
         ''')
         bg = actions[0].bg
 

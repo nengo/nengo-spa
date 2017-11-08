@@ -118,25 +118,20 @@ block = (
     Terminal(type=tk.INDENT) + effect_lines +
     Terminal(type=tk.DEDENT))
 
-name = Group(
-    'as', Terminal(type=tk.NAME, string='as') + Terminal(type=tk.STRING))
-
-nameable = (
-    Maybe(name) +
+blockstart = (
     Terminal(string=':') +
     ((nl + block) | effect_line))
 
 ifmax = Group(
     'ifmax',
-    Terminal(type=tk.NAME, string='ifmax') + Group('utility', expr) + nameable)
+    Terminal(type=tk.NAME, string='ifmax') + Group('utility', expr) +
+    blockstart)
 elifmax = Group(
     'elifmax',
     Terminal(type=tk.NAME, string='elifmax') + Group('utility', expr) +
-    nameable)
+    blockstart)
 max_action = Group('max_action', ifmax + AnyNumber(elifmax))
-always_action = Group(
-    'always', Terminal(type=tk.NAME, string='always') + nameable)
-keyword_action = always_action | max_action
+keyword_action = max_action
 action = keyword_action | effect_line
 
 
