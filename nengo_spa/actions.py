@@ -23,23 +23,15 @@ class AstAccessor(Sequence):
     """
     def __init__(self, ast):
         self.ast = ast
-        self.by_name = {
-            node.name: node for node in ast if hasattr(node, 'name')}
 
     def __len__(self):
         return len(self.ast)
 
     def __getitem__(self, key):
-        if is_integer(key):
-            return self.ast[key]
-        else:
-            return self.by_name[key]
+        return self.ast[key]
 
     def __contains__(self, key):
-        return key in self.ast or key in self.by_name
-
-    def keys(self):
-        return self.by_name.keys()
+        return key in self.ast
 
 
 def Actions(actions, stacklevel=1):

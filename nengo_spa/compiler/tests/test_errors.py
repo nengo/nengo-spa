@@ -62,29 +62,12 @@ def test_missing_colon():
         assert b
         with pytest.raises(SyntaxError) as excinfo:
             spa.Actions('''
-                always
+                ifmax 0.5
                     a -> b
             ''')
-    assert str(excinfo.value) == '''(2, 22) expected ':', but found '\\n'
-                always
-                      ^'''
-
-
-def test_non_string_name():
-    d = 16
-    with spa.Network():
-        a = spa.State(d)
-        b = spa.State(d)
-        assert a
-        assert b
-        with pytest.raises(SyntaxError) as excinfo:
-            spa.Actions('''
-                always as foo:
-                    a -> b
-            ''')
-    assert str(excinfo.value) == '''(2, 26) expected STRING, but found 'foo'
-                always as foo:
-                          ^'''
+    assert str(excinfo.value) == '''(2, 25) expected ':', but found '\\n'
+                ifmax 0.5
+                         ^'''
 
 
 def test_unclosed_parens():
@@ -105,12 +88,10 @@ def test_unclosed_single_line_str():
     with spa.Network():
         with pytest.raises(SyntaxError) as excinfo:
             spa.Actions('''
-                always as 'foo:
+                ifmax fn('foo:
                     pass
             ''')
-    assert str(excinfo.value) == '''(2, 31) EOL while scanning string literal
-                always as 'foo:
-                               ^'''
+    assert str(excinfo.value) == 'unexpected EOF while parsing actions'
 
 
 def test_noindent():
@@ -120,7 +101,7 @@ def test_noindent():
         assert a
         with pytest.raises(IndentationError) as excinfo:
             spa.Actions('''
-                always:
+                ifmax 0.5:
                 pass
             ''')
     assert str(excinfo.value) == '''(3, 16) expected an indented block
@@ -135,7 +116,7 @@ def test_overindent():
         assert a
         with pytest.raises(IndentationError) as excinfo:
             spa.Actions('''
-                always:
+                ifmax 0.5:
                     pass
                         pass
             ''')

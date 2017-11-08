@@ -57,66 +57,28 @@ def effect_tree(source, target):
     ]),
     ('''
         a -> b
-        always:
-            c -> d; e -> f
-            g -> h
+        c -> d; e -> f
+        g -> h
         i -> j''', [
         MatchToken(type=tokens.NL),
         MatchToken(type=tokens.INDENT),
         effect_tree('a', 'b'),
         MatchToken(type=tokens.NEWLINE),
-        ('always', [
-            MatchToken(type=tokens.NAME, string='always'),
-            MatchToken(string=':'),
-            MatchToken(type=tokens.NEWLINE),
-            MatchToken(type=tokens.INDENT),
-            effect_tree('c', 'd'),
-            MatchToken(string=';'),
-            effect_tree('e', 'f'),
-            MatchToken(type=tokens.NEWLINE),
-            effect_tree('g', 'h'),
-            MatchToken(type=tokens.NEWLINE),
-            MatchToken(type=tokens.DEDENT),
-        ]),
+        effect_tree('c', 'd'),
+        MatchToken(string=';'),
+        effect_tree('e', 'f'),
+        MatchToken(type=tokens.NEWLINE),
+        effect_tree('g', 'h'),
+        MatchToken(type=tokens.NEWLINE),
         effect_tree('i', 'j'),
         MatchToken(type=tokens.DEDENT),
     ]),
     ('''
-        always as 'name':
-            pass''', [
-        MatchToken(type=tokens.NL),
-        MatchToken(type=tokens.INDENT),
-        ('always', [
-            MatchToken(type=tokens.NAME, string='always'),
-            ('as', [
-                MatchToken(type=tokens.NAME, string='as'),
-                MatchToken(type=tokens.STRING, string="'name'"),
-            ]),
-            MatchToken(string=':'),
-            MatchToken(type=tokens.NEWLINE),
-            MatchToken(type=tokens.INDENT),
-            MatchToken(type=tokens.NAME, string='pass'),
-            MatchToken(type=tokens.DEDENT),
-        ]),
-        MatchToken(type=tokens.DEDENT),
-    ]),
-    ("always as 'name': pass", [
-        ('always', [
-            MatchToken(type=tokens.NAME, string='always'),
-            ('as', [
-                MatchToken(type=tokens.NAME, string='as'),
-                MatchToken(type=tokens.STRING, string="'name'"),
-            ]),
-            MatchToken(string=':'),
-            MatchToken(type=tokens.NAME, string='pass'),
-        ]),
-    ]),
-    ('''
-        ifmax dot(a, b) as 'rule1':
+        ifmax dot(a, b):
             a -> b
         elifmax dot(c, FOO) + 0.2:
             c -> d
-        elifmax 0.3 as 'rule3':
+        elifmax 0.3:
             e -> f''', [
         MatchToken(type=tokens.NL),
         MatchToken(type=tokens.INDENT),
@@ -124,10 +86,6 @@ def effect_tree(source, target):
             ('ifmax', [
                 MatchToken(type=tokens.NAME, string='ifmax'),
                 ('utility', [('expr', bare_tokens('dot(a, b)'))]),
-                ('as', [
-                    MatchToken(type=tokens.NAME, string='as'),
-                    MatchToken(type=tokens.STRING, string="'rule1'"),
-                ]),
                 MatchToken(string=':'),
                 MatchToken(type=tokens.NEWLINE),
                 MatchToken(type=tokens.INDENT),
@@ -148,10 +106,6 @@ def effect_tree(source, target):
             ('elifmax', [
                 MatchToken(type=tokens.NAME, string='elifmax'),
                 ('utility', [('expr', bare_tokens('0.3'))]),
-                ('as', [
-                    MatchToken(type=tokens.NAME, string='as'),
-                    MatchToken(type=tokens.STRING, string="'rule3'"),
-                ]),
                 MatchToken(string=':'),
                 MatchToken(type=tokens.NEWLINE),
                 MatchToken(type=tokens.INDENT),
@@ -162,19 +116,15 @@ def effect_tree(source, target):
         MatchToken(type=tokens.DEDENT),
     ]),
     ('''
-        ifmax dot(a, b) as 'rule1': a -> b
+        ifmax dot(a, b): a -> b
         elifmax dot(c, FOO) + 0.2: c -> d
-        elifmax 0.3 as 'rule3': e -> f''', [
+        elifmax 0.3: e -> f''', [
         MatchToken(type=tokens.NL),
         MatchToken(type=tokens.INDENT),
         ('max_action', [
             ('ifmax', [
                 MatchToken(type=tokens.NAME, string='ifmax'),
                 ('utility', [('expr', bare_tokens('dot(a, b)'))]),
-                ('as', [
-                    MatchToken(type=tokens.NAME, string='as'),
-                    MatchToken(type=tokens.STRING, string="'rule1'"),
-                ]),
                 MatchToken(string=':'),
                 effect_tree('a', 'b'),
                 MatchToken(type=tokens.NEWLINE),
@@ -189,10 +139,6 @@ def effect_tree(source, target):
             ('elifmax', [
                 MatchToken(type=tokens.NAME, string='elifmax'),
                 ('utility', [('expr', bare_tokens('0.3'))]),
-                ('as', [
-                    MatchToken(type=tokens.NAME, string='as'),
-                    MatchToken(type=tokens.STRING, string="'rule3'"),
-                ]),
                 MatchToken(string=':'),
                 effect_tree('e', 'f'),
             ]),
@@ -219,20 +165,12 @@ def effect_tree(source, target):
     ]),
     ('''
         # comment
-        always:
-            pass''', [  # check leading comments
+        pass''', [  # check leading comments
         MatchToken(type=tokens.NL),
         MatchToken(type=tokens.COMMENT),
         MatchToken(type=tokens.NL),
         MatchToken(type=tokens.INDENT),
-        ('always', [
-            MatchToken(type=tokens.NAME, string='always'),
-            MatchToken(string=':'),
-            MatchToken(type=tokens.NEWLINE),
-            MatchToken(type=tokens.INDENT),
-            MatchToken(type=tokens.NAME, string='pass'),
-            MatchToken(type=tokens.DEDENT),
-        ]),
+        MatchToken(type=tokens.NAME, string='pass'),
         MatchToken(type=tokens.DEDENT),
     ]),
 ])
