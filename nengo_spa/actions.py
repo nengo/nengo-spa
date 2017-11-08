@@ -7,7 +7,6 @@ except ImportError:
 
 from nengo.exceptions import NetworkContextError
 from nengo.network import Network as NengoNetwork
-from nengo.utils.compat import is_integer
 
 from nengo_spa.compiler.ast import build_ast, ConstructionContext
 from nengo_spa.compiler.grammar import parse, Terminal
