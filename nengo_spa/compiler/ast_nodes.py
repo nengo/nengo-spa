@@ -825,7 +825,8 @@ class Effects(Node):
     """Multiple effects."""
     def __init__(self, effects, name=None):
         super(Effects, self).__init__(
-            staticity=max(e.staticity for e in effects))
+            staticity=max(e.staticity for e in effects)
+            if len(effects) > 0 else self.Staticity.FIXED)
         self.type = TEffects
         self.effects = effects
         self.name = name

@@ -242,3 +242,13 @@ def test_provides_access_to_constructed_objects_of_effect():
             else:
                 raise AssertionError("Unexpected object constructed for Bind.")
         assert n_connections == 2 and n_bind == 1
+
+
+def test_noop_action():
+    with spa.Network():
+        actions = spa.Actions('''
+            ifmax 0.5:
+                pass
+        ''')
+
+    assert actions[0].bg.input.size_in == 1
