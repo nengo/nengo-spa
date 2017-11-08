@@ -8,8 +8,8 @@ import numpy as np
 
 
 class IdentityEnsembleArray(nengo.Network):
-    """An ensemble array optimized for representing the identity vector for
-    circular convolution.
+    """An ensemble array optimized for representing the identity circular
+    convolution vector.
 
     The ensemble array will use ensembles with *subdimensions* dimensions,
     except for the first *subdimensions* dimensions. These will be split into
@@ -78,9 +78,9 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_neuron_input(self):
-        """Adds a node that provides input to the neurons of all ensembles.
+        """Adds a node providing input to the neurons of all ensembles.
 
-        This node is accessible through the *neuron_input* attribute.
+        This node is accessible through the `neuron_input` attribute.
 
         Returns
         -------
