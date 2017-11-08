@@ -35,6 +35,10 @@ Release History
 - Allow the ``spa.Actions`` string to be empty.
   (`#107 <https://github.com/nengo/nengo_spa/issues/107>`_,
   `#109 <https://github.com/nengo/nengo_spa/pull/109>`_)
+- The ``pass`` keyword can now be used to create blocks in action rules that
+  do not have any effect.
+  (`#101 <https://github.com/nengo/nengo_spa/issues/101>`_,
+  `#103 <https://github.com/nengo/nengo_spa/pull/103>`_)
 
 
 0.3.1 (November 7, 2017)
