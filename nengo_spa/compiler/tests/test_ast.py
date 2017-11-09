@@ -192,8 +192,8 @@ def test_effect():
         ('expr', bare_tokens('A')),
         ('sink', bare_tokens('model.state')),
     ])
-    assert ast == [Effect(Sink('model.state', model.state), Symbol('A'))]
-    assert str(ast[0]) == 'A -> model.state'
+    assert ast == [Effect(Sink('model .state', model.state), Symbol('A'))]
+    assert str(ast[0]) == 'A -> model .state'
     assert ast[0].type == TEffect
 
 
@@ -447,3 +447,17 @@ def test_missing_operator():
 
     with pytest.raises(SyntaxError):
         AstBuilder().build_expr(bare_tokens('A B'))
+
+
+def test_expr_with_comment():
+    d = 16
+    with spa.Network() as model:
+        model.a = spa.State(d)
+        model.b = spa.State(d)
+
+    ast = AstBuilder().build_expr(bare_tokens('''
+        dot(
+            # comment
+            model.a, model.b)
+        '''))
+    assert str(ast[0]) == 'dot(model.a, model.b)'

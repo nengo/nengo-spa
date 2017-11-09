@@ -55,7 +55,6 @@ Operator precedence is defined as follows from highest to lowest priority:
 """
 
 import inspect
-import re
 
 from nengo_spa.compiler import tokens
 from nengo_spa.compiler.ast_nodes import (
@@ -250,13 +249,11 @@ class AstBuilder(object):
         expr = tokens.untokenize(
             ([] if self._encoding is None else [
                 (tokens.ENCODING, self._encoding)]) +
-            parse_tree +
+            [t[:2] for t in parse_tree] +
             [(tokens.ENDMARKER, '')])
         if self._encoding is not None:
             expr = expr.decode(self._encoding)
-        expr = re.sub(r'\\?\s+', ' ', expr)
-        expr = re.sub(r'\s*\.\s*', '.', expr)
-        return expr
+        return expr.strip()
 
     def build_effect(self, parse_tree):
         try:
