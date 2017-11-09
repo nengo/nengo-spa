@@ -161,7 +161,7 @@ class MainBlock(Rule):
             match.extend(Terminal(type=tk.DEDENT).read(tokens))
         else:
             # Main block is just a single line of Python without indentation
-            match = AtLeastOne(action).read(tokens)
+            match = AnyNumber(action).read(tokens)
         return match
 
     def __str__(self):
