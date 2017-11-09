@@ -178,12 +178,12 @@ def test_access_actions():
             ''')
 
     assert len(actions) == 3
-    assert str(actions[0]) == 'm.b -> m.a'
-    assert str(actions[1]) == 'm.c -> m.b'
+    assert str(actions[0]) == 'm.b -> m .a'
+    assert str(actions[1]) == 'm.c -> m .b'
     assert str(actions[2]) == '''always as 'named':
-    m.d -> m.c'''
+    m.d -> m .c'''
     assert str(actions['named']) == '''always as 'named':
-    m.d -> m.c'''
+    m.d -> m .c'''
 
 
 def test_access_thal_and_bg_objects():
