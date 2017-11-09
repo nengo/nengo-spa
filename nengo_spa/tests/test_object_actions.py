@@ -290,3 +290,15 @@ def test_provides_access_to_constructed_objects_of_effect():
             else:
                 raise AssertionError("Unexpected object constructed for Bind.")
         assert n_connections == 2 and n_bind == 1
+
+
+def test_eval(Simulator):
+    with spa.Network() as net:
+        a = spa.Transcode(input_vocab=16)
+        oact.Actions(oact.route("0.5*A", a))
+        p = nengo.Probe(a.output)
+
+    with Simulator(net) as sim:
+        sim.run(1.0)
+
+    assert np.allclose(sim.data[p][-1], net.vocabs[16].parse("0.5*A").v)
