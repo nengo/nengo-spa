@@ -59,18 +59,17 @@ class Actions(object):
         self.blocks = []
         self.data = AstAccessor(self.blocks)
         for b in blocks:
-            self.add_block(b)
+            if not isinstance(b, list):
+                b = [b]
+            self.add_block(*b)
 
-    def add_block(self, actions):
+    def add_block(self, *actions):
         if len(Network.context) <= 0:
             raise NetworkContextError(
                 "actions can only be called inside a ``with network:`` block.")
         root_network = Network.context[-1]
 
-        if not isinstance(actions, (list, tuple)):
-            actions = [actions]
-
-        if isinstance(actions[0], (list, tuple)):
+        if isinstance(actions[0], tuple):
             blocks = self._add_bg_block(actions)
         else:
             blocks = self._add_cortical_block(actions)

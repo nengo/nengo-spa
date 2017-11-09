@@ -46,14 +46,14 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         #         model.buff1 * model.buff2 -> model.buff3
         # ''')
         actions = oact.Actions()
-        actions.add_block([oact.route(model.input, model.ctrl),
-                           oact.route(model.buff1, model.state)])
-        actions.add_block([
+        actions.add_block(oact.route(model.input, model.ctrl),
+                          oact.route(model.buff1, model.state))
+        actions.add_block(
             (oact.dot(model.ctrl, "A"), oact.route(model.buff1, model.buff3)),
             (oact.dot(model.ctrl, "B"), oact.route(model.buff2, model.buff3)),
             (oact.dot(model.ctrl, "C"), oact.route(
                 oact.bind(model.buff1, model.buff2), model.buff3))
-        ])
+        )
 
         state_probe = nengo.Probe(model.state.output, synapse=0.03)
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -103,10 +103,10 @@ def test_dot_product(Simulator, seed, plt):
         #     model.stimulus -> model.state_b
         #     dot(model.state_a, model.state_b) -> model.result
         # ''')
-        oact.Actions([
+        oact.Actions(
             oact.route("A", model.state_a),
             oact.route(model.stimulus, model.state_b),
-            oact.route(oact.dot(model.state_a, model.state_b), model.result)])
+            oact.route(oact.dot(model.state_a, model.state_b), model.result))
         p = nengo.Probe(model.result.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -209,10 +209,10 @@ def test_access_actions():
         #     always as 'named':
         #         m.d -> m.c
         #     ''')
-        actions = oact.Actions([
+        actions = oact.Actions(
             oact.route(m.b, m.a),
             oact.route(m.c, m.b),
-            oact.route(m.d, m.c)]).data
+            oact.route(m.d, m.c)).data
 
     assert len(actions) == 3
     # assert str(actions[0]) == 'm.b -> m.a'
@@ -246,8 +246,8 @@ def test_access_thal_and_bg_objects():
         #     m.c -> m.d
         #     ''')
         actions = oact.Actions(
-            [(m.a, oact.route("0", m.c))],
-            [(m.b, oact.route("1", m.c))],
+            (m.a, oact.route("0", m.c)),
+            (m.b, oact.route("1", m.c)),
             oact.route(m.c, m.d)).data
 
     assert actions.all_bgs() == [actions[0].bg, actions[1].bg]
