@@ -2,7 +2,7 @@ from nengo.network import Network
 from nengo.exceptions import NetworkContextError
 from nengo_spa.actions import AstAccessor
 from nengo_spa.compiler import ast_nodes as nodes
-from nengo_spa.compiler.ast import ConstructionContext
+from nengo_spa.compiler.ast import ConstructionContext, ActionsScope
 
 
 def to_node(obj, as_sink=False):
@@ -13,7 +13,7 @@ def to_node(obj, as_sink=False):
     elif obj == "1":
         return nodes.One()
     elif isinstance(obj, str):
-        return nodes.Symbol(obj)
+        return eval(obj, {}, ActionsScope(stacklevel=2))
     elif isinstance(obj, (int, float)):
         return nodes.Scalar(obj)
     else:
