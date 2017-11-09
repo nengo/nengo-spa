@@ -30,6 +30,12 @@ Release History
   (`#61 <https://github.com/nengo/nengo_spa/pull/99>`_,
   `#28 <https://github.com/nengo/nengo_spa/issues/80>`_)
 
+**Fixed**
+
+- Allow the ``spa.Actions`` string to be empty.
+  (`#107 <https://github.com/nengo/nengo_spa/issues/107>`_,
+  `#109 <https://github.com/nengo/nengo_spa/pull/109>`_)
+
 
 0.3.1 (November 7, 2017)
 ========================

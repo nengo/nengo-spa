@@ -24,6 +24,7 @@ def effect_tree(source, target):
 
 
 @pytest.mark.parametrize('code, parse_tree', [
+    ('', []),
     ('a -> b', [effect_tree('a', 'b')]),
     ('a.x -> b.y', [effect_tree('a.x', 'b.y')]),
     ('a -> b; c -> d', [
