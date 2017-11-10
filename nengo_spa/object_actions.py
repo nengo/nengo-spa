@@ -1,5 +1,6 @@
 from nengo.network import Network
 from nengo.exceptions import NetworkContextError
+from nengo_spa import Vocabulary
 from nengo_spa.network import Network as SPANetwork
 from nengo_spa.actions import AstAccessor
 from nengo_spa.compiler import ast_nodes as nodes
@@ -59,12 +60,17 @@ def route(a, b):
     return nodes.Effect(to_node(b, as_sink=True), to_node(a))
 
 
-def reinterpret(a):
-    return nodes.Reinterpret(a)
+def reinterpret(a, vocab=None):
+    if vocab is not None and not isinstance(vocab, Vocabulary):
+        vocab = to_node(vocab)
+    return nodes.Reinterpret(to_node(a), vocab=vocab)
 
 
-def translate(a):
-    return nodes.Translate(a)
+def translate(a, vocab=None, populate=None, solver=None):
+    if vocab is not None and not isinstance(vocab, Vocabulary):
+        vocab = to_node(vocab)
+    return nodes.Translate(to_node(a), vocab=vocab, populate=populate,
+                           solver=solver)
 
 
 class Actions(AstAccessor):
