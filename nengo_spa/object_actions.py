@@ -1,5 +1,6 @@
 from nengo.network import Network
 from nengo.exceptions import NetworkContextError
+from nengo_spa.network import Network as SPANetwork
 from nengo_spa.actions import AstAccessor
 from nengo_spa.compiler import ast_nodes as nodes
 from nengo_spa.compiler.ast import ConstructionContext, ActionsScope
@@ -20,6 +21,18 @@ def to_node(obj, as_sink=False):
         name = str(obj)
         return (nodes.Sink(name, obj) if as_sink else
                 nodes.Module(name, obj))
+
+
+action_ops = {
+    "__invert__": lambda x: inv(x),
+    "__neg__": lambda x: neg(x),
+    "__add__": lambda x, y: add(x, y),
+    "__radd__": lambda x, y: add(x, y),
+    "__sub__": lambda x, y: add(x, neg(y)),
+    "__rsub__": lambda x, y: add(y, neg(x)),
+    "__mul__": lambda x, y: bind(x, y),
+    "__rmul__": lambda x, y: bind(x, y),
+}
 
 
 def dot(a, b):
@@ -54,14 +67,15 @@ def translate(a):
     return nodes.Translate(a)
 
 
-class Actions(object):
+class Actions(AstAccessor):
     def __init__(self, *blocks):
         self.blocks = []
-        self.data = AstAccessor(self.blocks)
         for b in blocks:
             if not isinstance(b, list):
                 b = [b]
             self.add_block(*b)
+
+        super(Actions, self).__init__(self.blocks)
 
     def add_block(self, *actions):
         if len(Network.context) <= 0:
@@ -95,3 +109,17 @@ class Actions(object):
             action_nodes.append(
                 nodes.Action(to_node(cond), effects, index=i))
         return [nodes.ActionSet(action_nodes)]
+
+    def __enter__(self):
+        self.saved_network_ops = {k: getattr(SPANetwork, k, None)
+                                  for k in action_ops}
+        for k, v in action_ops.items():
+            setattr(SPANetwork, k, v)
+        return self
+
+    def __exit__(self, *args):
+        for k, v in self.saved_network_ops.items():
+            if v is None:
+                delattr(SPANetwork, k)
+            else:
+                setattr(SPANetwork, k, v)
