@@ -336,3 +336,39 @@ def test_actions_context():
             a + b
 
         assert spa.Network.__dict__ == network_dict
+
+
+@pytest.mark.parametrize('d1,d2,method,lookup', [
+    (16, 16, 'reinterpret(a, v2)', 'v1'),
+    (16, 16, 'reinterpret(a)', 'v1'),
+    (16, 16, 'reinterpret(a, b)', 'v1'),
+    (16, 32, 'translate(a, v2)', 'v2'),
+    (16, 32, 'translate(a)', 'v2'),
+    (16, 32, 'translate(a, b)', 'v2'),
+    (16, 32, 'translate(a, solver=nengo.solvers.Lstsq())', 'v2')])
+def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
+    v1 = spa.Vocabulary(d1, rng=rng)
+    v1.populate('A')
+    v2 = spa.Vocabulary(d2, rng=rng)
+    v2.populate('A')
+
+    with spa.Network() as model:
+        a = spa.State(vocab=v1)
+        b = spa.State(vocab=v2)
+        # spa.Actions(
+        #     'A -> a; {} -> b'.format(method))
+        oact.Actions(oact.route("A", a),
+                     oact.route(eval("oact.%s" % method), b))
+        p = nengo.Probe(b.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    t = sim.trange() > 0.2
+    v = locals()[lookup].parse('A').v
+
+    plt.plot(sim.trange(), spa.similarity(sim.data[p], v))
+    plt.xlabel("t [s]")
+    plt.ylabel("Similarity")
+
+    assert np.mean(spa.similarity(sim.data[p][t], v)) > 0.8
