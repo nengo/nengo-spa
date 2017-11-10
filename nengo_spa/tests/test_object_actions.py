@@ -3,8 +3,9 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaTypeError
 from nengo_spa import object_actions as oact
+from nengo_spa.compiler import ast_nodes
+from nengo_spa.exceptions import SpaTypeError
 
 
 def test_new_action_syntax(Simulator, seed, plt, rng):
@@ -45,15 +46,18 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         #     elifmax dot(model.ctrl, C):
         #         model.buff1 * model.buff2 -> model.buff3
         # ''')
-        actions = oact.Actions()
-        actions.add_block(oact.route(model.input, model.ctrl),
-                          oact.route(model.buff1, model.state))
-        actions.add_block(
-            (oact.dot(model.ctrl, "A"), oact.route(model.buff1, model.buff3)),
-            (oact.dot(model.ctrl, "B"), oact.route(model.buff2, model.buff3)),
-            (oact.dot(model.ctrl, "C"), oact.route(
-                oact.bind(model.buff1, model.buff2), model.buff3))
-        )
+        with oact.Actions() as actions:
+            actions.add_block(
+                oact.route(model.input, model.ctrl),
+                oact.route(model.buff1, model.state))
+            actions.add_block(
+                (oact.dot(model.ctrl, "A"),
+                 oact.route(model.buff1, model.buff3)),
+                (oact.dot(model.ctrl, "B"),
+                 oact.route(model.buff2, model.buff3)),
+                (oact.dot(model.ctrl, "C"),
+                 oact.route(model.buff1 * model.buff2, model.buff3))
+            )
 
         state_probe = nengo.Probe(model.state.output, synapse=0.03)
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -133,14 +137,16 @@ class TestExceptions():
         with model:
             with pytest.raises(SpaTypeError):
                 # spa.Actions('model.state_a + model.state_b -> model.state_c')
-                oact.Actions(oact.route(oact.add(model.state_a, model.state_b),
-                                        model.state_c))
+                with oact.Actions() as actions:
+                    actions.add_block(oact.route(model.state_a + model.state_b,
+                                                 model.state_c))
 
     def test_approx_inverse_of_scalar(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 # spa.Actions('~model.scalar -> model.state_c')
-                oact.Actions(oact.route(model.scalar, model.state_c))
+                with oact.Actions() as actions:
+                    actions.add_block(oact.route(~model.scalar, model.state_c))
 
     def test_dot_product_incompatiple_vocabs(self, model):
         with model:
@@ -212,7 +218,7 @@ def test_access_actions():
         actions = oact.Actions(
             oact.route(m.b, m.a),
             oact.route(m.c, m.b),
-            oact.route(m.d, m.c)).data
+            oact.route(m.d, m.c))
 
     assert len(actions) == 3
     # assert str(actions[0]) == 'm.b -> m.a'
@@ -248,7 +254,7 @@ def test_access_thal_and_bg_objects():
         actions = oact.Actions(
             (m.a, oact.route("0", m.c)),
             (m.b, oact.route("1", m.c)),
-            oact.route(m.c, m.d)).data
+            oact.route(m.c, m.d))
 
     assert actions.all_bgs() == [actions[0].bg, actions[1].bg]
     assert actions.all_thals() == [actions[0].thalamus, actions[1].thalamus]
@@ -260,7 +266,7 @@ def test_access_thal_and_bg_objects():
         # actions = spa.Actions('''
         #     m.a -> m.b
         #     ''')
-        actions = oact.Actions(oact.route(m.a, m.b)).data
+        actions = oact.Actions(oact.route(m.a, m.b))
 
     assert len(actions.all_bgs()) == 0
     assert len(actions.all_thals()) == 0
@@ -274,8 +280,8 @@ def test_provides_access_to_constructed_objects_of_effect():
         model.c = spa.State()
 
         # actions = spa.Actions('model.a * model.b -> model.c')
-        actions = oact.Actions(oact.route(oact.bind(model.a, model.b),
-                                          model.c)).data
+        with oact.Actions() as actions:
+            actions.add_block(oact.route(model.a * model.b, model.c))
 
         assert len(actions[0].constructed) == 1
         assert isinstance(actions[0].constructed[0], nengo.Connection)
@@ -302,3 +308,31 @@ def test_eval(Simulator):
         sim.run(1.0)
 
     assert np.allclose(sim.data[p][-1], net.vocabs[16].parse("0.5*A").v)
+
+
+def test_actions_context():
+    with spa.Network():
+        a = spa.State(16)
+        b = "B"
+
+        network_dict = {k: v for k, v in spa.Network.__dict__.items()}
+
+        with oact.Actions():
+            assert isinstance(~a, ast_nodes.ApproxInverse)
+            assert isinstance(-a, ast_nodes.Negative)
+            assert isinstance(a + b, ast_nodes.Sum)
+            x = a - b
+            assert isinstance(x, ast_nodes.Sum)
+            assert isinstance(x.rhs, ast_nodes.Negative)
+            assert isinstance(x.rhs.source, ast_nodes.Symbol)
+            x = b - a
+            assert isinstance(x, ast_nodes.Sum)
+            assert isinstance(x.rhs, ast_nodes.Negative)
+            assert isinstance(x.rhs.source, ast_nodes.Module)
+            assert isinstance(a * b, ast_nodes.Product)
+
+        # make sure that things are reset after exiting context
+        with pytest.raises(TypeError):
+            a + b
+
+        assert spa.Network.__dict__ == network_dict
