@@ -36,6 +36,8 @@ action_ops = {
     "__rsub__": lambda x, y: add(y, neg(x)),
     "__mul__": lambda x, y: bind(x, y),
     "__rmul__": lambda x, y: bind(x, y),
+    "__rshift__": lambda x, y: route(x, y),
+    "__rrshift__": lambda x, y: route(y, x),
 }
 saved_network_ops = {k: getattr(SPANetwork, k, None) for k in action_ops}
 
