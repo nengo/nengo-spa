@@ -47,14 +47,12 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         #         model.buff1 * model.buff2 -> model.buff3
         # ''')
         with oact.Actions():
-            oact.route(model.input, model.ctrl),
-            oact.route(model.buff1, model.state))
-            oact.cond(oact.dot(model.ctrl, "A"), 
-                      oact.route(model.buff1, model.buff3))
-            oact.cond(oact.dot(model.ctrl, "B"), 
-                      oact.route(model.buff2, model.buff3))
+            model.input >> model.ctrl
+            model.buff1 >> model.state
+            oact.cond(oact.dot(model.ctrl, "A"), model.buff1 >> model.buff3)
+            oact.cond(oact.dot(model.ctrl, "B"), model.buff2 >> model.buff3)
             oact.cond(oact.dot(model.ctrl, "C"),
-                      oact.route(model.buff1 * model.buff2, model.buff3))
+                      model.buff1 * model.buff2 >> model.buff3)
 
         state_probe = nengo.Probe(model.state.output, synapse=0.03)
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -105,9 +103,9 @@ def test_dot_product(Simulator, seed, plt):
         #     dot(model.state_a, model.state_b) -> model.result
         # ''')
         with oact.Actions():
-            oact.route("A", model.state_a)
-            oact.route(model.stimulus, model.state_b)
-            oact.route(oact.dot(model.state_a, model.state_b), model.result)
+            "A" >> model.state_a
+            model.stimulus >> model.state_b
+            oact.dot(model.state_a, model.state_b) >> model.result
         p = nengo.Probe(model.result.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -135,14 +133,14 @@ class TestExceptions():
             with pytest.raises(SpaTypeError):
                 # spa.Actions('model.state_a + model.state_b -> model.state_c')
                 with oact.Actions():
-                    oact.route(model.state_a + model.state_b, model.state_c)
+                    model.state_a + model.state_b >> model.state_c
 
     def test_approx_inverse_of_scalar(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 # spa.Actions('~model.scalar -> model.state_c')
                 with oact.Actions():
-                    oact.route(~model.scalar, model.state_c)
+                    ~model.scalar >> model.state_c
 
     def test_dot_product_incompatiple_vocabs(self, model):
         with model:
@@ -150,8 +148,7 @@ class TestExceptions():
                 # spa.Actions(
                 #     'dot(model.state_a, model.state_b) -> model.scalar')
                 with oact.Actions():
-                    oact.route(oact.dot(model.state_a, model.state_b),
-                               model.scalar)
+                    oact.dot(model.state_a, model.state_b) >> model.scalar
 
     def test_dot_product_first_argument_invalid(self, model):
         with model:
@@ -159,8 +156,7 @@ class TestExceptions():
                 # spa.Actions(
                 #     'dot(model.scalar, model.state_b) -> model.scalar')
                 with oact.Actions():
-                    oact.route(oact.dot(model.scalar, model.state_b),
-                               model.scalar)
+                    oact.dot(model.scalar, model.state_b) >> model.scalar
 
     def test_dot_product_second_argument_invalid(self, model):
         with model:
@@ -168,8 +164,7 @@ class TestExceptions():
                 # spa.Actions(
                 #     'dot(model.state_a, model.scalar) -> model.scalar')
                 with oact.Actions():
-                    oact.route(oact.dot(model.state_a, model.scalar),
-                               model.scalar)
+                    oact.dot(model.state_a, model.scalar) >> model.scalar
 
     @pytest.mark.parametrize('method', ['reinterpret', 'translate'])
     def test_cast_type_inference_not_possible(self, model, method):
@@ -179,8 +174,7 @@ class TestExceptions():
                 #     method))
                 method = getattr(oact, method)
                 with oact.Actions():
-                    oact.route(oact.dot(method(model.state_a), "A"),
-                               model.scalar)
+                    oact.dot(method(model.state_a), "A") >> model.scalar
 
     @pytest.mark.parametrize('method', ['reinterpret', 'translate'])
     def test_cast_scalar(self, model, method):
@@ -190,15 +184,14 @@ class TestExceptions():
                 #     '{}(model.scalar) -> model.state_a'.format(method))
                 method = getattr(oact, method)
                 with oact.Actions():
-                    oact.route(method(model.scalar), model.state_a)
+                    method(model.scalar) >> model.state_a
 
     def test_reinterpret_non_matching_dimensions(self, model):
         with model:
             with pytest.raises(SpaTypeError):
                 # spa.Actions('reinterpret(model.state_b) -> model.state_a')
                 with oact.Actions():
-                    oact.route(oact.reinterpret(model.state_b),
-                               model.state_a)
+                    oact.reinterpret(model.state_b) >> model.state_a
 
 
 def test_access_actions():
@@ -215,9 +208,9 @@ def test_access_actions():
         #         m.d -> m.c
         #     ''')
         with oact.Actions() as actions:
-            oact.route(m.b, m.a)
-            oact.route(m.c, m.b)
-            oact.route(m.d, m.c)
+            m.b >> m.a
+            m.c >> m.b
+            m.d >> m.c
 
     assert len(actions) == 3
     # assert str(actions[0]) == 'm.b -> m.a'
@@ -251,10 +244,10 @@ def test_access_thal_and_bg_objects():
         #     m.c -> m.d
         #     ''')
         with oact.Actions() as actions:
-            oact.cond(m.a, oact.route("0", m.c))
+            oact.cond(m.a, "0" >> m.c)
         with actions:
-            oact.cond(m.b, oact.route("1", m.c))
-            oact.route(m.c, m.d)
+            oact.cond(m.b, "1" >> m.c)
+            m.c >> m.d
 
     assert actions.all_bgs() == [actions[0].bg, actions[1].bg]
     assert actions.all_thals() == [actions[0].thalamus, actions[1].thalamus]
@@ -267,7 +260,7 @@ def test_access_thal_and_bg_objects():
         #     m.a -> m.b
         #     ''')
         with oact.Actions() as actions:
-            oact.route(m.a, m.b)
+            m.a >> m.b
 
     assert len(actions.all_bgs()) == 0
     assert len(actions.all_thals()) == 0
@@ -282,7 +275,7 @@ def test_provides_access_to_constructed_objects_of_effect():
 
         # actions = spa.Actions('model.a * model.b -> model.c')
         with oact.Actions() as actions:
-            oact.route(model.a * model.b, model.c)
+            model.a * model.b >> model.c
 
         assert len(actions[0].constructed) == 1
         assert isinstance(actions[0].constructed[0], nengo.Connection)
@@ -303,7 +296,7 @@ def test_eval(Simulator):
     with spa.Network() as net:
         a = spa.Transcode(input_vocab=16)
         with oact.Actions():
-            oact.route("0.5*A", a)
+            "0.5*A" >> a
         p = nengo.Probe(a.output)
 
     with Simulator(net) as sim:
@@ -332,6 +325,7 @@ def test_actions_context():
             assert isinstance(x.rhs, ast_nodes.Negative)
             assert isinstance(x.rhs.source, ast_nodes.Module)
             assert isinstance(a * b, ast_nodes.Product)
+            assert isinstance(b >> a, ast_nodes.Effect)
 
         # make sure that things are reset after exiting context
         with pytest.raises(TypeError):
@@ -360,8 +354,8 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
         # spa.Actions(
         #     'A -> a; {} -> b'.format(method))
         with oact.Actions():
-            oact.route("A", a)
-            oact.route(eval("oact.%s" % method), b)
+            "A" >> a
+            eval("oact.%s" % method) >> b
         p = nengo.Probe(b.output, synapse=0.03)
 
     with Simulator(model) as sim:

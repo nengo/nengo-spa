@@ -219,6 +219,12 @@ class Source(Node):
     def __rmul__(self, other):
         return Product(other, self)
 
+    def __rshift__(self, other):
+        return Effect(other, self)
+
+    def __rrshift__(self, other):
+        return Effect(self, other)
+
     def infer_types(self, context_type):
         raise NotImplementedError()
 
