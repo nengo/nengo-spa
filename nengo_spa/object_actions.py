@@ -1,6 +1,9 @@
+import weakref
+
 from nengo.network import Network
 from nengo.exceptions import NetworkContextError
 from nengo_spa import Vocabulary
+from nengo_spa.exceptions import SpaConstructionError
 from nengo_spa.network import Network as SPANetwork
 from nengo_spa.actions import AstAccessor
 from nengo_spa.compiler import ast_nodes as nodes
@@ -34,6 +37,7 @@ action_ops = {
     "__mul__": lambda x, y: bind(x, y),
     "__rmul__": lambda x, y: bind(x, y),
 }
+saved_network_ops = {k: getattr(SPANetwork, k, None) for k in action_ops}
 
 
 def dot(a, b):
@@ -56,10 +60,6 @@ def neg(a):
     return nodes.Negative(to_node(a))
 
 
-def route(a, b):
-    return nodes.Effect(to_node(b, as_sink=True), to_node(a))
-
-
 def reinterpret(a, vocab=None):
     if vocab is not None and not isinstance(vocab, Vocabulary):
         vocab = to_node(vocab)
@@ -73,23 +73,33 @@ def translate(a, vocab=None, populate=None, solver=None):
                            solver=solver)
 
 
+def route(a, b):
+    eff = nodes.Effect(to_node(b, as_sink=True), to_node(a))
+    Actions.context.add_effect(eff)
+    return eff
+
+
+def cond(cond, *effects):
+    Actions.context.add_rule(cond, effects)
+
+
 class Actions(AstAccessor):
-    def __init__(self, *blocks):
+    context = None
+
+    def __init__(self):
         self.blocks = []
-        for b in blocks:
-            if not isinstance(b, list):
-                b = [b]
-            self.add_block(*b)
+        self.effects = []
+        self.rules = []
 
         super(Actions, self).__init__(self.blocks)
 
-    def add_block(self, *actions):
+    def add_block(self, actions, mode="bg"):
         if len(Network.context) <= 0:
             raise NetworkContextError(
                 "actions can only be called inside a ``with network:`` block.")
         root_network = Network.context[-1]
 
-        if isinstance(actions[0], tuple):
+        if mode == "bg":
             blocks = self._add_bg_block(actions)
         else:
             blocks = self._add_cortical_block(actions)
@@ -116,15 +126,44 @@ class Actions(AstAccessor):
                 nodes.Action(to_node(cond), effects, index=i))
         return [nodes.ActionSet(action_nodes)]
 
+    def add_effect(self, effect):
+        self.effects.append(effect)
+
+    def add_rule(self, cond, effects):
+        self.effects = [e for e in self.effects if e not in effects]
+        self.rules.append((cond, effects))
+
     def __enter__(self):
-        self.saved_network_ops = {k: getattr(SPANetwork, k, None)
-                                  for k in action_ops}
+        if Actions.context is not None:
+            try:
+                # TODO: is there a better way to check if it's alive?
+                Actions.context.test
+                raise SpaConstructionError("Nesting of Action contexts is not "
+                                           "supported")
+            except ReferenceError:
+                # dead context object
+                pass
+        Actions.context = weakref.proxy(self)
+
         for k, v in action_ops.items():
             setattr(SPANetwork, k, v)
         return self
 
     def __exit__(self, *args):
-        for k, v in self.saved_network_ops.items():
+        if args[0] is not None:
+            return
+
+        if len(self.rules) > 0:
+            self.add_block(self.rules, mode="bg")
+            self.rules = []
+
+        if len(self.effects) > 0:
+            self.add_block(self.effects, mode="cortical")
+            self.effects = []
+
+        Actions.context = None
+
+        for k, v in saved_network_ops.items():
             if v is None:
                 delattr(SPANetwork, k)
             else:
