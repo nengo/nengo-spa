@@ -296,7 +296,7 @@ def test_eval(Simulator):
     with spa.Network() as net:
         a = spa.Transcode(input_vocab=16)
         with spa.Actions():
-            "0.5*A" >> a
+            0.5 * spa.sym("A") >> a
         p = nengo.Probe(a.output)
 
     with Simulator(net) as sim:
