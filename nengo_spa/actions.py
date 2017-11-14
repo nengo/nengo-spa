@@ -34,7 +34,7 @@ def route(a, b):
     return eff
 
 
-def cond(cond, *effects):
+def ifmax(cond, *effects):
     Actions.context.add_rule(cond, effects)
 
 

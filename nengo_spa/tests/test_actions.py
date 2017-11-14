@@ -49,10 +49,10 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         with spa.Actions():
             model.input >> model.ctrl
             model.buff1 >> model.state
-            spa.cond(spa.dot(model.ctrl, "A"), model.buff1 >> model.buff3)
-            spa.cond(spa.dot(model.ctrl, "B"), model.buff2 >> model.buff3)
-            spa.cond(spa.dot(model.ctrl, "C"),
-                     model.buff1 * model.buff2 >> model.buff3)
+            spa.ifmax(spa.dot(model.ctrl, "A"), model.buff1 >> model.buff3)
+            spa.ifmax(spa.dot(model.ctrl, "B"), model.buff2 >> model.buff3)
+            spa.ifmax(spa.dot(model.ctrl, "C"),
+                      model.buff1 * model.buff2 >> model.buff3)
 
         state_probe = nengo.Probe(model.state.output, synapse=0.03)
         buff3_probe = nengo.Probe(model.buff3.output, synapse=0.03)
@@ -244,9 +244,9 @@ def test_access_thal_and_bg_objects():
         #     m.c -> m.d
         #     ''')
         with spa.Actions() as actions:
-            spa.cond(m.a, "0" >> m.c)
+            spa.ifmax(m.a, "0" >> m.c)
         with actions:
-            spa.cond(m.b, "1" >> m.c)
+            spa.ifmax(m.b, "1" >> m.c)
             m.c >> m.d
 
     assert actions.all_bgs() == [actions[0].bg, actions[1].bg]
