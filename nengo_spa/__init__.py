@@ -4,6 +4,7 @@ from nengo_spa.actions import Actions, route, ifmax
 from nengo_spa.actions import DotProduct as dot
 from nengo_spa.actions import Reinterpret as reinterpret
 from nengo_spa.actions import Translate as translate
+from nengo_spa.actions import Symbol as sym
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
     AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,

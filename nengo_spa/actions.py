@@ -46,7 +46,7 @@ def as_node(obj, as_sink=False):
     elif obj == "1":
         return One()
     elif isinstance(obj, str):
-        return eval(obj, {}, ActionsScope(stacklevel=2))
+        return Symbol(obj)
     elif isinstance(obj, (int, float)):
         return Scalar(obj)
     else:
@@ -718,36 +718,6 @@ class Translate(Source):
 
     def __str__(self):
         return 'translate({})'.format(self.source)
-
-
-class ActionsScope(object):
-    """Captures the scope that names in action rules refer to."""
-
-    def __init__(self, stacklevel=1):
-        frame = inspect.currentframe()
-        for _ in range(stacklevel):
-            frame = frame.f_back
-        self.locals = frame.f_locals
-        self.globals = frame.f_globals
-        self.py_builtins = frame.f_builtins
-
-    def __getitem__(self, key):
-        if key == '__tracebackhide__':  # gives better tracebacks in py.test
-            item = False
-        elif key in self.locals:
-            item = self.locals[key]
-        elif key in self.globals:
-            item = self.globals[key]
-        elif key in self.py_builtins:
-            item = self.py_builtins[key]
-        elif key[0].isupper():
-            item = Symbol(key)
-        else:
-            raise KeyError(key)
-
-        if isinstance(item, Network):
-            item = Module(key, item)
-        return item
 
 
 class Effect(nodes.Node):
