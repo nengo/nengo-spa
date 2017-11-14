@@ -1,6 +1,9 @@
 from nengo_spa import version
 
-from nengo_spa.actions import Actions
+from nengo_spa.actions import Actions, route, cond
+from nengo_spa.actions import DotProduct as dot
+from nengo_spa.actions import Reinterpret as reinterpret
+from nengo_spa.actions import Translate as translate
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
     AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,
