@@ -4,7 +4,6 @@ import pytest
 import nengo
 import nengo_spa as spa
 from nengo_spa import actions
-from nengo_spa.compiler import ast_nodes
 from nengo_spa.exceptions import SpaTypeError
 
 
@@ -36,16 +35,6 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
         nengo.Connection(node1, model.buff1.input)
         nengo.Connection(node2, model.buff2.input)
 
-        # spa.Actions('''
-        #     model.input -> model.ctrl
-        #     model.buff1 -> model.state
-        #     ifmax dot(model.ctrl, A):
-        #         model.buff1 -> model.buff3
-        #     elifmax dot(model.ctrl, B):
-        #         model.buff2 -> model.buff3
-        #     elifmax dot(model.ctrl, C):
-        #         model.buff1 * model.buff2 -> model.buff3
-        # ''')
         with spa.Actions():
             model.input >> model.ctrl
             model.buff1 >> model.state
@@ -97,11 +86,6 @@ def test_dot_product(Simulator, seed, plt):
         model.stimulus = spa.Transcode(
             lambda t: 'A' if t <= 0.3 else 'B', output_vocab=d)
 
-        # spa.Actions('''
-        #     A -> model.state_a
-        #     model.stimulus -> model.state_b
-        #     dot(model.state_a, model.state_b) -> model.result
-        # ''')
         with spa.Actions():
             "A" >> model.state_a
             model.stimulus >> model.state_b
@@ -131,38 +115,30 @@ class TestExceptions():
     def test_invalid_types_in_binary_operation(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions('model.state_a + model.state_b -> model.state_c')
                 with spa.Actions():
                     model.state_a + model.state_b >> model.state_c
 
     def test_approx_inverse_of_scalar(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions('~model.scalar -> model.state_c')
                 with spa.Actions():
                     ~model.scalar >> model.state_c
 
     def test_dot_product_incompatiple_vocabs(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions(
-                #     'dot(model.state_a, model.state_b) -> model.scalar')
                 with spa.Actions():
                     spa.dot(model.state_a, model.state_b) >> model.scalar
 
     def test_dot_product_first_argument_invalid(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions(
-                #     'dot(model.scalar, model.state_b) -> model.scalar')
                 with spa.Actions():
                     spa.dot(model.scalar, model.state_b) >> model.scalar
 
     def test_dot_product_second_argument_invalid(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions(
-                #     'dot(model.state_a, model.scalar) -> model.scalar')
                 with spa.Actions():
                     spa.dot(model.state_a, model.scalar) >> model.scalar
 
@@ -170,8 +146,6 @@ class TestExceptions():
     def test_cast_type_inference_not_possible(self, model, method):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions('dot({}(model.state_a), A) -> model.scalar'.format(
-                #     method))
                 method = getattr(spa, method)
                 with spa.Actions():
                     spa.dot(method(model.state_a), "A") >> model.scalar
@@ -180,8 +154,6 @@ class TestExceptions():
     def test_cast_scalar(self, model, method):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions(
-                #     '{}(model.scalar) -> model.state_a'.format(method))
                 method = getattr(spa, method)
                 with spa.Actions():
                     method(model.scalar) >> model.state_a
@@ -189,7 +161,6 @@ class TestExceptions():
     def test_reinterpret_non_matching_dimensions(self, model):
         with model:
             with pytest.raises(SpaTypeError):
-                # spa.Actions('reinterpret(model.state_b) -> model.state_a')
                 with spa.Actions():
                     spa.reinterpret(model.state_b) >> model.state_a
 
@@ -201,21 +172,13 @@ def test_access_actions():
         m.b = spa.State(d)
         m.c = spa.State(d)
         m.d = spa.State(d)
-        # actions = spa.Actions('''
-        #     m.b -> m.a
-        #     m.c -> m.b
-        #     always as 'named':
-        #         m.d -> m.c
-        #     ''')
         with spa.Actions() as actions:
             m.b >> m.a
             m.c >> m.b
             m.d >> m.c
 
     assert len(actions) == 3
-    # assert str(actions[0]) == 'm.b -> m.a'
     assert str(actions[0]) == "%s -> %s" % (m.b, m.a)
-    # assert str(actions[1]) == 'm.c -> m.b'
     assert str(actions[1]) == "%s -> %s" % (m.c, m.b)
 
     # this is being removed
@@ -236,13 +199,6 @@ def test_access_thal_and_bg_objects():
         m.c = spa.Scalar()
         m.d = spa.Scalar()
 
-        # actions = spa.Actions('''
-        #     ifmax m.a:
-        #         0 -> m.c
-        #     ifmax m.b:
-        #         1 -> m.c
-        #     m.c -> m.d
-        #     ''')
         with spa.Actions() as actions:
             spa.ifmax(m.a, "0" >> m.c)
         with actions:
@@ -256,9 +212,6 @@ def test_access_thal_and_bg_objects():
         m.a = spa.State(d)
         m.b = spa.State(d)
 
-        # actions = spa.Actions('''
-        #     m.a -> m.b
-        #     ''')
         with spa.Actions() as actions:
             m.a >> m.b
 
@@ -273,7 +226,6 @@ def test_provides_access_to_constructed_objects_of_effect():
         model.b = spa.State()
         model.c = spa.State()
 
-        # actions = spa.Actions('model.a * model.b -> model.c')
         with spa.Actions() as actions:
             model.a * model.b >> model.c
 
@@ -332,40 +284,3 @@ def test_actions_context():
             a + b
 
         assert spa.Network.__dict__ == network_dict
-
-
-@pytest.mark.parametrize('d1,d2,method,lookup', [
-    (16, 16, 'reinterpret(a, v2)', 'v1'),
-    (16, 16, 'reinterpret(a)', 'v1'),
-    (16, 16, 'reinterpret(a, b)', 'v1'),
-    (16, 32, 'translate(a, v2)', 'v2'),
-    (16, 32, 'translate(a)', 'v2'),
-    (16, 32, 'translate(a, b)', 'v2'),
-    (16, 32, 'translate(a, solver=nengo.solvers.Lstsq())', 'v2')])
-def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
-    v1 = spa.Vocabulary(d1, rng=rng)
-    v1.populate('A')
-    v2 = spa.Vocabulary(d2, rng=rng)
-    v2.populate('A')
-
-    with spa.Network() as model:
-        a = spa.State(vocab=v1)
-        b = spa.State(vocab=v2)
-        # spa.Actions(
-        #     'A -> a; {} -> b'.format(method))
-        with spa.Actions():
-            "A" >> a
-            eval("spa.%s" % method) >> b
-        p = nengo.Probe(b.output, synapse=0.03)
-
-    with Simulator(model) as sim:
-        sim.run(0.5)
-
-    t = sim.trange() > 0.2
-    v = locals()[lookup].parse('A').v
-
-    plt.plot(sim.trange(), spa.similarity(sim.data[p], v))
-    plt.xlabel("t [s]")
-    plt.ylabel("Similarity")
-
-    assert np.mean(spa.similarity(sim.data[p][t], v)) > 0.8

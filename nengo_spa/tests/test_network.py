@@ -21,7 +21,8 @@ class SpaCommunicationChannel(spa.Network):
             self.state_out = spa.State(dimensions)
             self.secondary = spa.State(dimensions)
 
-            spa.Actions('self.state_in -> self.state_out')
+            with spa.Actions():
+                self.state_in >> self.state_out
 
         self.input = self.state_in.input
         self.input_secondary = self.secondary.input
@@ -59,8 +60,9 @@ def test_hierarchical(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions(
-            'A -> model.comm_channel; model.comm_channel -> model.out')
+        with spa.Actions():
+            "A" >> model.comm_channel
+            model.comm_channel >> model.out
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -84,10 +86,9 @@ def test_hierarchical_actions(Simulator, seed, plt):
         model.comm_channel = SpaCommunicationChannel(d)
         model.out = spa.State(d)
 
-        spa.Actions('''
-            A -> model.comm_channel.state_in
-            model.comm_channel.state_out -> model.out
-        ''')
+        with spa.Actions():
+            "A" >> model.comm_channel.state_in
+            model.comm_channel.state_out >> model.out
 
         p = nengo.Probe(model.out.output, synapse=0.03)
 
@@ -125,7 +126,8 @@ def test_no_magic_vocab_transform():
         model.a = spa.State(vocab=v1)
         model.b = spa.State(vocab=v2)
         with pytest.raises(SpaTypeError):
-            spa.Actions('model.a -> model.b')
+            with spa.Actions():
+                model.a >> model.b
 
 
 @pytest.mark.parametrize('d1,d2,method,lookup', [
@@ -145,8 +147,9 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     with spa.Network() as model:
         a = spa.State(vocab=v1)
         b = spa.State(vocab=v2)
-        spa.Actions(
-            'A -> a; {} -> b'.format(method))
+        with spa.Actions():
+            "A" >> a
+            eval("spa.%s" % method) >> b
         p = nengo.Probe(b.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -155,17 +158,18 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     t = sim.trange() > 0.2
     v = locals()[lookup].parse('A').v
 
-    plt.plot(sim.trange(), similarity(sim.data[p], v))
+    plt.plot(sim.trange(), spa.similarity(sim.data[p], v))
     plt.xlabel("t [s]")
     plt.ylabel("Similarity")
 
-    assert np.mean(similarity(sim.data[p][t], v)) > 0.8
+    assert np.mean(spa.similarity(sim.data[p][t], v)) > 0.8
 
 
 def test_copy_spa(RefSimulator):
     with spa.Network() as original:
         original.state = spa.State(16)
-        spa.Actions('A -> original.state')
+        with spa.Actions():
+            "A" >> original.state
 
     cp = original.copy()
 

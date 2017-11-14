@@ -1,4 +1,3 @@
-import inspect
 import warnings
 import weakref
 
@@ -8,11 +7,10 @@ from nengo.network import Network as NengoNetwork
 from nengo.exceptions import NetworkContextError
 import numpy as np
 
-from nengo_spa import pointer
-from nengo_spa.compiler import ast_nodes as nodes
-from nengo_spa.compiler.ast_nodes import AstAccessor, ConstructionContext
-from nengo_spa.compiler.ast_types import (
-    TAction, TActionSet, TScalar, TEffect, TEffects, TVocabulary)
+from nengo_spa import pointer, ast
+from nengo_spa.ast import (
+    AstAccessor, ConstructionContext, TAction, TActionSet, TScalar, TEffect,
+    TEffects, TVocabulary)
 from nengo_spa.exceptions import (
     SpaConstructionError, SpaParseError, SpaTypeError)
 from nengo_spa.modules.basalganglia import BasalGanglia
@@ -23,23 +21,42 @@ from nengo_spa.modules.thalamus import Thalamus
 from nengo_spa.network import Network as Network
 from nengo_spa.vocab import Vocabulary
 
-action_ops = ["__invert__", "__neg__", "__add__", "__radd__", "__sub__",
-              "__rsub__", "__mul__", "__rmul__", "__rshift__", "__rrshift__"]
+action_ops = {
+    "__invert__": lambda a: ApproxInverse(a),
+    "__neg__": lambda a: Negative(a),
+    "__add__": lambda a, b: Sum(a, b),
+    "__radd__": lambda a, b: Sum(b, a),
+    "__sub__": lambda a, b: Sum(a, Negative(b)),
+    "__rsub__": lambda a, b: Sum(b, Negative(a)),
+    "__mul__": lambda a, b: Product(a, b),
+    "__rmul__": lambda a, b: Product(b, a),
+    "__rshift__": lambda a, b: route(a, b),
+    "__rrshift__": lambda a, b: route(b, a)}
 saved_network_ops = {k: getattr(Network, k, None) for k in action_ops}
 
 
 def route(a, b):
     eff = Effect(b, a)
-    Actions.context.add_effect(eff)
+    if Actions.context is not None and Actions.context() is not None:
+        Actions.context().add_effect(eff)
+
     return eff
 
 
 def ifmax(cond, *effects):
-    Actions.context.add_rule(cond, effects)
+    effects = Effects(effects)
+    for e in effects.effects:
+        e.channeled = True
+    act = Action(cond, effects)
+
+    if Actions.context is not None and Actions.context() is not None:
+        Actions.context().add_rule(act)
+
+    return act
 
 
 def as_node(obj, as_sink=False):
-    if isinstance(obj, nodes.Node):
+    if isinstance(obj, ast.Node):
         return obj
     elif obj is None or obj == "0":
         return Zero()
@@ -51,7 +68,7 @@ def as_node(obj, as_sink=False):
         return Scalar(obj)
     else:
         name = str(obj)
-        return (nodes.Sink(name, obj) if as_sink else
+        return (ast.Sink(name, obj) if as_sink else
                 Module(name, obj))
 
 
@@ -72,7 +89,9 @@ class Actions(AstAccessor):
         root_network = Network.context[-1]
 
         if mode == "bg":
-            actions = self._add_bg_block(actions)
+            for i, rule in enumerate(actions):
+                rule.index = i
+            actions = [ActionSet(actions)]
 
         for block in actions:
             block.infer_types(None)
@@ -81,39 +100,22 @@ class Actions(AstAccessor):
             block.construct(construction_context)
         self.blocks += actions
 
-    def _add_bg_block(self, actions):
-        action_nodes = []
-        for i, (cond, effects) in enumerate(actions):
-            if not isinstance(effects, (tuple, list)):
-                effects = [effects]
-            effects = Effects(effects)
-            for e in effects.effects:
-                e.channeled = True
-            action_nodes.append(
-                Action(cond, effects, index=i))
-        return [ActionSet(action_nodes)]
-
     def add_effect(self, effect):
         self.effects.append(effect)
 
-    def add_rule(self, cond, effects):
-        self.effects = [e for e in self.effects if e not in effects]
-        self.rules.append((cond, effects))
+    def add_rule(self, rule):
+        self.effects = [
+            e for e in self.effects if e not in rule.effects.effects]
+        self.rules.append(rule)
 
     def __enter__(self):
-        if Actions.context is not None:
-            try:
-                # TODO: is there a better way to check if it's alive?
-                Actions.context.test
-                raise SpaConstructionError("Nesting of Action contexts is not "
-                                           "supported")
-            except ReferenceError:
-                # dead context object
-                pass
-        Actions.context = weakref.proxy(self)
+        if Actions.context is not None and Actions.context() is not None:
+            raise SpaConstructionError("Nesting of Action contexts is not "
+                                       "supported")
+        Actions.context = weakref.ref(self)
 
-        for k in action_ops:
-            setattr(Network, k, getattr(ActionOps, k))
+        for k, v in action_ops.items():
+            setattr(Network, k, v)
         return self
 
     def __exit__(self, *args):
@@ -137,41 +139,12 @@ class Actions(AstAccessor):
                 setattr(Network, k, v)
 
 
-class ActionOps(object):
-    def __invert__(self):
-        return ApproxInverse(self)
-
-    def __neg__(self):
-        return Negative(self)
-
-    def __add__(self, other):
-        return Sum(self, other)
-
-    def __radd__(self, other):
-        return Sum(other, self)
-
-    def __sub__(self, other):
-        return Sum(self, Negative(other))
-
-    def __rsub__(self, other):
-        return Sum(other, Negative(self))
-
-    def __mul__(self, other):
-        return Product(self, other)
-
-    def __rmul__(self, other):
-        return Product(other, self)
-
-    def __rshift__(self, other):
-        return route(self, other)
-
-    def __rrshift__(self, other):
-        return route(other, self)
-
-
-class Source(nodes.Node, ActionOps):
-    """Abstract base class of all AST nodes that can provide some output value.
+class Source(ast.Node):
+    """Abstract base class of all AST ast that can provide some output value.
     """
+
+    def __init__(self, *args, **kwargs):
+        super(Source, self).__init__(*args, **kwargs)
 
     def infer_types(self, context_type):
         raise NotImplementedError()
@@ -183,11 +156,15 @@ class Source(nodes.Node, ActionOps):
         raise NotImplementedError()
 
 
+for k, v in action_ops.items():
+    setattr(Source, k, v)
+
+
 class Scalar(Source):
     """A fixed scalar."""
 
     def __init__(self, value):
-        super(Scalar, self).__init__(staticity=nodes.Node.Staticity.FIXED)
+        super(Scalar, self).__init__(staticity=ast.Node.Staticity.FIXED)
         self.value = value
         self.type = TScalar
 
@@ -195,7 +172,7 @@ class Scalar(Source):
         pass
 
     def construct(self, context):
-        return nodes.construct_bias(self, self.value, context)
+        return ast.construct_bias(self, self.value, context)
 
     def evaluate(self):
         return self.value
@@ -211,7 +188,7 @@ class Symbol(Source):
     """
 
     def __init__(self, key):
-        super(Symbol, self).__init__(staticity=nodes.Node.Staticity.FIXED)
+        super(Symbol, self).__init__(staticity=ast.Node.Staticity.FIXED)
         self.validate(key)
         self.key = key
 
@@ -231,7 +208,7 @@ class Symbol(Source):
 
     def construct(self, context):
         value = self.type.vocab[self.key].v
-        return nodes.construct_bias(self, value, context)
+        return ast.construct_bias(self, value, context)
 
     def evaluate(self):
         return self.type.vocab[self.key]
@@ -244,7 +221,7 @@ class Zero(Source):
     """Zero which can act as scalar or zero vector."""
 
     def __init__(self):
-        super(Zero, self).__init__(staticity=nodes.Node.Staticity.FIXED)
+        super(Zero, self).__init__(staticity=ast.Node.Staticity.FIXED)
 
     def infer_types(self, context_type):
         if context_type is None:
@@ -271,7 +248,7 @@ class One(Source):
     """One which can act as scalar or identity vector."""
 
     def __init__(self):
-        super(One, self).__init__(staticity=nodes.Node.Staticity.FIXED)
+        super(One, self).__init__(staticity=ast.Node.Staticity.FIXED)
 
     def infer_types(self, context_type):
         if context_type is None:
@@ -282,7 +259,7 @@ class One(Source):
             raise SpaTypeError("Invalid type.")
 
     def construct(self, context):
-        return nodes.construct_bias(self, self.evaluate(), context)
+        return ast.construct_bias(self, self.evaluate(), context)
 
     def evaluate(self):
         if self.type == TScalar:
@@ -303,7 +280,7 @@ class Module(Source):
 
     def __init__(self, name, obj):
         super(Module, self).__init__(
-            staticity=nodes.Node.Staticity.TRANSFORM_ONLY)
+            staticity=ast.Node.Staticity.TRANSFORM_ONLY)
         self.name = name
         self._obj = obj
 
@@ -326,7 +303,7 @@ class Module(Source):
             self.type = TVocabulary(vocab)
 
     def construct(self, context):
-        return [nodes.Artifact(self.obj)]
+        return [ast.Artifact(self.obj)]
 
     def evaluate(self):
         raise ValueError("Module cannot be statically evaluated.")
@@ -388,7 +365,7 @@ class DotProduct(BinaryNode):
         rhs = as_node(rhs)
 
         if not lhs.fixed and not rhs.fixed:
-            staticity = nodes.Node.Staticity.DYNAMIC
+            staticity = ast.Node.Staticity.DYNAMIC
         else:
             staticity = max(lhs.staticity, rhs.staticity)
 
@@ -396,7 +373,7 @@ class DotProduct(BinaryNode):
         self.type = TScalar
 
     def infer_types(self, context_type):
-        context_type = nodes.infer_vocab(self.lhs, self.rhs)
+        context_type = ast.infer_vocab(self.lhs, self.rhs)
         self.lhs.infer_types(context_type)
         self.rhs.infer_types(context_type)
         if not isinstance(self.lhs.type, TVocabulary):
@@ -414,14 +391,14 @@ class DotProduct(BinaryNode):
 
     def construct(self, context):
         if self.fixed:
-            return nodes.construct_bias(self, self.evaluate(), context)
+            return ast.construct_bias(self, self.evaluate(), context)
 
         if self.lhs.fixed:
-            tr = nodes.value_to_transform(self.lhs.evaluate()).T
+            tr = ast.value_to_transform(self.lhs.evaluate()).T
             return [x.add_transform(tr)
                     for x in self.rhs.construct(context)]
         if self.rhs.fixed:
-            tr = nodes.value_to_transform(self.rhs.evaluate()).T
+            tr = ast.value_to_transform(self.rhs.evaluate()).T
             return [x.add_transform(tr)
                     for x in self.lhs.construct(context)]
 
@@ -430,7 +407,7 @@ class DotProduct(BinaryNode):
             net = Compare(self.lhs.type.vocab, label=str(self))
             self._connect_binary_operation(context, net)
         self.constructed.append(net)
-        return [nodes.Artifact(net.output)]
+        return [ast.Artifact(net.output)]
 
     def evaluate(self):
         return np.dot(self.lhs.evaluate(), self.rhs.evaluate())
@@ -462,7 +439,7 @@ class BinaryOperation(BinaryNode):
 
     def infer_types(self, context_type):
         if context_type is None:
-            context_type = nodes.infer_vocab(self.lhs, self.rhs)
+            context_type = ast.infer_vocab(self.lhs, self.rhs)
 
         self.lhs.infer_types(context_type)
         self.rhs.infer_types(context_type)
@@ -500,7 +477,7 @@ class Product(BinaryOperation):
         rhs = as_node(rhs)
 
         if not lhs.fixed and not rhs.fixed:
-            staticity = nodes.Node.Staticity.DYNAMIC
+            staticity = ast.Node.Staticity.DYNAMIC
         else:
             staticity = max(lhs.staticity, rhs.staticity)
 
@@ -509,7 +486,7 @@ class Product(BinaryOperation):
 
     def construct(self, context):
         if self.fixed:
-            return nodes.construct_bias(self, self.evaluate(), context)
+            return ast.construct_bias(self, self.evaluate(), context)
 
         if self.lhs.fixed:
             tr = self.lhs.evaluate()
@@ -525,7 +502,7 @@ class Product(BinaryOperation):
             if is_binding:
                 tr = tr.get_convolution_matrix()
             else:
-                tr = nodes.value_to_transform(tr)
+                tr = ast.value_to_transform(tr)
             return [x.add_transform(tr) for x in artifacts]
 
         with context.active_net:
@@ -539,7 +516,7 @@ class Product(BinaryOperation):
         self.constructed.append(net)
 
         self._connect_binary_operation(context, net)
-        return [nodes.Artifact(net.output)]
+        return [ast.Artifact(net.output)]
 
     def evaluate(self):
         return self.lhs.evaluate() * self.rhs.evaluate()
@@ -550,13 +527,13 @@ class Sum(BinaryOperation):
         lhs = as_node(lhs)
         rhs = as_node(rhs)
         staticity = min(
-            nodes.Node.Staticity.TRANSFORM_ONLY,
+            ast.Node.Staticity.TRANSFORM_ONLY,
             max(lhs.staticity, rhs.staticity))
         super(Sum, self).__init__(lhs, rhs, '+', staticity, precedence=3)
 
     def construct(self, context):
         if self.fixed:
-            return nodes.construct_bias(self, self.evaluate(), context)
+            return ast.construct_bias(self, self.evaluate(), context)
 
         return (self.lhs.construct(context) +
                 self.rhs.construct(context))
@@ -603,7 +580,7 @@ class Negative(UnaryOperation):
 
     def construct(self, context):
         if self.fixed:
-            return nodes.construct_bias(self, self.evaluate(), context)
+            return ast.construct_bias(self, self.evaluate(), context)
         return [x.add_transform(-1) for x in self.source.construct(context)]
 
     def evaluate(self):
@@ -623,7 +600,7 @@ class ApproxInverse(UnaryOperation):
 
     def construct(self, context):
         if self.fixed:
-            return nodes.construct_bias(self, self.evaluate(), context)
+            return ast.construct_bias(self, self.evaluate(), context)
 
         d = self.type.vocab.dimensions
         tr = np.eye(d)[-np.arange(d)]
@@ -720,7 +697,7 @@ class Translate(Source):
         return 'translate({})'.format(self.source)
 
 
-class Effect(nodes.Node):
+class Effect(ast.Node):
     """Assignment of an expression to a SPA network.
 
     Attributes
@@ -745,6 +722,12 @@ class Effect(nodes.Node):
         self.source = as_node(source)
         self.channeled = channeled
         self.channel = None
+
+        if not isinstance(self.sink, ast.Sink):
+            raise SpaTypeError("%s is not a valid sink for SPA routing" % sink)
+        if not isinstance(self.source, Source):
+            raise SpaTypeError("%s is not a valid source for SPA routing" %
+                               source)
 
     def infer_types(self, context_type):
         if context_type is not None:
@@ -788,7 +771,7 @@ class Effect(nodes.Node):
         return '{source} -> {sink}'.format(source=self.source, sink=self.sink)
 
 
-class Effects(nodes.Node):
+class Effects(ast.Node):
     """Multiple effects."""
 
     def __init__(self, effects, name=None):
@@ -820,7 +803,7 @@ class Effects(nodes.Node):
                 "\n     ".join(str(e) for e in self.effects))
 
 
-class Action(nodes.Node):
+class Action(ast.Node):
     """A conditional SPA action.
 
     Attributes
@@ -836,7 +819,7 @@ class Action(nodes.Node):
     """
 
     def __init__(self, condition, effects, index=0, name=None):
-        super(Action, self).__init__(staticity=nodes.Node.Staticity.DYNAMIC)
+        super(Action, self).__init__(staticity=ast.Node.Staticity.DYNAMIC)
         self.type = TAction
         self.index = index
         self.condition = as_node(condition)
@@ -849,7 +832,7 @@ class Action(nodes.Node):
         return self.effects
 
     def infer_types(self, context_type):
-        if isinstance(self.condition, nodes.Node):
+        if isinstance(self.condition, ast.Node):
             self.condition.infer_types(context_type)
             if self.condition.type != TScalar:
                 raise SpaTypeError(
@@ -864,7 +847,7 @@ class Action(nodes.Node):
                 "Conditional actions require basal ganglia and thalamus.")
 
         # construct bg utility
-        if self.condition.staticity <= nodes.Node.Staticity.TRANSFORM_ONLY:
+        if self.condition.staticity <= ast.Node.Staticity.TRANSFORM_ONLY:
             condition_context = context
         else:
             condition_context = context.subcontext(active_net=NengoNetwork(
@@ -888,7 +871,7 @@ class Action(nodes.Node):
         for effect in self.effects.effects:
             if effect.fixed:
                 sink = effect.sink.obj
-                tr = nodes.value_to_transform(effect.source.evaluate())
+                tr = ast.value_to_transform(effect.source.evaluate())
                 context.thalamus.connect_fixed(self.index, sink, transform=tr)
             else:
                 context.thalamus.connect_gate(self.index, effect.channel)
@@ -912,7 +895,7 @@ class Action(nodes.Node):
             utility=self.condition, name=name_str, effects=effect_str)
 
 
-class ActionSet(nodes.Node):
+class ActionSet(ast.Node):
     """A set of actions implemented by one basal ganglia and thalamus.
 
     If multiple *ActionSets* exist, each creates their own basal ganglia and
@@ -920,7 +903,7 @@ class ActionSet(nodes.Node):
     """
 
     def __init__(self, actions):
-        super(ActionSet, self).__init__(staticity=nodes.Node.Staticity.DYNAMIC)
+        super(ActionSet, self).__init__(staticity=ast.Node.Staticity.DYNAMIC)
         self.type = TActionSet
         self.actions = actions
         self.bg = None
