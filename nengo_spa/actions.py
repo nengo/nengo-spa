@@ -68,7 +68,7 @@ def as_node(obj, as_sink=False):
         return Scalar(obj)
     else:
         name = str(obj)
-        return (ast.Sink(name, obj) if as_sink else
+        return (Sink(name, obj) if as_sink else
                 Module(name, obj))
 
 
@@ -137,6 +137,49 @@ class Actions(AstAccessor):
                 delattr(Network, k)
             else:
                 setattr(Network, k, v)
+
+
+class Sink(ast.Node):
+    """SPA network that acts as sink identified by its name."""
+
+    def __init__(self, name, obj):
+        super(Sink, self).__init__(staticity=ast.Node.Staticity.DYNAMIC)
+        self.name = name
+        self._obj = obj
+
+    @property
+    def obj(self):
+        if not isinstance(self._obj, NengoObject):
+            return getattr(self._obj, 'input')
+        else:
+            return self._obj
+
+    def infer_types(self, context_type):
+        try:
+            vocab = Network.get_input_vocab(self.obj)
+        except KeyError:
+            raise SpaTypeError("{} {} is not declared as input.".format(
+                self.name, self.obj))
+        if vocab is None:
+            self.type = TScalar
+        else:
+            self.type = TVocabulary(vocab)
+
+    def construct(self, context):
+        return []
+
+    def evaluate(self):
+        raise ValueError("Sinks cannot be statically evaluated.")
+
+    def __str__(self):
+        return self.name
+
+    def __getattr__(self, name):
+        attr = getattr(self._obj, name)
+        if isinstance(attr, Network):
+            return Sink(self.name + '.' + name, attr)
+        else:
+            return attr
 
 
 class Source(ast.Node):
@@ -723,7 +766,7 @@ class Effect(ast.Node):
         self.channeled = channeled
         self.channel = None
 
-        if not isinstance(self.sink, ast.Sink):
+        if not isinstance(self.sink, Sink):
             raise SpaTypeError("%s is not a valid sink for SPA routing" % sink)
         if not isinstance(self.source, Source):
             raise SpaTypeError("%s is not a valid source for SPA routing" %
