@@ -5,9 +5,9 @@ from nengo_spa.exceptions import SpaTypeError
 
 from nengo_spa.actions import (
     Action, ActionSet, ApproxInverse, DotProduct, Effect, Effects, Negative,
-    Module, Product, Scalar, Sum, Symbol, as_node)
+    Module, Product, Scalar, Sum, Symbol, Sink, as_node)
 from nengo_spa.ast import (
-    TActionSet, TEffect, TScalar, TVocabulary, Sink)
+    TActionSet, TEffect, TScalar, TVocabulary)
 
 
 def test_scalar():

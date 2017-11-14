@@ -6,7 +6,6 @@ except ImportError:
     from collections import Sequence
 
 import nengo
-from nengo.base import NengoObject
 from nengo.utils.compat import is_integer
 import numpy as np
 
@@ -273,49 +272,6 @@ class Node(object):
         will be raised.
         """
         raise NotImplementedError()
-
-
-class Sink(Node):
-    """SPA network that acts as sink identified by its name."""
-
-    def __init__(self, name, obj):
-        super(Sink, self).__init__(staticity=Node.Staticity.DYNAMIC)
-        self.name = name
-        self._obj = obj
-
-    @property
-    def obj(self):
-        if not isinstance(self._obj, NengoObject):
-            return getattr(self._obj, 'input')
-        else:
-            return self._obj
-
-    def infer_types(self, context_type):
-        try:
-            vocab = Network.get_input_vocab(self.obj)
-        except KeyError:
-            raise SpaTypeError("{} {} is not declared as input.".format(
-                self.name, self.obj))
-        if vocab is None:
-            self.type = TScalar
-        else:
-            self.type = TVocabulary(vocab)
-
-    def construct(self, context):
-        return []
-
-    def evaluate(self):
-        raise ValueError("Sinks cannot be statically evaluated.")
-
-    def __str__(self):
-        return self.name
-
-    def __getattr__(self, name):
-        attr = getattr(self._obj, name)
-        if isinstance(attr, Network):
-            return Sink(self.name + '.' + name, attr)
-        else:
-            return attr
 
 
 class Type(object):
