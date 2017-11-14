@@ -46,21 +46,23 @@ def test_basal_ganglia(Simulator, seed, plt):
         m.encode = spa.Transcode(input, output_vocab=16)
 
         # test all acceptable condition formats
-        actions = spa.Actions('''
-            ifmax 0.5: A -> m.motor
-            elifmax dot(m.vision, CAT): B -> m.motor
-            elifmax dot(m.vision * CAT, DOG): C -> m.motor
-            elifmax 2 * dot(m.vision, CAT * 0.5): D -> m.motor
-            elifmax dot(m.vision, CAT) + 0.5 - dot(m.vision, CAT): E -> m.motor
-            elifmax dot(m.vision, PARROT) + m.compare: F -> m.motor
-            elifmax 0.5 * dot(m.vision, MOUSE) + 0.5 * m.compare: G -> m.motor
-            elifmax (dot(m.vision, MOUSE) - m.compare) * 0.5: H -> m.motor
+        with spa.Actions() as actions:
+            spa.ifmax(0.5, "A" >> m.motor)
+            spa.ifmax(spa.dot(m.vision, "CAT"), "B" >> m.motor)
+            spa.ifmax(spa.dot(m.vision * "CAT", "DOG"), "C" >> m.motor)
+            spa.ifmax(2 * spa.dot(m.vision, spa.sym("CAT") * 0.5),
+                      "D" >> m.motor)
+            spa.ifmax(spa.dot(m.vision, "CAT") + 0.5 -
+                      spa.dot(m.vision, "CAT"), "E" >> m.motor)
+            spa.ifmax(spa.dot(m.vision, "PARROT") + m.compare, "F" >> m.motor)
+            spa.ifmax(0.5 * spa.dot(m.vision, "MOUSE") + 0.5 * m.compare,
+                      "G" >> m.motor)
+            spa.ifmax((spa.dot(m.vision, "MOUSE") - m.compare) * 0.5,
+                      "H" >> m.motor)
 
-            always:
-                m.encode -> m.vision
-                SHOOP -> m.compare.input_a
-                SHOOP -> m.compare.input_b
-        ''')
+            m.encode >> m.vision
+            spa.sym("SHOOP") >> m.compare.input_a
+            spa.sym("SHOOP") >> m.compare.input_b
         bg = actions[0].bg
 
         p = nengo.Probe(bg.input, 'output', synapse=0.03)
@@ -94,7 +96,8 @@ def test_basal_ganglia(Simulator, seed, plt):
 def test_scalar_product():
     with spa.Network() as model:
         model.scalar = spa.Scalar()
-        spa.Actions('ifmax model.scalar * model.scalar: 1 -> model.scalar')
+        with spa.Actions():
+            spa.ifmax(model.scalar * model.scalar, "1" >> model.scalar)
     # just testing network construction without exception here
 
 
@@ -104,7 +107,8 @@ def test_constructed_input_connections_are_accessible():
         model.state1 = spa.State()
         model.state2 = spa.State()
 
-        actions = spa.Actions('ifmax dot(model.state1, A): A -> model.state2')
+        with spa.Actions() as actions:
+            spa.ifmax(spa.dot(model.state1, "A"), "A" >> model.state2)
         bg = actions[0].bg
 
         assert isinstance(bg.input_connections[0], nengo.Connection)
