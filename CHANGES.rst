@@ -26,12 +26,22 @@ Release History
 This release increases the minimum required Nengo version to Nengo 2.5
 (previously Nengo 2.4).
 
+**Fixed**
+
+- Validation of ``VocabOrDimParam`` and ``VocabularyMapParam``.
+  (`#95 <https://github.com/nengo/nengo_spa/issues/95>`_,
+  `#98 <https://github.com/nengo/nengo_spa/pull/98>`_)
+
+
+0.3.2 (November 17, 2017)
+=========================
+
 **Added**
 
 - Add ``all_bgs`` and ``all_thals`` methods to
   ``AstAccessor`` to enable easy access to these objects.
-  (`#61 <https://github.com/nengo/nengo_spa/pull/99>`_,
-  `#28 <https://github.com/nengo/nengo_spa/issues/80>`_)
+  (`#61 <https://github.com/nengo/nengo_spa/pull/99>`__,
+  `#28 <https://github.com/nengo/nengo_spa/issues/80>`__)
 
 **Fixed**
 
@@ -42,9 +52,9 @@ This release increases the minimum required Nengo version to Nengo 2.5
   do not have any effect.
   (`#101 <https://github.com/nengo/nengo_spa/issues/101>`_,
   `#103 <https://github.com/nengo/nengo_spa/pull/103>`_)
-- Validation of ``VocabOrDimParam`` and ``VocabularyMapParam``.
-  (`#95 <https://github.com/nengo/nengo_spa/issues/95>`_,
-  `#98 <https://github.com/nengo/nengo_spa/pull/98>`_)
+- Allow comments at various places in actions rules.
+  (`#102 <https://github.com/nengo/nengo_spa/issues/102>`_,
+  `#104 <https://github.com/nengo/nengo_spa/pull/104>`_)
 
 
 0.3.1 (November 7, 2017)
