@@ -1,3 +1,4 @@
+import inspect
 import weakref
 
 import nengo
@@ -15,7 +16,7 @@ class _AutoConfig(object):
         return getattr(self._cfg, name)
 
     def __getitem__(self, key):
-        if key not in self._cfg.params:
+        if inspect.isclass(key) and key not in self._cfg.params:
             self._cfg.configures(key)
         return self._cfg[key]
 

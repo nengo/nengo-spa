@@ -31,6 +31,10 @@ This release increases the minimum required Nengo version to Nengo 2.5
 - Validation of ``VocabOrDimParam`` and ``VocabularyMapParam``.
   (`#95 <https://github.com/nengo/nengo_spa/issues/95>`_,
   `#98 <https://github.com/nengo/nengo_spa/pull/98>`_)
+- Allow the configuration of instance parameters with
+  ``nengo_spa.Network.config``.
+  (`#112 <https://github.com/nengo/nengo_spa/issues/112>`_,
+  `#113 <https://github.com/nengo/nengo_spa/pull/113>`_)
 
 
 0.3.2 (November 17, 2017)

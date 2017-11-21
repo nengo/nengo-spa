@@ -191,3 +191,11 @@ def test_create_inhibit_node(Simulator, plt):
     plt.xlabel("Time [s]")
 
     assert_allclose(sim.data[p][sim.trange() > 0.1], 0., atol=1e-3)
+
+
+def test_instance_config():
+    with spa.Network() as net:
+        ens = nengo.Ensemble(10, 1)
+        net.config[nengo.Ensemble].set_param(
+            'param', nengo.params.BoolParam('param', default=False))
+        net.config[ens].param = True
