@@ -3,7 +3,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.exceptions import SpaTypeError
 
-from nengo_spa.actions import (
+from nengo_spa.ast import (
     Action, ActionSet, ApproxInverse, DotProduct, Effect, Effects, Negative,
     Module, Product, Scalar, Sum, Symbol, Sink, as_node)
 from nengo_spa.ast import (

@@ -1,6 +1,6 @@
 import nengo
 from nengo.params import Default, IntParam
-from nengo_spa.network import Network
+from nengo_spa.ast import Network
 
 
 class Product(Network):

@@ -3,7 +3,7 @@ import pytest
 
 import nengo
 import nengo_spa as spa
-from nengo_spa import actions
+from nengo_spa import ast
 from nengo_spa.exceptions import SpaTypeError
 
 
@@ -181,6 +181,7 @@ def test_access_actions():
     assert str(actions[0]) == "%s -> %s" % (m.b, m.a)
     assert str(actions[1]) == "%s -> %s" % (m.c, m.b)
 
+    # FIXME
     # this is being removed
     # https://github.com/nengo/nengo_spa/pull/100
     # assert str(actions[2]) == '''always as 'named':
@@ -265,22 +266,19 @@ def test_actions_context():
         network_dict = {k: v for k, v in spa.Network.__dict__.items()}
 
         with spa.Actions():
-            assert isinstance(~a, actions.ApproxInverse)
-            assert isinstance(-a, actions.Negative)
-            assert isinstance(a + b, actions.Sum)
+            assert isinstance(~a, ast.ApproxInverse)
+            assert isinstance(-a, ast.Negative)
+            assert isinstance(a + b, ast.Sum)
             x = a - b
-            assert isinstance(x, actions.Sum)
-            assert isinstance(x.rhs, actions.Negative)
-            assert isinstance(x.rhs.source, actions.Symbol)
+            assert isinstance(x, ast.Sum)
+            assert isinstance(x.rhs, ast.Negative)
+            assert isinstance(x.rhs.source, ast.Symbol)
             x = b - a
-            assert isinstance(x, actions.Sum)
-            assert isinstance(x.rhs, actions.Negative)
-            assert isinstance(x.rhs.source, actions.Module)
-            assert isinstance(a * b, actions.Product)
-            assert isinstance(b >> a, actions.Effect)
+            assert isinstance(x, ast.Sum)
+            assert isinstance(x.rhs, ast.Negative)
+            assert isinstance(x.rhs.source, ast.Module)
+            assert isinstance(a * b, ast.Product)
+            assert isinstance(b >> a, ast.Effect)
 
         # make sure that things are reset after exiting context
-        with pytest.raises(TypeError):
-            a + b
-
         assert spa.Network.__dict__ == network_dict

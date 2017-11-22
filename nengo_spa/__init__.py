@@ -1,10 +1,12 @@
 from nengo_spa import version
 
-from nengo_spa.actions import Actions, route, ifmax
-from nengo_spa.actions import DotProduct as dot
-from nengo_spa.actions import Reinterpret as reinterpret
-from nengo_spa.actions import Translate as translate
-from nengo_spa.actions import Symbol as sym
+from nengo_spa.actions import Actions
+from nengo_spa.ast import Network
+from nengo_spa.ast import route, ifmax
+from nengo_spa.ast import DotProduct as dot
+from nengo_spa.ast import Reinterpret as reinterpret
+from nengo_spa.ast import Translate as translate
+from nengo_spa.ast import Symbol as sym
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
     AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,
@@ -16,7 +18,7 @@ from nengo_spa.modules import (
     State,
     Thalamus,
     Transcode)
-from nengo_spa.network import create_inhibit_node, Network
+from nengo_spa.network import create_inhibit_node
 from nengo_spa.vocab import Vocabulary, VocabularyMap
 
 
