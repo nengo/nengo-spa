@@ -8,7 +8,7 @@ from nengo.utils.compat import is_string
 from nengo.utils.network import with_self
 import numpy as np
 
-from nengo_spa.network import Network
+from nengo_spa.ast import Network
 from nengo_spa.networks.selection import IA, Thresholding, WTA
 from nengo_spa.vocab import VocabularyOrDimParam
 

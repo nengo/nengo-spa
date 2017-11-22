@@ -5,7 +5,7 @@ import numpy as np
 import nengo
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo_spa.network import Network
+from nengo_spa.ast import Network
 from nengo.synapses import Lowpass, SynapseParam
 
 
