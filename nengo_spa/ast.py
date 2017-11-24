@@ -4,13 +4,11 @@ try:
     from collections.abc import Sequence
 except ImportError:
     from collections import Sequence
-import inspect
 import weakref
 
 
 import nengo
 from nengo.base import NengoObject
-from nengo.config import Config, SupportDefaultsMixin
 from nengo.connection import Connection
 from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_integer
@@ -21,8 +19,12 @@ from nengo_spa.exceptions import (
     SpaConstructionError, SpaParseError, SpaTypeError)
 from nengo_spa.pointer import SemanticPointer
 
-from nengo_spa.vocab import Vocabulary, VocabularyMap, VocabularyMapParam
+from nengo_spa.vocab import Vocabulary
 
+
+input_network_registry = weakref.WeakKeyDictionary()
+input_vocab_registry = weakref.WeakKeyDictionary()
+output_vocab_registry = weakref.WeakKeyDictionary()
 
 
 class AstAccessor(Sequence):
@@ -303,7 +305,7 @@ class Sink(Node):
 
     def infer_types(self, context_type):
         try:
-            vocab = Network.get_input_vocab(self.obj)
+            vocab = input_vocab_registry[self.obj]
         except KeyError:
             raise SpaTypeError("{} {} is not declared as input.".format(
                 self.name, self.obj))
@@ -320,13 +322,6 @@ class Sink(Node):
 
     def __str__(self):
         return self.name
-
-    def __getattr__(self, name):
-        attr = getattr(self._obj, name)
-        if isinstance(attr, Network):
-            return Sink(self.name + '.' + name, attr)
-        else:
-            return attr
 
 
 class Source(Node):
@@ -479,7 +474,7 @@ class Module(Source):
 
     def infer_types(self, context_type):
         try:
-            vocab = Network.get_output_vocab(self.obj)
+            vocab = output_vocab_registry[self.obj]
         except KeyError:
             raise SpaTypeError("{} {} is not declared as output.".format(
                 self.name, self.obj))
@@ -493,13 +488,6 @@ class Module(Source):
 
     def evaluate(self):
         raise ValueError("Module cannot be statically evaluated.")
-
-    def __getattr__(self, name):
-        attr = getattr(self._obj, name)
-        if isinstance(attr, Network):
-            return Module(self.name + '.' + name, attr)
-        else:
-            return attr
 
     def __str__(self):
         return self.name
@@ -1191,11 +1179,11 @@ class ConstructionContext(object):
 
     @property
     def sink_network(self):
-        return Network.get_input_network(self.sink.obj)
+        return input_network_registry[self.sink.obj]
 
     @property
     def sink_input(self):
-        return self.sink.obj, Network.get_input_vocab(self.sink.obj)
+        return self.sink.obj, input_vocab_registry[self.sink.obj]
 
 
 class Artifact(object):
@@ -1262,81 +1250,3 @@ def value_to_transform(value):
     if isinstance(value, SemanticPointer):
         value = np.atleast_2d(value.v).T
     return np.asarray(value)
-
-
-class _AutoConfig(object):
-    def __init__(self, cfg):
-        self._cfg = cfg
-
-    def __getattr__(self, name):
-        return getattr(self._cfg, name)
-
-    def __getitem__(self, key):
-        if inspect.isclass(key) and key not in self._cfg.params:
-            self._cfg.configures(key)
-        return self._cfg[key]
-
-
-class Network(NengoNetwork, SupportDefaultsMixin, SpaOperatorMixin):
-    """Base class for SPA networks.
-
-    SPA networks are networks that also have a list of inputs and outputs,
-    each with an associated `.Vocabulary` (or a desired dimensionality for
-    the vocabulary).
-
-    The inputs and outputs are dictionaries that map a name to an
-    (object, Vocabulary) pair. The object can be a `.Node` or an `.Ensemble`.
-    """
-
-    vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
-
-    _input_vocabs = weakref.WeakKeyDictionary()
-    _input_networks = weakref.WeakKeyDictionary()
-    _output_vocabs = weakref.WeakKeyDictionary()
-
-    def __init__(
-            self, label=None, seed=None, add_to_container=None, vocabs=None):
-        super(Network, self).__init__(label, seed, add_to_container)
-        self.config.configures(Network)
-
-        if vocabs is None:
-            vocabs = Config.default(Network, 'vocabs')
-            if vocabs is None:
-                if seed is not None:
-                    rng = np.random.RandomState(seed)
-                else:
-                    rng = None
-                vocabs = VocabularyMap(rng=rng)
-        self.vocabs = vocabs
-        self.config[Network].vocabs = vocabs
-
-        self._stimuli = None
-
-    @property
-    def config(self):
-        return _AutoConfig(self._config)
-
-    def declare_input(self, obj, vocab):
-        if obj in self._input_vocabs:
-            raise ValueError('Object {} already declared as input.'.format(
-                obj))
-        self._input_vocabs[obj] = vocab
-        self._input_networks[obj] = self
-
-    def declare_output(self, obj, vocab):
-        if obj in self._output_vocabs:
-            raise ValueError('Object {} already declared as output.'.format(
-                obj))
-        self._output_vocabs[obj] = vocab
-
-    @classmethod
-    def get_input_vocab(cls, obj):
-        return cls._input_vocabs[obj]
-
-    @classmethod
-    def get_input_network(cls, obj):
-        return cls._input_networks[obj]
-
-    @classmethod
-    def get_output_vocab(cls, obj):
-        return cls._output_vocabs[obj]

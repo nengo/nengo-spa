@@ -1,6 +1,7 @@
 from nengo.params import BoolParam, Default, IntParam
+
 import nengo_spa
-from nengo_spa.ast import Network
+from nengo_spa.network import Network
 from nengo_spa.vocab import VocabularyOrDimParam
 
 
