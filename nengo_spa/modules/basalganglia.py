@@ -1,12 +1,12 @@
 import warnings
 
-import numpy as np
-
 import nengo
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
-from nengo_spa.ast import Network
 from nengo.synapses import Lowpass, SynapseParam
+import numpy as np
+
+from nengo_spa.network import Network
 
 
 # connection weights from (Gurney, Prescott, & Redgrave, 2001)

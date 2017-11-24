@@ -6,7 +6,7 @@ from nengo.utils.compat import is_string
 from nengo.utils.stdlib import checked_call
 import numpy as np
 
-from nengo_spa.ast import Network
+from nengo_spa.network import Network
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vocab import VocabularyOrDimParam
 

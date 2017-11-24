@@ -4,7 +4,7 @@ from nengo.exceptions import NetworkContextError
 
 from nengo_spa.ast import ActionSet, AstAccessor, ConstructionContext
 from nengo_spa.exceptions import SpaConstructionError
-from nengo_spa.ast import Network as Network
+from nengo_spa.network import Network
 
 
 class Actions(AstAccessor):
