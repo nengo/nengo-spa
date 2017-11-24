@@ -546,6 +546,8 @@ class BinaryNode(Source):
 
 
 class DotProduct(BinaryNode):
+    DotProductRealization = None
+
     def __init__(self, lhs, rhs):
         lhs = as_node(lhs)
         rhs = as_node(rhs)
@@ -590,8 +592,8 @@ class DotProduct(BinaryNode):
 
         assert self.lhs.type.vocab is self.rhs.type.vocab
         with context.active_net:
-            from nengo_spa.modules.compare import Compare
-            net = Compare(self.lhs.type.vocab, label=str(self))
+            net = self.DotProductRealization(
+                self.lhs.type.vocab, label=str(self))
             self._connect_binary_operation(context, net)
         self.constructed.append(net)
         return [Artifact(net.output)]
@@ -659,6 +661,9 @@ class BinaryOperation(BinaryNode):
 
 
 class Product(BinaryOperation):
+    BindRealization = None
+    ProductRealization = None
+
     def __init__(self, lhs, rhs):
         lhs = as_node(lhs)
         rhs = as_node(rhs)
@@ -694,11 +699,9 @@ class Product(BinaryOperation):
 
         with context.active_net:
             if is_binding:
-                from nengo_spa.modules.bind import Bind
-                net = Bind(self.type.vocab, label=str(self))
+                net = self.BindRealization(self.type.vocab, label=str(self))
             elif self.lhs.type == TScalar and self.rhs.type == TScalar:
-                from nengo_spa.modules.product import Product as ProductModule
-                net = ProductModule()
+                net = self.ProductRealization()
             else:
                 raise NotImplementedError(
                     "Dynamic scaling of semantic pointer not implemented.")
@@ -1090,6 +1093,9 @@ class ActionSet(Node):
     thalamus.
     """
 
+    BasalGangliaRealization = None
+    ThalamusRealization = None
+
     def __init__(self, actions):
         super(ActionSet, self).__init__(staticity=Node.Staticity.DYNAMIC)
         self.type = TActionSet
@@ -1107,10 +1113,8 @@ class ActionSet(Node):
             return
 
         with context.root_network:
-            from nengo_spa.modules.basalganglia import BasalGanglia
-            from nengo_spa.modules.thalamus import Thalamus
-            self.bg = BasalGanglia(action_count=action_count)
-            self.thalamus = Thalamus(action_count=action_count)
+            self.bg = self.BasalGangliaRealization(action_count=action_count)
+            self.thalamus = self.ThalamusRealization(action_count=action_count)
             for i, a in enumerate(self.actions):
                 self.thalamus.actions.ensembles[i].label = (
                     'action[{}]: {}'.format(i, a.effects))
