@@ -34,6 +34,9 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
 
     vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
 
+    _input_types = {}
+    _output_types = {}
+
     def __init__(
             self, label=None, seed=None, add_to_container=None, vocabs=None):
         super(Network, self).__init__(label, seed, add_to_container)
@@ -64,18 +67,27 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     def get_output_vocab(cls, obj):
         return output_vocab_registry[obj]
 
-    # FIXME type caching
     def declare_input(self, obj, vocab):
-        obj.__class__ = type(
-            'SpaInput<%s>' % obj.__class__.__name__,
-            (obj.__class__, SpaOperatorMixin), {})
+        try:
+            extended_type = self._input_types[obj.__class__]
+        except KeyError:
+            extended_type = type(
+                'SpaInput<%s>' % obj.__class__.__name__,
+                (obj.__class__, SpaOperatorMixin), {})
+            self._input_types[obj.__class__] = extended_type
+        obj.__class__ = extended_type
         input_vocab_registry[obj] = vocab
         input_network_registry[obj] = self
 
     def declare_output(self, obj, vocab):
-        obj.__class__ = type(
+        try:
+            extended_type = self._output_types[obj.__class__]
+        except KeyError:
+            extended_type = type(
             'SpaOutput<%s>' % obj.__class__.__name__,
             (obj.__class__, SpaOperatorMixin), {})
+            self._output_types[obj.__class__] = extended_type
+        obj.__class__ = extended_type
         output_vocab_registry[obj] = vocab
         return obj
 
