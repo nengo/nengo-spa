@@ -6,7 +6,7 @@ from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.ast import (
     Action, ActionSet, ApproxInverse, DotProduct, Effect, Effects, Negative,
     Module, Product, Scalar, Sum, Symbol, Sink, as_node)
-from nengo_spa.ast import (
+from nengo_spa.types import (
     TActionSet, TEffect, TScalar, TVocabulary)
 
 
