@@ -61,6 +61,18 @@ def as_node(obj, as_sink=False):
                 Module(name, obj))
 
 
+def instant_network_construction(fn):
+    def op(self, other):
+        node = fn(self, other)
+        if node.staticity == Node.Staticity.DYNAMIC:
+            node.infer_types(None)
+            return node.construct(ConstructionContext(
+                NengoNetwork.context[-1]))
+        else:
+            return node
+    return op
+
+
 class SpaOperatorMixin(object):
     def __invert__(self):
         return ApproxInverse(self)
@@ -68,21 +80,27 @@ class SpaOperatorMixin(object):
     def __neg__(self):
         return Negative(self)
 
+    @instant_network_construction
     def __add__(self, other):
         return Sum(self, other)
 
+    @instant_network_construction
     def __radd__(self, other):
         return Sum(other, self)
 
+    @instant_network_construction
     def __sub__(self, other):
         return Sum(self, Negative(other))
 
+    @instant_network_construction
     def __rsub__(self, other):
         return Sum(other, Negative(self))
 
+    @instant_network_construction
     def __mul__(self, other):
         return Product(self, other)
 
+    @instant_network_construction
     def __rmul__(self, other):
         return Product(other, self)
 
@@ -483,7 +501,7 @@ class DotProduct(BinaryNode):
                 self.lhs.type.vocab, label=str(self))
             self._connect_binary_operation(context, net)
         self.constructed.append(net)
-        return [Artifact(net.output)]
+        return net
 
     def evaluate(self):
         return np.dot(self.lhs.evaluate(), self.rhs.evaluate())
@@ -596,7 +614,7 @@ class Product(BinaryOperation):
         self.constructed.append(net)
 
         self._connect_binary_operation(context, net)
-        return [Artifact(net.output)]
+        return net
 
     def evaluate(self):
         return self.lhs.evaluate() * self.rhs.evaluate()
