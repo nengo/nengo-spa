@@ -203,3 +203,12 @@ def test_instance_config():
         net.config[nengo.Ensemble].set_param(
             'param', nengo.params.BoolParam('param', default=False))
         net.config[ens].param = True
+
+
+def test_instant_network_construction():
+    with spa.Network() as model:
+        state1 = spa.State(16)
+        state2 = spa.State(16)
+        bound = state1 * state2
+
+    assert isinstance(bound, spa.Bind)
