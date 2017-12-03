@@ -1,20 +1,15 @@
 """Definition of abstract AST construction tools."""
 
-try:
-    from collections.abc import Sequence
-except ImportError:
-    from collections import Sequence
 import weakref
-
 
 import nengo
 from nengo.base import NengoObject
 from nengo.connection import Connection
 from nengo.network import Network as NengoNetwork
-from nengo.utils.compat import is_integer
 import numpy as np
 
 from nengo_spa import pointer
+from nengo_spa import types
 from nengo_spa.exceptions import (
     SpaConstructionError, SpaParseError, SpaTypeError)
 from nengo_spa.pointer import SemanticPointer
@@ -27,45 +22,6 @@ input_vocab_registry = weakref.WeakKeyDictionary()
 output_vocab_registry = weakref.WeakKeyDictionary()
 
 
-class AstAccessor(Sequence):
-    """Provides access to the root AST nodes of build action rules.
-
-    Nodes can either be accessed by their ordinal position in the action rules
-    or by the name provided in the action rules.
-    """
-
-    def __init__(self, ast):
-        self.ast = ast
-        self.by_name = {
-            node.name: node for node in ast if hasattr(node, 'name')}
-
-    def __len__(self):
-        return len(self.ast)
-
-    def __getitem__(self, key):
-        if is_integer(key):
-            return self.ast[key]
-        else:
-            return self.by_name[key]
-
-    def __contains__(self, key):
-        return key in self.ast or key in self.by_name
-
-    def keys(self):
-        return self.by_name.keys()
-
-    def _attr_list(self, attr):
-        objs = []
-        for act_set in self.ast:
-            if hasattr(act_set, attr):
-                objs.append(getattr(act_set, attr))
-        return objs
-
-    def all_bgs(self):
-        return self._attr_list("bg")
-
-    def all_thals(self):
-        return self._attr_list("thalamus")
 def route(a, b):
     eff = Effect(b, a)
     from nengo_spa.actions import Actions
