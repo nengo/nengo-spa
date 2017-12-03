@@ -1,10 +1,56 @@
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 import weakref
 
 from nengo.exceptions import NetworkContextError
+from nengo.utils.compat import is_integer
 
-from nengo_spa.ast import ActionSet, AstAccessor, ConstructionContext
+from nengo_spa.ast import ActionSet, ConstructionContext
 from nengo_spa.exceptions import SpaConstructionError
 from nengo_spa.network import Network
+
+
+class AstAccessor(Sequence):
+    """Provides access to the root AST nodes of build action rules.
+
+    Nodes can either be accessed by their ordinal position in the action rules
+    or by the name provided in the action rules.
+    """
+
+    def __init__(self, ast):
+        self.ast = ast
+        self.by_name = {
+            node.name: node for node in ast if hasattr(node, 'name')}
+
+    def __len__(self):
+        return len(self.ast)
+
+    def __getitem__(self, key):
+        if is_integer(key):
+            return self.ast[key]
+        else:
+            return self.by_name[key]
+
+    def __contains__(self, key):
+        return key in self.ast or key in self.by_name
+
+    def keys(self):
+        return self.by_name.keys()
+
+    def _attr_list(self, attr):
+        objs = []
+        for act_set in self.ast:
+            if hasattr(act_set, attr):
+                objs.append(getattr(act_set, attr))
+        return objs
+
+    def all_bgs(self):
+        return self._attr_list("bg")
+
+    def all_thals(self):
+        return self._attr_list("thalamus")
 
 
 class Actions(AstAccessor):
