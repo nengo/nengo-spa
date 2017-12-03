@@ -66,65 +66,6 @@ class AstAccessor(Sequence):
 
     def all_thals(self):
         return self._attr_list("thalamus")
-
-
-class Type(object):
-    """Describes a type.
-
-    Each part of the AST evaluates to some type.
-    """
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.name)
-
-    def __str__(self):
-        return self.name
-
-    def __hash__(self):
-        return hash(self.__class__) ^ hash(self.name)
-
-    def __eq__(self, other):
-        return self.__class__ is other.__class__ and self.name == other.name
-
-    def __ne__(self, other):
-        return not self == other
-
-
-TAction = Type('TAction')
-TActionSet = Type('TActionSet')
-TScalar = Type('TScalar')
-TEffect = Type('TEffect')
-TEffects = Type('TEffects')
-
-
-class TVocabulary(Type):
-    """Each vocabulary is treated as its own type.
-
-    All vocabulary types constitute a type class.
-    """
-
-    def __init__(self, vocab):
-        super(TVocabulary, self).__init__('TVocabulary')
-        self.vocab = vocab
-
-    def __repr__(self):
-        return '{}({!r}, {!r})'.format(
-            self.__class__.__name__, self.name, self.vocab)
-
-    def __str__(self):
-        return '{}<{}>'.format(self.name, self.vocab)
-
-    def __hash__(self):
-        return super(TVocabulary, self).__hash__() ^ hash(self.vocab)
-
-    def __eq__(self, other):
-        return (super(TVocabulary, self).__eq__(other) and
-                self.vocab is other.vocab)
-
-
 def route(a, b):
     eff = Effect(b, a)
     from nengo_spa.actions import Actions
@@ -310,9 +251,9 @@ class Sink(Node):
             raise SpaTypeError("{} {} is not declared as input.".format(
                 self.name, self.obj))
         if vocab is None:
-            self.type = TScalar
+            self.type = types.TScalar
         else:
-            self.type = TVocabulary(vocab)
+            self.type = types.TVocabulary(vocab)
 
     def construct(self, context):
         return []
@@ -347,7 +288,7 @@ class Scalar(Source):
     def __init__(self, value):
         super(Scalar, self).__init__(staticity=Node.Staticity.FIXED)
         self.value = value
-        self.type = TScalar
+        self.type = types.TScalar
 
     def infer_types(self, context_type):
         pass
@@ -379,7 +320,7 @@ class Symbol(Source):
                 "Semantic pointers must begin with a capital letter.")
 
     def infer_types(self, context_type):
-        if not isinstance(context_type, TVocabulary):
+        if not isinstance(context_type, types.TVocabulary):
             raise SpaTypeError("Invalid type.")
         self.type = context_type
         # Make sure that key has been added to vocab after type inference to
@@ -406,8 +347,9 @@ class Zero(Source):
 
     def infer_types(self, context_type):
         if context_type is None:
-            self.type = TScalar
-        elif context_type == TScalar or isinstance(context_type, TVocabulary):
+            self.type = types.TScalar
+        elif context_type == types.TScalar or isinstance(
+                context_type, types.TVocabulary):
             self.type = context_type
         else:
             raise SpaTypeError("Invalid type.")
@@ -416,7 +358,7 @@ class Zero(Source):
         return []
 
     def evaluate(self):
-        if self.type == TScalar:
+        if self.type == types.TScalar:
             return 0
         else:
             return pointer.Zero(self.type.vocab.dimensions)
@@ -433,8 +375,9 @@ class One(Source):
 
     def infer_types(self, context_type):
         if context_type is None:
-            self.type = TScalar
-        elif context_type == TScalar or isinstance(context_type, TVocabulary):
+            self.type = types.TScalar
+        elif context_type == types.TScalar or isinstance(
+                context_type, types.TVocabulary):
             self.type = context_type
         else:
             raise SpaTypeError("Invalid type.")
@@ -443,7 +386,7 @@ class One(Source):
         return construct_bias(self, self.evaluate(), context)
 
     def evaluate(self):
-        if self.type == TScalar:
+        if self.type == types.TScalar:
             return 1
         else:
             return pointer.Identity(self.type.vocab.dimensions)
@@ -479,9 +422,9 @@ class Module(Source):
             raise SpaTypeError("{} {} is not declared as output.".format(
                 self.name, self.obj))
         if vocab is None:
-            self.type = TScalar
+            self.type = types.TScalar
         else:
-            self.type = TVocabulary(vocab)
+            self.type = types.TVocabulary(vocab)
 
     def construct(self, context):
         return [Artifact(self.obj)]
@@ -546,17 +489,17 @@ class DotProduct(BinaryNode):
             staticity = max(lhs.staticity, rhs.staticity)
 
         super(DotProduct, self).__init__(lhs, rhs, staticity)
-        self.type = TScalar
+        self.type = types.TScalar
 
     def infer_types(self, context_type):
         context_type = infer_vocab(self.lhs, self.rhs)
         self.lhs.infer_types(context_type)
         self.rhs.infer_types(context_type)
-        if not isinstance(self.lhs.type, TVocabulary):
+        if not isinstance(self.lhs.type, types.TVocabulary):
             raise SpaTypeError(
                 "First argument of dot product '{}' is not of type "
                 "TVocabulary, but {}.".format(self, self.lhs.type))
-        if not isinstance(self.rhs.type, TVocabulary):
+        if not isinstance(self.rhs.type, types.TVocabulary):
             raise SpaTypeError(
                 "Second argument of dot product '{}' is not of type "
                 "TVocabulary, but {}.".format(self, self.rhs.type))
@@ -623,9 +566,9 @@ class BinaryOperation(BinaryNode):
 
         if self.lhs.type == self.rhs.type:
             self.type = self.lhs.type
-        elif self.allow_scalar and self.lhs.type == TScalar:
+        elif self.allow_scalar and self.lhs.type == types.TScalar:
             self.type = self.rhs.type
-        elif self.allow_scalar and self.rhs.type == TScalar:
+        elif self.allow_scalar and self.rhs.type == types.TScalar:
             self.type = self.lhs.type
         else:
             raise SpaTypeError(
@@ -675,8 +618,8 @@ class Product(BinaryOperation):
             tr = self.rhs.evaluate()
             artifacts = self.lhs.construct(context)
 
-        is_binding = (isinstance(self.lhs.type, TVocabulary) and
-                      isinstance(self.rhs.type, TVocabulary))
+        is_binding = (isinstance(self.lhs.type, types.TVocabulary) and
+                      isinstance(self.rhs.type, types.TVocabulary))
 
         if self.lhs.fixed or self.rhs.fixed:
             if is_binding:
@@ -688,7 +631,8 @@ class Product(BinaryOperation):
         with context.active_net:
             if is_binding:
                 net = self.BindRealization(self.type.vocab, label=str(self))
-            elif self.lhs.type == TScalar and self.rhs.type == TScalar:
+            elif (self.lhs.type == types.TScalar and
+                    self.rhs.type == types.TScalar):
                 net = self.ProductRealization()
             else:
                 raise NotImplementedError(
@@ -773,7 +717,7 @@ class ApproxInverse(UnaryOperation):
 
     def infer_types(self, context_type):
         super(ApproxInverse, self).infer_types(context_type)
-        if not isinstance(self.type, TVocabulary):
+        if not isinstance(self.type, types.TVocabulary):
             raise SpaTypeError(
                 "Cannot apply approximate inverse to '{}' which is not of "
                 "type TVocabulary, but {}.".format(self.source, self.type))
@@ -806,13 +750,13 @@ class Reinterpret(Source):
             self.vocab.infer_types(None)
             self.type = self.vocab.type
         else:
-            self.type = TVocabulary(self.vocab)
-        if not isinstance(self.type, TVocabulary):
+            self.type = types.TVocabulary(self.vocab)
+        if not isinstance(self.type, types.TVocabulary):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
         self.source.infer_types(None)
-        if not isinstance(self.source.type, TVocabulary):
+        if not isinstance(self.source.type, types.TVocabulary):
             raise SpaTypeError(
                 "Cannot reinterpret '{}' because it is not of type "
                 "TVocabulary, but {}.".format(self.source, self.source.type))
@@ -851,13 +795,13 @@ class Translate(Source):
             self.vocab.infer_types(None)
             self.type = self.vocab.type
         else:
-            self.type = TVocabulary(self.vocab)
-        if not isinstance(self.type, TVocabulary):
+            self.type = types.TVocabulary(self.vocab)
+        if not isinstance(self.type, types.TVocabulary):
             raise SpaTypeError(
                 "Cannot infer vocabulary for '{}'.".format(self))
 
         self.source.infer_types(None)
-        if not isinstance(self.source.type, TVocabulary):
+        if not isinstance(self.source.type, types.TVocabulary):
             raise SpaTypeError(
                 "Cannot translate '{}' because it is not of type "
                 "TVocabulary, but {}.".format(self.source, self.source.type))
@@ -897,7 +841,7 @@ class Effect(Node):
     def __init__(self, sink, source, channeled=False):
         source = as_node(source)
         super(Effect, self).__init__(staticity=source.staticity)
-        self.type = TEffect
+        self.type = types.TEffect
         self.sink = as_node(sink, as_sink=True)
         self.source = as_node(source)
         self.channeled = channeled
@@ -957,7 +901,7 @@ class Effects(Node):
     def __init__(self, effects, name=None):
         super(Effects, self).__init__(
             staticity=max(e.staticity for e in effects))
-        self.type = TEffects
+        self.type = types.TEffects
         self.effects = effects
         self.name = name
 
@@ -999,7 +943,7 @@ class Action(Node):
 
     def __init__(self, condition, effects, index=0, name=None):
         super(Action, self).__init__(staticity=Node.Staticity.DYNAMIC)
-        self.type = TAction
+        self.type = types.TAction
         self.index = index
         self.condition = as_node(condition)
         self.effects = as_node(effects)
@@ -1013,7 +957,7 @@ class Action(Node):
     def infer_types(self, context_type):
         if isinstance(self.condition, Node):
             self.condition.infer_types(context_type)
-            if self.condition.type != TScalar:
+            if self.condition.type != types.TScalar:
                 raise SpaTypeError(
                     "Condition '{}' does not evaluate to a scalar.".format(
                         self.condition))
@@ -1086,7 +1030,7 @@ class ActionSet(Node):
 
     def __init__(self, actions):
         super(ActionSet, self).__init__(staticity=Node.Staticity.DYNAMIC)
-        self.type = TActionSet
+        self.type = types.TActionSet
         self.actions = actions
         self.bg = None
         self.thalamus = None
@@ -1227,7 +1171,7 @@ def infer_vocab(*nodes):
     for node in nodes:
         try:
             node.infer_types(None)
-            if isinstance(node.type, TVocabulary):
+            if isinstance(node.type, types.TVocabulary):
                 return node.type
         except SpaTypeError:
             pass
