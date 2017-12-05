@@ -97,7 +97,7 @@ class ModuleOutput(object):
         nengo.Connection(self.output, sink)
 
     def __invert__(self):
-        # FIXME alternate binding operators, explicit outputs
+        # FIXME alternate binding operators
         vocab = self.vocab
         transform = np.eye(vocab.dimensions)[-np.arange(vocab.dimensions)]
         return Transformed(self.output, transform, vocab)
@@ -124,31 +124,6 @@ class ModuleOutput(object):
         self.connect_to(mul.input_a)
         other.connect_to(mul.input_b)
         return ModuleOutput(mul.output, self.vocab)
-
-
-class SpaOperatorMixin(object):
-    @staticmethod
-    def __define_unary_op(op):
-        def op_impl(self):
-            vocab = output_vocab_registry[self.output]
-            return getattr(ModuleOutput(self.output, vocab), op)()
-        return op_impl
-
-    @staticmethod
-    def __define_binary_op(op):
-        def op_impl(self, other):
-            vocab_self = output_vocab_registry[self.output]
-            vocab_other = output_vocab_registry[other.output]
-            return getattr(ModuleOutput(self.output, vocab_self), op)(
-                ModuleOutput(other.output, vocab_other))
-        return op_impl
-
-    __invert__ = __define_unary_op.__func__('__invert__')
-    __neg__ = __define_unary_op.__func__('__neg__')
-
-    __add__ = __define_binary_op.__func__('__add__')
-    __sub__ = __define_binary_op.__func__('__sub__')
-    __mul__ = __define_binary_op.__func__('__mul__')
 
 
 # class Transformed(object):

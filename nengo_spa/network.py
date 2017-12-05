@@ -4,7 +4,7 @@ import numpy as np
 
 from nengo_spa.ast2 import (
     input_network_registry, input_vocab_registry, output_vocab_registry,
-    SpaOperatorMixin)
+    ModuleOutput)
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
 
@@ -19,6 +19,34 @@ class _AutoConfig(object):
         if inspect.isclass(key) and key not in self._cfg.params:
             self._cfg.configures(key)
         return self._cfg[key]
+
+
+def as_module_output(output):
+    if isinstance(output, Network):
+        output = output.output
+    vocab = output_vocab_registry[output]
+    return ModuleOutput(output, vocab)
+
+
+class SpaOperatorMixin(object):
+    @staticmethod
+    def __define_unary_op(op):
+        def op_impl(self):
+            return getattr(as_module_output(self), op)()
+        return op_impl
+
+    @staticmethod
+    def __define_binary_op(op):
+        def op_impl(self, other):
+            return getattr(as_module_output(self), op)(as_module_output(other))
+        return op_impl
+
+    __invert__ = __define_unary_op.__func__('__invert__')
+    __neg__ = __define_unary_op.__func__('__neg__')
+
+    __add__ = __define_binary_op.__func__('__add__')
+    __sub__ = __define_binary_op.__func__('__sub__')
+    __mul__ = __define_binary_op.__func__('__mul__')
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
