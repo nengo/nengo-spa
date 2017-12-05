@@ -2,7 +2,7 @@ import nengo
 from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
-from nengo_spa.ast import (
+from nengo_spa.ast2 import (
     input_network_registry, input_vocab_registry, output_vocab_registry,
     SpaOperatorMixin)
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
