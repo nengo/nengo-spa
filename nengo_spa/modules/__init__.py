@@ -27,6 +27,7 @@ from .state import State
 from .thalamus import Thalamus
 from .transcode import Transcode
 from nengo_spa import ast
+from nengo_spa import ast2
 
 
 def register_default_modules():
@@ -35,6 +36,9 @@ def register_default_modules():
     ast.Product.ProductRealization = Product
     ast.ActionSet.BasalGangliaRealization = BasalGanglia
     ast.ActionSet.ThalamusRealization = Thalamus
+
+    ast2.BindRealization = Bind
+    ast2.ProductRealization = Product
 
 
 register_default_modules()

@@ -1,8 +1,10 @@
+import nengo
 from numpy.testing import assert_equal
 import pytest
 
 import nengo_spa as spa
 from nengo_spa.ast2 import FixedPointer
+from nengo_spa.testing import sp_close
 
 
 def test_fixed_pointer_network_creation(rng):
@@ -16,7 +18,7 @@ def test_fixed_pointer_network_creation(rng):
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
-def test_unary_operations_on_fixed_pointer(op, rng):
+def test_unary_operation_on_fixed_pointer(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
@@ -37,9 +39,45 @@ def test_binary_operation_on_fixed_pointers(op, rng):
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
 
 
+@pytest.mark.parametrize('op', ['-', '~'])
+def test_unary_operation_on_network(Simulator, op, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A')
+
+    with spa.Network() as model:
+        stimulus = spa.Transcode('A', output_vocab=vocab)
+        x = eval(op + 'stimulus')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], vocab.parse(op + 'A'), skip=0.3)
+
+
+@pytest.mark.parametrize('op', ['+', '-', '*'])
+def test_binary_operation_on_networks(Simulator, op, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        b = spa.Transcode('B', output_vocab=vocab)
+        x = eval('a' + op + 'b')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.3)
+
+
+# network and network (using default in/out, specified in/out)
 # transform
 # transform and fixed pointer
-# network
 # network and transform
 # network and fixed pointer
+# transform and transform
 # assignment
+# product of scalars
