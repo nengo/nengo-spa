@@ -40,13 +40,14 @@ def test_binary_operation_on_fixed_pointers(op, rng):
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
-def test_unary_operation_on_network(Simulator, op, rng):
+@pytest.mark.parametrize('suffix', ['', '.output'])
+def test_unary_operation_on_network(Simulator, op, suffix, rng):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
         stimulus = spa.Transcode('A', output_vocab=vocab)
-        x = eval(op + 'stimulus')
+        x = eval(op + 'stimulus' + suffix)
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
@@ -56,14 +57,15 @@ def test_unary_operation_on_network(Simulator, op, rng):
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
-def test_binary_operation_on_networks(Simulator, op, rng):
+@pytest.mark.parametrize('suffix', ['', '.output'])
+def test_binary_operation_on_networks(Simulator, op, suffix, rng):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
         b = spa.Transcode('B', output_vocab=vocab)
-        x = eval('a' + op + 'b')
+        x = eval('a' + suffix + op + 'b' + suffix)
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
