@@ -1,5 +1,5 @@
 import nengo
-from numpy.testing import assert_equal
+from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
@@ -73,6 +73,23 @@ def test_binary_operation_on_networks(Simulator, op, suffix, rng):
 
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.3)
+
+
+def test_product_of_scalars(Simulator):
+    with spa.Network() as model:
+        stimulus = nengo.Node(0.5)
+        a = spa.Scalar()
+        b = spa.Scalar()
+        nengo.Connection(stimulus, a.input)
+        nengo.Connection(stimulus, b.input)
+        x = a * b
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert_allclose(sim.data[p][sim.trange() > 0.3], .25, atol=0.2)
+
 
 
 # network and network (using default in/out, specified in/out)
