@@ -124,9 +124,3 @@ class ModuleOutput(object):
         self.connect_to(mul.input_a)
         other.connect_to(mul.input_b)
         return ModuleOutput(mul.output, self.vocab)
-
-
-# class Transformed(object):
-    # def __init__(self, sources, transform):
-        # self.sources = sources
-        # self.transform = transform
