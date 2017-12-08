@@ -84,7 +84,7 @@ class FixedPointer(FixedNode):
         self._expr = expr
 
     def infer_types(self, type_):
-        if self.type == TInferVocab:
+        if self.type == TInferVocab and isinstance(type_, TVocabulary):
             self.type = type_
 
     def connect_to(self, sink):
@@ -108,7 +108,7 @@ class FixedPointer(FixedNode):
 
     def __add__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedNode):
+        if not isinstance(other, FixedPointer):
             return NotImplemented
         type_ = coerce_types(self.type, other.type)
         return FixedPointer(self.expr + '+' + other.expr, type_)
@@ -118,7 +118,7 @@ class FixedPointer(FixedNode):
 
     def __sub__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedNode):
+        if not isinstance(other, FixedPointer):
             return NotImplemented
         type_ = coerce_types(self.type, other.type)
         return FixedPointer(self.expr + '-' + other.expr, type_)
@@ -156,27 +156,44 @@ class DynamicNode(Node):
 
     def __add__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         other.infer_types(self.type)
         type_ = coerce_types(self.type, other.type)
         return Summed((self, other), type_)
 
     def __radd__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         return self + other
 
     def __sub__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         return self + (-other)
 
     def __rsub__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         return (-self) + other
 
     def _mul_with_fixed(self, other):
         if other.type == TScalar:
             tr = other.value
+        elif other.type == TInferVocab:
+            raise SpaTypeError(
+                "Cannot infer vocabulary for fixed pointer when multiplying "
+                "with scalar.")
+        elif isinstance(other.type, TVocabulary):
+            if self.type == TScalar:
+                tr = other.evaluate().v
+            else:
+                tr = other.evaluate().get_convolution_matrix()
         else:
-            tr = other.evaluate().get_convolution_matrix()
+            raise AssertionError("Unexpected node type in multiply.")
         return Transformed(self.construct(), tr, self.type)
 
     def _mul_with_dynamic(self, other, swap_inputs=False):
@@ -200,6 +217,8 @@ class DynamicNode(Node):
 
     def __mul__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
@@ -209,6 +228,8 @@ class DynamicNode(Node):
 
     def __rmul__(self, other):
         other = as_node(other)
+        if not isinstance(other, Node):
+            return NotImplemented
         other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
@@ -239,8 +260,10 @@ class Summed(DynamicNode):
         self.sources = sources
 
     def infer_types(self, type_):
+        # FIXME type propagation?
+        super(Summed, self).infer_types(type_)
         for s in self.sources:
-            s.infer_types(type_)
+            s.infer_types(self.type)
 
     def connect_to(self, sink):
         for s in self.sources:
