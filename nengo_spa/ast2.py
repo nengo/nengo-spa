@@ -172,58 +172,49 @@ class DynamicNode(Node):
         other = as_node(other)
         return (-self) + other
 
+    def _mul_with_fixed(self, other):
+        if other.type == TScalar:
+            tr = other.value
+        else:
+            tr = other.evaluate().get_convolution_matrix()
+        return Transformed(self.construct(), tr, self.type)
+
+    def _mul_with_dynamic(self, other, swap_inputs=False):
+        if self.type == TScalar and other.type == TScalar:
+            mul = ProductRealization()
+        elif self.type == other.type:
+            mul = BindRealization(self.type.vocab)
+        elif self.type == TScalar or other.type == TScalar:
+            raise NotImplementedError(
+                "Dynamic scaling of semantic pointer not implemented.")
+        else:
+            raise SpaTypeError("Vocabulary mismmatch.")
+
+        if swap_inputs:
+            a, b = other, self
+        else:
+            a, b = self, other
+        a.connect_to(mul.input_a)
+        b.connect_to(mul.input_b)
+        return ModuleOutput(mul.output, self.type)
+
     def __mul__(self, other):
         other = as_node(other)
         other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
-            # FIXME check AST type or instance type?
-            if other.type == TScalar:
-                tr = other.value
-            else:
-                tr = other.evaluate().get_convolution_matrix()
-            return Transformed(self.construct(), tr, self.type)
+            return self._mul_with_fixed(other)
         else:
-            if self.type == TScalar and other.type == TScalar:
-                mul = ProductRealization()
-            elif self.type == other.type:
-                mul = BindRealization(self.type.vocab)
-            elif self.type == TScalar or other.type == TScalar:
-                raise NotImplementedError(
-                    "Dynamic scaling of semantic pointer not implemented.")
-            else:
-                raise SpaTypeError("Vocabulary mismmatch.")
-
-            self.connect_to(mul.input_a)
-            other.connect_to(mul.input_b)
-            return ModuleOutput(mul.output, self.type)
+            return self._mul_with_dynamic(other)
 
     def __rmul__(self, other):
         other = as_node(other)
         other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
-            # FIXME check AST type or instance type?
-            if other.type == TScalar:
-                tr = other.value
-            else:
-                tr = other.evaluate().get_convolution_matrix()
-            return Transformed(self.construct(), tr, self.type)
+            return self._mul_with_fixed(other)
         else:
-            if self.type == TScalar and other.type == TScalar:
-                mul = ProductRealization()
-            elif self.type == other.type:
-                mul = BindRealization(self.type.vocab)
-            elif self.type == TScalar or other.type == TScalar:
-                print(self, other, self.type, other.type)
-                raise NotImplementedError(
-                    "Dynamic scaling of semantic pointer not implemented.")
-            else:
-                raise SpaTypeError("Vocabulary mismmatch.")
-
-            other.connect_to(mul.input_a)
-            self.connect_to(mul.input_b)
-            return ModuleOutput(mul.output, self.type)
+            return self._mul_with_dynamic(other, swap_inputs=True)
 
 
 class Transformed(DynamicNode):
