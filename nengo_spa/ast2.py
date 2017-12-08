@@ -5,7 +5,7 @@ from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TScalar, TVocabulary
+from nengo_spa.types import TInferVocab, TScalar, TVocabulary
 
 
 input_network_registry = weakref.WeakKeyDictionary()
@@ -27,7 +27,7 @@ def coerce_types(*types):
         else:
             raise SpaTypeError("Vocabulary mismatch.")
     else:
-        return None
+        return TInferVocab
 
 
 def as_node(obj):
@@ -37,7 +37,7 @@ def as_node(obj):
 
 
 class Node(object):
-    def __init__(self, type_=None):
+    def __init__(self, type_):
         self.type = type_
 
     def infer_types(self, context_type):
@@ -79,12 +79,12 @@ class FixedScalar(FixedNode):
 
 
 class FixedPointer(FixedNode):
-    def __init__(self, expr, type_=None):
+    def __init__(self, expr, type_=TInferVocab):
         super(FixedPointer, self).__init__(type_=type_)
         self._expr = expr
 
     def infer_types(self, type_):
-        if self.type is None:
+        if self.type == TInferVocab:
             self.type = type_
 
     def connect_to(self, sink):
