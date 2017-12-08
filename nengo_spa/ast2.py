@@ -1,9 +1,11 @@
 import weakref
 
 import nengo
+from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.types import TScalar, TVocabulary
 
 
 input_network_registry = weakref.WeakKeyDictionary()
@@ -14,10 +16,14 @@ BindRealization = None
 ProductRealization = None
 
 
-def coerce_vocabs(*vocabs):
-    defined = [v for v in vocabs if v is not None]
+# TODO test
+def coerce_types(*types):
+    if all(t == TScalar for t in types):
+        return TScalar
+
+    defined = [t for t in types if isinstance(t, TVocabulary)]
     if len(defined) > 0:
-        if all(v is defined[0] for v in defined):
+        if all(t == defined[0] for t in defined):
             return defined[0]
         else:
             raise SpaTypeError("Vocabulary mismatch.")
@@ -25,145 +31,256 @@ def coerce_vocabs(*vocabs):
         return None
 
 
+def as_node(obj):
+    if is_number(obj):
+        obj = Scalar(obj)
+    return obj
+
+
 class Node(object):
-    def infer_vocab(self, vocab):
+    class Staticity:
+        """Valid staticity values.
+
+        * ``FIXED``: Value of the node is static, i.e. does not change over
+          time.
+        * ``TRANSFORM_ONLY``: Value of the node changes over time, but can be
+          implemented with a transform on existing neural resources.
+        * ``DYNAMIC``: Value of the node is fully dynamic and needs additional
+          neural resources to be implemented.
+        """
+        FIXED = 0
+        TRANSFORM_ONLY = 1
+        DYNAMIC = 2
+
+    def __init__(self, staticity):
+        self.staticity = staticity
+        self.type = None
+
+    @property
+    def fixed(self):
+        """Indicates whether the node value is static.
+
+        A static node value does not change over time.
+        """
+        return self.staticity <= self.Staticity.FIXED
+
+    def infer_types(self, context_type):
         pass
 
+    def connect_to(self, sink):
+        raise NotImplementedError()
 
-class FixedPointer(Node):
-    def __init__(self, expr, vocab=None):
-        self.expr = expr
-        self.vocab = vocab
+    def construct(self):
+        raise NotImplementedError()
 
-    def infer_vocab(self, vocab):
-        if self.vocab is None:
-            self.vocab = vocab
+
+class Scalar(Node):
+    def __init__(self, value):
+        super(Scalar, self).__init__(self.Staticity.FIXED)
+        self.value = value
+        self.type = TScalar
+
+    @property
+    def expr(self):
+        return repr(self.value)
 
     def connect_to(self, sink):
         return nengo.Connection(self.construct(), sink)
 
     def construct(self):
-        return nengo.Node(self.vocab.parse(self.expr).v, label=self.expr)
+        return nengo.Node(self.value, label=str(self.value))
+
+
+class FixedPointer(Node):
+    def __init__(self, expr, type_=None):
+        super(FixedPointer, self).__init__(self.Staticity.FIXED)
+        self.expr = expr
+        self.type = type_
+
+    def infer_types(self, type_):
+        if self.type is None:
+            self.type = type_
+
+    def evaluate(self):
+        return self.type.vocab.parse(self.expr)
+
+    def connect_to(self, sink):
+        return nengo.Connection(self.construct(), sink)
+
+    def construct(self):
+        return nengo.Node(self.evaluate().v, label=self.expr)
 
     def __invert__(self):
-        return FixedPointer('~' + self.expr, self.vocab)
+        return FixedPointer('~' + self.expr, self.type)
 
     def __neg__(self):
-        return FixedPointer('-' + self.expr, self.vocab)
+        return FixedPointer('-' + self.expr, self.type)
 
     def __add__(self, other):
-        if not isinstance(other, FixedPointer):
+        other = as_node(other)
+        if not isinstance(other, (FixedPointer, Scalar)):
             return NotImplemented
-        vocab = coerce_vocabs(self.vocab, other.vocab)
-        return FixedPointer(self.expr + '+' + other.expr, vocab)
-
-    def __sub__(self, other):
-        if not isinstance(other, FixedPointer):
-            return NotImplemented
-        vocab = coerce_vocabs(self.vocab, other.vocab)
-        return FixedPointer(self.expr + '-' + other.expr, vocab)
-
-    def __mul__(self, other):
-        if not isinstance(other, FixedPointer):
-            return NotImplemented
-        vocab = coerce_vocabs(self.vocab, other.vocab)
-        return FixedPointer(self.expr + '*' + other.expr, vocab)
-
-
-class DynamicNode(Node):
-    def __invert__(self):
-        # FIXME alternate binding operators
-        vocab = self.vocab
-        transform = np.eye(vocab.dimensions)[-np.arange(vocab.dimensions)]
-        return Transformed(self.output, transform, vocab)
-
-    def __neg__(self):
-        return Transformed(self.output, transform=-1, vocab=self.vocab)
-
-    def __add__(self, other):
-        other.infer_vocab(self.vocab)
-        vocab = coerce_vocabs(self.vocab, other.vocab)
-        return Summed((self, other), vocab)
+        type_ = coerce_types(self.type, other.type)
+        return FixedPointer(self.expr + '+' + other.expr, type_)
 
     def __radd__(self, other):
         return self + other
 
     def __sub__(self, other):
-        return self + (-other)
+        other = as_node(other)
+        if not isinstance(other, (FixedPointer, Scalar)):
+            return NotImplemented
+        type_ = coerce_types(self.type, other.type)
+        return FixedPointer(self.expr + '-' + other.expr, type_)
 
     def __rsub__(self, other):
         return (-self) + other
 
     def __mul__(self, other):
-        other.infer_vocab(self.vocab)
-
-        if self.vocab is None and other.vocab is None:
-            mul = ProductRealization()
-        elif self.vocab is other.vocab:
-            mul = BindRealization(self.vocab)
-        else:
-            raise NotImplementedError(
-                "Dynamic scaling of semantic pointer not implemented.")
-
-        self.connect_to(mul.input_a)
-        other.connect_to(mul.input_b)
-        return ModuleOutput(mul.output, self.vocab)
+        other = as_node(other)
+        if not isinstance(other, (FixedPointer, Scalar)):
+            return NotImplemented
+        type_ = coerce_types(self.type, other.type)
+        return FixedPointer(self.expr + '*' + other.expr, type_)
 
     def __rmul__(self, other):
-        other.infer_vocab(self.vocab)
+        other = as_node(other)
+        if not isinstance(other, (FixedPointer, Scalar)):
+            return NotImplemented
+        type_ = coerce_types(self.type, other.type)
+        return FixedPointer(other.expr + '*' + self.expr, type_)
 
-        if self.vocab is None and other.vocab is None:
-            mul = ProductRealization()
-        elif self.vocab is other.vocab:
-            mul = BindRealization(self.vocab)
+    def __repr__(self):
+        return "FixedPointer({!r}, {!r})".format(self.expr, self.type_)
+
+
+class DynamicNode(Node):
+    def __init__(self):
+        super(DynamicNode, self).__init__(self.Staticity.DYNAMIC)
+
+    def __invert__(self):
+        # FIXME alternate binding operators
+        vocab = self.type.vocab
+        transform = np.eye(vocab.dimensions)[-np.arange(vocab.dimensions)]
+        return Transformed(self.output, transform, self.type)
+
+    def __neg__(self):
+        return Transformed(self.output, transform=-1, type_=self.type)
+
+    def __add__(self, other):
+        other = as_node(other)
+        other.infer_types(self.type)
+        type_ = coerce_types(self.type, other.type)
+        return Summed((self, other), type_)
+
+    def __radd__(self, other):
+        other = as_node(other)
+        return self + other
+
+    def __sub__(self, other):
+        other = as_node(other)
+        return self + (-other)
+
+    def __rsub__(self, other):
+        other = as_node(other)
+        return (-self) + other
+
+    def __mul__(self, other):
+        other = as_node(other)
+        other.infer_types(self.type)
+
+        if other.fixed:
+            # FIXME check AST type or instance type?
+            if other.type == TScalar:
+                tr = other.value
+            else:
+                tr = other.evaluate().get_convolution_matrix()
+            return Transformed(self.construct(), tr, self.type)
         else:
-            raise NotImplementedError(
-                "Dynamic scaling of semantic pointer not implemented.")
+            if self.type == TScalar and other.type == TScalar:
+                mul = ProductRealization()
+            elif self.type == other.type:
+                mul = BindRealization(self.type.vocab)
+            elif self.type == TScalar or other.type == TScalar:
+                raise NotImplementedError(
+                    "Dynamic scaling of semantic pointer not implemented.")
+            else:
+                raise SpaTypeError("Vocabulary mismmatch.")
 
-        other.connect_to(mul.input_a)
-        self.connect_to(mul.input_b)
-        return ModuleOutput(mul.output, self.vocab)
+            self.connect_to(mul.input_a)
+            other.connect_to(mul.input_b)
+            return ModuleOutput(mul.output, self.type)
+
+    def __rmul__(self, other):
+        other = as_node(other)
+        other.infer_types(self.type)
+
+        if other.fixed:
+            # FIXME check AST type or instance type?
+            if other.type == TScalar:
+                tr = other.value
+            else:
+                tr = other.evaluate().get_convolution_matrix()
+            return Transformed(self.construct(), tr, self.type)
+        else:
+            if self.type == TScalar and other.type == TScalar:
+                mul = ProductRealization()
+            elif self.type == other.type:
+                mul = BindRealization(self.type.vocab)
+            elif self.type == TScalar or other.type == TScalar:
+                print(self, other, self.type, other.type)
+                raise NotImplementedError(
+                    "Dynamic scaling of semantic pointer not implemented.")
+            else:
+                raise SpaTypeError("Vocabulary mismmatch.")
+
+            other.connect_to(mul.input_a)
+            self.connect_to(mul.input_b)
+            return ModuleOutput(mul.output, self.type)
 
 
 class Transformed(DynamicNode):
-    def __init__(self, source, transform, vocab):
+    def __init__(self, source, transform, type_):
+        super(Transformed, self).__init__()
         self.source = source
         self.transform = transform
-        self.vocab = vocab
+        self.type = type_
 
     def connect_to(self, sink):
         # FIXME connection params
         return nengo.Connection(self.source, sink, transform=self.transform)
 
     def construct(self):
-        node = nengo.Node(size_in=self.vocab.dimensions)
+        node = nengo.Node(size_in=self.type.vocab.dimensions)
         self.connect_to(node)
         return node
 
 
 class Summed(DynamicNode):
-    def __init__(self, sources, vocab):
+    def __init__(self, sources, type_):
+        super(Summed, self).__init__()
         self.sources = sources
-        self.vocab = vocab
+        self.type = type_
 
-    def infer_vocab(self, vocab):
+    def infer_types(self, type_):
         for s in self.sources:
-            s.infer_vocab(vocab)
+            s.infer_types(type_)
 
     def connect_to(self, sink):
         for s in self.sources:
             s.connect_to(sink)
 
     def construct(self):
-        node = nengo.Node(size_in=self.vocab.dimensions)
+        node = nengo.Node(size_in=self.type.vocab.dimensions)
         self.connect_to(node)
         return node
 
 
 class ModuleOutput(DynamicNode):
-    def __init__(self, output, vocab):
+    def __init__(self, output, type_):
+        super(ModuleOutput, self).__init__()
         self.output = output
-        self.vocab = vocab
+        self.type = type_
 
     def construct(self):
         return self.output
