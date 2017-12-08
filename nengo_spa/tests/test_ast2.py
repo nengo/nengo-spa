@@ -1,5 +1,4 @@
 import nengo
-import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
@@ -60,6 +59,27 @@ def test_binary_operation_on_fixed_pointers(op, rng):
         x.infer_types(TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
+
+
+def test_multiply_fixed_scalar_and_fixed_pointer(rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A')
+
+    with spa.Network() as model:
+        x = 2 * FixedPointer('A')
+        x.infer_types(TVocabulary(vocab))
+        node = x.construct()
+    assert_equal(node.output, vocab.parse('2 * A').v)
+
+
+@pytest.mark.parametrize('op', ['+', '-'])
+def test_additive_op_fixed_scalar_and_fixed_pointer(op, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A')
+
+    with spa.Network() as model:
+        with pytest.raises(TypeError):
+            eval("2" + op + "FixedPointer('A')")
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
@@ -155,19 +175,88 @@ def test_complex_rule(Simulator, rng):
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(),
-        sim.data[p] / np.maximum(
-            1e-10, np.linalg.norm(sim.data[p], axis=1, keepdims=True)),
-        vocab.parse(
-            '(0.5 * C * A + 0.5 * D) * (0.5 * B + 0.5 * A)').normalized(),
-        skip=0.3)
+        sim.trange(), sim.data[p],
+        vocab.parse('(0.5 * C * A + 0.5 * D) * (0.5 * B + 0.5 * A)'),
+        skip=0.3, normalized=True)
 
 
-# transform
-# transform and fixed pointer
-# network and transform
-# transform and transform
-# scalar with FixedPointer
-# assignment
-# sums get collapsed
+def test_transformed(Simulator, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        x = FixedPointer('B') * a
+        p = nengo.Probe(x.construct(), synapse=0.3)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('B*A'), skip=0.3,
+        normalized=True)
+
+
+def test_transformed_and_fixed_pointer(Simulator, rng, plt):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        x = FixedPointer('~B') * (FixedPointer('B') * a)
+        p = nengo.Probe(x.construct(), synapse=0.3)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('~B * B * A'), skip=0.3,
+        normalized=True)
+
+
+def test_transformed_and_network(Simulator, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B.unitary()')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        b = spa.Transcode('B', output_vocab=vocab)
+        x = b * (FixedPointer('~B') * a)
+        p = nengo.Probe(x.construct(), synapse=0.3)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('B * ~B * A'), skip=0.3,
+        normalized=True)
+
+
+def test_transformed_and_transformed(Simulator, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B.unitary(); C')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        c = spa.Transcode('C', output_vocab=vocab)
+        x = (FixedPointer('B') * a) * (FixedPointer('~B') * c)
+        p = nengo.Probe(x.construct(), synapse=0.3)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('B * A * ~B * C'), skip=0.3,
+        normalized=True)
+
+
+def test_fixed_pointer_with_dynamic_scalar(Simulator, rng):
+    with spa.Network() as model:
+        scalar = spa.Scalar()
+        with pytest.raises(SpaTypeError):
+            FixedPointer('A') * scalar
+
+
 # identity and zero
+# assignment
+# action selection
