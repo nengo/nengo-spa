@@ -25,9 +25,10 @@ class Type(object):
 
 TAction = Type('TAction')
 TActionSet = Type('TActionSet')
-TScalar = Type('TScalar')
 TEffect = Type('TEffect')
 TEffects = Type('TEffects')
+TInferVocab = Type('TInferVocab')
+TScalar = Type('TScalar')
 
 
 class TVocabulary(Type):
