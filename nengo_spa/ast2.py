@@ -16,7 +16,6 @@ BindRealization = None
 ProductRealization = None
 
 
-# TODO test
 def coerce_types(*types):
     if all(t == TScalar for t in types):
         return TScalar

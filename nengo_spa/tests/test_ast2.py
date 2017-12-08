@@ -4,9 +4,27 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.ast2 import FixedPointer
+from nengo_spa.ast2 import coerce_types, FixedPointer
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.testing import sp_close
-from nengo_spa.types import TVocabulary
+from nengo_spa.types import TScalar, TVocabulary
+
+
+def test_coercion():
+    v1 = TVocabulary(spa.Vocabulary(16))
+    v2 = TVocabulary(spa.Vocabulary(16))
+
+    assert coerce_types(None, None) is None
+    assert coerce_types(None, TScalar) is None
+    assert coerce_types(None, v1) == v1
+    assert coerce_types(TScalar, TScalar) == TScalar
+    assert coerce_types(TScalar, TScalar, TScalar) == TScalar
+    assert coerce_types(TScalar, v1) == v1
+    assert coerce_types(v1, v1) == v1
+    assert coerce_types(None, v1, TScalar) == v1
+    assert coerce_types(TScalar, TScalar, v1, TScalar, v1) == v1
+    with pytest.raises(SpaTypeError):
+        coerce_types(v1, v2)
 
 
 def test_fixed_pointer_network_creation(rng):
