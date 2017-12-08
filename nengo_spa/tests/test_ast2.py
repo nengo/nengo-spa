@@ -1,10 +1,12 @@
 import nengo
+import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
 from nengo_spa.ast2 import FixedPointer
 from nengo_spa.testing import sp_close
+from nengo_spa.types import TVocabulary
 
 
 def test_fixed_pointer_network_creation(rng):
@@ -13,7 +15,7 @@ def test_fixed_pointer_network_creation(rng):
 
     with spa.Network() as model:
         A = FixedPointer('A')
-        A.infer_vocab(vocab)
+        A.infer_types(TVocabulary(vocab))
         node = A.construct()
     assert_equal(node.output, vocab['A'].v)
 
@@ -25,7 +27,7 @@ def test_unary_operation_on_fixed_pointer(op, rng):
 
     with spa.Network() as model:
         x = eval(op + "FixedPointer('A')")
-        x.infer_vocab(vocab)
+        x.infer_types(TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse(op + 'A').v)
 
@@ -37,7 +39,7 @@ def test_binary_operation_on_fixed_pointers(op, rng):
 
     with spa.Network() as model:
         x = eval("FixedPointer('A')" + op + "FixedPointer('B')")
-        x.infer_vocab(vocab)
+        x.infer_types(TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
 
@@ -119,10 +121,35 @@ def test_binary_operation_on_modules_with_fixed_pointer(
         skip=0.3)
 
 
-# network and fixed pointer
+def test_complex_rule(Simulator, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B; C; D')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        b = spa.Transcode('B', output_vocab=vocab)
+
+        x = (0.5 * FixedPointer('C') * a + 0.5 * FixedPointer('D')) * (
+            0.5 * b + a * 0.5)
+        p = nengo.Probe(x.construct(), synapse=0.3)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(),
+        sim.data[p] / np.maximum(
+            1e-10, np.linalg.norm(sim.data[p], axis=1, keepdims=True)),
+        vocab.parse(
+            '(0.5 * C * A + 0.5 * D) * (0.5 * B + 0.5 * A)').normalized(),
+        skip=0.3)
+
+
 # transform
 # transform and fixed pointer
 # network and transform
 # transform and transform
+# scalar with FixedPointer
 # assignment
-# product of scalars
+# sums get collapsed
+# identity and zero

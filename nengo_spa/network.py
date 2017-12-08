@@ -3,8 +3,9 @@ from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
 from nengo_spa.ast2 import (
-    input_network_registry, input_vocab_registry, output_vocab_registry,
-    ModuleOutput, Node)
+    as_node, input_network_registry, input_vocab_registry,
+    output_vocab_registry, ModuleOutput, Node)
+from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
 
@@ -22,6 +23,7 @@ class _AutoConfig(object):
 
 
 def as_ast_node(obj):
+    obj = as_node(obj)
     if isinstance(obj, Node):
         return obj
     if isinstance(obj, Network):
@@ -29,7 +31,10 @@ def as_ast_node(obj):
     else:
         output = obj
     vocab = output_vocab_registry[output]
-    return ModuleOutput(output, vocab)
+    if vocab is None:
+        return ModuleOutput(output, TScalar)
+    else:
+        return ModuleOutput(output, TVocabulary(vocab))
 
 
 class SpaOperatorMixin(object):
