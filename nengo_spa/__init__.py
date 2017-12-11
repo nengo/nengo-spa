@@ -2,10 +2,10 @@ from nengo_spa import version
 
 from nengo_spa.actions import Actions
 from nengo_spa.ast import route, ifmax
-from nengo_spa.ast import DotProduct as dot
 from nengo_spa.ast import Reinterpret as reinterpret
 from nengo_spa.ast import Translate as translate
 from nengo_spa.ast import Symbol as sym
+from nengo_spa.builtins import dot
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
     AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,

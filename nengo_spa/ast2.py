@@ -12,6 +12,7 @@ input_network_registry = weakref.WeakKeyDictionary()
 input_vocab_registry = weakref.WeakKeyDictionary()
 output_vocab_registry = weakref.WeakKeyDictionary()
 
+DotProductRealization = None
 BindRealization = None
 ProductRealization = None
 
@@ -141,6 +142,16 @@ class FixedPointer(FixedNode):
         type_ = infer_types(self, other)
         return FixedPointer(other.expr + '*' + self.expr, type_)
 
+    def dot(self, other):
+        other = as_node(other)
+        if not isinstance(other, FixedPointer):
+            raise NotImplementedError()
+        type_ = infer_types(self, other)
+        return FixedScalar(self.evaluate().dot(other.evaluate()))
+
+    def rdot(self, other):
+        return self.dot(other)
+
     def __repr__(self):
         return "FixedPointer({!r}, {!r})".format(self.expr, self.type_)
 
@@ -235,6 +246,27 @@ class DynamicNode(Node):
         else:
             return self._mul_with_dynamic(other, swap_inputs=True)
 
+    def dot(self, other):
+        other = as_node(other)
+        if not isinstance(other, Node):
+            raise NotImplementedError()
+        type_ = infer_types(self, other)
+
+        if self.type == TScalar or other.type == TScalar:
+            raise NotImplementedError()  # FIXME better error?
+
+        if isinstance(other, FixedPointer):
+            tr = np.atleast_2d(other.evaluate().v)
+            return Transformed(self.construct(), tr, TScalar)
+        else:
+            net = DotProductRealization(type_.vocab)
+            self.connect_to(net.input_a)
+            other.connect_to(net.input_b)
+            return ModuleOutput(net.output, TScalar)
+
+    def rdot(self, other):
+        return self.dot(other)
+
 
 class Transformed(DynamicNode):
     def __init__(self, source, transform, type_):
@@ -247,7 +279,11 @@ class Transformed(DynamicNode):
         return nengo.Connection(self.source, sink, transform=self.transform)
 
     def construct(self):
-        node = nengo.Node(size_in=self.type.vocab.dimensions)
+        if self.type == TScalar:
+            size_in = 1
+        else:
+            size_in = self.type.vocab.dimenisons
+        node = nengo.Node(size_in=size_in)
         self.connect_to(node)
         return node
 

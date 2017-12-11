@@ -38,6 +38,7 @@ def register_default_modules():
     ast.ActionSet.ThalamusRealization = Thalamus
 
     ast2.BindRealization = Bind
+    ast2.DotProductRealization = Compare
     ast2.ProductRealization = Product
 
 
