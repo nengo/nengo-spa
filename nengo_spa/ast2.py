@@ -30,6 +30,14 @@ def coerce_types(*types):
         return TInferVocab
 
 
+def infer_types(*nodes):
+    type_ = coerce_types(*[n.type for n in nodes])
+    if isinstance(type_, TVocabulary):
+        for n in (n for n in nodes if n.type == TInferVocab):
+            n.type = type_
+    return type_
+
+
 def as_node(obj):
     if is_number(obj):
         obj = FixedScalar(obj)
@@ -39,9 +47,6 @@ def as_node(obj):
 class Node(object):
     def __init__(self, type_):
         self.type = type_
-
-    def infer_types(self, context_type):
-        pass
 
     def connect_to(self, sink):
         raise NotImplementedError()
@@ -83,10 +88,6 @@ class FixedPointer(FixedNode):
         super(FixedPointer, self).__init__(type_=type_)
         self._expr = expr
 
-    def infer_types(self, type_):
-        if self.type == TInferVocab and isinstance(type_, TVocabulary):
-            self.type = type_
-
     def connect_to(self, sink):
         return nengo.Connection(self.construct(), sink)
 
@@ -110,7 +111,7 @@ class FixedPointer(FixedNode):
         other = as_node(other)
         if not isinstance(other, FixedPointer):
             return NotImplemented
-        type_ = coerce_types(self.type, other.type)
+        type_ = infer_types(self, other)
         return FixedPointer(self.expr + '+' + other.expr, type_)
 
     def __radd__(self, other):
@@ -120,7 +121,7 @@ class FixedPointer(FixedNode):
         other = as_node(other)
         if not isinstance(other, FixedPointer):
             return NotImplemented
-        type_ = coerce_types(self.type, other.type)
+        type_ = infer_types(self, other)
         return FixedPointer(self.expr + '-' + other.expr, type_)
 
     def __rsub__(self, other):
@@ -130,14 +131,14 @@ class FixedPointer(FixedNode):
         other = as_node(other)
         if not isinstance(other, FixedNode):
             return NotImplemented
-        type_ = coerce_types(self.type, other.type)
+        type_ = infer_types(self, other)
         return FixedPointer(self.expr + '*' + other.expr, type_)
 
     def __rmul__(self, other):
         other = as_node(other)
         if not isinstance(other, FixedNode):
             return NotImplemented
-        type_ = coerce_types(self.type, other.type)
+        type_ = infer_types(self, other)
         return FixedPointer(other.expr + '*' + self.expr, type_)
 
     def __repr__(self):
@@ -158,8 +159,7 @@ class DynamicNode(Node):
         other = as_node(other)
         if not isinstance(other, Node):
             return NotImplemented
-        other.infer_types(self.type)
-        type_ = coerce_types(self.type, other.type)
+        type_ = infer_types(self, other)
         return Summed((self, other), type_)
 
     def __radd__(self, other):
@@ -181,9 +181,10 @@ class DynamicNode(Node):
         return (-self) + other
 
     def _mul_with_fixed(self, other):
+        type_ = infer_types(self, other)
         if other.type == TScalar:
             tr = other.value
-        elif other.type == TInferVocab:
+        elif self.type == TScalar and other.type == TInferVocab:
             raise SpaTypeError(
                 "Cannot infer vocabulary for fixed pointer when multiplying "
                 "with scalar.")
@@ -197,15 +198,14 @@ class DynamicNode(Node):
         return Transformed(self.construct(), tr, self.type)
 
     def _mul_with_dynamic(self, other, swap_inputs=False):
-        if self.type == TScalar and other.type == TScalar:
+        type_ = infer_types(self, other)
+        if type_ == TScalar:
             mul = ProductRealization()
-        elif self.type == other.type:
-            mul = BindRealization(self.type.vocab)
         elif self.type == TScalar or other.type == TScalar:
             raise NotImplementedError(
                 "Dynamic scaling of semantic pointer not implemented.")
         else:
-            raise SpaTypeError("Vocabulary mismmatch.")
+            mul = BindRealization(self.type.vocab)
 
         if swap_inputs:
             a, b = other, self
@@ -213,13 +213,12 @@ class DynamicNode(Node):
             a, b = self, other
         a.connect_to(mul.input_a)
         b.connect_to(mul.input_b)
-        return ModuleOutput(mul.output, self.type)
+        return ModuleOutput(mul.output, type_)
 
     def __mul__(self, other):
         other = as_node(other)
         if not isinstance(other, Node):
             return NotImplemented
-        other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
             return self._mul_with_fixed(other)
@@ -230,7 +229,6 @@ class DynamicNode(Node):
         other = as_node(other)
         if not isinstance(other, Node):
             return NotImplemented
-        other.infer_types(self.type)
 
         if isinstance(other, FixedNode):
             return self._mul_with_fixed(other)
@@ -258,12 +256,6 @@ class Summed(DynamicNode):
     def __init__(self, sources, type_):
         super(Summed, self).__init__(type_=type_)
         self.sources = sources
-
-    def infer_types(self, type_):
-        # FIXME type propagation?
-        super(Summed, self).infer_types(type_)
-        for s in self.sources:
-            s.infer_types(self.type)
 
     def connect_to(self, sink):
         for s in self.sources:
