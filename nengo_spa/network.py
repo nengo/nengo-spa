@@ -4,7 +4,7 @@ import numpy as np
 
 from nengo_spa.ast2 import (
     as_node, input_network_registry, input_vocab_registry,
-    output_vocab_registry, ModuleOutput, Node)
+    output_vocab_registry, ModuleInput, ModuleOutput, Node)
 from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
@@ -37,6 +37,18 @@ def as_ast_node(obj):
         return ModuleOutput(output, TVocabulary(vocab))
 
 
+def as_sink(obj):
+    if isinstance(obj, Network):
+        input_ = obj.input
+    else:
+        input_ = obj
+    vocab = input_vocab_registry[input_]
+    if vocab is None:
+        return ModuleInput(input_, TScalar)
+    else:
+        return ModuleInput(input_, TVocabulary(vocab))
+
+
 class SpaOperatorMixin(object):
     @staticmethod
     def __define_unary_op(op):
@@ -59,6 +71,12 @@ class SpaOperatorMixin(object):
     __rsub__ = __define_binary_op.__func__('__rsub__')
     __mul__ = __define_binary_op.__func__('__mul__')
     __rmul__ = __define_binary_op.__func__('__rmul__')
+
+    def __rshift__(self, other):
+        as_ast_node(self) >> as_sink(other)
+
+    def __rrshift__(self, other):
+        as_ast_node(other) >> as_sink(self)
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
