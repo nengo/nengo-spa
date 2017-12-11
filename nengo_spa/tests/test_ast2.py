@@ -31,8 +31,7 @@ def test_fixed_pointer_network_creation(rng):
     vocab.populate('A')
 
     with spa.Network() as model:
-        A = FixedPointer('A')
-        A.infer_types(TVocabulary(vocab))
+        A = FixedPointer('A', TVocabulary(vocab))
         node = A.construct()
     assert_equal(node.output, vocab['A'].v)
 
@@ -43,8 +42,7 @@ def test_unary_operation_on_fixed_pointer(op, rng):
     vocab.populate('A')
 
     with spa.Network() as model:
-        x = eval(op + "FixedPointer('A')")
-        x.infer_types(TVocabulary(vocab))
+        x = eval(op + "FixedPointer('A', TVocabulary(vocab))")
         node = x.construct()
     assert_equal(node.output, vocab.parse(op + 'A').v)
 
@@ -55,8 +53,8 @@ def test_binary_operation_on_fixed_pointers(op, rng):
     vocab.populate('A; B')
 
     with spa.Network() as model:
-        x = eval("FixedPointer('A')" + op + "FixedPointer('B')")
-        x.infer_types(TVocabulary(vocab))
+        v = TVocabulary(vocab)
+        x = eval("FixedPointer('A', v)" + op + "FixedPointer('B', v)")
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
 
@@ -66,8 +64,7 @@ def test_multiply_fixed_scalar_and_fixed_pointer(rng):
     vocab.populate('A')
 
     with spa.Network() as model:
-        x = 2 * FixedPointer('A')
-        x.infer_types(TVocabulary(vocab))
+        x = 2 * FixedPointer('A', TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse('2 * A').v)
 
