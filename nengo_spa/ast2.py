@@ -152,8 +152,13 @@ class FixedPointer(FixedNode):
     def rdot(self, other):
         return self.dot(other)
 
+    # FIXME needs specific pointers
+    # def translate(self, vocab, populate=None, keys=None, solver=None):
+        # tr = self.type.vocab.transform_to(vocab, populate, solver)
+        # return FixedPointer(np.dot(tr, self.evaluate().v), TVocabulary(vocab))
+
     def __repr__(self):
-        return "FixedPointer({!r}, {!r})".format(self.expr, self.type_)
+        return "FixedPointer({!r}, {!r})".format(self.expr, self.type)
 
 
 class DynamicNode(Node):
@@ -267,6 +272,10 @@ class DynamicNode(Node):
     def rdot(self, other):
         return self.dot(other)
 
+    def translate(self, vocab, populate=None, keys=None, solver=None):
+        tr = self.type.vocab.transform_to(vocab, populate, solver)
+        return Transformed(self.construct(), tr, TVocabulary(vocab))
+
 
 class Transformed(DynamicNode):
     def __init__(self, source, transform, type_):
@@ -282,7 +291,7 @@ class Transformed(DynamicNode):
         if self.type == TScalar:
             size_in = 1
         else:
-            size_in = self.type.vocab.dimenisons
+            size_in = self.type.vocab.dimensions
         node = nengo.Node(size_in=size_in)
         self.connect_to(node)
         return node

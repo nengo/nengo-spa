@@ -81,6 +81,9 @@ class SpaOperatorMixin(object):
     dot = __define_binary_op.__func__('dot')
     rdot = __define_binary_op.__func__('rdot')
 
+    def translate(self, vocab, populate=None, keys=None, solver=None):
+        return as_ast_node(self).translate(vocab, populate, keys, solver)
+
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     """Base class for SPA networks.

@@ -379,4 +379,33 @@ def test_fixed_dot(rng):
         FixedPointer('A', v), FixedPointer('B', v)).evaluate() <= 0.1
 
 
+# FIXME needs specific pointers
+# def test_translate(rng):
+    # v1 = spa.Vocabulary(16, rng=rng)
+    # v1.populate('A; B')
+    # v2 = spa.Vocabulary(16, rng=rng)
+    # v2.populate('A; B')
+
+    # assert_allclose(
+        # spa.translate(FixedPointer('A', TVocabulary(v1)), v2).evaluate().dot(
+            # v2['A']), 1., atol=0.2)
+
+
+def test_dynamic_translate(Simulator, rng):
+    v1 = spa.Vocabulary(64, rng=rng)
+    v1.populate('A; B')
+    v2 = spa.Vocabulary(64, rng=rng)
+    v2.populate('A; B')
+
+    with spa.Network() as model:
+        source = spa.Transcode('A', output_vocab=v1)
+        x = spa.translate(source, v2)
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], v2['A'], skip=0.3, atol=0.2)
+
+
 # action selection
