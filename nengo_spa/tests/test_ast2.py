@@ -311,5 +311,22 @@ def test_assignment_of_dynamic_pointer(Simulator, rng):
     assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
 
 
-# use of non-default input and outputs
+def test_non_default_input_and_output(Simulator, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        b = spa.Transcode('B', output_vocab=vocab)
+        bind = spa.Bind(vocab)
+        a.output >> bind.input_a
+        b.output >> bind.input_b
+        p = nengo.Probe(bind.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3)
+
+
 # action selection
