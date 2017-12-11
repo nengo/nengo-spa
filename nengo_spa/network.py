@@ -78,6 +78,9 @@ class SpaOperatorMixin(object):
     def __rrshift__(self, other):
         as_ast_node(other) >> as_sink(self)
 
+    dot = __define_binary_op.__func__('dot')
+    rdot = __define_binary_op.__func__('rdot')
+
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     """Base class for SPA networks.
