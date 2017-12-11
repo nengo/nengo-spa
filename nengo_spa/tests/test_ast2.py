@@ -254,6 +254,62 @@ def test_fixed_pointer_with_dynamic_scalar(Simulator, rng):
             FixedPointer('A') * scalar
 
 
-# identity and zero
-# assignment
+def test_assignment_of_fixed_scalar(Simulator, rng):
+    with spa.Network() as model:
+        sink = spa.Scalar()
+        0.5 >> sink
+        p = nengo.Probe(sink.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
+
+
+def test_assignment_of_fixed_pointer(Simulator, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A')
+
+    with spa.Network() as model:
+        sink = spa.State(vocab)
+        FixedPointer('A') >> sink
+        p = nengo.Probe(sink.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
+
+
+def test_assignment_of_dynamic_scalar(Simulator, rng):
+    with spa.Network() as model:
+        source = spa.Scalar()
+        sink = spa.Scalar()
+        nengo.Connection(nengo.Node(0.5), source.input)
+        source >> sink
+        p = nengo.Probe(sink.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
+
+
+def test_assignment_of_dynamic_pointer(Simulator, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A')
+
+    with spa.Network() as model:
+        source = spa.Transcode('A', output_vocab=vocab)
+        sink = spa.State(vocab)
+        source >> sink
+        p = nengo.Probe(sink.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
+
+
+# use of non-default input and outputs
 # action selection
