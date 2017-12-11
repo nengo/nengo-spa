@@ -277,3 +277,15 @@ class ModuleOutput(DynamicNode):
 
     def connect_to(self, sink):
         nengo.Connection(self.output, sink)
+
+
+class ModuleInput(object):
+    def __init__(self, input_, type_):
+        self.input = input_
+        self.type = type_
+
+    def __rrshift__(self, other):
+        if not isinstance(other, Node):
+            return NotImplemented
+        infer_types(self, other)
+        other.connect_to(self.input)
