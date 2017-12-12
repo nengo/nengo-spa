@@ -4,8 +4,9 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.ast2 import coerce_types, PointerSymbol
+from nengo_spa.ast2 import coerce_types, FixedPointer, PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
 from nengo_spa.types import TInferVocab, TScalar, TVocabulary
 
@@ -35,6 +36,15 @@ def test_pointer_symbol_network_creation(rng):
         A = PointerSymbol('A', TVocabulary(vocab))
         node = A.construct()
     assert_equal(node.output, vocab['A'].v)
+
+
+def test_fixed_pointer_network_creation(rng):
+    pointer = SemanticPointer(16)
+
+    with spa.Network() as model:
+        A = FixedPointer(pointer)
+        node = A.construct()
+    assert_equal(node.output, pointer.v)
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
@@ -145,6 +155,32 @@ def test_binary_operation_on_modules_with_pointer_symbol(
             x = eval('a' + op + 'PointerSymbol("B")')
         elif order == 'BA':
             x = eval('PointerSymbol("B")' + op + 'a')
+        else:
+            raise ValueError('Invalid order argument.')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
+        skip=0.3)
+
+
+@pytest.mark.parametrize('op', ['+', '-', '*'])
+@pytest.mark.parametrize('order', ['AB', 'BA'])
+def test_binary_operation_on_modules_with_fixed_pointer(
+        Simulator, op, order, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B')
+    b = SemanticPointer(vocab['B'].v)
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        if order == 'AB':
+            x = eval('a' + op + 'b')
+        elif order == 'BA':
+            x = eval('b' + op + 'a')
         else:
             raise ValueError('Invalid order argument.')
         p = nengo.Probe(x.construct(), synapse=0.03)
