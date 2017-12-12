@@ -4,7 +4,8 @@ import numpy as np
 
 from nengo_spa.ast2 import (
     as_node, input_network_registry, input_vocab_registry,
-    output_vocab_registry, ModuleInput, ModuleOutput, Node)
+    output_vocab_registry, FixedPointer, ModuleInput, ModuleOutput, Node)
+from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
@@ -26,6 +27,8 @@ def as_ast_node(obj):
     obj = as_node(obj)
     if isinstance(obj, Node):
         return obj
+    elif isinstance(obj, SemanticPointer):
+        return FixedPointer(obj)
     if isinstance(obj, Network):
         output = obj.output
     else:
