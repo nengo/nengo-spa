@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.ast2 import coerce_types, FixedPointer
+from nengo_spa.ast2 import coerce_types, PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.testing import sp_close
 from nengo_spa.types import TInferVocab, TScalar, TVocabulary
@@ -27,57 +27,57 @@ def test_coercion():
         coerce_types(v1, v2)
 
 
-def test_fixed_pointer_network_creation(rng):
+def test_pointer_symbol_network_creation(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
-        A = FixedPointer('A', TVocabulary(vocab))
+        A = PointerSymbol('A', TVocabulary(vocab))
         node = A.construct()
     assert_equal(node.output, vocab['A'].v)
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
-def test_unary_operation_on_fixed_pointer(op, rng):
+def test_unary_operation_on_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
-        x = eval(op + "FixedPointer('A', TVocabulary(vocab))")
+        x = eval(op + "PointerSymbol('A', TVocabulary(vocab))")
         node = x.construct()
     assert_equal(node.output, vocab.parse(op + 'A').v)
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
-def test_binary_operation_on_fixed_pointers(op, rng):
+def test_binary_operation_on_pointer_symbols(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
         v = TVocabulary(vocab)
-        x = eval("FixedPointer('A', v)" + op + "FixedPointer('B', v)")
+        x = eval("PointerSymbol('A', v)" + op + "PointerSymbol('B', v)")
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
 
 
-def test_multiply_fixed_scalar_and_fixed_pointer(rng):
+def test_multiply_fixed_scalar_and_pointer_symbol(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
-        x = 2 * FixedPointer('A', TVocabulary(vocab))
+        x = 2 * PointerSymbol('A', TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse('2 * A').v)
 
 
 @pytest.mark.parametrize('op', ['+', '-'])
-def test_additive_op_fixed_scalar_and_fixed_pointer(op, rng):
+def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
         with pytest.raises(TypeError):
-            eval("2" + op + "FixedPointer('A')")
+            eval("2" + op + "PointerSymbol('A')")
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
@@ -134,7 +134,7 @@ def test_product_of_scalars(Simulator):
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('order', ['AB', 'BA'])
-def test_binary_operation_on_modules_with_fixed_pointer(
+def test_binary_operation_on_modules_with_pointer_symbol(
         Simulator, op, order, rng):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A; B')
@@ -142,9 +142,9 @@ def test_binary_operation_on_modules_with_fixed_pointer(
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
         if order == 'AB':
-            x = eval('a' + op + 'FixedPointer("B")')
+            x = eval('a' + op + 'PointerSymbol("B")')
         elif order == 'BA':
-            x = eval('FixedPointer("B")' + op + 'a')
+            x = eval('PointerSymbol("B")' + op + 'a')
         else:
             raise ValueError('Invalid order argument.')
         p = nengo.Probe(x.construct(), synapse=0.03)
@@ -165,7 +165,7 @@ def test_complex_rule(Simulator, rng):
         a = spa.Transcode('A', output_vocab=vocab)
         b = spa.Transcode('B', output_vocab=vocab)
 
-        x = (0.5 * FixedPointer('C') * a + 0.5 * FixedPointer('D')) * (
+        x = (0.5 * PointerSymbol('C') * a + 0.5 * PointerSymbol('D')) * (
             0.5 * b + a * 0.5)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
@@ -184,7 +184,7 @@ def test_transformed(Simulator, rng):
 
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
-        x = FixedPointer('B') * a
+        x = PointerSymbol('B') * a
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
@@ -195,13 +195,13 @@ def test_transformed(Simulator, rng):
         normalized=True)
 
 
-def test_transformed_and_fixed_pointer(Simulator, rng, plt):
+def test_transformed_and_pointer_symbol(Simulator, rng, plt):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
-        x = FixedPointer('~B') * (FixedPointer('B') * a)
+        x = PointerSymbol('~B') * (PointerSymbol('B') * a)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
@@ -219,7 +219,7 @@ def test_transformed_and_network(Simulator, rng):
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
         b = spa.Transcode('B', output_vocab=vocab)
-        x = b * (FixedPointer('~B') * a)
+        x = b * (PointerSymbol('~B') * a)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
@@ -237,7 +237,7 @@ def test_transformed_and_transformed(Simulator, rng):
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
         c = spa.Transcode('C', output_vocab=vocab)
-        x = (FixedPointer('B') * a) * (FixedPointer('~B') * c)
+        x = (PointerSymbol('B') * a) * (PointerSymbol('~B') * c)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
@@ -248,11 +248,11 @@ def test_transformed_and_transformed(Simulator, rng):
         normalized=True)
 
 
-def test_fixed_pointer_with_dynamic_scalar(Simulator, rng):
+def test_pointer_symbol_with_dynamic_scalar(Simulator, rng):
     with spa.Network() as model:
         scalar = spa.Scalar()
         with pytest.raises(SpaTypeError):
-            FixedPointer('A') * scalar
+            PointerSymbol('A') * scalar
 
 
 def test_assignment_of_fixed_scalar(Simulator, rng):
@@ -267,13 +267,13 @@ def test_assignment_of_fixed_scalar(Simulator, rng):
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
 
 
-def test_assignment_of_fixed_pointer(Simulator, rng):
+def test_assignment_of_pointer_symbol(Simulator, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
     with spa.Network() as model:
         sink = spa.State(vocab)
-        FixedPointer('A') >> sink
+        PointerSymbol('A') >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
 
     with nengo.Simulator(model) as sim:
@@ -354,7 +354,7 @@ def test_dot_with_fixed(Simulator, rng):
     vocab.populate('A; B')
 
     with spa.Network() as model:
-        a = FixedPointer('A')
+        a = PointerSymbol('A')
         b = spa.Transcode(
             lambda t: 'A' if t <= 0.5 else 'B', output_vocab=vocab)
         x = spa.dot(a, b)
@@ -374,21 +374,20 @@ def test_fixed_dot(rng):
 
     v = TVocabulary(vocab)
     assert_allclose(
-        spa.dot(FixedPointer('A', v), FixedPointer('A', v)).evaluate(), 1.)
+        spa.dot(PointerSymbol('A', v), PointerSymbol('A', v)).evaluate(), 1.)
     assert spa.dot(
-        FixedPointer('A', v), FixedPointer('B', v)).evaluate() <= 0.1
+        PointerSymbol('A', v), PointerSymbol('B', v)).evaluate() <= 0.1
 
 
-# FIXME needs specific pointers
-# def test_translate(rng):
-    # v1 = spa.Vocabulary(16, rng=rng)
-    # v1.populate('A; B')
-    # v2 = spa.Vocabulary(16, rng=rng)
-    # v2.populate('A; B')
+def test_translate(rng):
+    v1 = spa.Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = spa.Vocabulary(16, rng=rng)
+    v2.populate('A; B')
 
-    # assert_allclose(
-        # spa.translate(FixedPointer('A', TVocabulary(v1)), v2).evaluate().dot(
-            # v2['A']), 1., atol=0.2)
+    assert_allclose(
+        spa.translate(PointerSymbol('A', TVocabulary(v1)), v2).evaluate().dot(
+            v2['A']), 1., atol=0.2)
 
 
 def test_dynamic_translate(Simulator, rng):
