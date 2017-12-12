@@ -3,11 +3,12 @@
 from nengo.exceptions import NengoWarning, ValidationError
 import nengo.solvers
 import numpy as np
+from numpy.testing import assert_equal
 import pytest
 
 from nengo_spa import Vocabulary, VocabularyMap
 from nengo_spa.exceptions import SpaParseError
-from nengo_spa.pointer import Identity
+from nengo_spa.pointer import Identity, SemanticPointer
 from nengo_spa.vocab import VocabularyMapParam, VocabularyOrDimParam
 
 
@@ -204,9 +205,22 @@ def test_subset(rng):
     # Test creating a vocabulary subset
     v2 = v1.create_subset(['A', 'C', 'E'])
     assert list(v2.keys()) == ['A', 'C', 'E']
-    assert v2['A'] == v1['A']
-    assert v2['C'] == v1['C']
-    assert v2['E'] == v1['E']
+    assert_equal(v2['A'].v, v1['A'].v)
+    assert_equal(v2['C'].v, v1['C'].v)
+    assert_equal(v2['E'].v, v1['E'].v)
+
+
+def test_vocabulary_tracking(rng):
+    v = Vocabulary(32, rng=rng)
+    v.populate('A')
+
+    assert v['A'].vocab is v
+    assert v.parse('2 * A').vocab is v
+
+    v.add('B', SemanticPointer(32))
+    v.add('C', SemanticPointer(32, vocab=v))
+    with pytest.raises(ValidationError):
+        v.add('D', SemanticPointer(32, vocab=Vocabulary(32)))
 
 
 def test_vocabulary_set(rng):

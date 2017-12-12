@@ -1,9 +1,11 @@
+from nengo.exceptions import ValidationError
+from nengo.utils.compat import range
 import numpy as np
 import pytest
 
-from nengo.exceptions import ValidationError
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
-from nengo.utils.compat import range
+from nengo_spa.vocab import Vocabulary
 
 
 def test_init():
@@ -172,6 +174,32 @@ def test_conv_matrix():
     m = b.get_convolution_matrix()
 
     assert np.allclose((a*b).v, np.dot(m, a.v))
+
+
+@pytest.mark.parametrize('op', ('~a', '-a', 'a+a', 'a-a', 'a*a', '2*a'))
+def test_ops_preserve_vocab(op):
+    v = Vocabulary(50)
+    a = SemanticPointer(50, vocab=v)
+    x = eval(op)
+    assert x.vocab is v
+
+
+@pytest.mark.parametrize('op', (
+    'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
+def test_ops_check_vocab_compatibility(op):
+    a = SemanticPointer(50, vocab=Vocabulary(50))
+    b = SemanticPointer(50, vocab=Vocabulary(50))
+    with pytest.raises(SpaTypeError):
+        x = eval(op)
+
+
+@pytest.mark.parametrize('op', (
+    'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
+def test_none_vocab_is_always_compatible(op):
+    v = Vocabulary(50)
+    a = SemanticPointer(50, vocab=v)
+    b = SemanticPointer(50, vocab=None)
+    x = eval(op)  # no assertion, just checking that no exception is raised
 
 
 def test_identity(rng):
