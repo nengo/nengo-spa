@@ -80,6 +80,9 @@ class FixedPointer(Fixed):
     def construct(self):
         return nengo.Node(self.evaluate().v)
 
+    def __neg__(self):
+        return FixedPointer(-self.pointer)
+
 
 class Symbol(Fixed):
     @property

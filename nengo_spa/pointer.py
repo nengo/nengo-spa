@@ -62,6 +62,8 @@ class SemanticPointer(object):
         return str(self.v)
 
     def __add__(self, other):
+        if not isinstance(other, SemanticPointer):
+            return NotImplemented
         vocab = self._coerce_vocab(other)
         return SemanticPointer(data=self.v + other.v, vocab=vocab)
 
@@ -69,6 +71,8 @@ class SemanticPointer(object):
         return SemanticPointer(data=-self.v, vocab=self.vocab)
 
     def __sub__(self, other):
+        if not isinstance(other, SemanticPointer):
+            return NotImplemented
         vocab = self._coerce_vocab(other)
         return SemanticPointer(data=self.v - other.v, vocab=vocab)
 
@@ -82,8 +86,7 @@ class SemanticPointer(object):
         elif is_number(other):
             return SemanticPointer(data=self.v * other, vocab=self.vocab)
         else:
-            raise NotImplementedError(
-                "Can only multiply by SemanticPointers or scalars")
+            return NotImplemented
 
     def __rmul__(self, other):
         """Multiplication of two SemanticPointers is circular convolution.
