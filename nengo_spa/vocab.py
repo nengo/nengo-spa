@@ -54,7 +54,7 @@ class Vocabulary(Mapping):
         self.dimensions = dimensions
         self.strict = strict
         self.max_similarity = max_similarity
-        self.pointers = {}
+        self._key2idx = {}
         self._keys = []
         self._vectors = np.zeros((0, dimensions), dtype=float)
         self.rng = rng
@@ -81,7 +81,8 @@ class Vocabulary(Mapping):
         best_p = None
         best_sim = np.inf
         for _ in range(attempts):
-            p = pointer.SemanticPointer(self.dimensions, rng=self.rng)
+            p = pointer.SemanticPointer(
+                self.dimensions, rng=self.rng, vocab=self)
             if transform is not None:
                 p = eval('p.' + transform, dict(self), {'p': p})
             if len(self) == 0:
@@ -99,11 +100,11 @@ class Vocabulary(Mapping):
                 'Could not create a semantic pointer with '
                 'max_similarity=%1.2f (D=%d, M=%d)'
                 % (self.max_similarity, self.dimensions,
-                   len(self.pointers)))
+                   len(self._key2idx)))
         return best_p
 
     def __contains__(self, key):
-        return key in self.pointers
+        return key in self._key2idx
 
     def __len__(self):
         return len(self._vectors)
@@ -123,7 +124,8 @@ class Vocabulary(Mapping):
             raise KeyError()
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
-        return self.pointers[key]
+        return pointer.SemanticPointer(
+            self._vectors[self._key2idx[key]], vocab=self)
 
     def __hash__(self):
         return hash(id(self))
@@ -139,13 +141,17 @@ class Vocabulary(Mapping):
                 "Python 2 identifiers beginning with a capital letter.".format(
                     key))
         if not isinstance(p, pointer.SemanticPointer):
-            p = pointer.SemanticPointer(p)
+            p = pointer.SemanticPointer(p, vocab=self)
 
-        if key in self.pointers:
+        if key in self._key2idx:
             raise ValidationError("The semantic pointer %r already exists"
-                                  % key, attr='pointers', obj=self)
+                                  % key, attr='', obj=self)
+        if p.vocab is not None and p.vocab is not self:
+            raise ValidationError(
+               "Cannot add a semantic pointer that belongs to a different "
+               "vocabulary.", attr='', obj=self)
 
-        self.pointers[key] = p
+        self._key2idx[key] = len(self._key2idx)
         self._keys.append(key)
         self._vectors = np.vstack([self._vectors, p.v])
 
@@ -269,7 +275,7 @@ class Vocabulary(Mapping):
 
         # Copy over the new keys
         for key in keys:
-            subset.add(key, self.pointers[key])
+            subset.add(key, self[key].reinterpret(subset))
 
         return subset
 
