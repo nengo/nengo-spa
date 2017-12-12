@@ -5,6 +5,7 @@ from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TInferVocab, TScalar, TVocabulary
 
 
@@ -56,16 +57,37 @@ class Node(object):
         raise NotImplementedError()
 
 
-class FixedNode(Node):
+class Fixed(Node):
     def evaluate(self):
         raise NotImplementedError()
 
+
+class FixedPointer(Fixed):
+    def __init__(self, pointer):
+        if pointer.vocab is None:
+            type_ = TInferVocab
+        else:
+            type_ = TVocabulary(pointer.vocab)
+        super(FixedPointer, self).__init__(type_=type_)
+        self.pointer = pointer
+
+    def evaluate(self):
+        return self.pointer
+
+    def connect_to(self, sink):
+        return nengo.Connection(self.construct(), sink)
+
+    def construct(self):
+        return nengo.Node(self.evaluate().v)
+
+
+class Symbol(Fixed):
     @property
     def expr(self):
         raise NotImplementedError()
 
 
-class FixedScalar(FixedNode):
+class FixedScalar(Symbol):
     def __init__(self, value):
         super(FixedScalar, self).__init__(type_=TScalar)
         self.value = value
@@ -84,9 +106,9 @@ class FixedScalar(FixedNode):
         return repr(self.value)
 
 
-class FixedPointer(FixedNode):
+class PointerSymbol(Symbol):
     def __init__(self, expr, type_=TInferVocab):
-        super(FixedPointer, self).__init__(type_=type_)
+        super(PointerSymbol, self).__init__(type_=type_)
         self._expr = expr
 
     def connect_to(self, sink):
@@ -103,48 +125,48 @@ class FixedPointer(FixedNode):
         return self._expr
 
     def __invert__(self):
-        return FixedPointer('~' + self.expr, self.type)
+        return PointerSymbol('~' + self.expr, self.type)
 
     def __neg__(self):
-        return FixedPointer('-' + self.expr, self.type)
+        return PointerSymbol('-' + self.expr, self.type)
 
     def __add__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedPointer):
+        if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return FixedPointer(self.expr + '+' + other.expr, type_)
+        return PointerSymbol(self.expr + '+' + other.expr, type_)
 
     def __radd__(self, other):
         return self + other
 
     def __sub__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedPointer):
+        if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return FixedPointer(self.expr + '-' + other.expr, type_)
+        return PointerSymbol(self.expr + '-' + other.expr, type_)
 
     def __rsub__(self, other):
         return (-self) + other
 
     def __mul__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedNode):
+        if not isinstance(other, Symbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return FixedPointer(self.expr + '*' + other.expr, type_)
+        return PointerSymbol(self.expr + '*' + other.expr, type_)
 
     def __rmul__(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedNode):
+        if not isinstance(other, Symbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return FixedPointer(other.expr + '*' + self.expr, type_)
+        return PointerSymbol(other.expr + '*' + self.expr, type_)
 
     def dot(self, other):
         other = as_node(other)
-        if not isinstance(other, FixedPointer):
+        if not isinstance(other, PointerSymbol):
             raise NotImplementedError()
         type_ = infer_types(self, other)
         return FixedScalar(self.evaluate().dot(other.evaluate()))
@@ -152,13 +174,13 @@ class FixedPointer(FixedNode):
     def rdot(self, other):
         return self.dot(other)
 
-    # FIXME needs specific pointers
-    # def translate(self, vocab, populate=None, keys=None, solver=None):
-        # tr = self.type.vocab.transform_to(vocab, populate, solver)
-        # return FixedPointer(np.dot(tr, self.evaluate().v), TVocabulary(vocab))
+    def translate(self, vocab, populate=None, keys=None, solver=None):
+        tr = self.type.vocab.transform_to(vocab, populate, solver)
+        return FixedPointer(SemanticPointer(
+            np.dot(tr, self.evaluate().v), vocab=vocab))
 
     def __repr__(self):
-        return "FixedPointer({!r}, {!r})".format(self.expr, self.type)
+        return "PointerSymbol({!r}, {!r})".format(self.expr, self.type)
 
 
 class DynamicNode(Node):
@@ -236,7 +258,7 @@ class DynamicNode(Node):
         if not isinstance(other, Node):
             return NotImplemented
 
-        if isinstance(other, FixedNode):
+        if isinstance(other, Symbol):
             return self._mul_with_fixed(other)
         else:
             return self._mul_with_dynamic(other)
@@ -246,7 +268,7 @@ class DynamicNode(Node):
         if not isinstance(other, Node):
             return NotImplemented
 
-        if isinstance(other, FixedNode):
+        if isinstance(other, Symbol):
             return self._mul_with_fixed(other)
         else:
             return self._mul_with_dynamic(other, swap_inputs=True)
@@ -260,7 +282,7 @@ class DynamicNode(Node):
         if self.type == TScalar or other.type == TScalar:
             raise NotImplementedError()  # FIXME better error?
 
-        if isinstance(other, FixedPointer):
+        if isinstance(other, PointerSymbol):
             tr = np.atleast_2d(other.evaluate().v)
             return Transformed(self.construct(), tr, TScalar)
         else:
