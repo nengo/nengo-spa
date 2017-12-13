@@ -1,11 +1,13 @@
+import nengo
 from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
 
-from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.ast2 import Fixed, infer_types
+from nengo_spa.types import TInferVocab, TScalar, TVocabulary
 
 
-class SemanticPointer(object):
+class SemanticPointer(Fixed):
     """A Semantic Pointer, based on Holographic Reduced Representations.
 
     Operators are overloaded so that ``+`` and ``-`` are addition,
@@ -13,6 +15,9 @@ class SemanticPointer(object):
     """
 
     def __init__(self, data, rng=None, vocab=None):
+        super(SemanticPointer, self).__init__(
+            TInferVocab if vocab is None else TVocabulary(vocab))
+
         if rng is None:
             rng = np.random
 
@@ -30,6 +35,15 @@ class SemanticPointer(object):
         self.v.setflags(write=False)
 
         self.vocab = vocab
+
+    def evaluate(self):
+        return self
+
+    def connect_to(self, sink):
+        return nengo.Connection(self.construct(), sink)
+
+    def construct(self):
+        return nengo.Node(self.v)
 
     def normalized(self):
         nrm = np.linalg.norm(self.v)
@@ -62,29 +76,41 @@ class SemanticPointer(object):
         return str(self.v)
 
     def __add__(self, other):
-        if not isinstance(other, SemanticPointer):
+        if not isinstance(other, Fixed):
             return NotImplemented
-        vocab = self._coerce_vocab(other)
-        return SemanticPointer(data=self.v + other.v, vocab=vocab)
+        type_ = infer_types(self, other)
+        vocab = None if type_ == TInferVocab else type_.vocab
+        return SemanticPointer(data=self.v + other.evaluate().v, vocab=vocab)
+
+    def __radd__(self, other):
+        return self + other
 
     def __neg__(self):
         return SemanticPointer(data=-self.v, vocab=self.vocab)
 
     def __sub__(self, other):
-        if not isinstance(other, SemanticPointer):
+        if not isinstance(other, Fixed):
             return NotImplemented
-        vocab = self._coerce_vocab(other)
-        return SemanticPointer(data=self.v - other.v, vocab=vocab)
+        type_ = infer_types(self, other)
+        vocab = None if type_ == TInferVocab else type_.vocab
+        return SemanticPointer(data=self.v - other.evaluate().v, vocab=vocab)
+
+    def __rsub__(self, other):
+        return (-self) + other
 
     def __mul__(self, other):
         """Multiplication of two SemanticPointers is circular convolution.
 
         If multiplied by a scalar, we do normal multiplication.
         """
-        if isinstance(other, SemanticPointer):
-            return self.convolve(other)
-        elif is_number(other):
+        if is_number(other):
             return SemanticPointer(data=self.v * other, vocab=self.vocab)
+        elif isinstance(other, Fixed):
+            if other.type == TScalar:
+                return SemanticPointer(
+                    data=self.v * other.evaluate(), vocab=self.vocab)
+            else:
+                return self.convolve(other)
         else:
             return NotImplemented
 
@@ -108,10 +134,11 @@ class SemanticPointer(object):
 
     def convolve(self, other):
         """Return the circular convolution of two SemanticPointers."""
-        assert len(self) == len(other)
-        vocab = self._coerce_vocab(other)
+        type_ = infer_types(self, other)
+        vocab = None if type_ == TInferVocab else type_.vocab
         n = len(self)
-        x = np.fft.irfft(np.fft.rfft(self.v) * np.fft.rfft(other.v), n=n)
+        x = np.fft.irfft(
+            np.fft.rfft(self.v) * np.fft.rfft(other.evaluate().v), n=n)
         return SemanticPointer(data=x, vocab=vocab)
 
     def get_convolution_matrix(self):
@@ -127,9 +154,9 @@ class SemanticPointer(object):
 
     def dot(self, other):
         """Return the dot product of the two vectors."""
-        if isinstance(other, SemanticPointer):
-            self._coerce_vocab(other)
-            other = other.v
+        if isinstance(other, Fixed):
+            infer_types(self, other)
+            other = other.evaluate().v
         return np.dot(self.v, other)
 
     def compare(self, other):
@@ -139,8 +166,8 @@ class SemanticPointer(object):
         the angle between the two vectors.
         """
         if isinstance(other, SemanticPointer):
-            self._coerce_vocab(other)
-            other = other.v
+            infer_types(self, other)
+            other = other.evaluate().v
         scale = np.linalg.norm(self.v) * np.linalg.norm(other)
         if scale == 0:
             return 0
@@ -148,6 +175,10 @@ class SemanticPointer(object):
 
     def reinterpret(self, vocab):
         return SemanticPointer(self.v, vocab=vocab)
+
+    def translate(self, vocab, populate=None, keys=None, solver=None):
+        tr = self.vocab.transform_to(vocab, populate, solver)
+        return SemanticPointer(np.dot(tr, self.evaluate().v), vocab=vocab)
 
     def distance(self, other):
         """Return a distance measure between the vectors.
@@ -161,16 +192,6 @@ class SemanticPointer(object):
         """Return the mean-squared-error between two vectors."""
         self._coerce_vocab(other)
         return np.sum((self - other).v**2) / len(self.v)
-
-    def _coerce_vocab(self, other):
-        if self.vocab is None:
-            return other.vocab
-        elif other.vocab is None:
-            return self.vocab
-        elif self.vocab is other.vocab:
-            return self.vocab
-        else:
-            raise SpaTypeError("Vocabulary mismatch.")
 
 
 class Identity(SemanticPointer):
