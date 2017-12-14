@@ -5,8 +5,10 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa.ast2 import coerce_types
+from nengo_spa.ast_dynamic import ActionSelection, ifmax
 from nengo_spa.ast_symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.network import create_inhibit_node
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
 from nengo_spa.types import TInferVocab, TScalar, TVocabulary
@@ -468,4 +470,58 @@ def test_dynamic_translate(Simulator, rng):
     assert sp_close(sim.trange(), sim.data[p], v2['A'], skip=0.3, atol=0.2)
 
 
-# action selection
+def test_action_selection(Simulator, rng):
+    vocab = spa.Vocabulary(64)
+    vocab.populate('A; B; C; D; E; F')
+
+    with spa.Network() as model:
+        state = spa.Transcode(
+            lambda t: 'ABCDEF'[min(5, int(t / 0.5))], output_vocab=vocab)
+        scalar = spa.Scalar()
+        pointer = spa.State(vocab)
+        with ActionSelection() as action_sel:
+            ifmax(spa.dot(state, PointerSymbol('A')), 0.5 >> scalar)
+            ifmax(
+                spa.dot(state, PointerSymbol('B')),
+                PointerSymbol('B') >> pointer)
+            ifmax(spa.dot(state, PointerSymbol('C')), state >> pointer)
+            d_utility = ifmax(0, PointerSymbol('D') >> pointer)
+            ifmax(
+                spa.dot(state, PointerSymbol('E')),
+                0.25 >> scalar, PointerSymbol('E') >> pointer)
+        nengo.Connection(
+            nengo.Node(lambda t: 1.5 < t <= 2.), d_utility.input)
+        p_scalar = nengo.Probe(scalar.output, synapse=0.03)
+        p_pointer = nengo.Probe(pointer.output, synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(3.)
+
+    t = sim.trange()
+    assert_allclose(sim.data[p_scalar][(0.3 < t) & (t <= 0.5)], 0.5, atol=0.2)
+    assert sp_close(
+        sim.trange(), sim.data[p_pointer], vocab['B'], skip=0.8, duration=0.2)
+    assert sp_close(
+        sim.trange(), sim.data[p_pointer], vocab['C'], skip=1.3, duration=0.2)
+    assert sp_close(
+        sim.trange(), sim.data[p_pointer], vocab['D'], skip=1.8, duration=0.2)
+    assert_allclose(sim.data[p_scalar][(2.3 < t) & (t <= 2.5)], 0.25, atol=0.2)
+    assert sp_close(
+        sim.trange(), sim.data[p_pointer], vocab['E'], skip=2.3, duration=0.2)
+
+
+def test_does_not_allow_nesting_of_action_selection():
+    with spa.Network():
+        with ActionSelection():
+            with pytest.raises(RuntimeError):
+                with ActionSelection():
+                    pass
+
+
+def test_action_selection_enforces_connections_to_be_part_of_action():
+    with spa.Network():
+        state1 = spa.State(16)
+        state2 = spa.State(16)
+        with pytest.raises(RuntimeError):
+            with ActionSelection():
+                    state1 >> state2

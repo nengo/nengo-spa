@@ -1,13 +1,18 @@
 import nengo
+from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast2 import infer_types, Node
+from nengo_spa.ast2 import Fixed, infer_types, Node
 from nengo_spa.ast_symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TInferVocab, TScalar, TVocabulary
 
 
+BasalGangliaRealization = None
+ScalarRealization = None
+StateRealization = None
+ThalamusRealization = None
 DotProductRealization = None
 BindRealization = None
 ProductRealization = None
@@ -190,5 +195,107 @@ class ModuleInput(object):
     def __rrshift__(self, other):
         if not isinstance(other, Node):
             return NotImplemented
-        infer_types(self, other)
-        other.connect_to(self.input)
+        if ActionSelection.active is None:
+            infer_types(self, other)
+            other.connect_to(self.input)
+        else:
+            return RoutedConnection(other, self)
+
+
+class RoutedConnection(object):
+    free_floating = set()
+
+    def __init__(self, source, sink):
+        self.type = infer_types(source, sink)
+        self.source = source
+        self.sink = sink
+        RoutedConnection.free_floating.add(self)
+
+    def construct(self):
+        return self.source.connect_to(self.sink.input)
+
+    @property
+    def fixed(self):
+        return isinstance(self.source, Fixed)
+
+    def transform(self):
+        assert self.fixed
+        if self.type == TScalar:
+            return self.source.evaluate()
+        else:
+            return np.atleast_2d(self.source.evaluate().v).T
+
+    def construct_with_channel(self):
+        if self.type == TScalar:
+            channel = ScalarRealization()
+        else:
+            channel = StateRealization(vocab=self.type.vocab)
+
+        self.source.connect_to(channel.input)
+        nengo.Connection(channel.output, self.sink.input)
+        return channel
+
+
+class ActionSelection(object):
+    active = None
+
+    def __init__(self):
+        self.built = False
+        self.bg = None
+        self.thalamus = None
+        self.utilities = []
+        self.actions = []
+
+    def __enter__(self):
+        assert not self.built
+        if ActionSelection.active is None:
+            ActionSelection.active = self
+        else:
+            raise RuntimeError()  # FIXME better error
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        ActionSelection.active = None
+
+        if exc_type is not None:
+            return
+
+        if len(RoutedConnection.free_floating) > 0:
+            raise RuntimeError()  # FIXME better error
+
+        if len(self.utilities) <= 0:
+            return
+
+        self.bg = BasalGangliaRealization(len(self.utilities))
+        self.thalamus = ThalamusRealization(len(self.utilities))
+        self.thalamus.connect_bg(self.bg)
+
+        for index, utility in enumerate(self.utilities):
+            self.bg.connect_input(utility.output, index=index)
+
+        for index, action in enumerate(self.actions):
+            for effect in action:
+                if effect.fixed:
+                    self.thalamus.connect_fixed(
+                        index, effect.sink.input, transform=effect.transform())
+                else:
+                    self.thalamus.construct_gate(
+                        index, net=NengoNetwork.context[-1])
+                    self.thalamus.connect_gate(
+                        index, effect.construct_with_channel())
+
+        self.built = True
+
+    def add_action(self, condition, *actions):
+        assert ActionSelection.active is self
+        utility = ScalarRealization()  # FIXME should be node
+        self.utilities.append(utility)
+        self.actions.append(actions)
+        RoutedConnection.free_floating.difference_update(actions)
+        return utility
+
+
+def ifmax(condition, *actions):
+    utility = ActionSelection.active.add_action(condition, *actions)
+    as_node(condition).connect_to(utility.input)
+    return utility

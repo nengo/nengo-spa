@@ -73,10 +73,10 @@ class SpaOperatorMixin(object):
     __rmul__ = __define_binary_op.__func__('__rmul__')
 
     def __rshift__(self, other):
-        as_ast_node(self) >> as_sink(other)
+        return as_ast_node(self) >> as_sink(other)
 
     def __rrshift__(self, other):
-        as_ast_node(other) >> as_sink(self)
+        return as_ast_node(other) >> as_sink(self)
 
     dot = __define_binary_op.__func__('dot')
     rdot = __define_binary_op.__func__('rdot')
