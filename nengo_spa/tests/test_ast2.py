@@ -6,7 +6,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.ast2 import coerce_types
 from nengo_spa.ast_dynamic import ActionSelection, ifmax
-from nengo_spa.ast_symbolic import PointerSymbol
+from nengo_spa.ast_symbolic import PointerSymbol, sym
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.network import create_inhibit_node
 from nengo_spa.pointer import SemanticPointer
@@ -525,3 +525,9 @@ def test_action_selection_enforces_connections_to_be_part_of_action():
         with pytest.raises(RuntimeError):
             with ActionSelection():
                     state1 >> state2
+
+
+def test_pointer_symbol_factory():
+    ps = sym.A
+    assert isinstance(ps, PointerSymbol)
+    assert ps.expr == 'A'
