@@ -239,7 +239,7 @@ class BasalGanglia(Network):
             nengo.Connection(gpi_output, self.output, synapse=None,
                              transform=self.output_weight)
 
-    def connect_input(self, source, transform, index):
+    def connect_input(self, source, transform=Default, index=None):
         self.input_connections[index] = nengo.Connection(
             source, self.input[index], transform=transform,
             synapse=self.input_synapse)

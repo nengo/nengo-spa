@@ -37,9 +37,13 @@ def register_default_modules():
     ast.ActionSet.BasalGangliaRealization = BasalGanglia
     ast.ActionSet.ThalamusRealization = Thalamus
 
+    ast_dynamic.BasalGangliaRealization = BasalGanglia
     ast_dynamic.BindRealization = Bind
     ast_dynamic.DotProductRealization = Compare
     ast_dynamic.ProductRealization = Product
+    ast_dynamic.ScalarRealization = Scalar
+    ast_dynamic.StateRealization = State
+    ast_dynamic.ThalamusRealization = Thalamus
 
 
 register_default_modules()
