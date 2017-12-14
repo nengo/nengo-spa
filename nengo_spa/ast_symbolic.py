@@ -112,3 +112,11 @@ class PointerSymbol(Symbol):
 
     def __repr__(self):
         return "PointerSymbol({!r}, {!r})".format(self.expr, self.type)
+
+
+class PointerSymbolFactory(object):
+    def __getattribute__(self, key):
+        return PointerSymbol(key)
+
+
+sym = PointerSymbolFactory()
