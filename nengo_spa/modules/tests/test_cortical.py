@@ -10,10 +10,10 @@ def test_connect(Simulator, seed):
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=16)
         model.buffer3 = spa.State(vocab=16)
-        with spa.Actions():
-            "A" >> model.buffer1
-            model.buffer1 >> model.buffer2
-            ~model.buffer1 >> model.buffer3
+
+        spa.sym.A >> model.buffer1
+        model.buffer1 >> model.buffer2
+        ~model.buffer1 >> model.buffer3
 
     with model:
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
@@ -32,9 +32,9 @@ def test_transform(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=32)
         model.buffer2 = spa.State(vocab=32)
-        with spa.Actions():
-            "A" >> model.buffer1
-            model.buffer1 * "B" >> model.buffer2
+
+        spa.sym.A >> model.buffer1
+        model.buffer1 * spa.sym.B >> model.buffer2
 
     with model:
         p = nengo.Probe(model.buffer2.output, synapse=0.03)
@@ -51,9 +51,10 @@ def test_translate(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=32)
-        with spa.Actions():
-            "A" >> model.buffer1
-            spa.translate(model.buffer1, populate=True) >> model.buffer2
+
+        spa.sym.A >> model.buffer1
+        spa.translate(
+            model.buffer1, model.buffer2.vocab, populate=True) >> model.buffer2
 
     with model:
         p = nengo.Probe(model.buffer2.output, synapse=0.03)
@@ -70,8 +71,7 @@ def test_errors():
     with pytest.raises(AttributeError):
         with spa.Network() as model:
             model.buffer1 = spa.State(vocab=16)
-            with spa.Actions():
-                model.buffer1 >> model.buffer2
+            model.buffer1 >> model.buffer2
 
 
 def test_direct(Simulator, seed):
@@ -80,11 +80,11 @@ def test_direct(Simulator, seed):
         model.buffer1.vocab.populate('A; B; C')
         model.buffer2 = spa.State(vocab=32)
         model.buffer2.vocab.populate('A; B; C')
-        with spa.Actions():
-            "A" >> model.buffer1
-            "B" >> model.buffer2
-            "C" >> model.buffer1
-            "C" >> model.buffer2
+
+        spa.sym.A >> model.buffer1
+        spa.sym.B >> model.buffer2
+        spa.sym.C >> model.buffer1
+        spa.sym.C >> model.buffer2
 
     with model:
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
@@ -113,11 +113,10 @@ def test_convolution(Simulator, plt, seed):
         model.outAinvB = spa.State()
         model.outAinvBinv = spa.State()
 
-        with spa.Actions():
-            model.inA * model.inB >> model.outAB
-            model.inA * ~model.inB >> model.outABinv
-            ~model.inA * model.inB >> model.outAinvB
-            ~model.inA * ~model.inB >> model.outAinvBinv
+        model.inA * model.inB >> model.outAB
+        model.inA * ~model.inB >> model.outABinv
+        ~model.inA * model.inB >> model.outAinvB
+        ~model.inA * ~model.inB >> model.outAinvBinv
         nengo.Connection(nengo.Node([0, 1, 0, 0, 0]), model.inA.input)
         nengo.Connection(nengo.Node([0, 0, 1, 0, 0]), model.inB.input)
 

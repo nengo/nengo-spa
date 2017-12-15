@@ -5,9 +5,11 @@ from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
 from nengo.synapses import Lowpass, SynapseParam
 
+from nengo_spa import ast_dynamic
 from nengo_spa.modules.scalar import Scalar
 from nengo_spa.modules.state import State
 from nengo_spa.network import Network
+from nengo_spa.types import TScalar
 
 
 class Thalamus(Network):
@@ -164,7 +166,7 @@ class Thalamus(Network):
         return self.gates[index]
 
     def construct_channel(
-            self, target_net, target_input, net, label=None):
+            self, sink, type_, label=None):
         """Construct a channel.
 
         Channels are an additional neural population in-between a source
@@ -177,8 +179,6 @@ class Thalamus(Network):
             The network that the channel will project to.
         target_vocab : :class:`spa.Vocabulary`
             The vocabulary used by the target population..
-        net : :class:`nengo.Network`, optional
-            Network to which to add the channel. Defaults to ``self.spa``.
         label : str, optional
             Label for the channel.
 
@@ -188,20 +188,15 @@ class Thalamus(Network):
             The constructed channel.
         """
         if label is None:
-            if target_net.label is not None:
-                label = 'channel to ' + target_net.label
-            else:
-                label = 'channel'
-        with net:
-            if target_input[1] is None:
-                channel = Scalar(label=label)
-            else:
-                vocab = target_input[1]
-                channel = State(vocab=vocab, label=label)
+            label = 'channel'
+        if type_ == TScalar:
+            channel = ast_dynamic.ScalarRealization()
+        else:
+            channel = ast_dynamic.StateRealization(vocab=type_.vocab)
 
         self.channels.append(channel)
         self.channel_out_connections.append(nengo.Connection(
-            channel.output, target_input[0], synapse=self.synapse_channel))
+            channel.output, sink, synapse=self.synapse_channel))
         return channel
 
     def connect_bg(self, bg):

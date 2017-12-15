@@ -15,9 +15,8 @@ def test_fixed(Simulator, seed):
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
         model.input1 = spa.Transcode('A', output_vocab=16)
         model.input2 = spa.Transcode('B', output_vocab=8)
-        with spa.Actions():
-            model.input1 >> model.buffer1
-            model.input2 >> model.buffer2
+        model.input1 >> model.buffer1
+        model.input2 >> model.buffer2
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
 
@@ -45,8 +44,7 @@ def test_time_varying_encode(Simulator, seed):
                 return '0'
 
         model.encode = spa.Transcode(stimulus, output_vocab=16)
-        with spa.Actions():
-            model.encode >> model.buffer
+        model.encode >> model.buffer
 
         p = nengo.Probe(model.buffer.output, synapse=0.03)
 
@@ -76,8 +74,7 @@ def test_encode_with_input(Simulator, seed):
 
         encode = spa.Transcode(stimulus, output_vocab=16, size_in=1)
         nengo.Connection(ctrl, encode.input)
-        with spa.Actions():
-            encode >> buffer
+        encode >> buffer
 
         p = nengo.Probe(buffer.output, synapse=0.03)
 
@@ -98,8 +95,7 @@ def test_transcode(Simulator, seed):
     with spa.Network(seed=seed) as model:
         transcode = Transcode(
             transcode_fn, input_vocab=16, output_vocab=16)
-        with spa.Actions():
-            "A" >> transcode
+        spa.sym.A >> transcode
         p = nengo.Probe(transcode.output, synapse=None)
 
     with Simulator(model) as sim:
@@ -112,8 +108,7 @@ def test_transcode(Simulator, seed):
 def test_passthrough(Simulator, seed):
     with spa.Network(seed=seed) as model:
         passthrough = Transcode(input_vocab=16, output_vocab=16)
-        with spa.Actions():
-            "A" >> passthrough
+        spa.sym.A >> passthrough
         p = nengo.Probe(passthrough.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -138,8 +133,7 @@ def test_decode(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.config[nengo.Connection].synapse = nengo.Lowpass(0.)
         model.output = Transcode(output_fn, input_vocab=16)
-        with spa.Actions():
-            "A" >> model.output
+        spa.sym.A >> model.output
 
     with Simulator(model) as sim:
         sim.run(0.01)

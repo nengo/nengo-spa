@@ -25,10 +25,11 @@ def test_basic(Simulator, plt, seed):
 
 
 def test_basal_ganglia(Simulator, seed, plt):
+    d = 64
     with spa.Network(seed=seed) as m:
-        m.vision = spa.State(vocab=16)
-        m.motor = spa.State(vocab=16)
-        m.compare = spa.Compare(vocab=16)
+        m.vision = spa.State(vocab=d)
+        m.motor = spa.State(vocab=d)
+        m.compare = spa.Compare(vocab=d)
 
         def input(t):
             if t < 0.1:
@@ -43,27 +44,34 @@ def test_basal_ganglia(Simulator, seed, plt):
                 return 'MOUSE'
             else:
                 return '0'
-        m.encode = spa.Transcode(input, output_vocab=16)
+        m.encode = spa.Transcode(input, output_vocab=d)
 
         # test all acceptable condition formats
-        with spa.Actions() as actions:
-            spa.ifmax(0.5, "A" >> m.motor)
-            spa.ifmax(spa.dot(m.vision, "CAT"), "B" >> m.motor)
-            spa.ifmax(spa.dot(m.vision * "CAT", "DOG"), "C" >> m.motor)
-            spa.ifmax(2 * spa.dot(m.vision, spa.sym("CAT") * 0.5),
-                      "D" >> m.motor)
-            spa.ifmax(spa.dot(m.vision, "CAT") + 0.5 -
-                      spa.dot(m.vision, "CAT"), "E" >> m.motor)
-            spa.ifmax(spa.dot(m.vision, "PARROT") + m.compare, "F" >> m.motor)
-            spa.ifmax(0.5 * spa.dot(m.vision, "MOUSE") + 0.5 * m.compare,
-                      "G" >> m.motor)
-            spa.ifmax((spa.dot(m.vision, "MOUSE") - m.compare) * 0.5,
-                      "H" >> m.motor)
+        with spa.ActionSelection() as actions:
+            spa.ifmax(0.5, spa.sym.A >> m.motor)
+            spa.ifmax(spa.dot(m.vision, spa.sym.CAT), spa.sym.B >> m.motor)
+            spa.ifmax(
+                spa.dot(m.vision * spa.sym.CAT, spa.sym.DOG),
+                spa.sym.C >> m.motor)
+            spa.ifmax(
+                2 * spa.dot(m.vision, spa.sym.CAT * 0.5),
+                spa.sym.D >> m.motor)
+            spa.ifmax(spa.dot(m.vision, spa.sym.CAT) + 0.5 -
+                      spa.dot(m.vision, spa.sym.CAT), spa.sym.E >> m.motor)
+            spa.ifmax(
+                spa.dot(m.vision, spa.sym.PARROT) + m.compare,
+                spa.sym.F >> m.motor)
+            spa.ifmax(
+                0.5 * spa.dot(m.vision, spa.sym.MOUSE) + 0.5 * m.compare,
+                spa.sym.G >> m.motor)
+            spa.ifmax(
+                (spa.dot(m.vision, spa.sym.MOUSE) - m.compare) * 0.5,
+                spa.sym.H >> m.motor)
 
-            m.encode >> m.vision
-            spa.sym("SHOOP") >> m.compare.input_a
-            spa.sym("SHOOP") >> m.compare.input_b
-        bg = actions[0].bg
+        m.encode >> m.vision
+        spa.sym.SHOOP >> m.compare.input_a
+        spa.sym.SHOOP >> m.compare.input_b
+        bg = actions.bg
 
         p = nengo.Probe(bg.input, 'output', synapse=0.03)
 
@@ -88,16 +96,16 @@ def test_basal_ganglia(Simulator, seed, plt):
     assert sim.data[p][t == 0.3, 2] > 0.5
 
     # Motor B should be the same as Motor D
-    assert np.allclose(sim.data[p][:, 1], sim.data[p][:, 3])
+    assert np.allclose(sim.data[p][:, 1], sim.data[p][:, 3], atol=0.2)
     # Motor A should be the same as Motor E
-    assert np.allclose(sim.data[p][:, 0], sim.data[p][:, 4])
+    assert np.allclose(sim.data[p][:, 0], sim.data[p][:, 4], atol=0.2)
 
 
 def test_scalar_product():
     with spa.Network() as model:
         model.scalar = spa.Scalar()
-        with spa.Actions():
-            spa.ifmax(model.scalar * model.scalar, "1" >> model.scalar)
+        with spa.ActionSelection():
+            spa.ifmax(model.scalar * model.scalar, 1 >> model.scalar)
     # just testing network construction without exception here
 
 
@@ -107,8 +115,9 @@ def test_constructed_input_connections_are_accessible():
         model.state1 = spa.State()
         model.state2 = spa.State()
 
-        with spa.Actions() as actions:
-            spa.ifmax(spa.dot(model.state1, "A"), "A" >> model.state2)
-        bg = actions[0].bg
+        with spa.ActionSelection() as actions:
+            spa.ifmax(
+                spa.dot(model.state1, spa.sym.A), spa.sym.A >> model.state2)
+        bg = actions.bg
 
         assert isinstance(bg.input_connections[0], nengo.Connection)

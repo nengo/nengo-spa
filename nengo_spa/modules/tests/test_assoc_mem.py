@@ -24,8 +24,7 @@ def test_am_basic(Simulator, plt, seed, rng):
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.3, input_vocab=vocab,
                                     function=filtered_step_fn)
-        with spa.Actions():
-            "A" >> m.am
+        spa.sym.A >> m.am
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -65,8 +64,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
             threshold=0.5, input_vocab=vocab, output_vocab=vocab2,
             function=filtered_step_fn, mapping='by-key')
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        with spa.Actions():
-            m.stimulus >> m.am
+        m.stimulus >> m.am
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -108,8 +106,7 @@ def test_am_wta(Simulator, plt, seed, rng):
         m.am = WTAAssocMem(
             threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        with spa.Actions():
-            m.stimulus >> m.am
+        m.stimulus >> m.am
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -152,7 +149,7 @@ def test_am_ia(Simulator, plt, seed, rng):
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
         m.reset = nengo.Node(lambda t: 0.2 < t < 0.4)
 
-        spa.Actions('m.stimulus -> m.am')
+        m.stimulus >> m.am
         nengo.Connection(m.reset, m.am.input_reset, synapse=0.1)
 
         in_p = nengo.Probe(m.am.input)
@@ -193,8 +190,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
                                     function=filtered_step_fn)
         m.am.add_default_output('D', 0.5)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
-        with spa.Actions():
-            m.stimulus >> m.am
+        m.stimulus >> m.am
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
@@ -241,8 +237,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
 
         m.inp = spa.Transcode(
             lambda t: 'A' if t < 0.1 else 'A*B', output_vocab=vocab_in)
-        with spa.Actions():
-            m.inp >> m.am
+        m.inp >> m.am
 
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)

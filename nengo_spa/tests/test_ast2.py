@@ -5,7 +5,7 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa.ast2 import coerce_types
-from nengo_spa.ast_dynamic import ActionSelection, ifmax
+from nengo_spa.ast_dynamic import ActionSelection
 from nengo_spa.ast_symbolic import PointerSymbol, sym
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.network import create_inhibit_node
@@ -480,13 +480,13 @@ def test_action_selection(Simulator, rng):
         scalar = spa.Scalar()
         pointer = spa.State(vocab)
         with ActionSelection() as action_sel:
-            ifmax(spa.dot(state, PointerSymbol('A')), 0.5 >> scalar)
-            ifmax(
+            spa.ifmax(spa.dot(state, PointerSymbol('A')), 0.5 >> scalar)
+            spa.ifmax(
                 spa.dot(state, PointerSymbol('B')),
                 PointerSymbol('B') >> pointer)
-            ifmax(spa.dot(state, PointerSymbol('C')), state >> pointer)
-            d_utility = ifmax(0, PointerSymbol('D') >> pointer)
-            ifmax(
+            spa.ifmax(spa.dot(state, PointerSymbol('C')), state >> pointer)
+            d_utility = spa.ifmax(0, PointerSymbol('D') >> pointer)
+            spa.ifmax(
                 spa.dot(state, PointerSymbol('E')),
                 0.25 >> scalar, PointerSymbol('E') >> pointer)
         nengo.Connection(

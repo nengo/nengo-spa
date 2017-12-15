@@ -1,7 +1,7 @@
 import weakref
 
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TInferVocab, TScalar, TVocabulary
+from nengo_spa.types import TInferVocab, TVocabulary
 
 
 input_network_registry = weakref.WeakKeyDictionary()
@@ -10,24 +10,18 @@ output_vocab_registry = weakref.WeakKeyDictionary()
 
 
 def coerce_types(*types):
-    if all(t == TScalar for t in types):
-        return TScalar
-
-    defined = [t for t in types if isinstance(t, TVocabulary)]
-    if len(defined) > 0:
-        if all(t == defined[0] for t in defined):
-            return defined[0]
-        else:
-            raise SpaTypeError("Vocabulary mismatch.")
-    else:
-        return TInferVocab
+    type_ = max(types)
+    if not all(t <= type_ for t in types):
+        raise SpaTypeError("Vocabulary mismatch.")
+    return type_
 
 
 def infer_types(*nodes):
     type_ = coerce_types(*[n.type for n in nodes])
     if isinstance(type_, TVocabulary):
-        for n in (n for n in nodes if n.type == TInferVocab):
-            n.type = type_
+        for n in nodes:
+            if TInferVocab <= n.type < type_:
+                n.type = type_
     return type_
 
 

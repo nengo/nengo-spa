@@ -33,9 +33,8 @@ def test_run(Simulator, seed):
                 return 'B'
 
         model.input = spa.Transcode(inputA, output_vocab=vocab)
-        with spa.Actions():
-            model.input >> model.bind.input_a
-            spa.sym("A") >> model.bind.input_b
+        model.input >> model.bind.input_a
+        spa.sym.A >> model.bind.input_b
 
     with model:
         p = nengo.Probe(model.bind.output, synapse=0.03)
