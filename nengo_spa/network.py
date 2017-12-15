@@ -1,10 +1,14 @@
+import inspect
+
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
+from nengo_spa import ast_dynamic
 from nengo_spa.ast2 import (
     input_network_registry, input_vocab_registry, output_vocab_registry, Node)
 from nengo_spa.ast_dynamic import as_node, ModuleInput, ModuleOutput
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
 
@@ -42,7 +46,10 @@ def as_sink(obj):
         input_ = obj.input
     else:
         input_ = obj
-    vocab = input_vocab_registry[input_]
+    try:
+        vocab = input_vocab_registry[input_]
+    except (KeyError, TypeError):  # Trying to create weakref can raise TypeErr
+        raise SpaTypeError("Invalid sink.")
     if vocab is None:
         return ModuleInput(input_, TScalar)
     else:
@@ -81,8 +88,15 @@ class SpaOperatorMixin(object):
     dot = __define_binary_op.__func__('dot')
     rdot = __define_binary_op.__func__('rdot')
 
+    def reinterpret(self, vocab=None):
+        return as_ast_node(self).reinterpret(vocab)
+
     def translate(self, vocab, populate=None, keys=None, solver=None):
         return as_ast_node(self).translate(vocab, populate, keys, solver)
+
+
+def ifmax(condition, *actions):
+    return ast_dynamic.ifmax(as_ast_node(condition), *actions)
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):

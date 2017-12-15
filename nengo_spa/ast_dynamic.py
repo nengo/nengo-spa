@@ -6,7 +6,7 @@ import numpy as np
 from nengo_spa.ast2 import Fixed, infer_types, Node
 from nengo_spa.ast_symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TInferVocab, TScalar, TVocabulary
+from nengo_spa.types import TInferVocab, TScalar, TVocabDimensions, TVocabulary
 
 
 BasalGangliaRealization = None
@@ -27,12 +27,14 @@ def as_node(obj):
 class DynamicNode(Node):
     def __invert__(self):
         # FIXME alternate binding operators
-        vocab = self.type.vocab
-        transform = np.eye(vocab.dimensions)[-np.arange(vocab.dimensions)]
+        if not hasattr(self.type, 'dimensions'):
+            raise SpaTypeError()  # FIXME better error
+        dimensions = self.type.dimensions
+        transform = np.eye(dimensions)[-np.arange(dimensions)]
         return Transformed(self.output, transform, self.type)
 
     def __neg__(self):
-        return Transformed(self.output, transform=-1, type_=self.type)
+        return Transformed(self.construct(), transform=-1, type_=self.type)
 
     def __add__(self, other):
         other = as_node(other)
@@ -121,7 +123,7 @@ class DynamicNode(Node):
         type_ = infer_types(self, other)
 
         if self.type == TScalar or other.type == TScalar:
-            raise NotImplementedError()  # FIXME better error?
+            raise SpaTypeError()  # FIXME better error?
 
         if isinstance(other, PointerSymbol):
             tr = np.atleast_2d(other.evaluate().v)
@@ -135,8 +137,14 @@ class DynamicNode(Node):
     def rdot(self, other):
         return self.dot(other)
 
+    def reinterpret(self, vocab=None):
+        return Transformed(
+            self.construct(), np.eye(self.type.dimensions),
+            TVocabDimensions(self.type.dimensions)
+            if vocab is None else TVocabulary(vocab))
+
     def translate(self, vocab, populate=None, keys=None, solver=None):
-        tr = self.type.vocab.transform_to(vocab, populate, solver)
+        tr = self.type.vocab.transform_to(vocab, populate, keys, solver)
         return Transformed(self.construct(), tr, TVocabulary(vocab))
 
 
@@ -170,7 +178,8 @@ class Summed(DynamicNode):
             s.connect_to(sink)
 
     def construct(self):
-        node = nengo.Node(size_in=self.type.vocab.dimensions)
+        dimensions = 1 if self.type == TScalar else self.type.dimensions
+        node = nengo.Node(size_in=dimensions)
         self.connect_to(node)
         return node
 
@@ -211,8 +220,11 @@ class RoutedConnection(object):
         self.sink = sink
         RoutedConnection.free_floating.add(self)
 
+    def connect_to(self, sink):
+        return self.source.connect_to(sink)
+
     def construct(self):
-        return self.source.connect_to(self.sink.input)
+        return self.connect_to(self.sink.input)
 
     @property
     def fixed(self):
@@ -224,16 +236,6 @@ class RoutedConnection(object):
             return self.source.evaluate()
         else:
             return np.atleast_2d(self.source.evaluate().v).T
-
-    def construct_with_channel(self):
-        if self.type == TScalar:
-            channel = ScalarRealization()
-        else:
-            channel = StateRealization(vocab=self.type.vocab)
-
-        self.source.connect_to(channel.input)
-        nengo.Connection(channel.output, self.sink.input)
-        return channel
 
 
 class ActionSelection(object):
@@ -281,8 +283,10 @@ class ActionSelection(object):
                 else:
                     self.thalamus.construct_gate(
                         index, net=NengoNetwork.context[-1])
-                    self.thalamus.connect_gate(
-                        index, effect.construct_with_channel())
+                    channel = self.thalamus.construct_channel(
+                        effect.sink.input, effect.type)
+                    effect.connect_to(channel.input)
+                    self.thalamus.connect_gate(index, channel)
 
         self.built = True
 
@@ -297,5 +301,5 @@ class ActionSelection(object):
 
 def ifmax(condition, *actions):
     utility = ActionSelection.active.add_action(condition, *actions)
-    as_node(condition).connect_to(utility.input)
+    condition.connect_to(utility.input)
     return utility

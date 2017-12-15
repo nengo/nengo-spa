@@ -190,8 +190,10 @@ class SemanticPointer(Fixed):
 
     def mse(self, other):
         """Return the mean-squared-error between two vectors."""
-        self._coerce_vocab(other)
-        return np.sum((self - other).v**2) / len(self.v)
+        if isinstance(other, SemanticPointer):
+            infer_types(self, other)
+            other = other.evaluate().v
+        return np.sum((self.v - other)**2) / len(self.v)
 
 
 class Identity(SemanticPointer):

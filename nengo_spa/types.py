@@ -17,18 +17,64 @@ class Type(object):
         return hash(self.__class__) ^ hash(self.name)
 
     def __eq__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
         return self.__class__ is other.__class__ and self.name == other.name
 
-    def __ne__(self, other):
-        return not self == other
+    def __lt__(self, other):
+        return other.__gt__(self)
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __gt__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+        return False
+
+    def __ge__(self, other):
+        return self > other or self == other
 
 
 TAction = Type('TAction')
 TActionSet = Type('TActionSet')
 TEffect = Type('TEffect')
 TEffects = Type('TEffects')
-TInferVocab = Type('TInferVocab')
 TScalar = Type('TScalar')
+
+
+class _TInferVocab(Type):
+    def __gt__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+        return other == TScalar
+
+
+TInferVocab = _TInferVocab('TInferVocab')
+
+
+class TVocabDimensions(Type):
+    def __init__(self, dimensions):
+        super(TVocabDimensions, self).__init__('TVocabDimensions')
+        self.dimensions = dimensions
+
+    def __repr__(self):
+        return '{}({!r}, {!r})'.format(
+            self.__class__.__name__, self.name, self.dimensions)
+
+    def __str__(self):
+        return '{}<{}>'.format(self.name, self.dimensions)
+
+    def __eq__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+        return (super(TVocabDimensions, self).__eq__(other) and
+                self.dimensions == other.dimensions)
+
+    def __gt__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+        return other <= TInferVocab
 
 
 class TVocabulary(Type):
@@ -41,6 +87,10 @@ class TVocabulary(Type):
         super(TVocabulary, self).__init__('TVocabulary')
         self.vocab = vocab
 
+    @property
+    def dimensions(self):
+        return self.vocab.dimensions
+
     def __repr__(self):
         return '{}({!r}, {!r})'.format(
             self.__class__.__name__, self.name, self.vocab)
@@ -52,5 +102,12 @@ class TVocabulary(Type):
         return super(TVocabulary, self).__hash__() ^ hash(self.vocab)
 
     def __eq__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
         return (super(TVocabulary, self).__eq__(other) and
                 self.vocab is other.vocab)
+
+    def __gt__(self, other):
+        if not isinstance(other, Type):
+            return NotImplemented
+        return other <= TVocabDimensions(self.vocab.dimensions)
