@@ -1,7 +1,7 @@
 import weakref
 
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TInferVocab, TVocabulary
+from nengo_spa.types import TAnyVocab, TVocabulary
 
 
 input_network_registry = weakref.WeakKeyDictionary()
@@ -20,7 +20,7 @@ def infer_types(*nodes):
     type_ = coerce_types(*[n.type for n in nodes])
     if isinstance(type_, TVocabulary):
         for n in nodes:
-            if TInferVocab <= n.type < type_:
+            if TAnyVocab <= n.type < type_:
                 n.type = type_
     return type_
 

@@ -4,7 +4,7 @@ from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
 
 from nengo_spa.ast2 import Fixed, infer_types
-from nengo_spa.types import TInferVocab, TScalar, TVocabulary
+from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
 class SemanticPointer(Fixed):
@@ -16,7 +16,7 @@ class SemanticPointer(Fixed):
 
     def __init__(self, data, rng=None, vocab=None):
         super(SemanticPointer, self).__init__(
-            TInferVocab if vocab is None else TVocabulary(vocab))
+            TAnyVocab if vocab is None else TVocabulary(vocab))
 
         if rng is None:
             rng = np.random
@@ -79,7 +79,7 @@ class SemanticPointer(Fixed):
         if not isinstance(other, Fixed):
             return NotImplemented
         type_ = infer_types(self, other)
-        vocab = None if type_ == TInferVocab else type_.vocab
+        vocab = None if type_ == TAnyVocab else type_.vocab
         return SemanticPointer(data=self.v + other.evaluate().v, vocab=vocab)
 
     def __radd__(self, other):
@@ -92,7 +92,7 @@ class SemanticPointer(Fixed):
         if not isinstance(other, Fixed):
             return NotImplemented
         type_ = infer_types(self, other)
-        vocab = None if type_ == TInferVocab else type_.vocab
+        vocab = None if type_ == TAnyVocab else type_.vocab
         return SemanticPointer(data=self.v - other.evaluate().v, vocab=vocab)
 
     def __rsub__(self, other):
@@ -135,7 +135,7 @@ class SemanticPointer(Fixed):
     def convolve(self, other):
         """Return the circular convolution of two SemanticPointers."""
         type_ = infer_types(self, other)
-        vocab = None if type_ == TInferVocab else type_.vocab
+        vocab = None if type_ == TAnyVocab else type_.vocab
         n = len(self)
         x = np.fft.irfft(
             np.fft.rfft(self.v) * np.fft.rfft(other.evaluate().v), n=n)
