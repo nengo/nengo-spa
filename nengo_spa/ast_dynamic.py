@@ -6,7 +6,7 @@ import numpy as np
 from nengo_spa.ast2 import Fixed, infer_types, Node
 from nengo_spa.ast_symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TInferVocab, TScalar, TVocabDimensions, TVocabulary
+from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
 
 
 BasalGangliaRealization = None
@@ -65,7 +65,7 @@ class DynamicNode(Node):
         type_ = infer_types(self, other)
         if other.type == TScalar:
             tr = other.value
-        elif self.type == TScalar and other.type == TInferVocab:
+        elif self.type == TScalar and other.type == TAnyVocab:
             raise SpaTypeError(
                 "Cannot infer vocabulary for fixed pointer when multiplying "
                 "with scalar.")
@@ -140,7 +140,7 @@ class DynamicNode(Node):
     def reinterpret(self, vocab=None):
         return Transformed(
             self.construct(), np.eye(self.type.dimensions),
-            TVocabDimensions(self.type.dimensions)
+            TAnyVocabOfDim(self.type.dimensions)
             if vocab is None else TVocabulary(vocab))
 
     def translate(self, vocab, populate=None, keys=None, solver=None):

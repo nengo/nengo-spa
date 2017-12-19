@@ -1,7 +1,25 @@
+"""Types used in the Nengo SPA type system to verify operations."""
+
+
 class Type(object):
     """Describes a type.
 
-    Each part of the AST evaluates to some type.
+    Types can be compared and by default two types are considered to be equal
+    when their class and name match. Subclasses are allowed to overwrite
+    *__eq__*.
+
+    Furthermore, a partial ordering can be defined over types by overwriting
+    the *__gt__* method. A call to ``a.__gt__(b)`` should return *True*, if
+    (and only if) *b* can be cast to the type *a*. For example, the type for an
+    unspecified vocabulary can be cast to the type for a specific vocabulary.
+
+    Note, that other comparison operators will be implemented on the
+    implementation of *__gt__*.
+
+    Parameters
+    ----------
+    name : str
+        Name of the type.
     """
 
     def __init__(self, name):
@@ -36,26 +54,26 @@ class Type(object):
         return self > other or self == other
 
 
-TAction = Type('TAction')
-TActionSet = Type('TActionSet')
-TEffect = Type('TEffect')
-TEffects = Type('TEffects')
 TScalar = Type('TScalar')
 
 
-class _TInferVocab(Type):
+class _TAnyVocab(Type):
+    """Type that allows for any vocabulary."""
+
     def __gt__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
         return other == TScalar
 
 
-TInferVocab = _TInferVocab('TInferVocab')
+TAnyVocab = _TAnyVocab('TAnyVocab')
 
 
-class TVocabDimensions(Type):
+class TAnyVocabOfDim(Type):
+    """Type that allows for any vocab of a given dimensionality."""
+
     def __init__(self, dimensions):
-        super(TVocabDimensions, self).__init__('TVocabDimensions')
+        super(TAnyVocabOfDim, self).__init__('TAnyVocabOfDim')
         self.dimensions = dimensions
 
     def __repr__(self):
@@ -68,17 +86,17 @@ class TVocabDimensions(Type):
     def __eq__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return (super(TVocabDimensions, self).__eq__(other) and
+        return (super(TAnyVocabOfDim, self).__eq__(other) and
                 self.dimensions == other.dimensions)
 
     def __gt__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return other <= TInferVocab
+        return other <= TAnyVocab
 
 
 class TVocabulary(Type):
-    """Each vocabulary is treated as its own type.
+    """Type for a specific vocabulary.
 
     All vocabulary types constitute a type class.
     """
@@ -110,4 +128,4 @@ class TVocabulary(Type):
     def __gt__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return other <= TVocabDimensions(self.vocab.dimensions)
+        return other <= TAnyVocabOfDim(self.vocab.dimensions)
