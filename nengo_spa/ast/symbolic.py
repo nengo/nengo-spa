@@ -2,8 +2,9 @@ import nengo
 import numpy as np
 
 from nengo_spa.ast.base import infer_types, Fixed
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
-from nengo_spa.types import TAnyVocab, TScalar
+from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 from nengo.utils.compat import is_number
 
 
@@ -50,6 +51,10 @@ class PointerSymbol(Symbol):
         return nengo.Node(self.evaluate().v, label=self.expr)
 
     def evaluate(self):
+        if not isinstance(self.type, TVocabulary):
+            raise SpaTypeError(
+                "Cannot evaluate a symbolic semantic pointer expression "
+                "without knowing the vocabulary.")
         return self.type.vocab.parse(self.expr)
 
     @property
@@ -99,7 +104,7 @@ class PointerSymbol(Symbol):
     def dot(self, other):
         other = as_node(other)
         if not isinstance(other, PointerSymbol):
-            raise NotImplementedError()
+            return NotImplemented
         type_ = infer_types(self, other)
         return FixedScalar(self.evaluate().dot(other.evaluate()))
 
