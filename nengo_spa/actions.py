@@ -7,7 +7,7 @@ import weakref
 from nengo.exceptions import NetworkContextError
 from nengo.utils.compat import is_integer
 
-from nengo_spa.ast import ActionSet, ConstructionContext
+from nengo_spa.ast.base import ActionSet, ConstructionContext
 from nengo_spa.exceptions import SpaConstructionError
 from nengo_spa.network import Network
 
