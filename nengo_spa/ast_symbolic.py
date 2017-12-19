@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
 
-from nengo_spa.ast2 import infer_types, Fixed
+from nengo_spa.ast import infer_types, Fixed
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TAnyVocab, TScalar
 from nengo.utils.compat import is_number

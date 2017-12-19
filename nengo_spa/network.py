@@ -5,7 +5,7 @@ from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
 from nengo_spa import ast_dynamic
-from nengo_spa.ast2 import Node
+from nengo_spa.ast import Node
 from nengo_spa.ast_dynamic import (
     as_node, input_network_registry, input_vocab_registry, ModuleInput,
     ModuleOutput, output_vocab_registry)
