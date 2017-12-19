@@ -126,7 +126,7 @@ class DynamicNode(Node):
     def dot(self, other):
         other = as_node(other)
         if not isinstance(other, Node):
-            raise NotImplementedError()
+            raise NotImplemented
         type_ = infer_types(self, other)
 
         if self.type == TScalar or other.type == TScalar:
