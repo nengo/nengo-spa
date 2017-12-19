@@ -4,31 +4,12 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.ast import coerce_types
 from nengo_spa.ast_dynamic import ActionSelection
 from nengo_spa.ast_symbolic import PointerSymbol, sym
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.network import create_inhibit_node
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
-from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
-
-
-def test_coercion():
-    v1 = TVocabulary(spa.Vocabulary(16))
-    v2 = TVocabulary(spa.Vocabulary(16))
-
-    assert coerce_types(TAnyVocab, TAnyVocab) is TAnyVocab
-    assert coerce_types(TAnyVocab, TScalar) is TAnyVocab
-    assert coerce_types(TAnyVocab, v1) == v1
-    assert coerce_types(TScalar, TScalar) == TScalar
-    assert coerce_types(TScalar, TScalar, TScalar) == TScalar
-    assert coerce_types(TScalar, v1) == v1
-    assert coerce_types(v1, v1) == v1
-    assert coerce_types(TAnyVocab, v1, TScalar) == v1
-    assert coerce_types(TScalar, TScalar, v1, TScalar, v1) == v1
-    with pytest.raises(SpaTypeError):
-        coerce_types(v1, v2)
+from nengo_spa.types import TVocabulary
 
 
 def test_pointer_symbol_network_creation(rng):

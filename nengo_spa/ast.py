@@ -1,12 +1,6 @@
-from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.types import TAnyVocab, TVocabulary
+"""Basic classes for abstract syntax trees (ASTs) in Nengo SPA."""
 
-
-def coerce_types(*types):
-    type_ = max(types)
-    if not all(t <= type_ for t in types):
-        raise SpaTypeError("Vocabulary mismatch.")
-    return type_
+from nengo_spa.types import coerce_types, TAnyVocab, TVocabulary
 
 
 def infer_types(*nodes):
