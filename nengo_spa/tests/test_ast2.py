@@ -11,21 +11,21 @@ from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.network import create_inhibit_node
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
-from nengo_spa.types import TInferVocab, TScalar, TVocabulary
+from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
 def test_coercion():
     v1 = TVocabulary(spa.Vocabulary(16))
     v2 = TVocabulary(spa.Vocabulary(16))
 
-    assert coerce_types(TInferVocab, TInferVocab) is TInferVocab
-    assert coerce_types(TInferVocab, TScalar) is TInferVocab
-    assert coerce_types(TInferVocab, v1) == v1
+    assert coerce_types(TAnyVocab, TAnyVocab) is TAnyVocab
+    assert coerce_types(TAnyVocab, TScalar) is TAnyVocab
+    assert coerce_types(TAnyVocab, v1) == v1
     assert coerce_types(TScalar, TScalar) == TScalar
     assert coerce_types(TScalar, TScalar, TScalar) == TScalar
     assert coerce_types(TScalar, v1) == v1
     assert coerce_types(v1, v1) == v1
-    assert coerce_types(TInferVocab, v1, TScalar) == v1
+    assert coerce_types(TAnyVocab, v1, TScalar) == v1
     assert coerce_types(TScalar, TScalar, v1, TScalar, v1) == v1
     with pytest.raises(SpaTypeError):
         coerce_types(v1, v2)

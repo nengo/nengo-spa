@@ -3,7 +3,7 @@ import numpy as np
 
 from nengo_spa.ast2 import infer_types, Fixed
 from nengo_spa.pointer import SemanticPointer
-from nengo_spa.types import TInferVocab, TScalar
+from nengo_spa.types import TAnyVocab, TScalar
 from nengo.utils.compat import is_number
 
 
@@ -39,7 +39,7 @@ class FixedScalar(Symbol):
 
 
 class PointerSymbol(Symbol):
-    def __init__(self, expr, type_=TInferVocab):
+    def __init__(self, expr, type_=TAnyVocab):
         super(PointerSymbol, self).__init__(type_=type_)
         self._expr = expr
 
