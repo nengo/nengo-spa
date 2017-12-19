@@ -1,5 +1,7 @@
 """Types used in the Nengo SPA type system to verify operations."""
 
+from nengo_spa.exceptions import SpaTypeError
+
 
 class Type(object):
     """Describes a type.
@@ -77,8 +79,8 @@ class TAnyVocabOfDim(Type):
         self.dimensions = dimensions
 
     def __repr__(self):
-        return '{}({!r}, {!r})'.format(
-            self.__class__.__name__, self.name, self.dimensions)
+        return '{}({!r})'.format(
+            self.__class__.__name__, self.dimensions)
 
     def __str__(self):
         return '{}<{}>'.format(self.name, self.dimensions)
@@ -110,8 +112,8 @@ class TVocabulary(Type):
         return self.vocab.dimensions
 
     def __repr__(self):
-        return '{}({!r}, {!r})'.format(
-            self.__class__.__name__, self.name, self.vocab)
+        return '{}({!r})'.format(
+            self.__class__.__name__, self.vocab)
 
     def __str__(self):
         return '{}<{}>'.format(self.name, self.vocab)
@@ -129,3 +131,19 @@ class TVocabulary(Type):
         if not isinstance(other, Type):
             return NotImplemented
         return other <= TAnyVocabOfDim(self.vocab.dimensions)
+
+
+def coerce_types(*types):
+    """Returns the most specific type in the argument list.
+
+    If the types passed in the argument list are incompatible a `.SpaTypeError`
+    will be raised.
+
+    The specificity of a types is defined by their partial ordering implemented
+    in the type classes.
+    """
+    type_ = max(types)
+    if not all(t <= type_ for t in types):
+        raise SpaTypeError(
+            "Incompatible types: " + ", ".join(str(t) for t in types))
+    return type_
