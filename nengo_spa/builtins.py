@@ -1,19 +1,25 @@
-from nengo_spa.exceptions import SpaTypeError
-
-
 def dot(a, b):
-    try:
-        return a.dot(b)
-    except (AttributeError, NotImplementedError):
-        try:
-            return b.dot(a)
-        except (AttributeError, NotImplementedError):
-            raise SpaTypeError()
+    result = NotImplemented
+    if hasattr(a, 'dot'):
+        result = a.dot(b)
+    if result is NotImplemented and hasattr(b, 'dot'):
+        result = b.dot(a)
+    if result is NotImplemented:
+        raise TypeError(
+            "'dot' not supported between instances of '{}' and '{}'".format(
+                type(a), type(b)))
+    return result
 
 
 def reinterpret(source, vocab=None):
-    return source.reinterpret(vocab)
+    if hasattr(source, 'reinterpret'):
+        return source.reinterpret(vocab)
+    else:
+        raise TypeError("bad operand type for 'reinterpret'")
 
 
 def translate(source, vocab, populate=None, keys=None, solver=None):
-    return source.translate(vocab, populate, keys, solver)
+    if hasattr(source, 'translate'):
+        return source.translate(vocab, populate, keys, solver)
+    else:
+        raise TypeError("bad operand type for 'translate'")
