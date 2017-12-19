@@ -4,8 +4,8 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.ast_dynamic import ActionSelection
-from nengo_spa.ast_symbolic import PointerSymbol, sym
+from nengo_spa.ast.dynamic import ActionSelection
+from nengo_spa.ast.symbolic import PointerSymbol, sym
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
