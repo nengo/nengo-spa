@@ -1,12 +1,5 @@
-import weakref
-
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TVocabulary
-
-
-input_network_registry = weakref.WeakKeyDictionary()
-input_vocab_registry = weakref.WeakKeyDictionary()
-output_vocab_registry = weakref.WeakKeyDictionary()
 
 
 def coerce_types(*types):
