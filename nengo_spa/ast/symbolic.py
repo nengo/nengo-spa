@@ -1,3 +1,5 @@
+"""AST classes for symbolic operations."""
+
 import nengo
 import numpy as np
 
@@ -8,7 +10,7 @@ from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 from nengo.utils.compat import is_number
 
 
-def as_node(obj):
+def as_symbolic_node(obj):
     if is_number(obj):
         obj = FixedScalar(obj)
     return obj
@@ -21,6 +23,12 @@ class Symbol(Fixed):
 
 
 class FixedScalar(Symbol):
+    # Does not implement any operators as Python does so for numbers and
+    # once a Python number gets converted into an AST node it must have been
+    # used with some other non-scalar AST node that will return
+    # a non-FixedScalar AST node. Thus, there should never be a situation where
+    # an operator is applied to two FixedScalar nodes.
+
     def __init__(self, value):
         super(FixedScalar, self).__init__(type_=TScalar)
         self.value = value
@@ -68,7 +76,7 @@ class PointerSymbol(Symbol):
         return PointerSymbol('-' + self.expr, self.type)
 
     def __add__(self, other):
-        other = as_node(other)
+        other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
@@ -78,7 +86,7 @@ class PointerSymbol(Symbol):
         return self + other
 
     def __sub__(self, other):
-        other = as_node(other)
+        other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
@@ -88,21 +96,21 @@ class PointerSymbol(Symbol):
         return (-self) + other
 
     def __mul__(self, other):
-        other = as_node(other)
+        other = as_symbolic_node(other)
         if not isinstance(other, Symbol):
             return NotImplemented
         type_ = infer_types(self, other)
         return PointerSymbol(self.expr + '*' + other.expr, type_)
 
     def __rmul__(self, other):
-        other = as_node(other)
+        other = as_symbolic_node(other)
         if not isinstance(other, Symbol):
             return NotImplemented
         type_ = infer_types(self, other)
         return PointerSymbol(other.expr + '*' + self.expr, type_)
 
     def dot(self, other):
-        other = as_node(other)
+        other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
@@ -120,6 +128,13 @@ class PointerSymbol(Symbol):
 
 
 class PointerSymbolFactory(object):
+    """Provides syntactic sugar to create *PointerSymbol* instances.
+
+    Use the `.sym` instance of this class to create *PointerSymbols* like so::
+
+        sym.foo  # creates PointerSymbol('foo')
+    """
+
     def __getattribute__(self, key):
         return PointerSymbol(key)
 
