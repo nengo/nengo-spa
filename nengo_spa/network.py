@@ -5,9 +5,10 @@ from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
 from nengo_spa import ast_dynamic
-from nengo_spa.ast2 import (
-    input_network_registry, input_vocab_registry, output_vocab_registry, Node)
-from nengo_spa.ast_dynamic import as_node, ModuleInput, ModuleOutput
+from nengo_spa.ast2 import Node
+from nengo_spa.ast_dynamic import (
+    as_node, input_network_registry, input_vocab_registry, ModuleInput,
+    ModuleOutput, output_vocab_registry)
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam

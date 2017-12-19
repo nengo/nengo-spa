@@ -1,3 +1,5 @@
+import weakref
+
 import nengo
 from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_number
@@ -16,6 +18,11 @@ ThalamusRealization = None
 DotProductRealization = None
 BindRealization = None
 ProductRealization = None
+
+
+input_network_registry = weakref.WeakKeyDictionary()
+input_vocab_registry = weakref.WeakKeyDictionary()
+output_vocab_registry = weakref.WeakKeyDictionary()
 
 
 def as_node(obj):
