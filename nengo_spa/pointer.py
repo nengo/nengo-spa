@@ -3,7 +3,7 @@ from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
 
-from nengo_spa.ast2 import Fixed, infer_types
+from nengo_spa.ast import Fixed, infer_types
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
