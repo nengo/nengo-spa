@@ -1,7 +1,7 @@
 from nengo_spa import version
 
-from nengo_spa.ast_dynamic import ActionSelection
-from nengo_spa.ast_symbolic import sym
+from nengo_spa.ast.dynamic import ActionSelection
+from nengo_spa.ast.symbolic import sym
 from nengo_spa.builtins import dot, reinterpret, translate
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (

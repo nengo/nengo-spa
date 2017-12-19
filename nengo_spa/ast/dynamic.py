@@ -5,8 +5,8 @@ from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast import Fixed, infer_types, Node
-from nengo_spa.ast_symbolic import FixedScalar, PointerSymbol, Symbol
+from nengo_spa.ast.base import Fixed, infer_types, Node
+from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
 

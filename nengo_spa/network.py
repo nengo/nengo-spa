@@ -4,9 +4,9 @@ import nengo
 from nengo.config import Config, SupportDefaultsMixin
 import numpy as np
 
-from nengo_spa import ast_dynamic
-from nengo_spa.ast import Node
-from nengo_spa.ast_dynamic import (
+from nengo_spa.ast import dynamic
+from nengo_spa.ast.base import Node
+from nengo_spa.ast.dynamic import (
     as_node, input_network_registry, input_vocab_registry, ModuleInput,
     ModuleOutput, output_vocab_registry)
 from nengo_spa.exceptions import SpaTypeError
@@ -97,7 +97,7 @@ class SpaOperatorMixin(object):
 
 
 def ifmax(condition, *actions):
-    return ast_dynamic.ifmax(as_ast_node(condition), *actions)
+    return dynamic.ifmax(as_ast_node(condition), *actions)
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):

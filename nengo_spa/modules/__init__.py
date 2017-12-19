@@ -26,17 +26,17 @@ from .scalar import Scalar
 from .state import State
 from .thalamus import Thalamus
 from .transcode import Transcode
-from nengo_spa import ast_dynamic
+from nengo_spa.ast import dynamic
 
 
 def register_default_modules():
-    ast_dynamic.BasalGangliaRealization = BasalGanglia
-    ast_dynamic.BindRealization = Bind
-    ast_dynamic.DotProductRealization = Compare
-    ast_dynamic.ProductRealization = Product
-    ast_dynamic.ScalarRealization = Scalar
-    ast_dynamic.StateRealization = State
-    ast_dynamic.ThalamusRealization = Thalamus
+    dynamic.BasalGangliaRealization = BasalGanglia
+    dynamic.BindRealization = Bind
+    dynamic.DotProductRealization = Compare
+    dynamic.ProductRealization = Product
+    dynamic.ScalarRealization = Scalar
+    dynamic.StateRealization = State
+    dynamic.ThalamusRealization = Thalamus
 
 
 register_default_modules()

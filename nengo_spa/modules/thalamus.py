@@ -5,7 +5,7 @@ from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
 from nengo.synapses import Lowpass, SynapseParam
 
-from nengo_spa import ast_dynamic
+from nengo_spa.ast import dynamic
 from nengo_spa.modules.scalar import Scalar
 from nengo_spa.modules.state import State
 from nengo_spa.network import Network
@@ -190,9 +190,9 @@ class Thalamus(Network):
         if label is None:
             label = 'channel'
         if type_ == TScalar:
-            channel = ast_dynamic.ScalarRealization()
+            channel = dynamic.ScalarRealization()
         else:
-            channel = ast_dynamic.StateRealization(vocab=type_.vocab)
+            channel = dynamic.StateRealization(vocab=type_.vocab)
 
         self.channels.append(channel)
         self.channel_out_connections.append(nengo.Connection(
