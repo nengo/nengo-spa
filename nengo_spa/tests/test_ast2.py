@@ -6,7 +6,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.actions import ActionSelection
 from nengo_spa.ast.symbolic import PointerSymbol, sym
-from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
 from nengo_spa.types import TVocabulary
@@ -471,7 +471,7 @@ def test_action_selection(Simulator, rng):
                 spa.dot(state, PointerSymbol('E')),
                 0.25 >> scalar, PointerSymbol('E') >> pointer)
         nengo.Connection(
-            nengo.Node(lambda t: 1.5 < t <= 2.), d_utility.input)
+            nengo.Node(lambda t: 1.5 < t <= 2.), d_utility)
         p_scalar = nengo.Probe(scalar.output, synapse=0.03)
         p_pointer = nengo.Probe(pointer.output, synapse=0.03)
 
@@ -494,7 +494,7 @@ def test_action_selection(Simulator, rng):
 def test_does_not_allow_nesting_of_action_selection():
     with spa.Network():
         with ActionSelection():
-            with pytest.raises(RuntimeError):
+            with pytest.raises(SpaActionSelectionError):
                 with ActionSelection():
                     pass
 
@@ -503,7 +503,7 @@ def test_action_selection_enforces_connections_to_be_part_of_action():
     with spa.Network():
         state1 = spa.State(16)
         state2 = spa.State(16)
-        with pytest.raises(RuntimeError):
+        with pytest.raises(SpaActionSelectionError):
             with ActionSelection():
                     state1 >> state2
 
