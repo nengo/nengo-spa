@@ -2,6 +2,10 @@ class SpaException(Exception):
     """A exception within the SPA subsystem."""
 
 
+class SpaActionSelectionError(SpaException):
+    """An error in the usage of the SPA action selection system."""
+
+
 class SpaConstructionError(SpaException):
     """An error in the construction of SPA action rules."""
 
