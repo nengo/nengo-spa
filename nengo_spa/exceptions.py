@@ -6,10 +6,6 @@ class SpaActionSelectionError(SpaException):
     """An error in the usage of the SPA action selection system."""
 
 
-class SpaConstructionError(SpaException):
-    """An error in the construction of SPA action rules."""
-
-
 class SpaParseError(SpaException, ValueError):
     """An error encountered while parsing a SPA expression."""
 
