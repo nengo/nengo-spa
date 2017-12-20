@@ -3,7 +3,7 @@ def dot(a, b):
     if hasattr(a, 'dot'):
         result = a.dot(b)
     if result is NotImplemented and hasattr(b, 'dot'):
-        result = b.dot(a)
+        result = b.rdot(a)
     if result is NotImplemented:
         raise TypeError(
             "'dot' not supported between instances of '{}' and '{}'".format(

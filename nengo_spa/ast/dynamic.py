@@ -1,23 +1,24 @@
+"""AST classes for dynamic operations (i.e. their output changes over time)."""
+
 import weakref
 
 import nengo
-from nengo.network import Network as NengoNetwork
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast.base import Fixed, infer_types, Node
+from nengo_spa.ast.base import infer_types, Node
 from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
 
 
 BasalGangliaRealization = None
+BindRealization = None
+DotProductRealization = None
+ProductRealization = None
 ScalarRealization = None
 StateRealization = None
 ThalamusRealization = None
-DotProductRealization = None
-BindRealization = None
-ProductRealization = None
 
 
 input_network_registry = weakref.WeakKeyDictionary()
@@ -25,17 +26,24 @@ input_vocab_registry = weakref.WeakKeyDictionary()
 output_vocab_registry = weakref.WeakKeyDictionary()
 
 
-def as_node(obj):
-    if is_number(obj):
-        obj = FixedScalar(obj)
-    return obj
+def binary_node_op(fn):
+    def checked(self, other):
+        if is_number(other):
+            other = FixedScalar(other)
+        if not isinstance(other, Node):
+            return NotImplemented
+        else:
+            return fn(self, other)
+    return checked
 
 
 class DynamicNode(Node):
+    """Base class for AST node with an output that changes over time."""
+
     def __invert__(self):
-        # FIXME alternate binding operators
         if not hasattr(self.type, 'dimensions'):
-            raise SpaTypeError()  # FIXME better error
+            raise SpaTypeError(
+                "Cannot invert semantic pointer of unknown dimensionality.")
         dimensions = self.type.dimensions
         transform = np.eye(dimensions)[-np.arange(dimensions)]
         return Transformed(self.output, transform, self.type)
@@ -43,29 +51,21 @@ class DynamicNode(Node):
     def __neg__(self):
         return Transformed(self.construct(), transform=-1, type_=self.type)
 
+    @binary_node_op
     def __add__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
         type_ = infer_types(self, other)
         return Summed((self, other), type_)
 
+    @binary_node_op
     def __radd__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
         return self + other
 
+    @binary_node_op
     def __sub__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
         return self + (-other)
 
+    @binary_node_op
     def __rsub__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
         return (-self) + other
 
     def _mul_with_fixed(self, other):
@@ -103,34 +103,26 @@ class DynamicNode(Node):
         b.connect_to(mul.input_b)
         return ModuleOutput(mul.output, type_)
 
+    @binary_node_op
     def __mul__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
-
         if isinstance(other, Symbol):
             return self._mul_with_fixed(other)
         else:
             return self._mul_with_dynamic(other)
 
+    @binary_node_op
     def __rmul__(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            return NotImplemented
-
         if isinstance(other, Symbol):
             return self._mul_with_fixed(other)
         else:
             return self._mul_with_dynamic(other, swap_inputs=True)
 
+    @binary_node_op
     def dot(self, other):
-        other = as_node(other)
-        if not isinstance(other, Node):
-            raise NotImplemented
         type_ = infer_types(self, other)
 
         if self.type == TScalar or other.type == TScalar:
-            raise SpaTypeError()  # FIXME better error?
+            raise SpaTypeError("Cannot do a dot product with a scalar.")
 
         if isinstance(other, PointerSymbol):
             tr = np.atleast_2d(other.evaluate().v)
@@ -156,13 +148,24 @@ class DynamicNode(Node):
 
 
 class Transformed(DynamicNode):
+    """AST node representing a transform.
+
+    Parameters
+    ----------
+    source : NengoObject
+        Nengo object providing the output to apply the transform to.
+    transform : ndarray
+        Transform to apply.
+    type_ : nengo_spa.types.Type
+        The resulting type.
+    """
+
     def __init__(self, source, transform, type_):
         super(Transformed, self).__init__(type_=type_)
         self.source = source
         self.transform = transform
 
     def connect_to(self, sink):
-        # FIXME connection params
         return nengo.Connection(self.source, sink, transform=self.transform)
 
     def construct(self):
@@ -176,6 +179,16 @@ class Transformed(DynamicNode):
 
 
 class Summed(DynamicNode):
+    """AST node representing the sum of multiple nodes.
+
+    Parameters
+    ----------
+    sources : sequence of NengoObject
+        Sequence of Nengo objects providing outputs to be summed.
+    type_ : nengo_spa.types.Type
+        The resulting type.
+    """
+
     def __init__(self, sources, type_):
         super(Summed, self).__init__(type_=type_)
         self.sources = sources
@@ -192,6 +205,16 @@ class Summed(DynamicNode):
 
 
 class ModuleOutput(DynamicNode):
+    """AST node representing the output of a SPA module.
+
+    Parameters
+    ----------
+    output : NengoObject
+        Nengo object providing the module output.
+    type_ : nengo_spa.types.Type
+        The resulting type.
+    """
+
     def __init__(self, output, type_):
         super(ModuleOutput, self).__init__(type_=type_)
         self.output = output
@@ -201,112 +224,3 @@ class ModuleOutput(DynamicNode):
 
     def connect_to(self, sink):
         nengo.Connection(self.output, sink)
-
-
-class ModuleInput(object):
-    def __init__(self, input_, type_):
-        self.input = input_
-        self.type = type_
-
-    def __rrshift__(self, other):
-        if not isinstance(other, Node):
-            return NotImplemented
-        if ActionSelection.active is None:
-            infer_types(self, other)
-            other.connect_to(self.input)
-        else:
-            return RoutedConnection(other, self)
-
-
-class RoutedConnection(object):
-    free_floating = set()
-
-    def __init__(self, source, sink):
-        self.type = infer_types(source, sink)
-        self.source = source
-        self.sink = sink
-        RoutedConnection.free_floating.add(self)
-
-    def connect_to(self, sink):
-        return self.source.connect_to(sink)
-
-    def construct(self):
-        return self.connect_to(self.sink.input)
-
-    @property
-    def fixed(self):
-        return isinstance(self.source, Fixed)
-
-    def transform(self):
-        assert self.fixed
-        if self.type == TScalar:
-            return self.source.evaluate()
-        else:
-            return np.atleast_2d(self.source.evaluate().v).T
-
-
-class ActionSelection(object):
-    active = None
-
-    def __init__(self):
-        self.built = False
-        self.bg = None
-        self.thalamus = None
-        self.utilities = []
-        self.actions = []
-
-    def __enter__(self):
-        assert not self.built
-        if ActionSelection.active is None:
-            ActionSelection.active = self
-        else:
-            raise RuntimeError()  # FIXME better error
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        ActionSelection.active = None
-
-        if exc_type is not None:
-            return
-
-        if len(RoutedConnection.free_floating) > 0:
-            raise RuntimeError()  # FIXME better error
-
-        if len(self.utilities) <= 0:
-            return
-
-        self.bg = BasalGangliaRealization(len(self.utilities))
-        self.thalamus = ThalamusRealization(len(self.utilities))
-        self.thalamus.connect_bg(self.bg)
-
-        for index, utility in enumerate(self.utilities):
-            self.bg.connect_input(utility.output, index=index)
-
-        for index, action in enumerate(self.actions):
-            for effect in action:
-                if effect.fixed:
-                    self.thalamus.connect_fixed(
-                        index, effect.sink.input, transform=effect.transform())
-                else:
-                    self.thalamus.construct_gate(
-                        index, net=NengoNetwork.context[-1])
-                    channel = self.thalamus.construct_channel(
-                        effect.sink.input, effect.type)
-                    effect.connect_to(channel.input)
-                    self.thalamus.connect_gate(index, channel)
-
-        self.built = True
-
-    def add_action(self, condition, *actions):
-        assert ActionSelection.active is self
-        utility = ScalarRealization()  # FIXME should be node
-        self.utilities.append(utility)
-        self.actions.append(actions)
-        RoutedConnection.free_floating.difference_update(actions)
-        return utility
-
-
-def ifmax(condition, *actions):
-    utility = ActionSelection.active.add_action(condition, *actions)
-    condition.connect_to(utility.input)
-    return utility
