@@ -7,7 +7,6 @@ import numpy as np
 
 from nengo_spa.actions import ifmax as actions_ifmax
 from nengo_spa.actions import ModuleInput
-from nengo_spa.ast import dynamic
 from nengo_spa.ast.base import Node
 from nengo_spa.ast.dynamic import (
     input_network_registry, input_vocab_registry, ModuleOutput,
@@ -63,6 +62,12 @@ def as_sink(obj):
 
 
 class SpaOperatorMixin(object):
+    """Mixin class that implements the SPA operators.
+
+    All operands will be converted to AST node and the implementation of the
+    operator itself is delegated to the implementation provided by those nodes.
+    """
+
     @staticmethod
     def __define_unary_op(op):
         def op_impl(self):
@@ -102,6 +107,24 @@ class SpaOperatorMixin(object):
 
 
 def ifmax(condition, *actions):
+    """Defines a potential action within an `ActionSelection` context.
+
+    This implementation allows Nengo objects in addition to AST nodes as
+    condition argument 
+
+    Parameters
+    ----------
+    condition : nengo_spa.ast.base.Node or NengoObject
+        The utility value for the given actions.
+    actions : sequence of `RoutedConnection`
+        The actions to activate if the given utility is the highest.
+
+    Returns
+    -------
+    NengoObject
+        Nengo object that can be connected to, to provide additional input to
+        the utility value.
+    """
     return actions_ifmax(as_ast_node(condition), *actions)
 
 
