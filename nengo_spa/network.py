@@ -2,13 +2,17 @@ import inspect
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
+from nengo.utils.compat import is_number
 import numpy as np
 
+from nengo_spa.actions import ifmax as actions_ifmax
+from nengo_spa.actions import ModuleInput
 from nengo_spa.ast import dynamic
 from nengo_spa.ast.base import Node
 from nengo_spa.ast.dynamic import (
-    as_node, input_network_registry, input_vocab_registry, ModuleInput,
-    ModuleOutput, output_vocab_registry)
+    input_network_registry, input_vocab_registry, ModuleOutput,
+    output_vocab_registry)
+from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TScalar, TVocabulary
 from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
@@ -28,10 +32,11 @@ class _AutoConfig(object):
 
 
 def as_ast_node(obj):
-    obj = as_node(obj)
     if isinstance(obj, Node):
         return obj
-    if isinstance(obj, Network):
+    elif is_number(obj):
+        return FixedScalar(obj)
+    elif isinstance(obj, Network):
         output = obj.output
     else:
         output = obj
@@ -97,7 +102,7 @@ class SpaOperatorMixin(object):
 
 
 def ifmax(condition, *actions):
-    return dynamic.ifmax(as_ast_node(condition), *actions)
+    return actions_ifmax(as_ast_node(condition), *actions)
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
