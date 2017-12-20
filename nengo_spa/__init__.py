@@ -2,7 +2,7 @@ from nengo_spa import version
 
 from nengo_spa.actions import ActionSelection
 from nengo_spa.ast.symbolic import sym
-from nengo_spa.builtins import dot, reinterpret, translate
+from nengo_spa.operators import dot, reinterpret, translate
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
     AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,
