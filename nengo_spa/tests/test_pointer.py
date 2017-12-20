@@ -1,10 +1,16 @@
+import nengo
 from nengo.exceptions import ValidationError
 from nengo.utils.compat import range
 import numpy as np
+from numpy.testing import assert_equal
 import pytest
 
+import nengo_spa as spa
+from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
+from nengo_spa.testing import sp_close
+from nengo_spa.types import TVocabulary
 from nengo_spa.vocab import Vocabulary
 
 
@@ -200,6 +206,39 @@ def test_none_vocab_is_always_compatible(op):
     a = SemanticPointer(50, vocab=v)
     b = SemanticPointer(50, vocab=None)
     x = eval(op)  # no assertion, just checking that no exception is raised
+
+
+def test_fixed_pointer_network_creation(rng):
+    with spa.Network() as model:
+        A = SemanticPointer(16)
+        node = A.construct()
+    assert_equal(node.output, A.v)
+
+
+@pytest.mark.parametrize('op', ['+', '-', '*'])
+@pytest.mark.parametrize('order', ['AB', 'BA'])
+def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
+        Simulator, op, order, rng):
+    vocab = spa.Vocabulary(64, rng=rng)
+    vocab.populate('A; B')
+    a = PointerSymbol('A', TVocabulary(vocab))
+    b = SemanticPointer(vocab['B'].v)
+
+    with spa.Network() as model:
+        if order == 'AB':
+            x = eval('a' + op + 'b')
+        elif order == 'BA':
+            x = eval('b' + op + 'a')
+        else:
+            raise ValueError('Invalid order argument.')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
+        skip=0.3)
 
 
 def test_identity(rng):
