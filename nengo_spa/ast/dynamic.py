@@ -3,7 +3,6 @@
 import weakref
 
 import nengo
-from nengo.config import Default
 from nengo.utils.compat import is_number
 import numpy as np
 
@@ -166,12 +165,12 @@ class Transformed(DynamicNode):
         self.source = source
         self.transform = transform
 
-    def connect_to(self, sink, transform=Default):
-        if transform is Default:
-            transform = self.transform
+    def connect_to(self, sink, **kwargs):
+        if 'transform' in kwargs:
+            transform = np.dot(kwargs.pop('transform'), self.transform)
         else:
-            transform = np.dot(transform, self.transform)
-        return self.source.connect_to(sink, transform=transform)
+            transform = self.transform
+        return self.source.connect_to(sink, transform=transform, **kwargs)
 
     def construct(self):
         if self.type == TScalar:
@@ -179,7 +178,7 @@ class Transformed(DynamicNode):
         else:
             size_in = self.type.vocab.dimensions
         node = nengo.Node(size_in=size_in)
-        self.connect_to(node)
+        self.connect_to(node, synapse=None)
         return node
 
 
@@ -198,14 +197,14 @@ class Summed(DynamicNode):
         super(Summed, self).__init__(type_=type_)
         self.sources = sources
 
-    def connect_to(self, sink, transform=Default):
+    def connect_to(self, sink, **kwargs):
         for s in self.sources:
-            s.connect_to(sink, transform=transform)
+            s.connect_to(sink, **kwargs)
 
     def construct(self):
         dimensions = 1 if self.type == TScalar else self.type.dimensions
         node = nengo.Node(size_in=dimensions)
-        self.connect_to(node)
+        self.connect_to(node, synapse=None)
         return node
 
 
@@ -227,5 +226,5 @@ class ModuleOutput(DynamicNode):
     def construct(self):
         return self.output
 
-    def connect_to(self, sink, transform=Default):
-        nengo.Connection(self.output, sink, transform=transform)
+    def connect_to(self, sink, **kwargs):
+        nengo.Connection(self.output, sink, **kwargs)

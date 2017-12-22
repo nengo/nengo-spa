@@ -1,7 +1,6 @@
 """AST classes for symbolic operations."""
 
 import nengo
-from nengo.config import Default
 import numpy as np
 
 from nengo_spa.ast.base import infer_types, Fixed
@@ -34,8 +33,8 @@ class FixedScalar(Symbol):
         super(FixedScalar, self).__init__(type_=TScalar)
         self.value = value
 
-    def connect_to(self, sink, transform=Default):
-        return nengo.Connection(self.construct(), sink, transform=Default)
+    def connect_to(self, sink, **kwargs):
+        return nengo.Connection(self.construct(), sink, **kwargs)
 
     def construct(self):
         return nengo.Node(self.value, label=str(self.value))
@@ -53,8 +52,8 @@ class PointerSymbol(Symbol):
         super(PointerSymbol, self).__init__(type_=type_)
         self._expr = expr
 
-    def connect_to(self, sink, transform=Default):
-        return nengo.Connection(self.construct(), sink, transform=Default)
+    def connect_to(self, sink, **kwargs):
+        return nengo.Connection(self.construct(), sink, **kwargs)
 
     def construct(self):
         return nengo.Node(self.evaluate().v, label=self.expr)
