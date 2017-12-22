@@ -116,8 +116,14 @@ class PointerSymbol(Symbol):
         type_ = infer_types(self, other)
         return FixedScalar(self.evaluate().dot(other.evaluate()))
 
+    def __matmul__(self, other):
+        return self.dot(other)
+
     def rdot(self, other):
         return self.dot(other)
+
+    def __rmatmul__(self, other):
+        return self.rdot(other)
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
         tr = self.type.vocab.transform_to(vocab, populate, solver)
