@@ -159,6 +159,9 @@ class SemanticPointer(Fixed):
             other = other.evaluate().v
         return np.dot(self.v, other)
 
+    def __matmul__(self, other):
+        return self.dot(other)
+
     def compare(self, other):
         """Return the similarity between two SemanticPointers.
 

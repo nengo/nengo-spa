@@ -1,3 +1,5 @@
+import sys
+
 import nengo
 import numpy as np
 from numpy.testing import assert_allclose
@@ -223,6 +225,46 @@ def test_dot_with_fixed(Simulator, rng):
         b = spa.Transcode(
             lambda t: 'A' if t <= 0.5 else 'B', output_vocab=vocab)
         x = spa.dot(a, b)
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(1.)
+
+    t = sim.trange()
+    assert_allclose(sim.data[p][(0.3 < t) & (t <= 0.5)], 1., atol=.2)
+    assert np.all(sim.data[p][0.8 < t] < 0.2)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
+def test_dot_matmul(Simulator, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=vocab)
+        b = spa.Transcode(
+            lambda t: 'A' if t <= 0.5 else 'B', output_vocab=vocab)
+        x = eval('a @ b')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with nengo.Simulator(model) as sim:
+        sim.run(1.)
+
+    t = sim.trange()
+    assert_allclose(sim.data[p][(0.3 < t) & (t <= 0.5)], 1., atol=.2)
+    assert np.all(sim.data[p][0.8 < t] < 0.2)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
+def test_dot_with_fixed_matmul(Simulator, rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A; B')
+
+    with spa.Network() as model:
+        a = PointerSymbol('A')
+        b = spa.Transcode(
+            lambda t: 'A' if t <= 0.5 else 'B', output_vocab=vocab)
+        x = eval('a @ b')
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with nengo.Simulator(model) as sim:

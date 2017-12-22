@@ -133,8 +133,14 @@ class DynamicNode(Node):
             other.connect_to(net.input_b)
             return ModuleOutput(net.output, TScalar)
 
+    def __matmul__(self, other):
+        return self.dot(other)
+
     def rdot(self, other):
         return self.dot(other)
+
+    def __rmatmul__(self, other):
+        return self.rdot(other)
 
     def reinterpret(self, vocab=None):
         return Transformed(
