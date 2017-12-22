@@ -1,3 +1,5 @@
+import sys
+
 import nengo
 from nengo.exceptions import ValidationError
 from nengo.utils.compat import range
@@ -134,6 +136,13 @@ def test_dot(rng):
     a = SemanticPointer(50, rng=rng) * 1.1
     b = SemanticPointer(50, rng=rng) * (-1.5)
     assert np.allclose(a.dot(b), np.dot(a.v, b.v))
+
+
+@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
+def test_dot_matmul(rng):
+    a = SemanticPointer(50, rng=rng) * 1.1
+    b = SemanticPointer(50, rng=rng) * (-1.5)
+    assert np.allclose(eval('a @ b'), np.dot(a.v, b.v))
 
 
 def test_distance(rng):

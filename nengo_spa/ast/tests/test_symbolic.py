@@ -1,3 +1,5 @@
+import sys
+
 import nengo
 from numpy.testing import assert_allclose, assert_equal
 import pytest
@@ -86,6 +88,16 @@ def test_fixed_dot(rng):
         spa.dot(PointerSymbol('A', v), PointerSymbol('A', v)).evaluate(), 1.)
     assert spa.dot(
         PointerSymbol('A', v), PointerSymbol('B', v)).evaluate() <= 0.1
+
+
+@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
+def test_fixed_dot_matmul(rng):
+    vocab = spa.Vocabulary(16, rng=rng)
+    vocab.populate('A; B')
+
+    v = TVocabulary(vocab)
+    assert_allclose(
+        eval("PointerSymbol('A', v) @ PointerSymbol('A', v)").evaluate(), 1.)
 
 
 def test_translate(rng):
