@@ -3,6 +3,7 @@
 import weakref
 
 import nengo
+from nengo.config import Default
 from nengo.utils.compat import is_number
 import numpy as np
 
@@ -46,10 +47,10 @@ class DynamicNode(Node):
                 "Cannot invert semantic pointer of unknown dimensionality.")
         dimensions = self.type.dimensions
         transform = np.eye(dimensions)[-np.arange(dimensions)]
-        return Transformed(self.output, transform, self.type)
+        return Transformed(self, transform, self.type)
 
     def __neg__(self):
-        return Transformed(self.construct(), transform=-1, type_=self.type)
+        return Transformed(self, transform=-1, type_=self.type)
 
     @binary_node_op
     def __add__(self, other):
@@ -83,7 +84,7 @@ class DynamicNode(Node):
                 tr = other.evaluate().get_convolution_matrix()
         else:
             raise AssertionError("Unexpected node type in multiply.")
-        return Transformed(self.construct(), tr, self.type)
+        return Transformed(self, tr, self.type)
 
     def _mul_with_dynamic(self, other, swap_inputs=False):
         type_ = infer_types(self, other)
@@ -126,7 +127,7 @@ class DynamicNode(Node):
 
         if isinstance(other, PointerSymbol):
             tr = np.atleast_2d(other.evaluate().v)
-            return Transformed(self.construct(), tr, TScalar)
+            return Transformed(self, tr, TScalar)
         else:
             net = DotProductRealization(type_.vocab)
             self.connect_to(net.input_a)
@@ -138,13 +139,13 @@ class DynamicNode(Node):
 
     def reinterpret(self, vocab=None):
         return Transformed(
-            self.construct(), np.eye(self.type.dimensions),
+            self, np.eye(self.type.dimensions),
             TAnyVocabOfDim(self.type.dimensions)
             if vocab is None else TVocabulary(vocab))
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
         tr = self.type.vocab.transform_to(vocab, populate, keys, solver)
-        return Transformed(self.construct(), tr, TVocabulary(vocab))
+        return Transformed(self, tr, TVocabulary(vocab))
 
 
 class Transformed(DynamicNode):
@@ -165,8 +166,12 @@ class Transformed(DynamicNode):
         self.source = source
         self.transform = transform
 
-    def connect_to(self, sink):
-        return nengo.Connection(self.source, sink, transform=self.transform)
+    def connect_to(self, sink, transform=Default):
+        if transform is Default:
+            transform = self.transform
+        else:
+            transform = np.dot(transform, self.transform)
+        return self.source.connect_to(sink, transform=transform)
 
     def construct(self):
         if self.type == TScalar:
@@ -193,9 +198,9 @@ class Summed(DynamicNode):
         super(Summed, self).__init__(type_=type_)
         self.sources = sources
 
-    def connect_to(self, sink):
+    def connect_to(self, sink, transform=Default):
         for s in self.sources:
-            s.connect_to(sink)
+            s.connect_to(sink, transform=transform)
 
     def construct(self):
         dimensions = 1 if self.type == TScalar else self.type.dimensions
@@ -222,5 +227,5 @@ class ModuleOutput(DynamicNode):
     def construct(self):
         return self.output
 
-    def connect_to(self, sink):
-        nengo.Connection(self.output, sink)
+    def connect_to(self, sink, transform=Default):
+        nengo.Connection(self.output, sink, transform=transform)

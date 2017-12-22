@@ -1,4 +1,5 @@
 import nengo
+from nengo.config import Default
 from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
@@ -39,8 +40,8 @@ class SemanticPointer(Fixed):
     def evaluate(self):
         return self
 
-    def connect_to(self, sink):
-        return nengo.Connection(self.construct(), sink)
+    def connect_to(self, sink, transform=Default):
+        return nengo.Connection(self.construct(), sink, transform=transform)
 
     def construct(self):
         return nengo.Node(self.v)

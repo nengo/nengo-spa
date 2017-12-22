@@ -1,5 +1,7 @@
 """Basic classes for abstract syntax trees (ASTs) in Nengo SPA."""
 
+from nengo.config import Default
+
 from nengo_spa.types import coerce_types, TAnyVocab, TVocabulary
 
 
@@ -30,7 +32,7 @@ class Node(object):
     def __init__(self, type_):
         self.type = type_
 
-    def connect_to(self, sink):
+    def connect_to(self, sink, transform=Default):
         """Implement the computation represented by the node and connect it.
 
         Parameters
