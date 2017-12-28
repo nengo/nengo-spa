@@ -39,11 +39,18 @@ def as_ast_node(obj):
         output = obj.output
     else:
         output = obj
+
     try:
+        # Trying to create weakref on access of weak dict can raise TypeError
         vocab = output_vocab_registry[output]
-    except (KeyError, TypeError):  # Trying to create weakref can raise TypeErr
-        raise SpaTypeError("{} was not registered as a SPA output.".format(
+    except (KeyError, TypeError) as cause:
+        err = SpaTypeError("{} was not registered as a SPA output.".format(
             output))
+        err.__suppress_context__ = True
+        raise err
+    finally:
+        err = None  # prevent cyclic reference, traceback might reference this
+
     if vocab is None:
         return ModuleOutput(output, TScalar)
     else:
@@ -55,11 +62,18 @@ def as_sink(obj):
         input_ = obj.input
     else:
         input_ = obj
+
     try:
+        # Trying to create weakref on access of weak dict can raise TypeError
         vocab = input_vocab_registry[input_]
-    except (KeyError, TypeError):  # Trying to create weakref can raise TypeErr
-        raise SpaTypeError("{} was not registered as a SPA input.".format(
+    except (KeyError, TypeError) as cause:
+        err = SpaTypeError("{} was not registered as a SPA input.".format(
             input_))
+        err.__suppress_context__ = True
+        raise err
+    finally:
+        err = None  # prevent cyclic reference, traceback might reference this
+
     if vocab is None:
         return ModuleInput(input_, TScalar)
     else:
