@@ -6,7 +6,7 @@ import nengo
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast.base import infer_types, Node
+from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
 from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
@@ -26,15 +26,13 @@ input_vocab_registry = weakref.WeakKeyDictionary()
 output_vocab_registry = weakref.WeakKeyDictionary()
 
 
-def binary_node_op(fn):
-    def checked(self, other):
-        if is_number(other):
-            other = FixedScalar(other)
-        if not isinstance(other, Node):
-            return NotImplemented
-        else:
-            return fn(self, other)
-    return checked
+def as_node(obj):
+    if is_number(obj):
+        obj = FixedScalar(obj)
+    return obj
+
+
+binary_node_op = TypeCheckedBinaryOp(Node, as_node)
 
 
 class DynamicNode(Node):

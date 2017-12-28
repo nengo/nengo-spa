@@ -3,7 +3,7 @@ from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
 
-from nengo_spa.ast.base import Fixed, infer_types
+from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
@@ -75,9 +75,8 @@ class SemanticPointer(Fixed):
     def __str__(self):
         return str(self.v)
 
+    @TypeCheckedBinaryOp(Fixed)
     def __add__(self, other):
-        if not isinstance(other, Fixed):
-            return NotImplemented
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
         return SemanticPointer(data=self.v + other.evaluate().v, vocab=vocab)
@@ -88,9 +87,8 @@ class SemanticPointer(Fixed):
     def __neg__(self):
         return SemanticPointer(data=-self.v, vocab=self.vocab)
 
+    @TypeCheckedBinaryOp(Fixed)
     def __sub__(self, other):
-        if not isinstance(other, Fixed):
-            return NotImplemented
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
         return SemanticPointer(data=self.v - other.evaluate().v, vocab=vocab)

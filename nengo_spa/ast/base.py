@@ -60,3 +60,34 @@ class Fixed(Node):
     def evaluate(self):
         """Return the fixed value that the node evaluates to."""
         raise NotImplementedError()
+
+
+class TypeCheckedBinaryOp(object):
+    """Decorator to check the type of the *other* parameter of an operator.
+
+    If the *other* parameter is not an instance of *expected_type*,
+    *NotImplemented* will be returned from the decorated method. If
+    *conversion* is given it will be applied first.
+
+    Parameters
+    ----------
+    expected_type : class
+        Type for which the operator is implemented.
+    conversion : function, optional
+        Used to convert *other* before checking its type.
+    """
+
+    __slots__ = ['expected_type', 'conversion']
+
+    def __init__(self, expected_type, conversion=None):
+        self.expected_type = expected_type
+        self.conversion = conversion
+
+    def __call__(self, fn):
+        def checked(inst, other):
+            if self.conversion is not None:
+                other = self.conversion(other)
+            if not isinstance(other, self.expected_type):
+                return NotImplemented
+            return fn(inst, other)
+        return checked
