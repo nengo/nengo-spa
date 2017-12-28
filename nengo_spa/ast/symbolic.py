@@ -3,7 +3,7 @@
 import nengo
 import numpy as np
 
-from nengo_spa.ast.base import infer_types, Fixed
+from nengo_spa.ast.base import infer_types, Fixed, TypeCheckedBinaryOp
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
@@ -20,6 +20,9 @@ class Symbol(Fixed):
     @property
     def expr(self):
         raise NotImplementedError()
+
+
+symbolic_op = TypeCheckedBinaryOp(Symbol, as_symbolic_node)
 
 
 class FixedScalar(Symbol):
@@ -95,17 +98,13 @@ class PointerSymbol(Symbol):
     def __rsub__(self, other):
         return (-self) + other
 
+    @symbolic_op
     def __mul__(self, other):
-        other = as_symbolic_node(other)
-        if not isinstance(other, Symbol):
-            return NotImplemented
         type_ = infer_types(self, other)
         return PointerSymbol(self.expr + '*' + other.expr, type_)
 
+    @symbolic_op
     def __rmul__(self, other):
-        other = as_symbolic_node(other)
-        if not isinstance(other, Symbol):
-            return NotImplemented
         type_ = infer_types(self, other)
         return PointerSymbol(other.expr + '*' + self.expr, type_)
 
