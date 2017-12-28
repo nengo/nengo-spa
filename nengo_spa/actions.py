@@ -166,7 +166,7 @@ class ActionSelection(object):
 
         self.built = True
 
-    def add_action(self, condition, *actions):
+    def add_action(self, *actions):
         assert ActionSelection.active is self
         utility = nengo.Node(size_in=1)
         self._utilities.append(utility)
@@ -191,6 +191,6 @@ def ifmax(condition, *actions):
         Nengo object that can be connected to, to provide additional input to
         the utility value.
     """
-    utility = ActionSelection.active.add_action(condition, *actions)
+    utility = ActionSelection.active.add_action(*actions)
     condition.connect_to(utility)
     return utility
