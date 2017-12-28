@@ -39,7 +39,11 @@ def as_ast_node(obj):
         output = obj.output
     else:
         output = obj
-    vocab = output_vocab_registry[output]
+    try:
+        vocab = output_vocab_registry[output]
+    except (KeyError, TypeError):  # Trying to create weakref can raise TypeErr
+        raise SpaTypeError("{} was not registered as a SPA output.".format(
+            output))
     if vocab is None:
         return ModuleOutput(output, TScalar)
     else:
@@ -54,7 +58,8 @@ def as_sink(obj):
     try:
         vocab = input_vocab_registry[input_]
     except (KeyError, TypeError):  # Trying to create weakref can raise TypeErr
-        raise SpaTypeError("Invalid sink.")
+        raise SpaTypeError("{} was not registered as a SPA input.".format(
+            input_))
     if vocab is None:
         return ModuleInput(input_, TScalar)
     else:

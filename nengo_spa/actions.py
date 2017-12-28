@@ -5,7 +5,7 @@ import numpy as np
 
 from nengo_spa.ast.base import Fixed, infer_types, Node
 from nengo_spa.ast import dynamic
-from nengo_spa.exceptions import SpaActionSelectionError
+from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.types import TScalar
 
 
@@ -191,6 +191,18 @@ def ifmax(condition, *actions):
         Nengo object that can be connected to, to provide additional input to
         the utility value.
     """
+    if ActionSelection.active is None:
+        raise SpaActionSelectionError(
+            "ifmax must be used within the context of an ActionSelection "
+            "instance.")
+    if condition.type != TScalar:
+        raise SpaTypeError(
+            "ifmax condition must evaluate to a scalar, but got {}.".format(
+                condition.type))
+    if any(not isinstance(a, RoutedConnection) for a in actions):
+        raise SpaActionSelectionError(
+            "ifmax actions must be routing expressions like 'a >> b'.")
+
     utility = ActionSelection.active.add_action(*actions)
     condition.connect_to(utility)
     return utility
