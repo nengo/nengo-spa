@@ -74,8 +74,8 @@ class TranscodeFunctionParam(Parameter):
                     "Vocabulary.", attr=self.name, obj=obj)
             else:
                 raise ValidationError(
-                    "Transcode function %r is expected to accept exactly 1 or 2 "
-                    "arguments: time as a float, and optionally the input "
+                    "Transcode function %r is expected to accept exactly 1 or "
+                    "2 arguments: time as a float, and optionally the input "
                     "data as NumPy array.", attr=self.name, obj=obj)
         return fn
 

@@ -5,10 +5,10 @@ abstract syntax tree (AST) with the `AstBuilder` which allows to infer types of
 individual nodes in the tree and to construct the required SPA modules for
 implementing it in a Nengo network.
 
-For the construction of the AST of basic expressions the Python eval function is
-used (by modifiying the name lookup in the globals dictionary). Because of this
-all Python code not involving identifiers will be statically evaluated before
-insertion into the syntax tree (e.g., '2 * 3 + 1' will be inserted as
+For the construction of the AST of basic expressions the Python eval function
+is used (by modifiying the name lookup in the globals dictionary). Because of
+this all Python code not involving identifiers will be statically evaluated
+before insertion into the syntax tree (e.g., '2 * 3 + 1' will be inserted as
 ``Scalar(7)``).
 
 Each node in the syntax tree will evaluate to a specific type. The most

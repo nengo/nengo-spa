@@ -2,9 +2,9 @@
 
 The classes are used to construct the rules of a context-free grammar. Each
 class allows to test whether the next token(s) are accepted and to read the
-tokens and produce a list of parse objects. The parsing is greedy in so far that
-the first rule that accepts the upcoming tokens will be applied without any
-backtracking should it fail later.
+tokens and produce a list of parse objects. The parsing is greedy in so far
+that the first rule that accepts the upcoming tokens will be applied without
+any backtracking should it fail later.
 """
 
 from nengo_spa.compiler import tokens
