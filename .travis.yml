@@ -55,7 +55,7 @@ install:
   - if [[ -n "$NENGO" ]]; then
       export PIP_DEPS="$PIP_DEPS nengo==$NENGO";
     fi
-  - if [[ -n "$CONDA_DEPS" ]]; then eval conda install "$CONDA_DEPS"; fi
+  - if [[ -n "$CONDA_DEPS" ]]; then eval conda install --quiet "$CONDA_DEPS"; fi
   - if [[ -n "$PIP_DEPS" ]]; then eval pip install "$PIP_DEPS"; fi
 
 # Run the tests
