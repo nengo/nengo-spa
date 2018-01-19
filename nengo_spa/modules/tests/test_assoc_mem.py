@@ -5,8 +5,10 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa import Vocabulary
-from nengo_spa.modules.assoc_mem import ThresholdingAssocMem, WTAAssocMem
+from nengo_spa.modules.assoc_mem import (
+    ThresholdingAssocMem, WTAAssocMem, IAAssocMem)
 from nengo_spa.examine import similarity
+from nengo_spa.testing import sp_close
 
 
 filtered_step_fn = lambda x: np.maximum(1. - np.exp(-15. * x), 0.)
@@ -40,9 +42,8 @@ def test_am_basic(Simulator, plt, seed, rng):
     plt.plot(t[t > 0.15], np.ones(t.shape)[t > 0.15] * 0.95, c='g', lw=2)
     plt.ylabel("Output")
 
-    assert np.all(similarity(sim.data[in_p][t > 0.15], vocab)[:, 0] > 0.99)
-    assert np.all(similarity(sim.data[out_p][t > 0.15], vocab)[:, 0] > 0.95)
-    assert np.all(similarity(sim.data[out_p][t > 0.15], vocab)[:, 1:] < 0.15)
+    assert sp_close(t, sim.data[in_p], vocab['A'], skip=0.15, atol=0.05)
+    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15)
 
 
 def test_am_threshold(Simulator, plt, seed, rng):
@@ -83,8 +84,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
     plt.ylabel("Output")
 
     assert np.mean(sim.data[out_p][below_th]) < 0.01
-    assert np.all(
-        similarity(sim.data[out_p][above_th], [vocab2['B'].v]) > 0.90)
+    assert sp_close(t, sim.data[out_p], vocab2['B'], skip=0.25, duration=0.05)
 
 
 def test_am_wta(Simulator, plt, seed, rng):
@@ -127,10 +127,54 @@ def test_am_wta(Simulator, plt, seed, rng):
     plt.plot(t[more_b], np.ones(t.shape)[more_b] * 0.9, c='g', lw=2)
     plt.ylabel("Output")
 
-    assert np.all(similarity(sim.data[out_p][more_a], [vocab['A'].v]) > 0.9)
-    assert np.all(similarity(sim.data[out_p][more_a], [vocab['B'].v]) < 0.1)
-    assert np.all(similarity(sim.data[out_p][more_b], [vocab['B'].v]) > 0.79)
-    assert np.all(similarity(sim.data[out_p][more_b], [vocab['A'].v]) < 0.1)
+    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
+    assert sp_close(t, sim.data[out_p], vocab['B'], skip=0.45, duration=0.05)
+
+
+def test_am_ia(Simulator, plt, seed, rng):
+    """Test the winner-take-all ability of the IA memory."""
+
+    d = 64
+    vocab = Vocabulary(d, rng=rng)
+    vocab.populate('A; B; C; D')
+
+    def input_func(t):
+        if t < 0.2:
+            return 'A + 0.8 * B'
+        else:
+            return '0.6 * A + B'
+
+    with spa.Network('model', seed=seed) as m:
+        m.am = IAAssocMem(input_vocab=vocab)
+        m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
+        m.reset = nengo.Node(lambda t: 0.2 < t < 0.4)
+
+        spa.Actions('m.stimulus -> m.am')
+        nengo.Connection(m.reset, m.am.input_reset, synapse=0.1)
+
+        in_p = nengo.Probe(m.am.input)
+        reset_p = nengo.Probe(m.reset)
+        out_p = nengo.Probe(m.am.output, synapse=0.03)
+
+    with nengo.Simulator(m) as sim:
+        sim.run(0.7)
+    t = sim.trange()
+    more_a = (t > 0.15) & (t < 0.2)
+    more_b = t > 0.65
+
+    plt.subplot(2, 1, 1)
+    plt.plot(t, similarity(sim.data[in_p], vocab))
+    plt.plot(t, sim.data[reset_p], c='k', linestyle='--')
+    plt.ylabel("Input")
+    plt.ylim(top=1.1)
+    plt.subplot(2, 1, 2)
+    plt.plot(t, similarity(sim.data[out_p], vocab))
+    plt.plot(t[more_a], np.ones(t.shape)[more_a] * 0.9, c='tab:blue', lw=2)
+    plt.plot(t[more_b], np.ones(t.shape)[more_b] * 0.9, c='tab:orange', lw=2)
+    plt.ylabel("Output")
+
+    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
+    assert sp_close(t, sim.data[out_p], vocab['B'], skip=0.65, duration=0.05)
 
 
 def test_am_default_output(Simulator, plt, seed, rng):

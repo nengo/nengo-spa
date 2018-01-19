@@ -154,7 +154,7 @@ class IAAssocMem(AssociativeMemory):
             add_to_container=add_to_container, vocabs=vocabs,
             **selection_net_args)
         self.input_reset = self.selection.input_reset
-        self.inputs['reset'] = (self.input_reset, None)
+        self.declare_input(self.input_reset, None)
 
 
 class ThresholdingAssocMem(AssociativeMemory):
