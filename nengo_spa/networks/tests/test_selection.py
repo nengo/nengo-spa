@@ -26,7 +26,7 @@ def test_ia(Simulator, plt, seed):
         out_p = nengo.Probe(ia.output, synapse=0.05)
 
     with Simulator(m) as sim:
-        sim.run(0.9)
+        sim.run(1.1)
     t = sim.trange()
 
     plt.subplot(3, 1, 1)
@@ -44,8 +44,8 @@ def test_ia(Simulator, plt, seed):
     first_selection = np.logical_and(0.15 < t, t < 0.4)
     assert np.all(sim.data[out_p][first_selection, 0] > 0.85)
     assert_allclose(sim.data[out_p][first_selection, 1:], 0., atol=0.05)
-    assert np.all(sim.data[out_p][t > 0.85, 3] > 0.85)
-    assert_allclose(sim.data[out_p][t > 0.85, :3], 0., atol=0.05)
+    assert np.all(sim.data[out_p][t > 0.95, 3] > 0.85)
+    assert_allclose(sim.data[out_p][t > 0.95, :3], 0., atol=0.05)
 
 
 def test_thresholding_array(Simulator, plt, seed):

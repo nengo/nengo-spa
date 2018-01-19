@@ -5,7 +5,7 @@ import numpy as np
 
 def IA(
         n_neurons, n_ensembles, accum_threshold=0.8, accum_neuron_ratio=0.7,
-        accum_timescale=0.1, feedback_timescale=0.005,
+        accum_timescale=0.2, feedback_timescale=0.005,
         accum_synapse=0.1, ff_synapse=0.005,
         intercept_width=0.15, radius=1., **kwargs):
     """Independent accumulator (IA) winner-take-all (WTA) network.
