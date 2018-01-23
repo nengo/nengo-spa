@@ -2,7 +2,6 @@
 
 from nengo.exceptions import NengoWarning, ValidationError
 import nengo.solvers
-from nengo.utils.testing import warns
 import numpy as np
 import pytest
 
@@ -167,7 +166,7 @@ def test_transform(recwarn, rng, solver):
     # Test warns on missing keys
     v1.populate('D')
     D = v1['D']
-    with warns(NengoWarning):
+    with pytest.warns(NengoWarning):
         v1.transform_to(v2, solver=solver)
 
     # Test populating missing keys
@@ -184,7 +183,7 @@ def test_create_pointer_warning(rng):
     v = Vocabulary(2, rng=rng)
 
     # five pointers shouldn't fit
-    with warns(UserWarning):
+    with pytest.warns(UserWarning):
         v.populate('A; B; C; D; E')
 
 
