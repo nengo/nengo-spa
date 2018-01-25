@@ -35,6 +35,9 @@ This release increases the minimum required Nengo version to Nengo 2.5
   ``nengo_spa.Network.config``.
   (`#112 <https://github.com/nengo/nengo_spa/issues/112>`_,
   `#113 <https://github.com/nengo/nengo_spa/pull/113>`_)
+- Fix an undeclared input to the ``IAAssocMem`` module.
+  (`#118 <https://github.com/nengo/nengo_spa/issues/118>`_,
+  `#120 <https://github.com/nengo/nengo_spa/pull/120>`_)
 
 
 0.3.2 (November 17, 2017)
