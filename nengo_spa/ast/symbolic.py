@@ -49,6 +49,9 @@ class FixedScalar(Symbol):
     def expr(self):
         return repr(self.value)
 
+    def __neg__(self):
+        return FixedScalar(-self.value)
+
 
 class PointerSymbol(Symbol):
     def __init__(self, expr, type_=TAnyVocab):
