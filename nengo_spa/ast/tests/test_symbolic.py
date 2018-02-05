@@ -6,7 +6,7 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa import sym
-from nengo_spa.ast.symbolic import PointerSymbol
+from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol
 from nengo_spa.types import TVocabulary
 
 
@@ -24,6 +24,10 @@ def test_product_of_scalars(Simulator):
         sim.run(0.5)
 
     assert_allclose(sim.data[p][sim.trange() > 0.3], .25, atol=0.2)
+
+
+def test_unary_minus_on_scalar(rng):
+    assert (-FixedScalar(1.)).evaluate() == -1.
 
 
 def test_pointer_symbol_network_creation(rng):
