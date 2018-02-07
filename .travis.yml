@@ -21,7 +21,7 @@ matrix:
   include:
     - env: PYTHON="3.6" STATIC="true"
     - env: PYTHON="2.7" COVERAGE="true"
-    - env: PYTHON="2.7" NUMPY="1.7"  # minimum supported NumPy
+    - env: PYTHON="2.7" NUMPY="1.8"  # minimum supported NumPy
     - env: PYTHON="3.4" NUMPY="1.11"  # 1.12 not packaged for py34 in conda
     - env: PYTHON="3.5"
     - env: PYTHON="3.6" COVERAGE="true"
