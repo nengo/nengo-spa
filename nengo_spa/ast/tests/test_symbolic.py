@@ -34,7 +34,7 @@ def test_pointer_symbol_network_creation(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
-    with spa.Network() as model:
+    with spa.Network():
         A = PointerSymbol('A', TVocabulary(vocab))
         node = A.construct()
     assert_equal(node.output, vocab['A'].v)
@@ -45,7 +45,7 @@ def test_unary_operation_on_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
-    with spa.Network() as model:
+    with spa.Network():
         x = eval(op + "PointerSymbol('A', TVocabulary(vocab))")
         node = x.construct()
     assert_equal(node.output, vocab.parse(op + 'A').v)
@@ -56,8 +56,8 @@ def test_binary_operation_on_pointer_symbols(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A; B')
 
-    with spa.Network() as model:
-        v = TVocabulary(vocab)
+    with spa.Network():
+        v = TVocabulary(vocab)  # noqa: F841
         x = eval("PointerSymbol('A', v)" + op + "PointerSymbol('B', v)")
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
@@ -68,7 +68,7 @@ def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
-    with spa.Network() as model:
+    with spa.Network():
         with pytest.raises(TypeError):
             eval("2" + op + "PointerSymbol('A')")
 
@@ -77,7 +77,7 @@ def test_multiply_fixed_scalar_and_pointer_symbol(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')
 
-    with spa.Network() as model:
+    with spa.Network():
         x = 2 * PointerSymbol('A', TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse('2 * A').v)
@@ -99,7 +99,7 @@ def test_fixed_dot_matmul(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A; B')
 
-    v = TVocabulary(vocab)
+    v = TVocabulary(vocab)  # noqa: F841
     assert_allclose(
         eval("PointerSymbol('A', v) @ PointerSymbol('A', v)").evaluate(), 1.)
 

@@ -155,8 +155,6 @@ class TestExceptions():
 
 
 def test_access_thal_and_bg_objects():
-    d = 16
-
     with spa.Network() as m:
         m.a = spa.Scalar()
         m.b = spa.Scalar()
@@ -268,7 +266,7 @@ def test_action_selection(Simulator, rng):
             lambda t: 'ABCDEF'[min(5, int(t / 0.5))], output_vocab=vocab)
         scalar = spa.Scalar()
         pointer = spa.State(vocab)
-        with ActionSelection() as action_sel:
+        with ActionSelection():
             spa.ifmax(spa.dot(state, PointerSymbol('A')), 0.5 >> scalar)
             spa.ifmax(
                 spa.dot(state, PointerSymbol('B')),

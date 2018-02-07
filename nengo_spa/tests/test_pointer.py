@@ -194,7 +194,7 @@ def test_conv_matrix():
 @pytest.mark.parametrize('op', ('~a', '-a', 'a+a', 'a-a', 'a*a', '2*a'))
 def test_ops_preserve_vocab(op):
     v = Vocabulary(50)
-    a = SemanticPointer(50, vocab=v)
+    a = SemanticPointer(50, vocab=v)  # noqa: F841
     x = eval(op)
     assert x.vocab is v
 
@@ -202,23 +202,23 @@ def test_ops_preserve_vocab(op):
 @pytest.mark.parametrize('op', (
     'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
 def test_ops_check_vocab_compatibility(op):
-    a = SemanticPointer(50, vocab=Vocabulary(50))
-    b = SemanticPointer(50, vocab=Vocabulary(50))
+    a = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841
+    b = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841
     with pytest.raises(SpaTypeError):
-        x = eval(op)
+        eval(op)
 
 
 @pytest.mark.parametrize('op', (
     'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
 def test_none_vocab_is_always_compatible(op):
     v = Vocabulary(50)
-    a = SemanticPointer(50, vocab=v)
-    b = SemanticPointer(50, vocab=None)
-    x = eval(op)  # no assertion, just checking that no exception is raised
+    a = SemanticPointer(50, vocab=v)  # noqa: F841
+    b = SemanticPointer(50, vocab=None)  # noqa: F841
+    eval(op)  # no assertion, just checking that no exception is raised
 
 
 def test_fixed_pointer_network_creation(rng):
-    with spa.Network() as model:
+    with spa.Network():
         A = SemanticPointer(16)
         node = A.construct()
     assert_equal(node.output, A.v)
@@ -230,8 +230,8 @@ def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
         Simulator, op, order, rng):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A; B')
-    a = PointerSymbol('A', TVocabulary(vocab))
-    b = SemanticPointer(vocab['B'].v)
+    a = PointerSymbol('A', TVocabulary(vocab))  # noqa: F841
+    b = SemanticPointer(vocab['B'].v)  # noqa: F841
 
     with spa.Network() as model:
         if order == 'AB':
