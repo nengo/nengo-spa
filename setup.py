@@ -42,11 +42,11 @@ setup(
     zip_safe=True,
     include_package_data=True,
     setup_requires=['pytest-runner'] if testing else [] + [
-        'numpy>=1.7',
+        'numpy>=1.8',
     ],
     install_requires=[
         'nengo>=2.5',
-        'numpy>=1.7',
+        'numpy>=1.8',
     ],
     extras_require={
         'prob_cleanup': ['scipy'],
