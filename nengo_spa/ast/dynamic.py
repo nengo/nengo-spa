@@ -67,7 +67,7 @@ class DynamicNode(Node):
         return (-self) + other
 
     def _mul_with_fixed(self, other):
-        type_ = infer_types(self, other)
+        infer_types(self, other)
         if other.type == TScalar:
             tr = other.value
         elif self.type == TScalar and other.type == TAnyVocab:

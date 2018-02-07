@@ -131,7 +131,7 @@ def ifmax(condition, *actions):
     """Defines a potential action within an `ActionSelection` context.
 
     This implementation allows Nengo objects in addition to AST nodes as
-    condition argument 
+    condition argument.
 
     Parameters
     ----------
@@ -212,8 +212,8 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
             extended_type = self._output_types[obj.__class__]
         except KeyError:
             extended_type = type(
-            'SpaOutput<%s>' % obj.__class__.__name__,
-            (obj.__class__, SpaOperatorMixin), {})
+                'SpaOutput<%s>' % obj.__class__.__name__,
+                (obj.__class__, SpaOperatorMixin), {})
             self._output_types[obj.__class__] = extended_type
         obj.__class__ = extended_type
         output_vocab_registry[obj] = vocab
