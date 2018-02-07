@@ -9,7 +9,7 @@ def sp_close(
     actual = data[(skip < t) & (t <= skip + duration)]
     expected = target_sp
     if normalized:
-        actual /= np.linalg.norm(actual, axis=1, keepdims=True)
+        actual /= np.expand_dims(np.linalg.norm(actual, axis=1), 1)
         expected = expected.normalized()
     return np.all(np.sqrt(np.sum(
         np.square(actual - expected.v), axis=1)) < atol)
