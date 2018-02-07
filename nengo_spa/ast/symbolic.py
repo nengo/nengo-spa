@@ -115,7 +115,7 @@ class PointerSymbol(Symbol):
         other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
-        type_ = infer_types(self, other)
+        infer_types(self, other)
         return FixedScalar(self.evaluate().dot(other.evaluate()))
 
     def __matmul__(self, other):

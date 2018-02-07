@@ -148,8 +148,8 @@ class Vocabulary(Mapping):
                                   % key, attr='', obj=self)
         if p.vocab is not None and p.vocab is not self:
             raise ValidationError(
-               "Cannot add a semantic pointer that belongs to a different "
-               "vocabulary.", attr='', obj=self)
+                "Cannot add a semantic pointer that belongs to a different "
+                "vocabulary.", attr='', obj=self)
 
         self._key2idx[key] = len(self._key2idx)
         self._keys.append(key)
