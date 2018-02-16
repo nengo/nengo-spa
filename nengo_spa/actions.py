@@ -139,7 +139,9 @@ class ActionSelection(Mapping):
     active = None
 
     def __init__(self):
+        super(ActionSelection, self).__init__()
         self.built = False
+        self.bias = None
         self.bg = None
         self.thalamus = None
         self._utilities = []
@@ -158,11 +160,12 @@ class ActionSelection(Mapping):
 
     def __exit__(self, exc_type, exc_value, traceback):
         ActionSelection.active = None
+        if exc_type is not None:
+            return
+        self._build()
 
+    def _build(self):
         try:
-            if exc_type is not None:
-                return
-
             if len(RoutedConnection._free_floating) > 0:
                 raise SpaActionSelectionError(
                     "All actions in an action selection context must be part "
@@ -173,6 +176,7 @@ class ActionSelection(Mapping):
         if len(self._utilities) <= 0:
             return
 
+        self.bias = nengo.Node(1., label="bias")
         self.bg = dynamic.BasalGangliaRealization(len(self._utilities))
         self.thalamus = dynamic.ThalamusRealization(len(self._utilities))
         self.thalamus.connect_bg(self.bg)
@@ -186,13 +190,11 @@ class ActionSelection(Mapping):
                     self.thalamus.connect_fixed(
                         index, effect.sink.input, transform=effect.transform())
                 else:
-                    self.thalamus.construct_gate(
-                        index, net=nengo.Network.context[-1])
+                    self.thalamus.construct_gate(index, self.bias)
                     channel = self.thalamus.construct_channel(
                         effect.sink.input, effect.type)
                     effect.connect_to(channel.input)
                     self.thalamus.connect_gate(index, channel)
-
         self.built = True
 
     def __getitem__(self, key):
