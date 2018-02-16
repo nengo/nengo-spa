@@ -54,6 +54,16 @@ class Node(object):
         raise NotImplementedError()
 
 
+class Noop(Node):
+    """Node that has no effect."""
+
+    def connect_to(self, sink, **kwargs):
+        pass
+
+    def construct(self):
+        raise NotImplementedError("Noop nodes cannot be constructed.")
+
+
 class Fixed(Node):
     """Base class for AST nodes that provide a fixed value."""
 

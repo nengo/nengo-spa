@@ -7,7 +7,7 @@ import numpy as np
 
 from nengo_spa.actions import ifmax as actions_ifmax
 from nengo_spa.actions import ModuleInput
-from nengo_spa.ast.base import Node
+from nengo_spa.ast.base import Node, Noop
 from nengo_spa.ast.dynamic import (
     input_network_registry, input_vocab_registry, ModuleOutput,
     output_vocab_registry)
@@ -154,6 +154,11 @@ def ifmax(name, condition, *actions):
         actions = (condition,) + actions
         condition = name
         name = None
+
+    if condition == 0:
+        condition = Noop(TScalar)
+    else:
+        condition = as_ast_node(condition)
 
     return actions_ifmax(name, as_ast_node(condition), *actions)
 
