@@ -61,6 +61,7 @@ class State(Network):
                  neurons_per_dimension=Default, feedback=Default,
                  represent_identity=Default,
                  feedback_synapse=Default, **kwargs):
+        kwargs.setdefault('label', "State")
         super(State, self).__init__(**kwargs)
 
         self.vocab = vocab

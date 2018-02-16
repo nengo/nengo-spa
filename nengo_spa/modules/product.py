@@ -27,6 +27,7 @@ class Product(Network):
     n_neurons = IntParam('n_neurons', default=200, low=1, readonly=True)
 
     def __init__(self, n_neurons=Default, **kwargs):
+        kwargs.setdefault('label', "Product")
         super(Product, self).__init__(**kwargs)
 
         self.n_neurons = n_neurons
