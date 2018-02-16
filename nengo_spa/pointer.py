@@ -61,7 +61,8 @@ class SemanticPointer(Fixed):
         return nengo.Connection(self.construct(), sink, **kwargs)
 
     def construct(self):
-        return nengo.Node(self.v)
+        return nengo.Node(
+            self.v, label="Semantic Pointer ({}d)".format(len(self)))
 
     def normalized(self):
         """Normalize the Semantic Pointer and return it as a new object.
