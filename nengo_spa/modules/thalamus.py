@@ -125,7 +125,7 @@ class Thalamus(Network):
         self.input = self.actions.input
         self.output = self.actions.output
 
-    def construct_gate(self, index, net, label=None):
+    def construct_gate(self, index, bias, label=None):
         """Construct a gate ensemble.
 
         The gate neurons have no activity when the action is selected, but are
@@ -137,8 +137,8 @@ class Thalamus(Network):
         ----------
         index : int
             Index to identify the gate.
-        net : nengo.Network
-            Network to which to add the channel.
+        bias : :class:`nengo.Network`
+            Node providing a bias input of 1.
         label : str, optional
             Label for the gate.
 
@@ -149,14 +149,11 @@ class Thalamus(Network):
         """
         if label is None:
             label = 'gate[%d]' % index
-        with net:
-            intercepts = Uniform(self.threshold_gate, 1)
-            self.gates[index] = gate = nengo.Ensemble(
-                self.neurons_gate, dimensions=1, intercepts=intercepts,
-                label=label, encoders=[[1]] * self.neurons_gate)
-            if not hasattr(net, 'bias'):
-                net.bias = nengo.Node([1], label="bias")
-            nengo.Connection(net.bias, gate, synapse=None)
+        intercepts = Uniform(self.threshold_gate, 1)
+        self.gates[index] = gate = nengo.Ensemble(
+            self.neurons_gate, dimensions=1, intercepts=intercepts,
+            label=label, encoders=[[1]] * self.neurons_gate)
+        nengo.Connection(bias, gate, synapse=None)
 
         self.gate_in_connections[index] = nengo.Connection(
             self.actions.ensembles[index], self.gates[index],
