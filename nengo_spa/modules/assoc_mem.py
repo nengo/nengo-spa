@@ -60,8 +60,8 @@ class AssociativeMemory(Network):
 
     def __init__(
             self, selection_net, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None, add_to_container=None,
-            vocabs=None, **selection_net_args):
+            n_neurons=50, label="Associative memory", seed=None,
+            add_to_container=None, vocabs=None, **selection_net_args):
         super(AssociativeMemory, self).__init__(
             label=label, seed=seed, add_to_container=add_to_container,
             vocabs=vocabs)
@@ -145,8 +145,8 @@ class IAAssocMem(AssociativeMemory):
     """
     def __init__(
             self, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None, add_to_container=None,
-            vocabs=None, **selection_net_args):
+            n_neurons=50, label="IA associative memory", seed=None,
+            add_to_container=None, vocabs=None, **selection_net_args):
         super(IAAssocMem, self).__init__(
             selection_net=IA,
             input_vocab=input_vocab, output_vocab=output_vocab,
@@ -164,8 +164,8 @@ class ThresholdingAssocMem(AssociativeMemory):
     """
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None, add_to_container=None,
-            vocabs=None, **selection_net_args):
+            n_neurons=50, label="Thresholding associative memory", seed=None,
+            add_to_container=None, vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
         super(ThresholdingAssocMem, self).__init__(
             selection_net=Thresholding,
@@ -182,8 +182,8 @@ class WTAAssocMem(AssociativeMemory):
     """
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None, add_to_container=None,
-            vocabs=None, **selection_net_args):
+            n_neurons=50, label="WTA associative memory", seed=None,
+            add_to_container=None, vocabs=None, **selection_net_args):
         selection_net_args['threshold'] = threshold
         super(WTAAssocMem, self).__init__(
             selection_net=WTA,

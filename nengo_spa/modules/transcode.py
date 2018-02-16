@@ -162,6 +162,7 @@ class Transcode(Network):
     def __init__(
             self, function=Default, input_vocab=Default, output_vocab=Default,
             size_in=Default, size_out=Default, **kwargs):
+        kwargs.setdefault('label', "Transcode")
         super(Transcode, self).__init__(**kwargs)
 
         # Vocabs need to be set before function which accesses vocab for
