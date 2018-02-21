@@ -120,6 +120,7 @@ class ActionSelection(object):
         self.thalamus = None
         self._utilities = []
         self._actions = []
+        self._names = []
 
     def __enter__(self):
         assert not self.built
@@ -169,20 +170,26 @@ class ActionSelection(object):
 
         self.built = True
 
-    def add_action(self, *actions):
+    def keys(self):
+        return tuple(self._names)
+
+    def add_action(self, name, *actions):
         assert ActionSelection.active is self
         utility = nengo.Node(size_in=1)
         self._utilities.append(utility)
         self._actions.append(actions)
+        self._names.append(name)
         RoutedConnection._free_floating.difference_update(actions)
         return utility
 
 
-def ifmax(condition, *actions):
+def ifmax(name, condition, *actions):
     """Defines a potential action within an `ActionSelection` context.
 
     Parameters
     ----------
+    name : str
+        Name for the action
     condition : nengo_spa.ast.base.Node
         The utility value for the given actions.
     actions : sequence of `RoutedConnection`
@@ -206,6 +213,6 @@ def ifmax(condition, *actions):
         raise SpaActionSelectionError(
             "ifmax actions must be routing expressions like 'a >> b'.")
 
-    utility = ActionSelection.active.add_action(*actions)
+    utility = ActionSelection.active.add_action(name, *actions)
     condition.connect_to(utility)
     return utility

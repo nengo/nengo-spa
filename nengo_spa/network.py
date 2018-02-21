@@ -2,7 +2,7 @@ import inspect
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo.utils.compat import is_number
+from nengo.utils.compat import is_number, is_string
 import numpy as np
 
 from nengo_spa.actions import ifmax as actions_ifmax
@@ -127,7 +127,7 @@ class SpaOperatorMixin(object):
         return as_ast_node(self).translate(vocab, populate, keys, solver)
 
 
-def ifmax(condition, *actions):
+def ifmax(name, condition, *actions):
     """Defines a potential action within an `ActionSelection` context.
 
     This implementation allows Nengo objects in addition to AST nodes as
@@ -135,6 +135,8 @@ def ifmax(condition, *actions):
 
     Parameters
     ----------
+    name : str, optional
+        Name for the action. Can be omitted.
     condition : nengo_spa.ast.base.Node or NengoObject
         The utility value for the given actions.
     actions : sequence of `RoutedConnection`
@@ -146,7 +148,12 @@ def ifmax(condition, *actions):
         Nengo object that can be connected to, to provide additional input to
         the utility value.
     """
-    return actions_ifmax(as_ast_node(condition), *actions)
+    if not is_string(name):
+        actions = (condition,) + actions
+        condition = name
+        name = None
+
+    return actions_ifmax(name, as_ast_node(condition), *actions)
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):

@@ -312,3 +312,15 @@ def test_action_selection_enforces_connections_to_be_part_of_action():
         with pytest.raises(SpaActionSelectionError):
             with ActionSelection():
                     state1 >> state2
+
+
+def test_naming_of_actions():
+    with spa.Network():
+        state1 = spa.State(16)
+        state2 = spa.State(16)
+        with ActionSelection() as action_sel:
+            spa.ifmax('name1', 0., state1 >> state2)
+            spa.ifmax(0., state1 >> state2)
+            spa.ifmax('name2', 0., state1 >> state2)
+
+    assert action_sel.keys() == ('name1', None, 'name2')
