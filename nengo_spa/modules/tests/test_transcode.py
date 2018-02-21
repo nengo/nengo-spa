@@ -88,8 +88,8 @@ def test_encode_with_input(Simulator, seed):
 
 
 def test_transcode(Simulator, seed):
-    def transcode_fn(t, sp, vocab):
-        assert t < 0.15 or vocab.parse('A').dot(sp) > 0.8
+    def transcode_fn(t, sp):
+        assert t < 0.15 or sp.vocab.parse('A').dot(sp) > 0.8
         return 'B'
 
     with spa.Network(seed=seed) as model:
@@ -123,10 +123,10 @@ def test_decode(Simulator, seed):
         def __init__(self):
             self.called = False
 
-        def __call__(self, t, v, vocab):
+        def __call__(self, t, v):
             if t > 0.001:
                 self.called = True
-                assert_almost_equal(vocab.parse('A').v, v.v)
+                assert_almost_equal(v.vocab.parse('A').v, v.v)
 
     output_fn = OutputFn()
 
@@ -142,7 +142,7 @@ def test_decode(Simulator, seed):
 
 
 def test_decode_with_output(Simulator, seed):
-    def decode_fn(t, v, vocab):
+    def decode_fn(t, v):
         return [t]
 
     with spa.Network(seed=seed) as model:
@@ -156,7 +156,7 @@ def test_decode_with_output(Simulator, seed):
 
 
 def test_decode_size_out(Simulator, seed):
-    def decode_fn(t, v, vocab):
+    def decode_fn(t, v):
         return [t]
 
     with spa.Network(seed=seed) as model:
