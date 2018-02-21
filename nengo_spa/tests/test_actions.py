@@ -319,8 +319,12 @@ def test_naming_of_actions():
         state1 = spa.State(16)
         state2 = spa.State(16)
         with ActionSelection() as action_sel:
-            spa.ifmax('name1', 0., state1 >> state2)
-            spa.ifmax(0., state1 >> state2)
-            spa.ifmax('name2', 0., state1 >> state2)
+            u0 = spa.ifmax('name0', 0., state1 >> state2)
+            u1 = spa.ifmax(0., state1 >> state2)
+            u2 = spa.ifmax('name2', 0., state1 >> state2)
 
-    assert action_sel.keys() == ('name1', None, 'name2')
+    assert tuple(action_sel.keys()) == ('name0', 1, 'name2')
+    assert action_sel['name0'] is u0
+    assert action_sel['name2'] is u2
+    for i, u in enumerate((u0, u1, u2)):
+        assert action_sel[i] is u
