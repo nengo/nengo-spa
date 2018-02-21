@@ -133,13 +133,16 @@ class ActionSelection(object):
     def __exit__(self, exc_type, exc_value, traceback):
         ActionSelection.active = None
 
-        if exc_type is not None:
-            return
+        try:
+            if exc_type is not None:
+                return
 
-        if len(RoutedConnection._free_floating) > 0:
-            raise SpaActionSelectionError(
-                "All actions in an action selection context must be part of "
-                "an ifmax call.")
+            if len(RoutedConnection._free_floating) > 0:
+                raise SpaActionSelectionError(
+                    "All actions in an action selection context must be part "
+                    "of an ifmax call.")
+        finally:
+            RoutedConnection._free_floating.clear()
 
         if len(self._utilities) <= 0:
             return
