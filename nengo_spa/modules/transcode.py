@@ -25,7 +25,7 @@ class SpArrayExtractor(object):
 
 def make_sp_func(fn, vocab):
     def sp_func(t, v):
-        return fn(t, SemanticPointer(v), vocab)
+        return fn(t, SemanticPointer(v, vocab=vocab))
     return sp_func
 
 
@@ -57,8 +57,8 @@ class TranscodeFunctionParam(Parameter):
     def coerce_callable(self, obj, fn):
         t = 0.
         if obj.input_vocab is not None:
-            args = (t, SemanticPointer(obj.input_vocab.dimensions),
-                    obj.input_vocab)
+            args = (t, SemanticPointer(
+                obj.input_vocab.dimensions, vocab=obj.input_vocab))
         elif obj.size_in is not None:
             args = (t, np.zeros(obj.size_in))
         else:
