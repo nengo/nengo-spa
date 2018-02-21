@@ -1,6 +1,9 @@
 """Implementation of action syntax."""
 
+from collections import Mapping, OrderedDict
+
 import nengo
+from nengo.utils.compat import is_string
 import numpy as np
 
 from nengo_spa.ast.base import Fixed, infer_types, Node
@@ -81,7 +84,7 @@ class RoutedConnection(object):
             return np.atleast_2d(self.source.evaluate().v).T
 
 
-class ActionSelection(object):
+class ActionSelection(Mapping):
     """Implements an action selection system with basal ganglia and thalamus.
 
     The *ActionSelection* instance has to be used as context manager and each
@@ -120,7 +123,8 @@ class ActionSelection(object):
         self.thalamus = None
         self._utilities = []
         self._actions = []
-        self._names = []
+        # Maps labels of actions to the index of that action
+        self._name2idx = OrderedDict()
 
     def __enter__(self):
         assert not self.built
@@ -170,15 +174,32 @@ class ActionSelection(object):
 
         self.built = True
 
-    def keys(self):
-        return tuple(self._names)
+    def __getitem__(self, key):
+        if is_string(key):
+            key = self._name2idx[key]
+        return self._utilities[key]
+
+    def __iter__(self):
+        # Given not all actions have names, there will actions whose keys
+        # will be numbers and not names.
+        for i, (name, v) in enumerate(self._name2idx.items()):
+            while i < v:
+                yield i
+                i += 1
+            yield name
+        for i in range(i + 1, len(self)):
+            yield i
+
+    def __len__(self):
+        return len(self._actions)
 
     def add_action(self, name, *actions):
         assert ActionSelection.active is self
         utility = nengo.Node(size_in=1)
+        if name is not None:
+            self._name2idx[name] = len(self._actions)
         self._utilities.append(utility)
         self._actions.append(actions)
-        self._names.append(name)
         RoutedConnection._free_floating.difference_update(actions)
         return utility
 
