@@ -124,14 +124,14 @@ def test_routing(Simulator, seed, plt):
     valueC = np.mean(data[550:600], axis=0)  # should be [1, 0, 0]
 
     assert valueA[0] < 0.2
-    assert valueA[1] > 0.75
+    assert valueA[1] > 0.7
     assert valueA[2] < 0.2
 
     assert valueB[0] < 0.2
     assert valueB[1] < 0.2
-    assert valueB[2] > 0.75
+    assert valueB[2] > 0.7
 
-    assert valueC[0] > 0.75
+    assert valueC[0] > 0.7
     assert valueC[1] < 0.2
     assert valueC[2] < 0.2
 
