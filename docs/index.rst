@@ -10,6 +10,7 @@ implemented with large-scale spiking neural networks.
 
 
 .. toctree::
+   :maxdepth: 2
 
    getting_started
    user_guide
