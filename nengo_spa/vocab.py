@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 
 import nengo
-from nengo.exceptions import ConfigError, NengoWarning, ValidationError
+from nengo.exceptions import NengoWarning, ValidationError
 from nengo_spa import pointer
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
@@ -356,12 +356,7 @@ class VocabularyMapParam(nengo.params.Parameter):
 class VocabularyOrDimParam(nengo.params.Parameter):
     """Can be a vocabulary or integer denoting a dimensionality."""
 
-    # TODO replace this method by `coerce_defaults = False` and bump the
-    # minimum required Nengo version to >2.6.0.
-    def set_default(self, obj, value):
-        if not self.configurable:
-            raise ConfigError("Parameter '%s' is not configurable." % self)
-        self._defaults[obj] = value
+    coerce_defaults = False
 
     def coerce(self, instance, value):
         value = super(VocabularyOrDimParam, self).coerce(instance, value)
