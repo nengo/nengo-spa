@@ -26,7 +26,7 @@ Project status
 Installation
 ============
 
-Nengo SPA depends on `Nengo 2.5+ <https://nengo.github.io/>`_, and we recommend
+Nengo SPA depends on `Nengo 2.7+ <https://nengo.github.io/>`_, and we recommend
 that you install Nengo before installing Nengo SPA.
 
 To install Nengo SPA::

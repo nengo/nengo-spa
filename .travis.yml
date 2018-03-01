@@ -9,7 +9,7 @@ notifications:
 
 env:
   global:
-    - NENGO="2.5"
+    - NENGO="2.7"
     - NUMPY="1.14"
     - SCIPY="true"
     - COVERAGE="false"

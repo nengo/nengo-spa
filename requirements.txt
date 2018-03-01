@@ -1,2 +1,2 @@
-nengo>=2.5
+nengo>=2.7
 numpy>=1.8
