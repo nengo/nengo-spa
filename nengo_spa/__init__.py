@@ -15,7 +15,7 @@ from nengo_spa.modules import (
     Thalamus,
     Transcode)
 from nengo_spa.network import create_inhibit_node, ifmax, Network
-from nengo_spa.vocab import Vocabulary, VocabularyMap
+from nengo_spa.vocab import Vocabulary
 
 
 __copyright__ = "2013-2017, Applied Brain Research"
