@@ -107,7 +107,7 @@ def test_vocab_config():
         with spa.Network() as model.shared_vocabs:
             pass
         with spa.Network(
-                vocabs=spa.VocabularyMap()) as model.non_shared_vocabs:
+                vocabs=spa.vocab.VocabularyMap()) as model.non_shared_vocabs:
             pass
 
     assert model.shared_vocabs.vocabs is model.vocabs

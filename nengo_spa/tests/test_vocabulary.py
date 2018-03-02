@@ -6,10 +6,11 @@ import numpy as np
 from numpy.testing import assert_equal
 import pytest
 
-from nengo_spa import Vocabulary, VocabularyMap
+from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity, SemanticPointer
-from nengo_spa.vocab import VocabularyMapParam, VocabularyOrDimParam
+from nengo_spa.vocab import (
+    VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
 
 def test_add(rng):
