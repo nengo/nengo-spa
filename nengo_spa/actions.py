@@ -88,16 +88,9 @@ class ActionSelection(Mapping):
     """Implements an action selection system with basal ganglia and thalamus.
 
     The *ActionSelection* instance has to be used as context manager and each
-    potential action is defined by an *ifmax* call providing an expression
-    for the utility value and any number of _actions (routing of information)
+    potential action is defined by an `.ifmax` call providing an expression
+    for the utility value and any number of effects (routing of information)
     to activate when this utility value is highest of all.
-
-    Example::
-
-        with ActionSelection():
-            ifmax(dot(state, sym.A), B >> state)
-            ifmax(dot(state, sym.B), C >> state)
-            ifmax(dot(state, sym.C), A >> state)
 
     Attributes
     ----------
@@ -113,6 +106,34 @@ class ActionSelection(Mapping):
     thalamus : nengo.Network
         Thalamus network. Available after the action selection system has
         been built.
+
+    See Also
+    --------
+
+    nengo_spa.modules.BasalGanglia : Default basal ganglia network
+    nengo_spa.modules.Thalamus : Default thalamus network
+
+    Examples
+    --------
+
+    .. code-block:: python
+
+        with ActionSelection():
+            ifmax(dot(state, sym.A), sym.B >> state)
+            ifmax(dot(state, sym.B), sym.C >> state)
+            ifmax(dot(state, sym.C), sym.A >> state)
+
+    This will route the *B* Semantic Pointer to *state* when *state* is more
+    similar to *A* than any of the other Semantic Pointers. Similarly, *C*
+    will be routed to *state* when *state* is *B*. Once, *state* is *C*, it
+    will be reset to *A* and the cycle begins anew.
+
+    Further action selection examples:
+
+      * :ref:`/examples/question_control.ipynb`
+      * :ref:`/examples/spa_parser.ipynb`
+      * :ref:`/examples/spa_sequence.ipynb`
+      * :ref:`/examples/spa_sequence_routed.ipynb`
     """
 
     active = None

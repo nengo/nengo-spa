@@ -20,33 +20,45 @@ class Vocabulary(Mapping):
 
     The Vocabulary can also act as a dictionary, with keys as the names
     of the semantic pointers and values as the `.SemanticPointer` objects
-    themselves.
+    themselves. The names of Semantic Pointers must be valid Python 2
+    identifiers starting with a capital letter.
 
     Parameters
     -----------
     dimensions : int
         Number of dimensions for each semantic pointer.
-    strict : bool, optional (Default: True)
+    strict : bool, optional
         Whether to automatically create missing semantic pointers. If a
         non-strict vocabulary is asked for a pointer that does not exist within
         the vocabulary, the missing pointer will be automatically added to the
         vocabulary. A strict vocabulary will throw an error if asked for a
         pointer that does not exist in the vocabulary.
-    max_similarity : float, optional (Default: 0.1)
+    max_similarity : float, optional
         When randomly generating pointers, ensure that the cosine of the
         angle between the new pointer and all existing pointers is less
         than this amount. If the system is unable to find such a pointer
         after 100 tries, a warning message is printed.
-    rng : `numpy.random.RandomState`, optional (Default: None)
+    rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
 
     Attributes
     ----------
-    keys : list of strings
+    keys : sequence
         The names of all known semantic pointers (e.g., ``['A', 'B', 'C']``).
+    max_similarity : float
+        When randomly generating pointers, ensure that the cosine of the
+        angle between the new pointer and all existing pointers is less
+        than this amount. If the system is unable to find such a pointer
+        after 100 tries, a warning message is printed.
+    strict : bool
+        Whether to automatically create missing semantic pointers. If a
+        non-strict vocabulary is asked for a pointer that does not exist within
+        the vocabulary, the missing pointer will be automatically added to the
+        vocabulary. A strict vocabulary will throw an error if asked for a
+        pointer that does not exist in the vocabulary.
     vectors : ndarray
-        All of the semantic pointer values in a matrix, in the same order
-        as in ``keys``.
+        All of the semantic pointer vectors in a matrix, in the same order
+        as in `keys`.
     """
 
     def __init__(self, dimensions, strict=True, max_similarity=0.1, rng=None):
@@ -73,13 +85,27 @@ class Vocabulary(Mapping):
             self.dimensions, id(self))
 
     def create_pointer(self, attempts=100, transform=None):
-        """Create a new semantic pointer.
+        """Create a new semantic pointer and add it to the vocabulary.
 
-        This will take into account the max_similarity
-        parameter from self. If a pointer satisfying max_similarity
-        is not generated after the specified number of attempts, the
-        candidate pointer with lowest maximum cosine with all existing
-        pointers is returned.
+        This will take into account the `max_similarity` attribute.  If a
+        pointer satisfying max_similarity is not generated after the specified
+        number of attempts, the candidate pointer with lowest maximum cosine
+        similarity with all existing pointers is returned.
+
+        Parameters
+        ----------
+        attempts : int, optional
+            Maximum number of attempts to create a Semantic Pointer not
+            exceeding `max_similarity`.
+        transform : str, optional
+            A transform to apply to the generated vector. Needs to be the name
+            of a method of `.SemanticPointer`. Currently, the only sensible
+            value is 'unitary'.
+
+        Returns
+        -------
+        SemanticPointer
+            The generated Semantic Pointer.
         """
         best_p = None
         best_sim = np.inf
@@ -134,9 +160,15 @@ class Vocabulary(Mapping):
         return hash(id(self))
 
     def add(self, key, p):
-        """Add a new semantic pointer to the vocabulary.
+        """Add the semantic pointer *p* to the vocabulary.
 
-        The pointer value can be a `.SemanticPointer` or a vector.
+        Parameters
+        ----------
+        key : str
+            Name of the Semantic Pointer. Must be a valid Python 2 identifier
+            starting with a capital letter.
+        p : SemanticPointer or array_like
+            Semantic Pointer to add.
         """
         if not valid_sp_regex.match(key):
             raise SpaParseError(
@@ -159,7 +191,23 @@ class Vocabulary(Mapping):
         self._vectors = np.vstack([self._vectors, p.v])
 
     def populate(self, pointers):
-        """Generate semantic pointers given an expression.
+        """Populate the vocabulary with semantic pointers given an expression.
+
+        In its most basic form *pointers* is a string of names separated with
+        ``;``::
+
+            vocab.populate('A; B; C')
+
+        Semantic Pointers can be constructed from other Semantic Pointers::
+
+            vocab.populate('A; B; C = 0.3 * A + 1.4 * C')
+
+        Those constructed Semantic Pointers are **not** normalized to
+        unit-length. This can be done by appending a ``normalized()`` call.
+        In the same way unitary Semantic Pointers can be obtained with
+        ``unitary()``::
+
+            vocab.populate('A.unitary(); B; C = (A+B).normalized()')
 
         Parameters
         ----------
@@ -215,12 +263,16 @@ class Vocabulary(Mapping):
         return value
 
     def parse_n(self, *texts):
+        """Applies `parse` to each item in *texts* and returns the result."""
         return [self.parse(t) for t in texts]
 
     def dot(self, v):
         """Returns the dot product with all terms in the Vocabulary.
 
-        Input parameter can either be a `.SemanticPointer` or a vector.
+        Parameters
+        ----------
+        v : SemanticPointer or array_like
+            SemanticPointer to calculate dot product with.
         """
         if isinstance(v, pointer.SemanticPointer):
             v = v.v
@@ -230,23 +282,22 @@ class Vocabulary(Mapping):
         """Create a linear transform from one Vocabulary to another.
 
         This is simply the sum of the outer products of the corresponding
-        terms in each Vocabulary.
+        terms in each Vocabulary if no *solver* is given, otherwise a
+        least-squares solution will be obtained.
 
         Parameters
         ----------
         other : Vocabulary
-            The other vocabulary to translate into.
-        populate : Boolean (Default: None)
+            The vocabulary to translate into.
+        populate : Boolean
             Whether to add the missing keys from the original vocabulary
             to the new target vocabulary.
-        keys : list, optional (Default: None)
-            If None, any term that exists in just one of the Vocabularies
-            will be created in the other Vocabulary and included. Otherwise,
-            the transformation will only consider terms in this list. Any
-            terms in this list that do not exist in the Vocabularies will
-            be created.
+        keys : list, optional
+            Limits the Semantic Pointers considered from the original
+            vocabulary if given.
         solver: callable (Default: None)
-            Function to map one vocabulary to the other.
+            Solver to obtain least-squares solution to map one vocabulary to
+            the other.
         """
         if keys is None:
             keys = self._keys
@@ -274,14 +325,14 @@ class Vocabulary(Mapping):
             return solver(from_vocab, to_vocab)[0].T
 
     def create_subset(self, keys):
-        """Returns the subset of this vocabulary.
+        """Returns a subset of this vocabulary.
 
         Creates and returns a subset of the current vocabulary that contains
         all the semantic pointers found in keys.
 
         Parameters
         ----------
-        keys : list or set
+        keys : sequence
             List or set of semantic pointer names to be copied over to the
             new vocabulary.
         """
