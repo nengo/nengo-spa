@@ -12,6 +12,24 @@ class SemanticPointer(Fixed):
 
     Operators are overloaded so that ``+`` and ``-`` are addition,
     ``*`` is circular convolution, and ``~`` is the inversion operator.
+
+    Parameters
+    ----------
+    data : int or array_like
+        The vector constituting the Semantic Pointer. If an integer is given,
+        a random unit-length vector will be generated.
+    rng : numpy.random.RandomState, optional
+        Random number generator used for random generation of a Semantic
+        Pointer.
+    vocab : Vocabulary
+        Vocabulary that the Semantic Pointer is considered to be part of.
+
+    Attributes
+    ----------
+    v : array_like
+        The vector constituting the Semantic Pointer.
+    vocab : Vocabulary or None
+        The vocabulary the this Semantic Pointer is considered to be part of.
     """
 
     def __init__(self, data, rng=None, vocab=None):
@@ -46,12 +64,23 @@ class SemanticPointer(Fixed):
         return nengo.Node(self.v)
 
     def normalized(self):
+        """Normalize the Semantic Pointer and return it as a new object.
+
+        The original object is not modified.
+        """
         nrm = np.linalg.norm(self.v)
         if nrm > 0:
             return SemanticPointer(self.v / nrm, vocab=self.vocab)
 
     def unitary(self):
-        """Make the vector unitary."""
+        """Make the Semantic Pointer unitary and return it as a new object.
+
+        The original object is not modified.
+
+        A unitary Semantic Pointer has the property that it does not change
+        the length of Semantic Pointers it is bound with using circular
+        convolution.
+        """
         fft_val = np.fft.fft(self.v)
         fft_imag = fft_val.imag
         fft_real = fft_val.real
@@ -142,7 +171,8 @@ class SemanticPointer(Fixed):
     def get_convolution_matrix(self):
         """Return the matrix that does a circular convolution by this vector.
 
-        This should be such that ``A*B == dot(A.get_convolution_matrix, B.v)``.
+        This should be such that
+        ``A*B == dot(A.get_convolution_matrix(), B.v)``.
         """
         D = len(self.v)
         T = []
@@ -198,6 +228,16 @@ class SemanticPointer(Fixed):
 
 
 class Identity(SemanticPointer):
+    """Circular convolution identity.
+
+    Parameters
+    ----------
+    n_dimensions : int
+        Dimensionality of the identity vector.
+    vocab : Vocabulary
+        Vocabulary that the Semantic Pointer is considered to be part of.
+    """
+
     def __init__(self, n_dimensions, vocab=None):
         data = np.zeros(n_dimensions)
         data[0] = 1.
@@ -205,11 +245,29 @@ class Identity(SemanticPointer):
 
 
 class AbsorbingElement(SemanticPointer):
+    """Circular convolution absorbing element.
+
+    Parameters
+    ----------
+    n_dimensions : int
+        Dimensionality of the identity vector.
+    vocab : Vocabulary
+        Vocabulary that the Semantic Pointer is considered to be part of.
+    """
     def __init__(self, n_dimensions, vocab=None):
         data = np.ones(n_dimensions) / np.sqrt(n_dimensions)
         super(AbsorbingElement, self).__init__(data, vocab=vocab)
 
 
 class Zero(SemanticPointer):
+    """An all zero Semantic Pointer.
+
+    Parameters
+    ----------
+    n_dimensions : int
+        Dimensionality of the identity vector.
+    vocab : Vocabulary
+        Vocabulary that the Semantic Pointer is considered to be part of.
+    """
     def __init__(self, n_dimensions, vocab=None):
         super(Zero, self).__init__(np.zeros(n_dimensions), vocab=vocab)

@@ -1,18 +1,31 @@
 nengo\_spa
 ==========
 
-Commonly used classes and functions are accessible at the top level of the
-`nengo_spa` package.
+* `nengo_spa.ActionSelection`
+* `nengo_spa.create_inhibit_node`
+* `nengo_spa.ifmax`
+* `nengo_spa.Network`
+* `nengo_spa.sym`
 
+.. autoclass:: nengo_spa.ActionSelection
 
-.. autosummary::
+.. autofunction:: nengo_spa.create_inhibit_node
 
-   nengo_spa.actions.ActionSelection
-   nengo_spa.network.create_inhibit_node
-   nengo_spa.network.ifmax
-   nengo_spa.network.Network
-   nengo_spa.vocab.Vocabulary
+.. function:: nengo_spa.ifmax([name,] condition, actions)
 
+   Defines a potential aciton within an `ActionSelection` context.
+
+   :param name: Name for the action. Can be omitted.
+   :type name: str, optional
+   :param condition: The utility value for the given actions.
+   :param actions: The actions to activate if the given utility is the highest.
+
+   :return: Nengo object that can be connected to, to provide additional input
+            to the utility value.
+   :rtype: nengo.base.NengoObject
+
+.. autoclass:: nengo_spa.Network
+   :show-inheritance:
 
 .. data:: nengo_spa.sym
 
@@ -29,10 +42,23 @@ Commonly used classes and functions are accessible at the top level of the
        state.vocab.parse('A * B') >> state
 
 
-Modules
--------
+Further members
+---------------
+
+Commonly used classes and functions are accessible at the top level of the
+`nengo_spa` package.
 
 .. autosummary::
+   :nosignatures:
+
+   nengo_spa.vocab.Vocabulary
+
+
+SPA Modules
+^^^^^^^^^^^
+
+.. autosummary::
+   :nosignatures:
 
    nengo_spa.modules.AssociativeMemory
    nengo_spa.modules.IAAssocMem
@@ -49,9 +75,10 @@ Modules
 
 
 Examination of Semantic Pointers
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
+   :nosignatures:
 
    nengo_spa.examine.pairs
    nengo_spa.examine.similarity
@@ -59,9 +86,10 @@ Examination of Semantic Pointers
 
 
 Operators
----------
+^^^^^^^^^
 
 .. autosummary::
+   :nosignatures:
 
    nengo_spa.operators.dot
    nengo_spa.operators.reinterpret

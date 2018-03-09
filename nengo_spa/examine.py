@@ -6,28 +6,29 @@ import numpy as np
 
 import nengo.utils.numpy as npext
 from nengo.exceptions import ValidationError
-from nengo_spa.pointer import SemanticPointer
 from nengo.utils.compat import is_iterable
+
+from nengo_spa.pointer import SemanticPointer
+from nengo_spa.vocab import Vocabulary
 
 
 def similarity(data, vocab, normalize=False):
-    """Return the similarity between some data and the vocabulary.
+    """Return the similarity between simulation data and Semantic Pointers.
 
-    Computes the dot products between all data vectors and each
-    vocabulary vector. If ``normalize=True``, normalizes all vectors
-    to compute the cosine similarity.
+    Computes the dot products between all Semantic Pointers in the Vocabulary
+    and the simulation data for each timestep. If ``normalize=True``,
+    normalizes all vectors to compute the cosine similarity.
 
     Parameters
     ----------
-    data: array_like
-        The data used for comparison.
+    data: (D,) or (T, D) array_like
+        The *D*-dimensional data for *T* timesteps used for comparison.
     vocab: Vocabulary or array_like
-        Vocabulary (or list of vectors) to use to calculate
-        the similarity values.
-    normalize : bool, optional (Default: False)
+        Vocabulary (or list of vectors) used to calculate the similarity
+        values.
+    normalize : bool, optional
         Whether to normalize all vectors, to compute the cosine similarity.
     """
-    from nengo_spa.vocab import Vocabulary
 
     if isinstance(data, SemanticPointer):
         data = data.v
@@ -60,6 +61,17 @@ def similarity(data, vocab, normalize=False):
 
 
 def pairs(vocab):
+    """Return expressions for all possible combinations to bind *vocab*'s keys.
+
+    Examples
+    --------
+
+    >>> vocab = nengo_spa.Vocabulary(32)
+    >>> vocab.populate('A; B; C')
+    >>> sorted(pairs(vocab))
+    ['A*B', 'A*C', 'B*C']
+    """
+
     return set(x + '*' + y for x, y in combinations(vocab.keys(), 2))
 
 
@@ -71,26 +83,26 @@ def text(v, vocab, minimum_count=1, maximum_count=None,
     purposes. To do this, compute the dot product between the vector
     and all the terms in the vocabulary. The top few vectors are
     chosen for inclusion in the text. It will try to only return
-    terms with a match above the threshold, but will always return
-    at least minimum_count and at most maximum_count terms. Terms
+    terms with a match above the *threshold*, but will always return
+    at least *minimum_count* and at most maximum_count terms. Terms
     are sorted from most to least similar.
 
     Parameters
     ----------
-    v : SemanticPointer or ndarray
+    v : SemanticPointer or array_like
         The vector to convert into text.
-    minimum_count : int, optional (Default: 1)
+    minimum_count : int, optional
         Always return at least this many terms in the text.
-    maximum_count : int, optional (Default: None)
+    maximum_count : int, optional
         Never return more than this many terms in the text.
         If None, all terms will be returned.
-    threshold : float, optional (Default: 0.1)
+    threshold : float, optional
         How small a similarity for a term to be ignored.
-    join : str, optional (Default: ';')
+    join : str, optional
         The text separator to use between terms.
-    terms : list, optional (Default: None)
+    terms : list, optional
         Only consider terms in this list of strings.
-    normalize : bool, optional (Default: False)
+    normalize : bool
         Whether to normalize the vector before computing similarity.
     """
     if not isinstance(v, SemanticPointer):

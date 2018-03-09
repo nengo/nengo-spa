@@ -157,14 +157,38 @@ def ifmax(name, condition, *actions):
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
-    """Base class for SPA networks.
+    """Base class for SPA networks or modules.
 
-    SPA networks are networks that also have a list of inputs and outputs,
-    each with an associated `.Vocabulary` (or a desired dimensionality for
-    the vocabulary).
+    SPA modules are networks that declare their inputs and outputs with
+    associated `.Vocabulary` instances. These inputs and outputs can then be
+    be used in the SPA syntax, for example ``module1.output >> module2.input``.
+    Inputs and outputs named `default` can be omitted in the SPA syntax so that
+    one can write ``module1 >> module2``.
 
-    The inputs and outputs are dictionaries that map a name to an
-    (object, Vocabulary) pair. The object can be a `.Node` or an `.Ensemble`.
+    Furthermore, SPA modules allow to configure parameters of contained SPA
+    modules, for example::
+
+        with spa.Network() as net:
+            net.config[spa.State].vocab = 32
+            state = spa.State()  # Will now have a 32-dimensional vocabulary
+
+    Parameters
+    ----------
+    label : str, optional
+        Name of the network.
+    seed : int, optional
+        Random number seed for the network.
+    add_to_container : bool, optional
+        Determines if this network will be addet to the current cotainer.
+    vocabs : VocabularyMap, optional
+        Maps from integer dimensionalities to the associated default
+        vocabularies.
+
+    Attributes
+    ----------
+    vocabs : VocabularyMap
+        Maps from integer dimensionalities to the associated default
+        vocabularies.
     """
 
     vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
@@ -194,7 +218,18 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     def config(self):
         return _AutoConfig(self._config)
 
-        """Creates an input for use in an Actions object.
+    @classmethod
+    def get_input_vocab(cls, obj):
+        """Get the vocabulary associated with an network input *obj*."""
+        return input_vocab_registry[obj]
+
+    @classmethod
+    def get_output_vocab(cls, obj):
+        """Get the vocabulary associated with an network output *obj*."""
+        return output_vocab_registry[obj]
+
+    def declare_input(self, obj, vocab):
+        """Declares a network input.
 
         Parameters
         ----------
@@ -203,24 +238,6 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         vocab: Vocabulary
             Vocabulary to assign to the input.
         """
-        """Creates an output for use in an Actions object.
-
-        Parameters
-        ----------
-        obj : nengo.base.NengoObject
-            Nengo object to use as an output to the network.
-        vocab : Vocabulary
-            Vocabulary to assign to the output.
-        """
-    @classmethod
-    def get_input_vocab(cls, obj):
-        return input_vocab_registry[obj]
-
-    @classmethod
-    def get_output_vocab(cls, obj):
-        return output_vocab_registry[obj]
-
-    def declare_input(self, obj, vocab):
         try:
             extended_type = self._input_types[obj.__class__]
         except KeyError:
@@ -233,6 +250,15 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         input_network_registry[obj] = self
 
     def declare_output(self, obj, vocab):
+        """ Declares a network output.
+
+        Parameters
+        ----------
+        obj : nengo.base.NengoObject
+            Nengo object to use as an output of the network.
+        vocab : Vocabulary
+            Vocabulary to assign to the output.
+        """
         try:
             extended_type = self._output_types[obj.__class__]
         except KeyError:
@@ -261,7 +287,7 @@ def create_inhibit_node(net, strength=2., **kwargs):
     Returns
     -------
     nengo.Node
-        Node that can be connected to to provide an inhibitory signal to the
+        Node that can be connected to, to provide an inhibitory signal to the
         network.
     """
     inhibit_node = nengo.Node(size_in=1)

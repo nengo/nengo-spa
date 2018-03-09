@@ -18,6 +18,6 @@ from nengo_spa.network import create_inhibit_node, ifmax, Network
 from nengo_spa.vocab import Vocabulary
 
 
-__copyright__ = "2013-2017, Applied Brain Research"
+__copyright__ = "2013-2018, Applied Brain Research"
 __license__ = "Free for non-commercial use; see LICENSE.rst"
 __version__ = version.version
