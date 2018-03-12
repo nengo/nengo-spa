@@ -21,9 +21,7 @@ def IA(
     conditions and keep a stable choice selection until the processing of the
     choice has been finished.
 
-    Further details are to be found in "A Spiking Independent Accumulator Model
-    for Winner-Take-All Computation" (J Gosmann, AR Voelker, and C Eliasimth;
-    submitted to CogSci 2017).
+    Further details are to be found in [gosmann2017]_.
 
     Parameters
     ----------
@@ -31,40 +29,46 @@ def IA(
         Number of neurons for each choice.
     n_ensembles : int
         Number of choices.
-    accum_threshold : float, optional (Default: 0.8)
+    accum_threshold : float, optional
         Accumulation threshold that needs to be reached to produce an output.
-    accum_neuron_ratio: float, optional (Default: 0.7)
+    accum_neuron_ratio: float, optional
         Portion of *n_neurons* that will be used for a layer 1 accumulator
         ensemble. The remaining neurons will be used for a layer 2 thresholding
         ensemble.
-    accum_timescale : float, optional (Default: 0.1)
+    accum_timescale : float, optional
         Evidence accumulation timescale.
-    feedback_timescale : float, optional (Default: 0.005)
+    feedback_timescale : float, optional
         Timescale for the feedback connection from the thresholding layer to
         the accumulation layer.
-    accum_synapse : Synapse or float, optional (Default: 0.1)
+    accum_synapse : Synapse or float, optional
         The synapse for connections to the accumulator ensembles.
-    ff_synapse : Synapse or float, optional (Default: 0.005)
+    ff_synapse : Synapse or float, optional
         Synapse for feed-forward connections.
-    intercept_width : float, optional (Default: 0.15)
-        The `presets.ThresholdingEnsembles` *intercept_width* parameter.
-    radius : float, optional (Default: 1.0)
+    intercept_width : float, optional
+        The `nengo.presets.ThresholdingEnsembles` *intercept_width* parameter.
+    radius : float, optional
         The representational radius of the ensembles.
     kwargs : dict
         Passed on to `nengo.Network`.
 
-    Attributes
+    Returns
+    -------
+    nengo.Network
+        Network with attributes:
+
+        * **input** (`nengo.Node`): The inputs to the network.
+        * **input_reset** (`nengo.Node`): Input to reset the accumulators.
+        * **output** (`nengo.Node`): The outputs of the network.
+        * **accumulators** (`nengo.Thresholding`): The layer 1 accumulators.
+        * **thresholding** (`nengo.Thresholding`): The layer 2 thresholding
+          ensembles.
+
+    References
     ----------
-    input : Node
-        The inputs to the network.
-    input_reset : Node
-        Input to reset the accumulators.
-    output : Node
-        The outputs of the network.
-    accumulators : Thresholding
-        The layer 1 accumulators.
-    thresholding : Thresholding
-        The layer 2 thresholding ensembles.
+    .. [gosmann2017] Jan Gosmann, Aaron R. Voelker, and Chris Eliasmith. "A
+       spiking independent accumulator model for winner-take-all computation."
+       In Proceedings of the 39th Annual Conference of the Cognitive Science
+       Society. London, UK, 2017. Cognitive Science Society.
     """
     n_accum_neurons = int(accum_neuron_ratio * n_neurons)
     n_thresholding_neurons = n_neurons - n_accum_neurons
@@ -121,24 +125,25 @@ def Thresholding(
         Number of ensembles.
     threshold : float
         The thresholding value.
-    intercept_width : float, optional (Default: 0.15)
-        The `presets.ThresholdingEnsembles` *intercept_width* parameter.
-    function : function, optional (Default: None)
+    intercept_width : float, optional
+        The `nengo.presets.ThresholdingEnsembles` *intercept_width* parameter.
+    function : function, optional
         Function to apply to the thresholded values.
-    radius : float, optional (Default: 1.0)
+    radius : float, optional
         The representational radius of the ensembles.
     kwargs : dict
         Arguments passed on to `nengo.Network`.
 
-    Attributes
-    ----------
-    input : Node
-        The inputs to the network.
-    output : Node
-        The outputs of the network.
-    thresholded : Node
-        The raw thresholded value (before applying *function* or correcting
-        for the shift produced by the thresholding).
+    Returns
+    -------
+    nengo.Network
+        Network with attributes:
+
+        * **input** (`nengo.Node`): The inputs to the network.
+        * **output** (`nengo.Node`): The outputs of the network.
+        * **thresholded** (`nengo.Node`): The raw thresholded value (before
+          applying *function* or correcting for the shift produced by the
+          thresholding).
     """
     with nengo.Network(**kwargs) as net:
         with nengo.presets.ThresholdingEnsembles(
@@ -170,22 +175,23 @@ def WTA(n_neurons, n_ensembles, inhibit_scale=1.0, inhibit_synapse=0.005,
         Number of neurons for each ensemble.
     n_ensembles : int
         Number of ensembles.
-    inhibit_scale : float, optional (Default: 1.0)
+    inhibit_scale : float, optional
         Scaling of the lateral inhibition.
-    inhibit_synapse : Synapse or float, optional (Default: 0.005)
+    inhibit_synapse : Synapse or float, optional
         Synapse on the recurrent connection for lateral inhibition.
     kwargs : dict
         Arguments passed on to `Thresholding`.
 
-    Attributes
-    ----------
-    input : Node
-        The inputs to the network.
-    output : Node
-        The outputs of the network.
-    thresholded : Node
-        The raw thresholded value (before applying *function* or correcting
-        for the shift produced by the thresholding).
+    Returns
+    -------
+    nengo.Network
+        Network with attributes:
+
+        * **input** (`nengo.Node`): The inputs to the network.
+        * **output** (`nengo.Node`): The outputs of the network.
+        * **thresholded** (`nengo.Node`): The raw thresholded value (before
+          applying *function* or correcting for the shift produced by the
+          thresholding).
     """
     net = Thresholding(n_neurons, n_ensembles, **kwargs)
     with net:

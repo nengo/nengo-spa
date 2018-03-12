@@ -86,7 +86,7 @@ def dft_half(n):
 
 
 def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
-                        input_magnitude=1.0, net=None):
+                        input_magnitude=1.0, **kwargs):
     r"""Compute the circular convolution of two vectors.
 
     The circular convolution :math:`c` of vectors :math:`a` and :math:`b`
@@ -98,7 +98,7 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
 
     This computation can also be done in the Fourier domain,
 
-    .. math:: c = DFT^{-1} ( DFT(a) DFT(b) )
+    .. math:: c = DFT^{-1} ( DFT(a) \odot DFT(b) )
 
     where :math:`DFT` is the Discrete Fourier Transform operator, and
     :math:`DFT^{-1}` is its inverse. This network uses this method.
@@ -106,40 +106,34 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
     Parameters
     ----------
     n_neurons : int
-        Number of neurons to use in each product computation
+        Number of neurons to use in each product computation.
     dimensions : int
         The number of dimensions of the input and output vectors.
 
-    invert_a, invert_b : bool, optional (Default: False, False)
-        Whether to reverse the order of elements in either
-        the first input (``invert_a``) or the second input (``invert_b``).
-        Flipping the second input will make the network perform circular
-        correlation instead of circular convolution.
-    input_magnitude : float, optional (Default: 1.0)
+    invert_a : bool, optional
+        Whether to reverse the order of elements in first input.
+    invert_b : bool, optional
+        Whether to reverse the order of elements in the second input.
+        Flipping exactly one input will make the network perform circular
+        correlation instead of circular convolution which can be treated as an
+        approximate inverse to circular convolution.
+    input_magnitude : float, optional
         The expected magnitude of the vectors to be convolved.
         This value is used to determine the radius of the ensembles
         computing the element-wise product.
-    net : Network, optional (Default: None)
-        A network in which the network components will be built.
-        This is typically used to provide a custom set of Nengo object
-        defaults through modifying ``net.config``.
+    kwargs : dict
+        Arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------
-    net : Network
-        The newly built product network, or the provided ``net``.
+    nengo.Network
+        The newly built product network with attributes:
 
-    Attributes
-    ----------
-    net.input_a : Node
-        The first vector to be convolved.
-    net.input_b : Node
-        The second vector to be convolved.
-    net.product : Network
-        Network created with `.Product` to do the element-wise product
-        of the :math:`DFT` components.
-    net.output : Node
-        The resulting convolved vector.
+         * **input_a** (`nengo.Node`): The first vector to be convolved.
+         * **input_b** (`nengo.Node`): The second vector to be convolved.
+         * **product** (`nengo.networks.Product`): Network created to do the
+           element-wise product of the :math:`DFT` components.
+         * **output** (`nengo.Node`): The resulting convolved vector.
 
     Examples
     --------
@@ -150,7 +144,7 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
         A = EnsembleArray(50, n_ensembles=10)
         B = EnsembleArray(50, n_ensembles=10)
         C = EnsembleArray(50, n_ensembles=10)
-        cconv = nengo.networks.CircularConvolution(50, dimensions=10)
+        cconv = nengo_spa.networks.CircularConvolution(50, dimensions=10)
         nengo.Connection(A.output, cconv.input_a)
         nengo.Connection(B.output, cconv.input_b)
         nengo.Connection(cconv.output, C.input)
@@ -158,8 +152,9 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
     Notes
     -----
 
-    The network maps the input vectors :math:`a` and :math:`b` of length N into
-    the Fourier domain and aligns them for complex multiplication.
+    The network maps the input vectors :math:`a` and :math:`b` of length
+    :math:`N` into the Fourier domain and aligns them for complex
+    multiplication.
     Letting :math:`F = DFT(a)` and :math:`G = DFT(b)`, this is given by::
 
         [ F[i].real ]     [ G[i].real ]     [ w[i] ]
@@ -182,14 +177,13 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
     only the real part of :math:`c` since the imaginary part
     is analytically zero.
     """
-    if net is None:
-        net = nengo.Network("Circular Convolution")
+    kwargs.setdefault('label', "CircularConvolution")
 
     tr_a = transform_in(dimensions, 'A', invert_a)
     tr_b = transform_in(dimensions, 'B', invert_b)
     tr_out = transform_out(dimensions)
 
-    with net:
+    with nengo.Network(**kwargs) as net:
         net.input_a = nengo.Node(size_in=dimensions, label="input_a")
         net.input_b = nengo.Node(size_in=dimensions, label="input_b")
         net.product = Product(

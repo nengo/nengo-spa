@@ -9,7 +9,7 @@ import numpy as np
 
 class IdentityEnsembleArray(nengo.Network):
     """An ensemble array optimized for representing the identity circular
-    convolution vector.
+    convolution vector besides random unit vectors.
 
     The ensemble array will use ensembles with *subdimensions* dimensions,
     except for the first *subdimensions* dimensions. These will be split into
@@ -27,12 +27,13 @@ class IdentityEnsembleArray(nengo.Network):
     kwargs : dict
         Arguments to pass through to the `nengo.Network` constructor.
 
-    Attributes
-    ----------
-    input : nengo.Node
-        Input node.
-    output : nengo.Node
-        Output node.
+    Returns
+    -------
+    nengo.Network
+        Network with attributes:
+
+        * **input** (`nengo.Node`): Input node.
+        * **output** (`nengo.Node`): Output node.
     """
     def __init__(
             self, neurons_per_dimension, dimensions, subdimensions, **kwargs):
@@ -80,7 +81,7 @@ class IdentityEnsembleArray(nengo.Network):
     def add_neuron_input(self):
         """Adds a node providing input to the neurons of all ensembles.
 
-        This node is accessible through the `neuron_input` attribute.
+        This node will be accessible through the *neuron_input* attribute.
 
         Returns
         -------
@@ -113,6 +114,15 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_neuron_output(self):
+        """Adds a node providing neuron (non-decoded) output of all ensembles.
+
+        This node will be accessible through the *neuron_output* attribute.
+
+        Returns
+        -------
+        nengo.Node
+            The added node.
+        """
         if self.neuron_output is not None:
             warnings.warn("neuron_output already exists. Returning.")
             return self.neuron_output
@@ -139,6 +149,27 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_output(self, name, function, synapse=None, **conn_kwargs):
+        """Adds a new decoded output.
+
+        This will add the attribute named *name* to the object.
+
+        Parameters
+        ----------
+        name : str
+            Name of output. Must be a valid Python attribute name.
+        function : func
+            Function to decode.
+        synapse : float or nengo.Lowpass
+            Synapse to apply to the decoded connection to the returned output
+            node.
+        conn_kwargs : dict
+            Additional keywword arguments to apply to the decoded connection.
+
+        Returns
+        -------
+        nengo.Node
+            Node providing the decoded output.
+        """
         if is_iterable(function):
             function = list(function)
             if (len(function) != 3 and
