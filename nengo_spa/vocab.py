@@ -295,7 +295,7 @@ class Vocabulary(Mapping):
         keys : list, optional
             Limits the Semantic Pointers considered from the original
             vocabulary if given.
-        solver: callable (Default: None)
+        solver: callable
             Solver to obtain least-squares solution to map one vocabulary to
             the other.
         """
@@ -348,7 +348,20 @@ class Vocabulary(Mapping):
 
 
 class VocabularyMap(Mapping):
-    """Maps dimensionalities to corresponding vocabularies."""
+    """Maps dimensionalities to corresponding vocabularies.
+
+    Acts like a Python dictionary.
+
+    Parameters
+    ----------
+    vocabs : sequence of Vocabulary
+        A list of vocabularies to add to the mapping. The dimensionalities
+        will be determined from the vocabulary objects.
+    rng : numpy.random.RandomState
+        Random number generator to use for newly created vocabularies (with
+        `.get_or_create`).
+    """
+
     def __init__(self, vocabs=None, rng=None):
         if vocabs is None:
             vocabs = []
@@ -364,6 +377,15 @@ class VocabularyMap(Mapping):
                 "instances or `None`.")
 
     def add(self, vocab):
+        """Add a vocabulary to the map.
+
+        The dimensionality will be determined from the vocabulary.
+
+        Parameters
+        ----------
+        vocab : Vocaublary
+            Vocabulary to add.
+        """
         if vocab.dimensions in self._vocabs:
             warnings.warn("Duplicate vocabularies with dimension %d. "
                           "Using the last entry in the vocab list with "
@@ -374,6 +396,15 @@ class VocabularyMap(Mapping):
         del self._vocabs[dimensions]
 
     def discard(self, vocab):
+        """Discard (remove) a vocabulary from the mapping.
+
+        Parameters
+        ----------
+        vocab : int or Vocabulary
+            If an integer is given, the vocabulary associated to the
+            dimensionality will be discarded. If a `.Vocabulary` is given, that
+            specific instance will be discarded.
+        """
         if isinstance(vocab, int):
             del self._vocabs[vocab]
         elif self._vocabs.get(vocab.dimensions, None) is vocab:
@@ -383,6 +414,22 @@ class VocabularyMap(Mapping):
         return self._vocabs[dimensions]
 
     def get_or_create(self, dimensions):
+        """Gets or creates a vocabulary of given dimensionality.
+
+        If the mapping already maps the given dimensionality to a vocabulary,
+        it will be returned. Otherwise, a new vocabulary will be created,
+        added to the mapping, and returned.
+
+        Parameters
+        ----------
+        dimensions : int
+            Dimensionality of vocabulary to return.
+
+        Returns
+        -------
+        Vocabulary
+            Vocabulary of given dimensionality.
+        """
         if dimensions not in self._vocabs:
             self._vocabs[dimensions] = Vocabulary(
                 dimensions, strict=False, rng=self.rng)
@@ -403,7 +450,10 @@ class VocabularyMap(Mapping):
 
 
 class VocabularyMapParam(nengo.params.Parameter):
-    """Can be a mapping from dimensions to vocabularies."""
+    """Nengo parameter that accepts `.VocabularyMap` instances.
+
+    Sequences of `.Vocabulary` will be coerced to `.VocabularyMap`.
+    """
 
     def coerce(self, instance, vocab_set):
         vocab_set = super(VocabularyMapParam, self).coerce(instance, vocab_set)
@@ -421,7 +471,13 @@ class VocabularyMapParam(nengo.params.Parameter):
 
 
 class VocabularyOrDimParam(nengo.params.Parameter):
-    """Can be a vocabulary or integer denoting a dimensionality."""
+    """Nengo parameter that accepts `.Vocabulary` or integer dimensionality.
+
+    If an integer is assigned, the vocabulary will retrieved from the
+    instance's *vocabs* attribute with *vocabs.get_or_create(dimensions)*.
+    Thus, a class using *VocabularyOrDimParam* should also have an attribute
+    *vocabs* of type `VocabularyMap`.
+    """
 
     coerce_defaults = False
 
