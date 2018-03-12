@@ -1,4 +1,4 @@
-"""SPA modules.
+"""SPA modules with defined inputs and outputs usable in action rules.
 
 SPA modules derive from `nengo_spa.Network` and thus provide information about
 inputs and outputs that can be used in action rules and the associated
@@ -10,7 +10,7 @@ possible to set module parameters with `nengo.Config` objects to allow to
 easily change parameters of networks created in this way.
 
 Note that SPA modules can be used as standalone networks without using
-nengo_spa features.
+any other Nengo SPA features.
 """
 
 from .assoc_mem import (
@@ -29,7 +29,7 @@ from .transcode import Transcode
 from nengo_spa.ast import dynamic
 
 
-def register_default_modules():
+def _register_default_modules():
     dynamic.BasalGangliaRealization = BasalGanglia
     dynamic.BindRealization = Bind
     dynamic.DotProductRealization = Compare
@@ -39,4 +39,4 @@ def register_default_modules():
     dynamic.ThalamusRealization = Thalamus
 
 
-register_default_modules()
+_register_default_modules()

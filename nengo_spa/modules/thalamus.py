@@ -15,7 +15,7 @@ from nengo_spa.types import TScalar
 class Thalamus(Network):
     """Inhibits non-selected actions.
 
-    The thalamus is intended to work in tandem with a basal ganglia network.
+    The thalamus is intended to work in tandem with a `.BasalGanglia` module.
     It converts basal ganglia output into a signal with (approximately) 1 for
     the selected action and 0 elsewhere.
 
@@ -51,20 +51,19 @@ class Thalamus(Network):
         Minimum value for gating neurons.
     synapse_to-gate : float, optional (Default: 0.002)
         Synaptic filter for controlling a gate.
-
-    kwargs
-        Passed through to ``spa.Network``.
+    kwargs : dict
+        Passed through to `nengo_spa.Network`.
 
     Attributes
     ----------
-    actions : EnsembleArray
+    actions : nengo.networks.EnsembleArray
         Each ensemble represents one dimension (action).
-    bias : Node
-        The constant bias injected in each ``actions`` ensemble.
-    input : Node
-        Input to the ``actions`` ensembles.
-    output : Node
-        Output from the ``actions`` ensembles.
+    bias : nengo.Node
+        The constant bias injected in each *actions* ensemble.
+    input : nengo.Node
+        Input to the *actions* ensembles.
+    output : nengo.Node
+        Output from the *actions* ensembles.
     """
 
     neurons_action = IntParam('neurons_action', default=50)
@@ -138,14 +137,14 @@ class Thalamus(Network):
         ----------
         index : int
             Index to identify the gate.
-        net : :class:`nengo.Network`, optional
-            Network to which to add the channel. Defaults to ``self.spa``.
+        net : nengo.Network
+            Network to which to add the channel.
         label : str, optional
             Label for the gate.
 
         Returns
         -------
-        :class:`nengo.Ensemble`
+        nengo.Ensemble
             The constructed gate.
         """
         if label is None:
@@ -175,10 +174,10 @@ class Thalamus(Network):
 
         Parameters
         ----------
-        target_net : :class:`spa.Network`
-            The network that the channel will project to.
-        target_vocab : :class:`spa.Vocabulary`
-            The vocabulary used by the target population..
+        sink : nengo.base.NengoObject
+            Sink/target that the channel feeds into.
+        type_ : nengo_spa.types.Type
+            Type of the data transmitted through the channel.
         label : str, optional
             Label for the channel.
 
@@ -211,7 +210,7 @@ class Thalamus(Network):
         ----------
         index : int
             Index of the gate to connect.
-        channel : :class:`nengo.networks.EnsembleArray`
+        channel : nengo.networks.EnsembleArray
             Channel to inhibit with the gate.
         """
         if isinstance(channel, Scalar):
@@ -233,7 +232,7 @@ class Thalamus(Network):
         ----------
         index : int
             Index of the action to connect.
-        target : :class:`nengo.base.NengoObject`
+        target : nengo.base.NengoObject
             Target of the connection.
         transform : array-like
             Transform to apply to apply to the connection.
@@ -244,7 +243,16 @@ class Thalamus(Network):
     def connect(self, source, target, transform):
         """Create connection.
 
-        The connection will use the thalamus' `synapse_channel`.
+        The connection will use the thalamus's *synapse_channel*.
+
+        Parameters
+        ----------
+        source : nengo.base.NengoObject
+            Source object.
+        target : nengo.base.NengoObject
+            Target object.
+        transform : array-like
+            Transform to apply to the connection.
         """
         return nengo.Connection(
             source, target, transform=transform, synapse=self.synapse_channel)
