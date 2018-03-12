@@ -21,17 +21,30 @@ class State(Network):
         the default vocabulary of that dimensionality will be used.
     subdimensions : int, optional (Default: 16)
         Size of the individual ensembles making up the vector.
-        Must divide ``dimensions`` evenly.
+        Must divide *dimensions* evenly.
     neurons_per_dimensions : int, optional (Default: 50)
-        Number of neurons in an ensemble will be
+        Number of neurons per dimension. Total number in an ensemble will be
         ``neurons_per_dimensions * subdimensions``.
     feedback : float, optional (Default: 0.0)
         Gain of feedback connection. Set to 1.0 for perfect memory,
         or 0.0 for no memory. Values in between will create a decaying memory.
+    represent_identity : bool, optional
+        Whether to use optimizations to better represent the circular
+        convolution identity vector. If activated, the `.IdentityEnsembleArray`
+        will be used internally, otherwise a normal
+        `nengo.networks.EnsembleArray` split up regularly according to
+        *subdimensions*.
     feedback_synapse : float, optional (Default: 0.1)
         The synapse on the feedback connection.
-    kwargs
-        Keyword arguments passed through to ``spa.Network``.
+    kwargs : dict
+        Keyword arguments passed through to `nengo_spa.Network`.
+
+    Attributes
+    ----------
+    input : nengo.Node
+        Input.
+    output : nengo.Node
+        Output.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

@@ -17,7 +17,16 @@ class Compare(Network):
     neurons_per_dimension : int, optional (Default: 200)
         Number of neurons to use in each product computation.
     kwargs : dict
-        Keyword arguments passed through to ``spa.Network``.
+        Keyword arguments passed through to `nengo_spa.Network`.
+
+    Attributes
+    ----------
+    input_a : nengo.Node
+        First input vector.
+    input_b : nengo.Node
+        Second input vector.
+    output : nengo.Node
+        Output.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

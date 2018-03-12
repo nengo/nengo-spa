@@ -12,7 +12,16 @@ class Product(Network):
     n_neurons : int, optional (Default: 200)
         Number of neurons to use in product computation.
     kwargs : dict
-        Keyword arguments passed through to ``spa.Network``.
+        Keyword arguments passed through to `nengo_spa.Network`.
+
+    Attributes
+    ----------
+    input_a : nengo.Node
+        First input.
+    input_b : nengo.Node
+        Second input.
+    output : nengo.Node
+        Output.
     """
 
     n_neurons = IntParam('n_neurons', default=200, low=1, readonly=True)

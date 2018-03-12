@@ -9,7 +9,7 @@ class Bind(Network):
     """Network for binding together two inputs.
 
     Binding is done with circular convolution. For more details on how
-    this is computed, see the underlying `~.network.CircularConvolution`
+    this is computed, see the underlying `.CircularConvolution`
     network.
 
     Parameters
@@ -19,13 +19,24 @@ class Bind(Network):
         the default vocabulary of that dimensionality will be used.
     neurons_per_dimension : int, optional (Default: 200)
         Number of neurons to use in each product computation.
-    invert_a, invert_b : bool, optional (Default: False, False)
-        Whether to reverse the order of elements in either
-        the first input (``invert_a``) or the second input (``invert_b``).
-        Flipping the second input will make the network perform circular
-        correlation instead of circular convolution.
+    invert_a : bool, optional
+        Whether to reverse the order of elements in first input.
+    invert_b : bool, optional
+        Whether to reverse the order of elements in the second input.
+        Flipping exactly one input will make the network perform circular
+        correlation instead of circular convolution which can be treated as an
+        approximate inverse to circular convolution.
     kwargs : dict
-        Keyword arguments passed through to ``spa.Network``.
+        Keyword arguments passed through to `nengo_spa.Network`.
+
+    Attributes
+    ----------
+    input_a : nengo.Node
+        First input vector.
+    input_b : nengo.Node
+        Second input vector.
+    output : nengo.Node
+        Output.
     """
 
     vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)

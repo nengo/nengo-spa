@@ -63,62 +63,62 @@ class BasalGanglia(Network):
     function, it is also organized to match the organization of the human
     basal ganglia. It consists of five ensembles:
 
-    * Striatal D1 dopamine-receptor neurons (``strD1``)
-    * Striatal D2 dopamine-receptor neurons (``strD2``)
-    * Subthalamic nucleus (``stn``)
-    * Globus pallidus internus / substantia nigra reticulata (``gpi``)
-    * Globus pallidus externus (``gpe``)
+    * Striatal D1 dopamine-receptor neurons (*strD1*)
+    * Striatal D2 dopamine-receptor neurons (*strD2*)
+    * Subthalamic nucleus (*stn*)
+    * Globus pallidus internus / substantia nigra reticulata (*gpi*)
+    * Globus pallidus externus (*gpe*)
 
     Interconnections between these areas are also based on known
     neuroanatomical connections. See [1]_ for more details, and [2]_ for
     the original non-spiking basal ganglia model by
     Gurney, Prescott & Redgrave that this model is based on.
 
-    .. note:: The default `.Solver` for the basal ganglia is `.NnlsL2nz`, which
-              requires SciPy. If SciPy is not installed, the global default
-              solver will be used instead.
+    .. note:: The default `nengo.solvers.Solver` for the basal ganglia is
+              `nengo.solvers.NnlsL2nz`, which requires SciPy. If SciPy is not
+              installed, the global default solver will be used instead.
 
     Parameters
     ----------
     action_count : int
         Number of actions.
-    n_neuron_per_ensemble : int, optional (Default: 100)
+    n_neuron_per_ensemble : int, optional
         Number of neurons in each ensemble in the network.
-    output_weight : float, optional (Default: -3.)
+    output_weight : float, optional
         A scaling factor on the output of the basal ganglia
         (specifically on the connection out of the GPi).
-    input_bias : float, optional (Default: 0.)
+    input_bias : float, optional
         An amount by which to bias all dimensions of the input node.
         Biasing the input node is important for ensuring that all input
         dimensions are positive and easily comparable.
-    ampa_synapse : Synapse, optional (Default: Lowpass(0.002))
+    ampa_synapse : Synapse, optional
         Synapse for connections corresponding to biological connections
         to AMPA receptors (i.e., connections from STN to to GPi and GPe).
-    gaba_synapse : Synapse, optional (Default: Lowpass(0.008))
+    gaba_synapse : Synapse, optional
         Synapse for connections corresponding to biological connections
         to GABA receptors (i.e., connections from StrD1 to GPi, StrD2 to GPe,
         and GPe to GPi and STN).
     kwargs
-        Passed through the ``spa.Network``.
+        Passed through the `nengo_spa.Network`.
 
     Attributes
     ----------
-    bias_input : Node or None
-        If ``input_bias`` is non-zero, this node will be created to bias
+    bias_input : nengo.Node or None
+        If *input_bias* is non-zero, this node will be created to bias
         all of the dimensions of the input signal.
-    gpe : EnsembleArray
+    gpe : nengo.networks.EnsembleArray
         Globus pallidus externus ensembles.
-    gpi : EnsembleArray
+    gpi : nengo.networks.EnsembleArray
         Globus pallidus internus ensembles.
-    input : Node
+    input : nengo.Node
         Accepts the input signal.
-    output : Node
+    output : nengo.Node
         Provides the output signal.
-    stn : EnsembleArray
+    stn : nengo.networks.EnsembleArray
         Subthalamic nucleus ensembles.
-    strD1 : EnsembleArray
+    strD1 : nengo.networks.EnsembleArray
         Striatal D1 ensembles.
-    strD2 : EnsembleArray
+    strD2 : nengo.networks.EnsembleArray
         Striatal D2 ensembles.
 
     References

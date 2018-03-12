@@ -30,11 +30,11 @@ class AssociativeMemory(Network):
         connection will be created to read the selected output(s).
     input_vocab: Vocabulary
         The vocabulary to match.
-    output_vocab: Vocabulary, optional (Default: None)
+    output_vocab: Vocabulary, optional
         The vocabulary to be produced for each match. If
         None, the associative memory will act like an autoassociative memory
         (cleanup memory).
-    mapping: dict or str, optional (Default: None)
+    mapping: dict or str, optional
         A dictionary that defines the mapping from Semantic Pointers in the
         input vocabulary to Semantic Pointers in the output vocabulary. If set
         to the string ``'by-key'``, the mapping will be done based on the keys
@@ -43,14 +43,14 @@ class AssociativeMemory(Network):
     n_neurons : int
         Number of neurons to represent each choice, passed on to the
         *selection_net*.
-    label : str, optional (Default: None)
+    label : str, optional
         A name for the ensemble. Used for debugging and visualization.
-    seed : int, optional (Default: None)
+    seed : int, optional
         The seed used for random number generation.
-    add_to_container : bool, optional (Default: None)
+    add_to_container : bool, optional
         Determines if this Network will be added to the current container.
-        If None, will be true if currently with
-    vocabs : VocabularyMap, optional (Default: None)
+        See `nengo.Network` for more details.
+    vocabs : VocabularyMap, optional
         Maps dimensionalities to the corresponding default vocabularies.
     """
     input_vocab = VocabularyOrDimParam(
@@ -118,7 +118,7 @@ class AssociativeMemory(Network):
         min_activation_value : float
             Minimum output of another Semantic Pointer to deactivate the
             default output.
-        n_neurons : int, optional (Default: 50)
+        n_neurons : int, optional
             Number of neurons used to represent the default Semantic Pointer.
         """
         assert not hasattr(self, 'default_ens'), \
@@ -139,9 +139,9 @@ class AssociativeMemory(Network):
 
 
 class IAAssocMem(AssociativeMemory):
-    """Associative memory based on the `IA` network.
+    """Associative memory based on the `.IA` network.
 
-    See `AssociativeMemory` and `IA` for more information.
+    See `AssociativeMemory` and `.IA` for more information.
     """
     def __init__(
             self, input_vocab, output_vocab=None, mapping=None,
@@ -158,9 +158,9 @@ class IAAssocMem(AssociativeMemory):
 
 
 class ThresholdingAssocMem(AssociativeMemory):
-    """Associative memory based on `Thresholding`.
+    """Associative memory based on `.Thresholding`.
 
-    See `AssociativeMemory` and `Thresholding` for more information.
+    See `AssociativeMemory` and `.Thresholding` for more information.
     """
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,
@@ -176,9 +176,9 @@ class ThresholdingAssocMem(AssociativeMemory):
 
 
 class WTAAssocMem(AssociativeMemory):
-    """Associative memory based on the `WTA` network.
+    """Associative memory based on the `.WTA` network.
 
-    See `AssociativeMemory` and `WTA` for more information.
+    See `AssociativeMemory` and `.WTA` for more information.
     """
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,

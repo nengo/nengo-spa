@@ -69,9 +69,9 @@ class TranscodeFunctionParam(Parameter):
         if not invoked:
             if obj.input_vocab is not None:
                 raise ValidationError(
-                    "Transcode function %r is expected to accept exactly 3 "
-                    "arguments: time as a float, a SemanticPointer, and a "
-                    "Vocabulary.", attr=self.name, obj=obj)
+                    "Transcode function %r is expected to accept exactly 2 "
+                    "arguments: time as a float, and a SemanticPointer",
+                    attr=self.name, obj=obj)
             else:
                 raise ValidationError(
                     "Transcode function %r is expected to accept exactly 1 or "
@@ -96,6 +96,58 @@ class TranscodeFunctionParam(Parameter):
 
 
 class Transcode(Network):
+    """Transcode from, to, and between Semantic Pointers.
+
+    This can thought of the equivalent of a `nengo.Node` for Semantic Pointers.
+
+    Either the *input_vocab* or the *output_vocab* argument must not be *None*.
+    (If you want both arguments to be *None*, use a normal `nengo.Node`.)
+    Which one of the parameters in the pairs *input_vocab/size_in* and
+    *output_vocab/size_out* is not set to *None*, determines whether a Semantic
+    Pointer input/output or a normal vector input/output is expected.
+
+    Parameters
+    ----------
+    function : func, optional (Default: None)
+        Function that transforms the input Semantic Pointer to an output
+        Semantic Pointer. The function signature depends on *input_vocab*:
+
+        * If *input_vocab* is *None*, the allowed signatures are the same as
+          for a `nengo.Node`. Either ``function(t)`` or ``function(t, x)``
+          where *t* (float) is the current simulation time and *x* (NumPy
+          array) is the current input to transcode with size *size_in*.
+        * If *input_vocab* is not *None*, the signature has to be
+          ``function(t, sp)`` where *t* (float) is the current simulation time
+          and *sp* (`.SemanticPointer`) is the current Semantic Pointer input.
+          The associated vocabulary can be obtained via ``sp.vocab``.
+
+        The allowed function return value depends on *output_vocab*:
+
+        * If *output_vocab* is *None*, the return value must be a NumPy array
+          (or equivalent) of size *size_out* or *None* (i.e. no return value)
+          if *size_out* is *None*.
+        * If *output_vocab* is not *None*, the return value can be either of:
+          NumPy array, `.SemanticPointer` instance, or an SemanticPointer
+          expression as string that gets parsed with the *output_vocab*.
+    input_vocab : Vocabulary, optional (Default: None)
+        Input vocabulary. Mutually exclusive with *size_in*.
+    output_vocab : Vocabulary, optional (Default: None)
+        Output vocabulary. Mutually exclusive with *size_out*.
+    size_in : int, optional (Default: None)
+        Input size. Mutually exclusive with *input_vocab*.
+    size_out : int, optional (Default: None)
+        Output size. Mutually exclusive with *output_vocab*.
+    kwargs : dict
+        Additional keyword arguments passed to `nengo_spa.Network`.
+
+    Attributes
+    ----------
+    input : nengo.Node
+        Input.
+    output : nengo.Node
+        Output.
+    """
+
     function = TranscodeFunctionParam(
         'function', optional=True, default=None, readonly=True)
     input_vocab = VocabularyOrDimParam(

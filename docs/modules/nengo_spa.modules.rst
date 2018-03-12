@@ -5,20 +5,17 @@ nengo\_spa\.modules
    :members:
    :imported-members:
 
-   
-   
-   .. rubric:: Functions
-
    .. autosummary::
-   
-      register_default_modules
-   
-   
 
-   
-   
-   
-
-   
-   
-   
+      AssociativeMemory
+      BasalGanglia
+      Bind
+      Compare
+      IAAssocMem
+      Product
+      Scalar
+      State
+      Thalamus
+      ThresholdingAssocMem
+      Transcode
+      WTAAssocMem
