@@ -16,4 +16,4 @@ implemented with large-scale spiking neural networks.
    user_guide
    examples
    api
-   license
+   developer
