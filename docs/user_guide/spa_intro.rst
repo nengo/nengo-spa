@@ -51,15 +51,16 @@ In particular, we usually use random vectors of unit-length and three basic
 operations.
 
 1. *Superposition*: Two vectors :math:`\vec{v}` and :math:`\vec{w}` can be
-   combined in a union-like operation by simple addition as :math:`\vec{u}
-   = \vec{v} + \vec{w}`. The resulting vector will be similar to both of the
-   original vectors.
+   combined in a union-like operation by simple addition as
+   :math:`\vec{u} = \vec{v} + \vec{w}`. The resulting vector will be similar to
+   both of the original vectors.
 2. *Binding*: The binding has to produce a vector that is dissimilar to both of
    the original vectors and allows to recover one of the original vectors given
    the other one. In the SPA, we employ circular convolution for this purpose
    defined as
 
    .. math::
+
       \vec{u} = \vec{v} \circledast \vec{w}\ :\quad u_i = \sum_{j=1}^D v_j
       w_{(i-j)\ \mathrm{mod}\ D}
 
@@ -67,34 +68,32 @@ operations.
 3. *Unbinding*: To unbind a vector from a circular convolution, another circular
    convolution with the approximate inverse of one of the vectors can be used:
    :math:`\vec{v} \approx \vec{u} \circledast \vec{w}^+`. The approximate
-   inverse is given by reordering the vector components: :math:`\vec{w}^+
-   = (w_1, w_D, w_{D-1}, \dots, w_2)^T`.
+   inverse is given by reordering the vector components:
+   :math:`\vec{w}^+ = (w_1, w_D, w_{D-1}, \dots, w_2)^T`.
 
 Note that circular convolution is associative, commutative, and distributive:
 
-* :math:`(\vec{u} \circledast \vec{v}) \circledast \vec{w} = \vec{u} \circledast
-  (\vec{v} \circledast \vec{w})`,
+* :math:`(\vec{u} \circledast \vec{v}) \circledast \vec{w} = \vec{u} \circledast (\vec{v} \circledast \vec{w})`,
 * :math:`\vec{v} \circledast \vec{w} = \vec{w} \circledast \vec{v}`,
-* :math:`\vec{u} \circledast (\vec{v} + \vec{w}) = \vec{u} \circledast \vec{v}
-  + \vec{u} \circledast \vec{w}`.
+* :math:`\vec{u} \circledast (\vec{v} + \vec{w}) = \vec{u} \circledast \vec{v} + \vec{u} \circledast \vec{w}`.
 
 Let us consider a simple example: Given vectors for *red*, *blue*,
 *square*, and *circle*, we can represent a scene with a *red square* and *blue
 circle* as
 
 .. math::
+
    \vec{v} = \mathrm{Red} \circledast \mathrm{Square} + \mathrm{Blue}
    \circledast \mathrm{Circle}
 
 If we want to know the color of the square, we can unbind the *square* vector:
 
-.. math:: \vec{v} \circledast \mathrm{Square}^+ = \mathrm{Red} \circledast
+.. math::
+
+   \vec{v} \circledast \mathrm{Square}^+ = \mathrm{Red} \circledast
    \mathrm{Square} \circledast \mathrm{Square}^+ + \mathrm{Blue} \circledast
    \mathrm{Circle} \circledast \mathrm{Square}^+ \approx \mathrm{Red}
    + \mathit{noise}
-
-TODO: link to more in depth discussion of circular convolution (including
-unitary vectors etc); mention alternate binding approaches?
 
 
 An example: Spaun
