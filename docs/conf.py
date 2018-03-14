@@ -38,18 +38,19 @@ autodoc_member_order = 'bysource'  # default is alphabetical
 # -- sphinx.ext.intersphinx
 intersphinx_mapping = {
     'nengo': ('https://www.nengo.ai/nengo/', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy', None),
 }
 
 # -- sphinx.ext.todo
 todo_include_todos = True
 
 # -- nbsphinx
-nbsphinx_allow_errors = True  # FIXME set to false and fix errors
+nbsphinx_allow_errors = False
 nbsphinx_timeout = 300
+nbsphinx_execute = 'always'
 
 # -- sphinx
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'examples/.ipynb_checkpoints']
 source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
@@ -70,7 +71,7 @@ pygments_style = 'default'
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_title = "Nengo {0} docs".format(release)
-html_static_path = ['_static']
+# html_static_path = ['_static']
 html_context = {
     'css_files': [os.path.join('_static', 'custom.css')],
 }

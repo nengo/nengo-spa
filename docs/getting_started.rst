@@ -69,6 +69,9 @@ To use Nengo SPA functionality in your models use `nengo_spa.Network` instead of
 Next steps
 ----------
 
-* If you are unfamiliar with the Semantic Pointer Architecture, TODO
-* If you are new to building SPA models with Nengo, TODO
-* If you have used the legacy SPA module included in core Nengo, TODO
+* If you are unfamiliar with the Semantic Pointer Architecture, start with the
+  :ref:`/user_guide/spa_intro.rst`.
+* If you are new to building SPA models with Nengo, read the
+  :ref:`/examples/intro.ipynb`.
+* If you have used the legacy SPA module included in core Nengo, read the
+  tutorial on :ref:`/examples/intro_coming_from_legacy_spa.ipynb`.
