@@ -1,14 +1,10 @@
-import codecs
 import os
-from pkg_resources import resource_stream
 
-from nengo.utils.ipython import read_nb
-from nengo.utils.stdlib import execfile
 import pytest
 import _pytest.capture
 
-from nengo_spa.resources import resource_walk
-
+from nengo.utils.ipython import read_nb
+from nengo.utils.stdlib import execfile
 
 # Monkeypatch _pytest.capture.DontReadFromInput
 #  If we don't do this, importing IPython will choke as it reads the current
@@ -20,27 +16,25 @@ _pytest.capture.DontReadFromInput.encoding = "utf-8"
 _pytest.capture.DontReadFromInput.write = lambda: None
 _pytest.capture.DontReadFromInput.flush = lambda: None
 
-too_slow = [
-    'intro_coming_from_legacy_spa',
-    'question',
-    'question_control',
-    'question_memory',
-    'spa_parser',
-    'spa_sequence',
-    'spa_sequence_routed',
-]
+example_dir = 'docs/examples'
+
+too_slow = ['question',
+            'question_control',
+            'question_memory',
+            'spa_parser',
+            'spa_sequence',
+            'spa_sequence_routed']
 
 all_examples, slow_examples, fast_examples = [], [], []
 
 
 def load_example(example):
-    with codecs.getreader('utf-8')(resource_stream(
-            'nengo_spa', example + '.ipynb')) as f:
+    with open(example + '.ipynb', 'r') as f:
         nb = read_nb(f)
     return nb
 
 
-for subdir, _, files in resource_walk('nengo_spa', 'examples'):
+for subdir, _, files in os.walk(example_dir):
     if (os.path.sep + '.') in subdir:
         continue
     files = [f for f in files if f.endswith('.ipynb')]
@@ -114,18 +108,3 @@ def test_no_outputs(nb_file):
 
     for cell in iter_cells(nb_file):
         assert cell.outputs == [], "Cell outputs not cleared"
-
-
-@pytest.mark.example
-@pytest.mark.parametrize('nb_file', all_examples)
-def test_loads_ipynb_ext(nb_file):
-    pytest.importorskip("IPython", minversion="1.0")
-
-    no_sim = True
-    for cell in iter_cells(nb_file):
-        if "%load_ext nengo.ipynb" in cell.source:
-            break
-        if "nengo.Simulator(" in cell.source:
-            no_sim = False
-    else:
-        assert no_sim, "nengo.ipynb extension not loaded"
