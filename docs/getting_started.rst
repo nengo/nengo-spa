@@ -42,10 +42,7 @@ Examples
 ^^^^^^^^
 
 Examples of Nengo SPA usage are included in this documentation. Each example
-has a link to download it as Jupyter notebook at the top of its page. If you
-prefer, you can extract all of them as Jupyter notebook files with::
-
-    python -m nengo_spa extract-examples <destination>
+has a link to download it as Jupyter notebook at the top of its page.
 
 
 Usage
