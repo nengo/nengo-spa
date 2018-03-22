@@ -23,8 +23,18 @@ Release History
 0.4.0 (unreleased)
 ==================
 
-This release increases the minimum required Nengo version to Nengo 2.5
+This release increases the minimum required Nengo version to Nengo 2.7
 (previously Nengo 2.4).
+
+**Added**
+
+- Added documentation and build tools for the documentation.
+  (`#68 <https://github.com/nengo/nengo_spa/pull/68>`_)
+
+**Remove**
+
+- Unnecessary ``vocab`` argument from ``Transcode``.
+  (`#68 <https://github.com/nengo/nengo_spa/pull/68>`_)
 
 **Fixed**
 
