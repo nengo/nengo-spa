@@ -2,7 +2,7 @@
 Nengo SPA license
 *****************
 
-Copyright (c) 2013-2016 Applied Brain Research Inc.
+Copyright (c) 2013-2018 Applied Brain Research Inc.
 
 Nengo SPA is made available under a proprietary license that permits using,
 copying, sharing, and making derivative works from Nengo and its source code
