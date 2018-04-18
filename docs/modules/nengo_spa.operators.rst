@@ -3,8 +3,7 @@ nengo\_spa\.operators
 
 .. automodule:: nengo_spa.operators
 
-   
-   
+
    .. rubric:: Functions
 
    .. autosummary::
@@ -12,13 +11,3 @@ nengo\_spa\.operators
       dot
       reinterpret
       translate
-   
-   
-
-   
-   
-   
-
-   
-   
-   

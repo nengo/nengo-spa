@@ -3,8 +3,6 @@ nengo\_spa\.examine
 
 .. automodule:: nengo_spa.examine
 
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -12,13 +10,3 @@ nengo\_spa\.examine
       pairs
       similarity
       text
-   
-   
-
-   
-   
-   
-
-   
-   
-   
