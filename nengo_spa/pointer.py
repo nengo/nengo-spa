@@ -245,7 +245,11 @@ class Identity(SemanticPointer):
 
 
 class AbsorbingElement(SemanticPointer):
-    """Circular convolution absorbing element.
+    r"""Circular convolution absorbing element.
+
+    If :math:`z` denotes the absorbing element, :math:`v \circledast z = c z`,
+    where :math:`v` is a Semantic Pointer and :math:`c` is a real-valued
+    scalar.
 
     Parameters
     ----------
