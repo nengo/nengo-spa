@@ -90,7 +90,7 @@ networks. For this, `nengo_spa.Network` derives from `.SpaOperatorMixin` which:
 
 Furthermore, the operators need to be overloaded for the input and outputs of
 a SPA network. These will be basic Nengo objects and should continue to be
-useable as such. Thus, the `.Network.declare_input` and
+usable as such. Thus, the `.Network.declare_input` and
 `.Network.declare_output` methods will dynamically insert `.SpaOperatorMixin`
 into the inheritance list of a single instance. They also register the
 associated vocabulary for the type checking.
