@@ -19,7 +19,7 @@ Making pull requests
 If you want to fix a bug or add a feature to Nengo SPA, we welcome pull
 requests.  We try to maintain 100% test coverage, so any new features should
 also include unit tests to cover that change.  If you fix a bug it's also a good
-idea to add a unit test, so that the bug doesn't get un-fixed in the future!
+idea to add a unit test, so the bug doesn't get un-fixed in the future!
 
 Contributor agreement
 ---------------------

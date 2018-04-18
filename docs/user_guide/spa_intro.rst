@@ -126,8 +126,8 @@ Matrix <https://en.wikipedia.org/wiki/Raven's_Progressive_Matrices>`_ task,
 which requires people to figure out a pattern in the input, and apply that
 pattern to new input to produce novel output. For instance given the following
 input ``[1] [11] [111] [2n [22] [222] [3] [33] ?`` the expected answer is
-``333``. The input to the model first indicates which task it is going to
-preform by presenting it with an ``A`` followed by the task number (e.g. ``A 7``
+``333``. The input to the model first indicates which task it will
+perform by presenting it with an ``A`` followed by the task number (e.g. ``A 7``
 for this task). Then it is shown a series of letters and brackets and it has to
 draw the correct answer with its arm. The processing for such a task goes
 something like this:
@@ -164,7 +164,7 @@ something like this:
 .. figure:: spa_2.png
    :alt: Example input and output from Spaun.
 
-   Exapmle input and output from Spaun. a) Handwritten numbers used as input.
+   Example input and output from Spaun. a) Handwritten numbers used as input.
    b) Numbers drawn by Spaun using its arm.
 
 All of the control-like steps (e.g. “compared with”, “inferred”, and routing
