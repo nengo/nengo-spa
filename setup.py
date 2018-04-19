@@ -33,7 +33,7 @@ setup(
     version=version_module.version,
     author="Applied Brain Research",
     author_email="info@appliedbrainresearch.com",
-    packages=find_packages(),
+    packages=find_packages(exclude=['*.tests']),
     scripts=[],
     license="Free for non-commercial use",
     description="An implementation of the Semantic Pointer Architecture for "
