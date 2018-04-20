@@ -240,7 +240,7 @@ def test_assignment_of_dynamic_pointer(Simulator, rng):
 
 
 def test_non_default_input_and_output(Simulator, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(32, rng=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
