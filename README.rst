@@ -18,10 +18,9 @@ Nengo SPA: Implementation of the Semantic Pointer Architecture for Nengo
 Project status
 ==============
 
-- All of the core functionality is implemented, but the API might still be
-  subject to changes.
-- The documentation needs extensive updates.
-- The integration with the Nengo GUI is not implemented yet.
+- All of the core functionality is implemented, but some of the API might still
+  be subject to changes.
+- The integration with the Nengo GUI is not fully implemented yet.
 
 Installation
 ============
@@ -38,7 +37,7 @@ Nengo SPA is tested to work on Python 2.7 and 3.4+.
 Documentation
 =============
 
-TODO
+The documentation can be found `here <https://www.nengo.ai/nengo-spa/>`_.
 
 Getting Help
 ============
