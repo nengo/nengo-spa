@@ -30,7 +30,7 @@ that you install Nengo before installing Nengo SPA.
 
 To install Nengo SPA::
 
-    pip install nengo_spa
+    pip install nengo-spa
 
 Nengo SPA is tested to work on Python 2.7 and 3.4+.
 
