@@ -22,3 +22,6 @@ Vagrantfile
 .coverage
 htmlcov
 .ropeproject
+.idea
+.vscode
+.pytest_cache/
