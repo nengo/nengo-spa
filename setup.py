@@ -28,6 +28,21 @@ version_module = imp.load_source(
     "version", os.path.join(root, "nengo_spa", "version.py"))
 testing = "test" in sys.argv or "pytest" in sys.argv
 
+docs_require = [
+    "jupyter_client",
+    "sphinx",
+    "nbsphinx",
+    "sphinx_rtd_theme",
+]
+optional_requires = [
+    "scipy"
+]
+tests_require = [
+    "jupyter",
+    "matplotlib>=2.0",
+    "pytest>=2.3",
+]
+
 setup(
     name="nengo_spa",
     version=version_module.version,
@@ -44,18 +59,17 @@ setup(
     setup_requires=["pytest-runner"] if testing else [] + [
         "numpy>=1.8",
     ],
-    install_requires=[
+    install_requires = [
         "nengo>=2.7",
         "numpy>=1.8",
     ],
-    extras_require={
-        "prob_cleanup": ["scipy"],
+    extras_require = {
+        "all": docs_require + optional_requires + tests_require,
+        "docs": docs_require,
+        "optional": optional_requires,
+        "tests": tests_require
     },
-    tests_require=[
-        "jupyter",
-        "matplotlib>=2.0",
-        "pytest>=2.3",
-    ],
+    tests_require=tests_require,
     entry_points={
     },
     classifiers=[  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
