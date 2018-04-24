@@ -6,8 +6,8 @@
   :target: https://ci.appveyor.com/project/jgosmann/nengo-spa/branch/master
   :alt: AppVeyor build status
 
-.. image:: https://img.shields.io/codecov/c/github/nengo/nengo_spa/master.svg
-  :target: https://codecov.io/gh/nengo/nengo_spa/branch/master
+.. image:: https://img.shields.io/codecov/c/github/nengo/nengo-spa/master.svg
+  :target: https://codecov.io/gh/nengo/nengo-spa/branch/master
   :alt: Test coverage
 
 
