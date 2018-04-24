@@ -70,7 +70,10 @@ pygments_style = 'default'
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-html_title = "Nengo {0} docs".format(release)
+html_title = "Nengo SPA {0} docs".format(release)
+html_static_path = ['_static']
+html_favicon = os.path.join('_static', 'favicon.ico')
+html_logo = os.path.join('_static', 'square-light.svg')
 html_context = {
     'css_files': [os.path.join('_static', 'custom.css')],
 }
