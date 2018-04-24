@@ -15,11 +15,10 @@ prune docs/_build
 prune dist
 prune examples
 
-prune .*
-prune .git
-prune .tox
-
-prune nengo_spa/examples/.ipynb_checkpoints
+# Patterns to exclude from any directory
+global-exclude *.git*
+global-exclude *.tox*
+global-exclude *-checkpoint.ipynb
 
 # Exclude all bytecode
 global-exclude *.pyc *.pyo *.pyd
