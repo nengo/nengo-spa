@@ -14,8 +14,6 @@ env:
     - SCIPY="true"
     - COVERAGE="false"
     - STATIC="false"
-    - CONDA_DEPS="matplotlib jupyter"
-    - PIP_DEPS="pytest pytest-xdist"
 
 matrix:
   include:
@@ -29,52 +27,30 @@ matrix:
 
 # Setup Miniconda
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p "$HOME/miniconda"
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
-  - conda create -q -n test python="$PYTHON" pip
-  - source activate test
+  - source .ci/conda.sh install
 
 # Install packages with conda, then pip
 install:
   - if [[ "$COVERAGE" == "true" ]]; then
-      export PIP_DEPS="pytest coverage";
-    elif [[ "$STATIC" == "true" ]]; then
-      export CONDA_DEPS="";
-      export PIP_DEPS="flake8 pylint";
+      .ci/coverage.sh install;
     fi
-  - if [[ -n "$NUMPY" && "$STATIC" == "false" ]]; then
-      export CONDA_DEPS="$CONDA_DEPS numpy=$NUMPY";
+  - if [[ "$STATIC" == "true" ]]; then
+      .ci/static.sh install;
+    else
+      .ci/test.sh install;
     fi
-  - if [[ "$SCIPY" == "true" ]]; then
-      export CONDA_DEPS="$CONDA_DEPS scipy";
-    fi
-  - if [[ -n "$NENGO" ]]; then
-      export PIP_DEPS="$PIP_DEPS nengo==$NENGO";
-    fi
-  - if [[ -n "$CONDA_DEPS" ]]; then eval conda install --quiet "$CONDA_DEPS"; fi
-  - if [[ -n "$PIP_DEPS" ]]; then eval pip install "$PIP_DEPS"; fi
 
 # Run the tests
 script:
-  - mkdir -p "$HOME/.ipython/profile_default"
-  - "echo 'c.HistoryAccessor.enabled = False\n' > $HOME/.ipython/profile_default/ipython_config.py"
-  - if [[ "$STATIC" == "false" ]]; then
-      python -c "import numpy; numpy.show_config()";
-      python setup.py -q develop;
-      if [[ "$COVERAGE" == "false" ]]; then
-        py.test nengo_spa -n 2 -v --duration 20;
-      else
-        coverage run --rcfile .coveragerc --source nengo_spa -m py.test nengo_spa -v --duration 20 && coverage report;
-      fi
+  - if [[ "$STATIC" == "true" ]]; then
+      .ci/static.sh run;
+    elif [[ "$COVERAGE" == "true" ]]; then
+      .ci/coverage.sh run;
     else
-      flake8 -v nengo_spa && pylint nengo_spa;
+      .ci/test.sh run;
     fi
 
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then
-      eval "bash <(curl -s https://codecov.io/bash)";
+      .ci/coverage.sh upload;
     fi
