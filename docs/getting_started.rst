@@ -33,10 +33,10 @@ Further optional packages
 Besides optional SciPy package, there are a few more optional packages that
 are only required for specific purposes.
 
-* To run the test suite the packages listed in ``requirements-test.txt`` need to
-  be installed.
-* To build the documentation the packages listed in ``requirements-docs.txt``
-  need to be installed
+.. code-block:: bash
+   pip install nengo[docs]  # For building docs
+   pip install nengo[tests]  # For running the test suite
+   pip install nengo[all]  # All of the above, including SciPy
 
 Examples
 ^^^^^^^^
