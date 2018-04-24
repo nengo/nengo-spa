@@ -10,10 +10,15 @@
   :target: https://codecov.io/gh/nengo/nengo-spa/branch/master
   :alt: Test coverage
 
+|
 
-************************************************************************
-Nengo SPA: Implementation of the Semantic Pointer Architecture for Nengo
-************************************************************************
+.. image:: docs/_static/full-light.svg
+   :alt: Nengo SPA logo
+   :width: 300px
+
+*************************************************************
+Implementation of the Semantic Pointer Architecture for Nengo
+*************************************************************
 
 Project status
 ==============
