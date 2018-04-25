@@ -14,6 +14,7 @@ env:
     - SCIPY="true"
     - COVERAGE="false"
     - STATIC="false"
+    - DOCS="false"
 
 matrix:
   include:
@@ -24,6 +25,7 @@ matrix:
     - env: PYTHON="3.5"
     - env: PYTHON="3.6" COVERAGE="true"
     - env: PYTHON="3.6" SCIPY="false"
+    - env: PYTHON="3.6" DOCS="true"
 
 # Setup Miniconda
 before_install:
@@ -33,6 +35,9 @@ before_install:
 install:
   - if [[ "$COVERAGE" == "true" ]]; then
       .ci/coverage.sh install;
+    fi
+  - if [[ "$DOCS" == "true" ]]; then
+      .ci/docs.sh install;
     fi
   - if [[ "$STATIC" == "true" ]]; then
       .ci/static.sh install;
@@ -46,6 +51,8 @@ script:
       .ci/static.sh run;
     elif [[ "$COVERAGE" == "true" ]]; then
       .ci/coverage.sh run;
+    elif [[ "$DOCS" == "true" && -n "$TRAVIS_TAG" ]]; then
+      .ci/docs.sh run;
     else
       .ci/test.sh run;
     fi
@@ -53,4 +60,6 @@ script:
 after_success:
   - if [[ "$COVERAGE" == "true" ]]; then
       .ci/coverage.sh upload;
+    elif [[ "$DOCS" == "true" && -n "$TRAVIS_TAG" ]]; then
+      .ci/docs.sh upload;
     fi
