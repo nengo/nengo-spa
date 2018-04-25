@@ -98,11 +98,11 @@ def test_convolution(d, rng):
     c = a.copy()
     c *= b
 
-    ans = np.fft.irfft(np.fft.rfft(a.v) * np.fft.rfft(b.v), n=d)
+    conv_ans = np.fft.irfft(np.fft.rfft(a.v) * np.fft.rfft(b.v), n=d)
 
-    assert np.allclose((a * b).v, ans)
-    assert np.allclose(a.convolve(b).v, ans)
-    assert np.allclose(c.v, ans)
+    assert np.allclose((a * b).v, conv_ans)
+    assert np.allclose(a.convolve(b).v, conv_ans)
+    assert np.allclose(c.v, conv_ans)
     assert np.allclose((a * identity).v, a.v)
     assert (a * b * ~b).compare(a) > 0.6
 
