@@ -14,7 +14,8 @@ function usage {
 
 if [[ "$COMMAND" == "install" ]]; then
     conda install matplotlib scipy
-    pip install jupyter_client sphinx nbsphinx sphinx_rtd_theme ghp-import
+    pip install ghp-import
+    pip install -e .[docs]
 elif [[ "$COMMAND" == "run" ]]; then
     rm "$HOME/.ipython/profile_default/ipython_config.py"
     sphinx-build -vW docs docs/_build
