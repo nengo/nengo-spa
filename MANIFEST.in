@@ -1,5 +1,6 @@
 global-include *.py
 include *.rst
+global-include *.sh
 include *.txt
 include *.yml
 
