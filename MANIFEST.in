@@ -9,7 +9,6 @@ include MANIFEST.in
 
 # Directories to include
 graft docs
-graft nengo_spa/examples
 
 # Subdirectories to exclude, if they exist
 prune docs/_build
