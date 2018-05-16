@@ -137,7 +137,7 @@ def test_transformed(Simulator, rng):
         normalized=True)
 
 
-def test_transformed_and_pointer_symbol(Simulator, rng, plt):
+def test_transformed_and_pointer_symbol(Simulator, rng):
     vocab = spa.Vocabulary(64, rng=rng)
     vocab.populate('A; B')
 
