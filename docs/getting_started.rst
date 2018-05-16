@@ -34,6 +34,7 @@ Besides optional SciPy package, there are a few more optional packages that
 are only required for specific purposes.
 
 .. code-block:: bash
+
    pip install nengo[docs]  # For building docs
    pip install nengo[tests]  # For running the test suite
    pip install nengo[all]  # All of the above, including SciPy
