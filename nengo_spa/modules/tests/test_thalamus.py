@@ -136,7 +136,7 @@ def test_routing(Simulator, seed, plt):
     assert valueC[2] < 0.2
 
 
-def test_routing_recurrency_compilation(Simulator, seed, plt):
+def test_routing_recurrency_compilation(Simulator, seed):
     model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 2
     model.config[spa.State].subdimensions = 2
