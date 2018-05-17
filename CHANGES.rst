@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-0.4.0 (unreleased)
-==================
+0.4.0 (May 17, 2018)
+====================
 
 This release increases the minimum required Nengo version to Nengo 2.7
 (previously Nengo 2.4).
@@ -30,6 +30,11 @@ This release increases the minimum required Nengo version to Nengo 2.7
 
 - Added documentation and build tools for the documentation.
   (`#68 <https://github.com/nengo/nengo_spa/pull/68>`_)
+
+**Changed**
+
+- This release introduces a new syntax for SPA action rules.
+  (`#114 <https://github.com/nengo/nengo_spa/pull/114>`_)
 
 **Remove**
 
