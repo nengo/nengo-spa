@@ -179,7 +179,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     seed : int, optional
         Random number seed for the network.
     add_to_container : bool, optional
-        Determines if this network will be addet to the current cotainer.
+        Determines if this network will be added to the current container.
     vocabs : VocabularyMap, optional
         Maps from integer dimensionalities to the associated default
         vocabularies.
