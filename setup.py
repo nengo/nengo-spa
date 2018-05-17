@@ -48,6 +48,7 @@ setup(
     version=version_module.version,
     author="Applied Brain Research",
     author_email="info@appliedbrainresearch.com",
+    url="https://www.nengo.ai/nengo-spa/",
     packages=find_packages(exclude=["*.tests"]),
     scripts=[],
     license="Free for non-commercial use",
