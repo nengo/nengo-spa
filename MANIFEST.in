@@ -14,10 +14,10 @@ graft docs
 prune docs/_build
 prune dist
 prune examples
-prune *.tox
+prune .*
+graft .ci
 
 # Patterns to exclude from any directory
-global-exclude *.git*
 global-exclude *-checkpoint.ipynb
 
 # Exclude all bytecode
