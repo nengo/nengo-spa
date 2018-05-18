@@ -188,7 +188,7 @@ def test_assignment_of_fixed_scalar(Simulator, rng):
         0.5 >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
@@ -203,7 +203,7 @@ def test_assignment_of_pointer_symbol(Simulator, rng):
         PointerSymbol('A') >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
@@ -217,7 +217,7 @@ def test_assignment_of_dynamic_scalar(Simulator, rng):
         source >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
@@ -233,7 +233,7 @@ def test_assignment_of_dynamic_pointer(Simulator, rng):
         source >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
@@ -251,7 +251,7 @@ def test_non_default_input_and_output(Simulator, rng):
         b.output >> bind.input_b
         p = nengo.Probe(bind.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert sp_close(sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3)
@@ -281,7 +281,7 @@ def test_action_selection(Simulator, rng):
         p_scalar = nengo.Probe(scalar.output, synapse=0.03)
         p_pointer = nengo.Probe(pointer.output, synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(3.)
 
     t = sim.trange()
