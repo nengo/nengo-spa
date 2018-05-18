@@ -25,6 +25,10 @@ Release History
 
 **Added**
 
+- One-dimensional outputs of Nengo objects can be used as scalars in action
+  rules.
+  (`#139 <https://github.com/nengo/nengo_spa/issues/139>`_,
+  `#157 <https://github.com/nengo/nengo_spa/pull/157>`_)
 - Syntactic sugar for complex symbolic expressions:
   ``nengo_spa.sym('A + B * C')``.
   (`#138 <https://github.com/nengo/nengo_spa/issues/138>`_,
