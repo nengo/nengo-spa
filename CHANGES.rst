@@ -20,10 +20,11 @@ Release History
    - Fixed
 
 
-0.4.1 (unreleased)
-==================
+0.4.1 (May 18, 2018)
+====================
 
-
+This release fixes problems with the online documentation. Local installs are
+not affected.
 
 
 0.4.0 (May 17, 2018)
