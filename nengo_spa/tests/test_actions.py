@@ -223,6 +223,27 @@ def test_assignment_of_dynamic_scalar(Simulator, rng):
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
 
 
+@pytest.mark.parametrize('source,use_ens', [
+    ('nengo.Node(0.5)', False),
+    ('nengo.Node([0., 0.5, 1.])[1]', False),
+    ('nengo.Node(0.5)', True)])
+def test_assignment_of_nengo_scalar(source, use_ens, Simulator, rng):
+    with spa.Network() as model:
+        source = eval(source)
+        if use_ens:
+            ens = nengo.Ensemble(50, 1)
+            nengo.Connection(source, ens)
+            source = ens
+        sink = spa.Scalar()
+        source >> sink
+        p = nengo.Probe(sink.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
+
+
 def test_assignment_of_dynamic_pointer(Simulator, rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A')

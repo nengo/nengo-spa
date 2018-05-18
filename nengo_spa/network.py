@@ -44,6 +44,8 @@ def as_ast_node(obj):
         # Trying to create weakref on access of weak dict can raise TypeError
         vocab = output_vocab_registry[output]
     except (KeyError, TypeError) as cause:
+        if getattr(output, 'size_out', 0) == 1:
+            return ModuleOutput(output, TScalar)
         err = SpaTypeError("{} was not registered as a SPA output.".format(
             output))
         err.__suppress_context__ = True
