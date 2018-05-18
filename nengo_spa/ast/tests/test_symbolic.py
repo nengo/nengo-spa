@@ -119,3 +119,9 @@ def test_pointer_symbol_factory():
     ps = sym.A
     assert isinstance(ps, PointerSymbol)
     assert ps.expr == 'A'
+
+
+def test_pointer_symbol_factory_expressions():
+    ps = sym('A + B * C')
+    assert isinstance(ps, PointerSymbol)
+    assert ps.expr == (sym.A + sym.B * sym.C).expr

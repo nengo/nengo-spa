@@ -1,5 +1,7 @@
 """AST classes for symbolic operations."""
 
+import re
+
 import nengo
 import numpy as np
 
@@ -141,10 +143,18 @@ class PointerSymbolFactory(object):
     Use the `.sym` instance of this class to create *PointerSymbols* like so::
 
         sym.foo  # creates PointerSymbol('foo')
+
+    To create more complex symbolic expressions the following syntax is
+    supported too::
+
+        sym('foo + bar * baz')  # creates PointerSymbol('foo+bar*baz')
     """
 
     def __getattribute__(self, key):
         return PointerSymbol(key)
+
+    def __call__(self, expr):
+        return PointerSymbol(re.sub(r'\s+', '', expr))
 
 
 sym = PointerSymbolFactory()
