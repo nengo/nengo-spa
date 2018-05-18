@@ -23,6 +23,12 @@ Release History
 0.4.1 (unreleased)
 ==================
 
+**Added**
+
+- Syntactic sugar for complex symbolic expressions:
+  ``nengo_spa.sym('A + B * C')``.
+  (`#138 <https://github.com/nengo/nengo_spa/issues/138>`_,
+  `#159 <https://github.com/nengo/nengo_spa/pull/159>`_)
 
 
 
