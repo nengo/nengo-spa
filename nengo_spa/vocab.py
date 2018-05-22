@@ -127,9 +127,9 @@ class Vocabulary(Mapping):
         else:
             warnings.warn(
                 'Could not create a semantic pointer with '
-                'max_similarity=%1.2f (D=%d, M=%d)'
+                'max_similarity=%1.2f (D=%d, M=%d, similarity=%1.2f)'
                 % (self.max_similarity, self.dimensions,
-                   len(self._key2idx)))
+                   len(self._key2idx), best_sim))
         return best_p
 
     def __contains__(self, key):
