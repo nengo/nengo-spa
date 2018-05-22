@@ -29,6 +29,10 @@ Release History
   ``nengo_spa.sym('A + B * C')``.
   (`#138 <https://github.com/nengo/nengo_spa/issues/138>`_,
   `#159 <https://github.com/nengo/nengo_spa/pull/159>`_)
+- Include the achieved similarity in warning issued when desired maximum
+  similarity could not be obtained.
+  (`#117 <https://github.com/nengo/nengo_spa/issues/117>`_,
+  `#158 <https://github.com/nengo/nengo_spa/pull/158>`_)
 
 
 
