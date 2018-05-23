@@ -144,6 +144,15 @@ def coerce_types(*types):
     """
     type_ = max(types)
     if not all(t <= type_ for t in types):
-        raise SpaTypeError(
-            "Incompatible types: " + ", ".join(str(t) for t in types))
+        offender = next(iter(t for t in types if not t <= type_))
+        if (hasattr(offender, 'vocab') and hasattr(type_, 'vocab') and
+                offender.vocab is not type_.vocab):
+            reason = "Different vocabularies"
+        elif (hasattr(offender, 'dimensions') and
+                hasattr(type_, 'dimensions') and
+                offender.dimensions != type_.dimensions):
+            reason = "Dimensionality mismatch"
+        else:
+            reason = "Incompatible types"
+        raise SpaTypeError(reason + ": " + ", ".join(str(t) for t in types))
     return type_

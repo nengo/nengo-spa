@@ -38,6 +38,12 @@ Release History
   (`#117 <https://github.com/nengo/nengo_spa/issues/117>`_,
   `#158 <https://github.com/nengo/nengo_spa/pull/158>`_)
 
+**Changed**
+
+- Make the error message for incompatible types more informative.
+  (`#131 <https://github.com/nengo/nengo_spa/issues/131>`_,
+  `#160 <https://github.com/nengo/nengo_spa/pull/160>`_
+
 
 
 0.4.1 (May 18, 2018)
