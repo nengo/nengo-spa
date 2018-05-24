@@ -2,10 +2,11 @@ import numpy as np
 import pytest
 
 import nengo
+from nengo.utils.numpy import rmse
+
 import nengo_spa
 from nengo_spa.networks.circularconvolution import (
     circconv, transform_in, transform_out)
-from nengo.utils.numpy import rmse
 
 
 @pytest.mark.parametrize('invert_a', [True, False])

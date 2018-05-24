@@ -13,6 +13,8 @@ Note that SPA modules can be used as standalone networks without using
 any other Nengo SPA features.
 """
 
+from nengo_spa.ast import dynamic as _dynamic
+
 from .assoc_mem import (
     AssociativeMemory,
     IAAssocMem,
@@ -26,17 +28,16 @@ from .scalar import Scalar
 from .state import State
 from .thalamus import Thalamus
 from .transcode import Transcode
-from nengo_spa.ast import dynamic
 
 
 def _register_default_modules():
-    dynamic.BasalGangliaRealization = BasalGanglia
-    dynamic.BindRealization = Bind
-    dynamic.DotProductRealization = Compare
-    dynamic.ProductRealization = Product
-    dynamic.ScalarRealization = Scalar
-    dynamic.StateRealization = State
-    dynamic.ThalamusRealization = Thalamus
+    _dynamic.BasalGangliaRealization = BasalGanglia
+    _dynamic.BindRealization = Bind
+    _dynamic.DotProductRealization = Compare
+    _dynamic.ProductRealization = Product
+    _dynamic.ScalarRealization = Scalar
+    _dynamic.StateRealization = State
+    _dynamic.ThalamusRealization = Thalamus
 
 
 _register_default_modules()
