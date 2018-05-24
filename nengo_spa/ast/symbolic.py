@@ -3,13 +3,13 @@
 import re
 
 import nengo
+from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.ast.base import infer_types, Fixed, TypeCheckedBinaryOp
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
-from nengo.utils.compat import is_number
 
 
 def as_symbolic_node(obj):

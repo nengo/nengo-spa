@@ -2,14 +2,14 @@ from collections import Mapping
 import re
 import warnings
 
-import numpy as np
-
 import nengo
 from nengo.exceptions import NengoWarning, ValidationError
+from nengo.utils.compat import is_number, is_integer, range
+import numpy as np
+
 from nengo_spa import pointer
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
-from nengo.utils.compat import is_number, is_integer, range
 
 
 valid_sp_regex = re.compile('[A-Z][_a-zA-Z0-9]*')
