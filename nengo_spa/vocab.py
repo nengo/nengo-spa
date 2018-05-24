@@ -357,6 +357,34 @@ class Vocabulary(Mapping):
         return subset
 
 
+def combine_vocabs(
+        vocabs, strict=True, max_similarity=0.1, rng=None,
+        check_similarity=True):
+    if not all(v.dimensions == vocabs[0].dimensions for v in vocabs):
+        raise ValueError(
+            "Can only combine vocabularies with equal dimensionality.")
+
+    combined = Vocabulary(
+        vocabs[0].dimensions, strict=strict, max_similarity=max_similarity,
+        rng=rng)
+    for v in vocabs:
+        for key in v:
+            combined.add(key, v[key].reinterpret(combined))
+
+    if check_similarity:
+        similarities = np.dot(combined.vectors, combined.vectors.T)
+        np.fill_diagonal(similarities, 0.)
+        if np.max(similarities) >= max_similarity:
+            warnings.warn(
+                "Max. similarity ({:.2f}) in the combined vocabulary exceeds "
+                "the threshold ({:.2f}).".format(
+                    np.max(similarities), max_similarity))
+
+    for v in vocabs:
+        v.supersets.append(combined)
+    return combined
+
+
 class VocabularyMap(Mapping):
     """Maps dimensionalities to corresponding vocabularies.
 

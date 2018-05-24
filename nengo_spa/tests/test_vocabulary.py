@@ -10,7 +10,7 @@ from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity, SemanticPointer
 from nengo_spa.vocab import (
-    VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
+    combine_vocabs, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
 
 def test_add(rng):
@@ -309,3 +309,50 @@ def test_vocabulary_or_dim_param():
 
     with pytest.raises(ValidationError):
         obj.vocab = 0
+
+
+def test_combine_vocabs(rng):
+    base_vocab = Vocabulary(16, rng)
+    base_vocab.populate('A; B; C; D')
+    v1 = Vocabulary(16)
+    for k in ['A', 'B']:
+        v1.add(k, base_vocab[k].reinterpret(v1))
+    v2 = Vocabulary(16)
+    for k in ['C', 'D']:
+        v2.add(k, base_vocab[k].reinterpret(v2))
+
+    combined = combine_vocabs((v1, v2))
+    for k in base_vocab:
+        assert k in combined
+        assert np.all(combined[k].v == base_vocab[k].v)
+    assert combined in v1.supersets
+    assert combined in v2.supersets
+
+
+def test_combine_vocabs_shared_keys():
+    v1 = Vocabulary(16)
+    v1.populate('A')
+    v2 = Vocabulary(16)
+    v2.populate('A')
+
+    with pytest.raises(ValidationError):
+        combine_vocabs((v1, v2))
+
+
+def test_combine_vocabs_differing_dimensions():
+    v1 = Vocabulary(16)
+    v2 = Vocabulary(32)
+
+    with pytest.raises(ValueError):
+        combine_vocabs((v1, v2))
+
+
+def test_combine_vocabs_checks_similarity():
+    v1 = Vocabulary(16)
+    v1.populate('A')
+    v2 = Vocabulary(16)
+    v2.add('B', v1['A'].reinterpret(v2))
+
+    combine_vocabs((v1, v2), check_similarity=False)  # no warning
+    with pytest.warns(UserWarning, match="Max. similarity"):
+        combine_vocabs((v1, v2))
