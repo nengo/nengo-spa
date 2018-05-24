@@ -130,7 +130,9 @@ class TVocabulary(Type):
     def __gt__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return other <= TAnyVocabOfDim(self.vocab.dimensions)
+        return other <= TAnyVocabOfDim(self.vocab.dimensions) or (
+            isinstance(other, TVocabulary) and
+            self.vocab in other.vocab.supersets)
 
 
 def coerce_types(*types):

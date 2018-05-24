@@ -32,3 +32,17 @@ def test_coercion_errors():
     with pytest.raises(SpaTypeError) as err:
         coerce_types(Type('x'), Type('y'))
     assert "Incompatible types" in str(err.value)
+
+
+def test_vocab_hierarchy():
+    vocab = Vocabulary(16)
+    vocab.populate('A; B')
+    subvocab = vocab.create_subset(['A'])
+
+    vocab_type = TVocabulary(vocab)
+    subvocab_type = TVocabulary(subvocab)
+
+    assert coerce_types(vocab_type, subvocab_type) == vocab_type
+
+    subvocab.populate('C')
+    assert coerce_types(vocab_type, subvocab_type) == vocab_type

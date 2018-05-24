@@ -79,6 +79,8 @@ class Vocabulary(Mapping):
         self.rng = rng
         self.name = name
 
+        self.supersets = []
+
     @property
     def vectors(self):
         v = self._vectors.view()
@@ -91,7 +93,7 @@ class Vocabulary(Mapping):
             self.dimensions, name, id(self))
 
     def create_pointer(self, attempts=100, transform=None):
-        """Create a new semantic pointer and add it to the vocabulary.
+        """Create a new semantic pointer (without adding it to the vocabulary).
 
         This will take into account the `max_similarity` attribute.  If a
         pointer satisfying max_similarity is not generated after the specified
@@ -349,6 +351,8 @@ class Vocabulary(Mapping):
         # Copy over the new keys
         for key in keys:
             subset.add(key, self[key].reinterpret(subset))
+
+        subset.supersets.append(self)
 
         return subset
 
