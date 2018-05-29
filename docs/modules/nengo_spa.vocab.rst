@@ -11,3 +11,4 @@ nengo\_spa\.vocab
       VocabularyMap
       VocabularyMapParam
       VocabularyOrDimParam
+      combine_vocabs

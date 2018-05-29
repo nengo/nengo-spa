@@ -360,6 +360,38 @@ class Vocabulary(Mapping):
 def combine_vocabs(
         vocabs, strict=True, max_similarity=0.1, rng=None,
         check_similarity=True):
+    """Combines vocabularies into a single vocabulary.
+
+    The keys in vocabularies that are being combined need to be unique.
+
+    Parameters
+    ----------
+    vocabs : sequence of `.Vocabulary`
+        Vocabularies to combine.
+    strict : bool, optional
+        Whether to automatically create missing semantic pointers when parsing
+        expressions with the returned vocabulary object. If a
+        non-strict vocabulary is asked for a pointer that does not exist within
+        the vocabulary, the missing pointer will be automatically added to the
+        vocabulary. A strict vocabulary will throw an error if asked for a
+        pointer that does not exist in the vocabulary.
+    max_similarity : float, optional
+        When randomly generating pointers, ensure that the cosine of the
+        angle between the new pointer and all existing pointers is less
+        than this amount. If the system is unable to find such a pointer
+        after 100 tries, a warning message is printed.
+    rng : numpy.random.RandomState, optional
+        The random number generator to use to create new vectors.
+    check_similarity : bool, optional
+        If *True*, the function will give a warning if the similarity of any
+        two Semantic Pointers in the combined vocabulary exceeds
+        *max_similarity*.
+
+    Returns
+    -------
+    Vocabulary
+        Combined vocabulary.
+    """
     if not all(v.dimensions == vocabs[0].dimensions for v in vocabs):
         raise ValueError(
             "Can only combine vocabularies with equal dimensionality.")
