@@ -10,6 +10,7 @@ from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import sp_close
+from nengo_spa.types import TVocabulary
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
@@ -98,6 +99,83 @@ def test_binary_operation_on_modules_with_fixed_pointer(
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
         skip=0.3)
+
+
+def test_binding_of_paired_modules(Simulator, rng):
+    v1 = spa.Vocabulary(64, rng=rng)
+    v1.populate('A')
+    v2 = spa.Vocabulary(64, rng=rng)
+    v2.populate('B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=v1)
+        b = spa.Transcode('B', output_vocab=v2)
+        x = a * b
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(
+        sim.trange(), sim.data[p], v1['A'] * v2['B'], skip=0.3)
+    assert (id(v1), id(v2)) in x.type.vocab.factors
+
+
+@pytest.mark.parametrize('order', ['AB', 'BA'])
+def test_binding_of_paired_module_with_pointer_symbol(Simulator, order, rng):
+    v1 = spa.Vocabulary(64, rng=rng)
+    v1.populate('A')
+    v2 = spa.Vocabulary(64, rng=rng)
+    v2.populate('B')
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=v1)
+        if order == 'AB':
+            x = a * PointerSymbol('B', TVocabulary(v2))
+            expected = v1['A'] * v2['B']
+            factors = (id(v1), id(v2))
+        elif order == 'BA':
+            x = PointerSymbol('B', TVocabulary(v2)) * a
+            expected = v2['B'] * v1['A']
+            factors = (id(v2), id(v1))
+        else:
+            raise ValueError('Invalid order argument.')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], expected, skip=0.3)
+    assert factors in x.type.vocab.factors
+
+
+@pytest.mark.parametrize('order', ['AB', 'BA'])
+def test_binding_of_paired_module_with_fixed_pointer(Simulator, order, rng):
+    v1 = spa.Vocabulary(64, rng=rng)
+    v1.populate('A')
+    v2 = spa.Vocabulary(64, rng=rng)
+    v2.populate('B')
+    b = SemanticPointer(v2['B'].v, vocab=v2)
+
+    with spa.Network() as model:
+        a = spa.Transcode('A', output_vocab=v1)
+        if order == 'AB':
+            x = a * b
+            expected = v1['A'] * v2['B']
+            factors = (id(v1), id(v2))
+        elif order == 'BA':
+            x = b * a
+            expected = v2['B'] * v1['A']
+            factors = (id(v2), id(v1))
+        else:
+            raise ValueError('Invalid order argument.')
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], expected, skip=0.3)
+    assert factors in x.type.vocab.factors
 
 
 def test_complex_rule(Simulator, rng):

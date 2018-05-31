@@ -12,8 +12,8 @@ from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity, SemanticPointer
 from nengo_spa.vocab import (
-    combine_vocabs, pair_vocabs, VocabularyMap, VocabularyMapParam,
-    VocabularyOrDimParam)
+    combine_vocabs, LazyVocabPairing, pair_vocabs, VocabularyMap,
+    VocabularyMapParam, VocabularyOrDimParam)
 
 
 def test_add(rng):
@@ -315,9 +315,9 @@ def test_vocabulary_or_dim_param():
 
 
 def test_combine_vocabs(rng):
-    base_vocab = Vocabulary(16, rng)
+    base_vocab = Vocabulary(16, rng=rng)
     base_vocab.populate('A; B; C; D')
-    v1 = Vocabulary(16)
+    v1 = Vocabulary(16, rng=rng)
     for k in ['A', 'B']:
         v1.add(k, base_vocab[k].reinterpret(v1))
     v2 = Vocabulary(16)
@@ -332,10 +332,10 @@ def test_combine_vocabs(rng):
     assert combined in v2.supersets
 
 
-def test_combine_vocabs_shared_keys():
-    v1 = Vocabulary(16)
+def test_combine_vocabs_shared_keys(rng):
+    v1 = Vocabulary(16, rng=rng)
     v1.populate('A')
-    v2 = Vocabulary(16)
+    v2 = Vocabulary(16, rng=rng)
     v2.populate('A')
 
     with pytest.raises(ValidationError):
@@ -350,10 +350,10 @@ def test_combine_vocabs_differing_dimensions():
         combine_vocabs((v1, v2))
 
 
-def test_combine_vocabs_checks_similarity():
-    v1 = Vocabulary(16)
+def test_combine_vocabs_checks_similarity(rng):
+    v1 = Vocabulary(16, rng=rng)
     v1.populate('A')
-    v2 = Vocabulary(16)
+    v2 = Vocabulary(16, rng=rng)
     v2.add('B', v1['A'].reinterpret(v2))
 
     combine_vocabs((v1, v2), check_similarity=False)  # no warning
@@ -362,9 +362,9 @@ def test_combine_vocabs_checks_similarity():
 
 
 def test_pair_vocabs(rng):
-    v1 = Vocabulary(16)
+    v1 = Vocabulary(16, rng=rng)
     v1.populate('A; B')
-    v2 = Vocabulary(16)
+    v2 = Vocabulary(16, rng=rng)
     v2.populate('A; C')
 
     paired = pair_vocabs((v1, v2), check_similarity=False)
@@ -376,6 +376,31 @@ def test_pair_vocabs(rng):
     assert (id(v1), id(v2)) in paired.factors
 
 
+def test_pair_vocabs_hierarchical(rng):
+    v1 = Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = Vocabulary(16, rng=rng)
+    v2.populate('C; D')
+    v3 = Vocabulary(16, rng=rng)
+    v3.populate('E; F')
+
+    print('0')
+    p0 = pair_vocabs((v1, v2), check_similarity=False)
+    print('1')
+    p1 = pair_vocabs((p0, v3), check_similarity=False)
+    print('2')
+    p2 = pair_vocabs((v1, v2, v3), check_similarity=False)
+
+    assert len(p1) == len(p2) == 8
+    assert p1.keys() == p2.keys()
+    assert tuple(p1.keys()) == tuple('_'.join(x) for x in itertools.product(
+        ('A', 'B'), ('C', 'D'), ('E', 'F')))
+    assert np.all(p1.vectors == p2.vectors)
+    assert (id(p0), id(v3)) in p1.factors
+    assert (id(v1), id(v2), id(v3)) in p1.factors
+    assert (id(v1), id(v2), id(v3)) in p2.factors
+
+
 def test_pair_vocabs_differing_dimensions():
     v1 = Vocabulary(16)
     v2 = Vocabulary(32)
@@ -384,11 +409,65 @@ def test_pair_vocabs_differing_dimensions():
         combine_vocabs((v1, v2))
 
 
-def test_pair_vocabs_checks_similarity():
-    v1 = Vocabulary(16)
+def test_pair_vocabs_checks_similarity(rng):
+    v1 = Vocabulary(16, rng=rng)
     v1.populate('A')
-    v2 = Vocabulary(16)
+    v2 = Vocabulary(16, rng=rng)
     v2.populate('B')
 
     with pytest.warns(UserWarning, match="Max. similarity"):
         pair_vocabs((v1, v2), max_similarity=0.)
+
+
+def test_lazy_vocab_pairing(rng):
+    v1 = Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = Vocabulary(16, rng=rng)
+    v2.populate('A; C')
+
+    paired = LazyVocabPairing((v1, v2))
+    assert len(paired) == 4
+    for i, (k1, k2) in enumerate(itertools.product(('A', 'B'), ('A', 'C'))):
+        k = k1 + '*' + k2
+        assert k in paired
+        assert np.all(paired[k].v == (
+            v1[k1].reinterpret(paired) * v2[k2].reinterpret(paired)).v)
+        assert np.all(paired[k].v == paired.vectors[i])
+    assert (id(v1), id(v2)) in paired.factors
+
+
+def test_lazy_vocab_hierarchical_pairing(rng):
+    v1 = Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = Vocabulary(16, rng=rng)
+    v2.populate('C; D')
+    v3 = Vocabulary(16, rng=rng)
+    v3.populate('E; F')
+
+    p1 = LazyVocabPairing((LazyVocabPairing((v1, v2)), v3))
+    p2 = LazyVocabPairing((v1, v2, v3))
+
+    assert len(p1) == len(p2) == 8
+    assert p1.keys() == p2.keys()
+    assert tuple(p1.keys()) == tuple('*'.join(x) for x in itertools.product(
+        ('A', 'B'), ('C', 'D'), ('E', 'F')))
+    assert np.all(p1.vectors == p2.vectors)
+    assert (id(v1), id(v2), id(v3)) in p1.factors
+    assert (id(v1), id(v2), id(v3)) in p2.factors
+
+
+def test_lazy_vocab_conversion(rng):
+    v1 = Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = Vocabulary(16, rng=rng)
+    v2.populate('A; C')
+
+    lazy_paired = LazyVocabPairing((v1, v2))
+    paired = lazy_paired.to_vocabulary()
+    for k1, k2 in itertools.product(('A', 'B'), ('A', 'C')):
+        k = k1 + '_' + k2
+        assert k in paired
+        assert np.all(paired[k].v == (
+            v1[k1].reinterpret(paired) * v2[k2].reinterpret(paired)).v)
+    assert (id(v1), id(v2)) in paired.factors
+    assert paired in lazy_paired.supersets

@@ -41,9 +41,6 @@ Release History
   similarity could not be obtained.
   (`#117 <https://github.com/nengo/nengo_spa/issues/117>`_,
   `#158 <https://github.com/nengo/nengo_spa/pull/158>`_)
-- Possibility to name Vocabulary instances for debugging.
-  (`#163 <https://github.com/nengo/nengo_spa/issues/163>`_,
-  `#165 <https://github.com/nengo/nengo_spa/pull/165>`_)
 
 **Changed**
 

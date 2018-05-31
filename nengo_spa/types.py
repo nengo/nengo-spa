@@ -125,7 +125,8 @@ class TVocabulary(Type):
         if not isinstance(other, Type):
             return NotImplemented
         return (super(TVocabulary, self).__eq__(other) and
-                self.vocab is other.vocab)
+                (self.vocab is other.vocab or
+                 any(f in other.vocab.factors for f in self.vocab.factors)))
 
     def __gt__(self, other):
         if not isinstance(other, Type):

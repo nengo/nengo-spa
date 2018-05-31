@@ -3,7 +3,8 @@ from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_integer, is_number, range
 import numpy as np
 
-from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
+from nengo_spa.ast.base import (
+    Fixed, infer_types, infer_paired_types, TypeCheckedBinaryOp)
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
@@ -162,7 +163,7 @@ class SemanticPointer(Fixed):
 
     def convolve(self, other):
         """Return the circular convolution of two SemanticPointers."""
-        type_ = infer_types(self, other)
+        type_ = infer_paired_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
         n = len(self)
         x = np.fft.irfft(

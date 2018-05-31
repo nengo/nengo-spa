@@ -19,6 +19,26 @@ def infer_types(*nodes):
     return type_
 
 
+def infer_paired_types(a, b):
+    """Infers the for pair of nodes allowing for mismatched vocabularies.
+
+    This determines the most specific type for given nodes. If it is a specific
+    vocabulary, this vocabulary will be set for all less specific vocabulary
+    types (but not scalar types) on the given node. Then the type will be
+    returned.
+
+    If both nodes have a `.TVocabulary` type, but different vocabularies,
+    a `.TVocabulary` type representing the pairing of these two vocabularies
+    is returned.
+    """
+    both_tvocab = (isinstance(a.type, TVocabulary) and
+                   isinstance(b.type, TVocabulary))
+    if both_tvocab and a.type != b.type:
+        from nengo_spa.vocab import LazyVocabPairing
+        return TVocabulary(LazyVocabPairing((a.type.vocab, b.type.vocab)))
+    return infer_types(a, b)
+
+
 class Node(object):
     """Base class for nodes in the AST for Nengo SPA operations.
 
