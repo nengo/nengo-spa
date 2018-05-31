@@ -40,6 +40,8 @@ class Vocabulary(Mapping):
         after 100 tries, a warning message is printed.
     rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
+    name : str
+        A name to display in the string representation of this vocabulary.
 
     Attributes
     ----------
@@ -61,7 +63,9 @@ class Vocabulary(Mapping):
         as in `keys`.
     """
 
-    def __init__(self, dimensions, strict=True, max_similarity=0.1, rng=None):
+    def __init__(
+            self, dimensions, strict=True, max_similarity=0.1, rng=None,
+            name=None):
 
         if not is_integer(dimensions) or dimensions < 1:
             raise ValidationError("dimensions must be a positive integer",
@@ -73,6 +77,7 @@ class Vocabulary(Mapping):
         self._keys = []
         self._vectors = np.zeros((0, dimensions), dtype=float)
         self.rng = rng
+        self.name = name
 
     @property
     def vectors(self):
@@ -81,8 +86,9 @@ class Vocabulary(Mapping):
         return v
 
     def __str__(self):
-        return '{}-dimensional vocab at 0x{:x}'.format(
-            self.dimensions, id(self))
+        name = '' if self.name is None else '"{}" '.format(self.name)
+        return '{}-dimensional vocab {}at 0x{:x}'.format(
+            self.dimensions, name, id(self))
 
     def create_pointer(self, attempts=100, transform=None):
         """Create a new semantic pointer and add it to the vocabulary.
