@@ -24,7 +24,6 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'nengo.utils.docutils',
     'nbsphinx',
 ]
 
