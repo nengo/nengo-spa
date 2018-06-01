@@ -335,6 +335,16 @@ def test_action_selection_enforces_connections_to_be_part_of_action():
                     state1 >> state2
 
 
+def test_action_selection_is_not_built_on_exception():
+    with spa.Network():
+        state1 = spa.State(16)
+        state2 = spa.State(32)
+        with pytest.raises(SpaTypeError):
+            with ActionSelection() as action_sel:
+                spa.ifmax(1., state1 >> state2)
+    assert not action_sel.built
+
+
 def test_naming_of_actions():
     with spa.Network():
         state1 = spa.State(16)
