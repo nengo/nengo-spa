@@ -25,7 +25,6 @@ Project status
 
 - All of the core functionality is implemented, but some of the API might still
   be subject to changes.
-- The integration with the Nengo GUI is not fully implemented yet.
 
 Installation
 ============
