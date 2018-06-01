@@ -117,7 +117,7 @@ def test_binding_of_paired_modules(Simulator, rng):
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(), sim.data[p], v1['A'] * v2['B'], skip=0.3)
+        sim.trange(), sim.data[p], v1['A'] * v2['B'], skip=0.3, atol=0.3)
     assert (id(v1), id(v2)) in x.type.vocab.factors
 
 
