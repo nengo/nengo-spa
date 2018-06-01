@@ -14,4 +14,5 @@ of how ``nengo_spa`` works.
    examples/spa_sequence
    examples/spa_sequence_routed
    examples/spa_parser
+   examples/combining_vocabularies
    examples/vocabulary_casting
