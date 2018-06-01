@@ -45,7 +45,8 @@ def test_binary_operation_on_modules(Simulator, op, suffix, rng):
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.3)
+        sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.3,
+        atol=0.3)
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
