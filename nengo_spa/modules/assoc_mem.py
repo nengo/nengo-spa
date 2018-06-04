@@ -28,9 +28,9 @@ class AssociativeMemory(Network):
         network needs to have an *input* attribute to which the utilities for
         each choice are connected and an *output* attribute from which a
         connection will be created to read the selected output(s).
-    input_vocab: Vocabulary
+    input_vocab: Vocabulary or int
         The vocabulary to match.
-    output_vocab: Vocabulary, optional
+    output_vocab: Vocabulary or int, optional
         The vocabulary to be produced for each match. If
         None, the associative memory will act like an autoassociative memory
         (cleanup memory).
@@ -83,9 +83,10 @@ class AssociativeMemory(Network):
                 "'by-key' or None.", attr='mapping', obj=self)
 
         input_keys = mapping.keys()
-        input_vectors = [input_vocab.parse(key).v for key in input_keys]
+        input_vectors = [self.input_vocab.parse(key).v for key in input_keys]
         output_keys = [mapping[k] for k in input_keys]
-        output_vectors = [output_vocab.parse(key).v for key in output_keys]
+        output_vectors = [
+            self.output_vocab.parse(key).v for key in output_keys]
 
         input_vectors = np.asarray(input_vectors)
         output_vectors = np.asarray(output_vectors)

@@ -23,6 +23,12 @@ Release History
 0.5.1 (unreleased)
 ==================
 
+**Fixed**
+
+- Allow integer values for vocabularies in associative memories.
+  (`#171 <https://github.com/nengo/nengo_spa/pull/171>`_)
+
+
 
 0.5.0 (June 1, 2018)
 ====================

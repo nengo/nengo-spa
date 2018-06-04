@@ -282,3 +282,12 @@ def test_invalid_mapping_string():
             ThresholdingAssocMem(
                 threshold=0.3, input_vocab=16, output_vocab=32,
                 mapping='invalid')
+
+
+@pytest.mark.parametrize('cls_and_args', (
+    (ThresholdingAssocMem, (0.3,)), (WTAAssocMem, (0.3,)), (IAAssocMem, ())))
+def test_int_vocabs(cls_and_args):
+    cls, args = cls_and_args
+    with spa.Network() as model:
+        model.vocabs.get_or_create(32).populate('A')
+        cls(*args, input_vocab=32)  # no assertion, just ensure no exception
