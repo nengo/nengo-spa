@@ -23,11 +23,17 @@ Release History
 0.5.1 (unreleased)
 ==================
 
+**Added**
+
+- ``Transcode`` now supports ``SemanticPointer`` and
+  ``PointerSymbol`` output types.
+  (`#175 <https://github.com/nengo/nengo-spa/issues/175>`_,
+  `#178 <https://github.com/nengo/nengo-spa/pull/178>`_)
+
 **Fixed**
 
 - Allow integer values for vocabularies in associative memories.
   (`#171 <https://github.com/nengo/nengo_spa/pull/171>`_)
-
 
 
 0.5.0 (June 1, 2018)

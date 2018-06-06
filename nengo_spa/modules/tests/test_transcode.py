@@ -175,3 +175,21 @@ def test_exception_when_no_vocabularies_are_given():
             Transcode('A')
         with pytest.raises(ValidationError):
             Transcode(lambda t: 'A')
+
+
+@pytest.mark.parametrize('value', [
+    'String',
+    spa.pointer.Zero(32),
+    spa.sym.Symbol,
+    lambda t: 'String',
+    lambda t: spa.pointer.Zero(32),
+    lambda t: spa.sym.Symbol,
+])
+def test_output_types(Simulator, value):
+    with spa.Network() as model:
+        stim = spa.Transcode(value, output_vocab=32)
+        state = spa.State(32)
+        stim >> state
+
+    with Simulator(model) as sim:
+        sim.run(0.01)
