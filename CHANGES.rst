@@ -23,7 +23,12 @@ Release History
 0.6.0 (unreleased)
 ==================
 
+**Changed**
 
+- Require the ``mapping`` argument for associative memories. In addition to
+  dictionaries and the string ``'by-key'``, a sequence of strings can be passed
+  in to create an auto-associative memory.
+  (`#177 <https://github.com/nengo/nengo_spa/pull/177>`_)
 
 
 0.5.2 (July 6, 2018)

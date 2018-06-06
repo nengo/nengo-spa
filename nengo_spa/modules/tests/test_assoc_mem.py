@@ -23,6 +23,7 @@ def test_am_basic(Simulator, plt, seed, rng):
 
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.3, input_vocab=vocab,
+                                    mapping=vocab.keys(),
                                     function=filtered_step_fn)
         spa.sym.A >> m.am
 
@@ -104,7 +105,9 @@ def test_am_wta(Simulator, plt, seed, rng):
 
     with spa.Network('model', seed=seed) as m:
         m.am = WTAAssocMem(
-            threshold=0.3, input_vocab=vocab, function=filtered_step_fn)
+            threshold=0.3, input_vocab=vocab,
+            mapping=vocab.keys(),
+            function=filtered_step_fn)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
         m.stimulus >> m.am
 
@@ -145,7 +148,7 @@ def test_am_ia(Simulator, plt, seed, rng):
             return '0.6 * A + B'
 
     with spa.Network('model', seed=seed) as m:
-        m.am = IAAssocMem(input_vocab=vocab)
+        m.am = IAAssocMem(input_vocab=vocab, mapping=vocab.keys())
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
         m.reset = nengo.Node(lambda t: 0.2 < t < 0.4)
 
@@ -187,6 +190,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
 
     with spa.Network('model', seed=seed) as m:
         m.am = ThresholdingAssocMem(threshold=0.5, input_vocab=vocab,
+                                    mapping=vocab.keys(),
                                     function=filtered_step_fn)
         m.am.add_default_output('D', 0.5)
         m.stimulus = spa.Transcode(input_func, output_vocab=vocab)
@@ -290,4 +294,15 @@ def test_int_vocabs(cls_and_args):
     cls, args = cls_and_args
     with spa.Network() as model:
         model.vocabs.get_or_create(32).populate('A')
-        cls(*args, input_vocab=32)  # no assertion, just ensure no exception
+        # no assertion, just ensure no exception
+        cls(*args, input_vocab=32, mapping=['A'])
+
+
+@pytest.mark.parametrize('cls_and_args', (
+    (ThresholdingAssocMem, (0.3,)), (WTAAssocMem, (0.3,)), (IAAssocMem, ())))
+def test_enforces_explicit_mapping(cls_and_args):
+    cls, args = cls_and_args
+    with spa.Network() as model:
+        model.vocabs.get_or_create(32).populate('A')
+        with pytest.raises(TypeError):
+            cls(*args, input_vocab=32)

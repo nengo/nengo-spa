@@ -32,14 +32,14 @@ class AssociativeMemory(Network):
         The vocabulary to match.
     output_vocab: Vocabulary or int, optional
         The vocabulary to be produced for each match. If
-        None, the associative memory will act like an autoassociative memory
+        None, the associative memory will act like an auto-associative memory
         (cleanup memory).
-    mapping: dict or str, optional
+    mapping: dict, str, or sequence of str
         A dictionary that defines the mapping from Semantic Pointers in the
         input vocabulary to Semantic Pointers in the output vocabulary. If set
         to the string ``'by-key'``, the mapping will be done based on the keys
-        of the to vocabularies. If *None*, the associative memory will be
-        autoassociative (cleanup memory).
+        of the to vocabularies. If a sequence is provided, an auto-associative
+        (cleanup) memory with the given set of keys will be created.
     n_neurons : int
         Number of neurons to represent each choice, passed on to the
         *selection_net*.
@@ -75,12 +75,17 @@ class AssociativeMemory(Network):
         self.input_vocab = input_vocab
         self.output_vocab = output_vocab
 
-        if mapping is None or mapping == 'by-key':
-            mapping = {k: k for k in self.input_vocab.keys()}
+        if mapping is None:
+            raise TypeError("Must provide 'mapping' argument.")
+        elif mapping == 'by-key':
+            mapping = self.input_vocab.keys()
         elif is_string(mapping):
             raise ValidationError(
                 "The mapping argument must be a dictionary, the string "
-                "'by-key' or None.", attr='mapping', obj=self)
+                "'by-key' or a sequence of strings.", attr='mapping', obj=self)
+
+        if not hasattr(mapping, 'keys'):
+            mapping = {k: k for k in mapping}
 
         input_keys = mapping.keys()
         input_vectors = [self.input_vocab.parse(key).v for key in input_keys]
