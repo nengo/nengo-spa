@@ -87,6 +87,11 @@ class AssociativeMemory(Network):
         if not hasattr(mapping, 'keys'):
             mapping = {k: k for k in mapping}
 
+        if len(mapping) < 1:
+            raise ValidationError(
+                "At least one item must be provided with the mapping "
+                "argument.", attr='mapping', obj=self)
+
         input_keys = mapping.keys()
         input_vectors = [self.input_vocab.parse(key).v for key in input_keys]
         output_keys = [mapping[k] for k in input_keys]
