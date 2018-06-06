@@ -6,6 +6,7 @@ from nengo.utils.compat import is_string
 from nengo.utils.stdlib import checked_call
 import numpy as np
 
+from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.network import Network
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vocab import VocabularyOrDimParam
@@ -16,6 +17,8 @@ class SpArrayExtractor(object):
         self.vocab = vocab
 
     def __call__(self, value):
+        if isinstance(value, PointerSymbol):
+            value = value.expr
         if is_string(value):
             value = self.vocab.parse(value)
         if isinstance(value, SemanticPointer):
@@ -44,11 +47,14 @@ class TranscodeFunctionParam(Parameter):
     def coerce(self, obj, fn):
         fn = super(TranscodeFunctionParam, self).coerce(obj, fn)
 
+        pointer_cls = (SemanticPointer, PointerSymbol)
+
         if fn is None:
             return fn
         elif callable(fn):
             return self.coerce_callable(obj, fn)
-        elif not obj.input_vocab and is_string(fn):
+        elif not obj.input_vocab and (is_string(fn) or
+                                      isinstance(fn, pointer_cls)):
             return fn
         else:
             raise ValidationError("Invalid output type {!r}".format(
@@ -89,7 +95,7 @@ class TranscodeFunctionParam(Parameter):
             if output_vocab is not None:
                 fn = make_parse_func(fn, output_vocab)
             return fn
-        elif is_string(fn):
+        elif is_string(fn) or isinstance(fn, (SemanticPointer, PointerSymbol)):
             return SpArrayExtractor(output_vocab)(fn)
         else:
             raise ValueError("Invalid output type {!r}".format(type(fn)))
@@ -128,7 +134,8 @@ class Transcode(Network):
           if *size_out* is *None*.
         * If *output_vocab* is not *None*, the return value can be either of:
           NumPy array, `.SemanticPointer` instance, or an SemanticPointer
-          expression as string that gets parsed with the *output_vocab*.
+          expression or symbolic expression as string that gets parsed with
+          the *output_vocab*.
     input_vocab : Vocabulary, optional (Default: None)
         Input vocabulary. Mutually exclusive with *size_in*.
     output_vocab : Vocabulary, optional (Default: None)
