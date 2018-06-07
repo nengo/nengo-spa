@@ -21,6 +21,33 @@ requests.  We try to maintain 100% test coverage, so any new features should
 also include unit tests to cover that change.  If you fix a bug it's also a good
 idea to add a unit test, so the bug doesn't get un-fixed in the future!
 
+
+Building the documentation
+--------------------------
+
+To build the documentation install the required dependencies by running
+the following command from the root folder of the Nengo SPA source code:
+
+.. code-block:: bash
+
+   python setup.py -e .[docs]
+
+To build the documentation use one of the following commands:
+
+.. code-block:: bash
+
+   python setup.py build_sphinx
+
+or if you need set explicitly set the Jupyter kernel for building the
+notebooks included in the documentation:
+
+.. code-block:: bash
+
+   sphinx-build docs docs/_build -D nbsphinx_kernel_name=<kernelname>
+
+You will find the build documentation in the ``docs/_build`` folder.
+
+
 Contributor agreement
 ---------------------
 
