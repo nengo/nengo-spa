@@ -34,6 +34,9 @@ Release History
 
 - Allow integer values for vocabularies in associative memories.
   (`#171 <https://github.com/nengo/nengo_spa/pull/171>`_)
+- Implement ``reinterpret`` operator for pointer symbols.
+  (`#169 <https://github.com/nengo/nengo_spa/issues/169>`_,
+  `#179 <https://github.com/nengo/nengo_spa/pull/179>`_)
 
 
 0.5.0 (June 1, 2018)
