@@ -129,6 +129,9 @@ class PointerSymbol(Symbol):
     def __rmatmul__(self, other):
         return self.rdot(other)
 
+    def reinterpret(self, vocab=None):
+        return self.evaluate().reinterpret(vocab)
+
     def translate(self, vocab, populate=None, keys=None, solver=None):
         tr = self.type.vocab.transform_to(vocab, populate, solver)
         return SemanticPointer(np.dot(tr, self.evaluate().v), vocab=vocab)

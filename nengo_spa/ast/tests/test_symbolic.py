@@ -115,6 +115,17 @@ def test_translate(rng):
             v2['A']), 1., atol=0.2)
 
 
+def test_reinterpret(rng):
+    v1 = spa.Vocabulary(16, rng=rng)
+    v1.populate('A; B')
+    v2 = spa.Vocabulary(16, rng=rng)
+    v2.populate('A; B')
+
+    assert_equal(
+        spa.reinterpret(PointerSymbol('A', TVocabulary(v1)), v2).evaluate().v,
+        v1['A'].v)
+
+
 def test_pointer_symbol_factory():
     ps = sym.A
     assert isinstance(ps, PointerSymbol)
