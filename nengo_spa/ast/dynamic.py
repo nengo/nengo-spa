@@ -11,7 +11,6 @@ from nengo_spa.ast.base import (
 from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
-from nengo_spa.vocab import LazyVocabPairing
 
 
 BasalGangliaRealization = None
