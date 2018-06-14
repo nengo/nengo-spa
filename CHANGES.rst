@@ -23,6 +23,15 @@ Release History
 0.5.1 (unreleased)
 ==================
 
+**Added**
+
+- Methods ``join_vocabs`` any ``pair_vocabs`` for construction vocabularies
+  from smaller vocabularies. Furthermore, these vocabularies and subset
+  vocabularies will keep track of their hierarchical relationships to reduce
+  the number of required ``reinterpret`` operations.
+  (`#79 <https://github.com/nengo/nengo_spa/issues/79>`_,
+  `#162 <https://github.com/nengo/nengo_spa/pull/162>`_)
+
 
 0.5.0 (June 1, 2018)
 ====================
