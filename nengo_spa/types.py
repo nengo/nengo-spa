@@ -41,6 +41,9 @@ class Type(object):
             return NotImplemented
         return self.__class__ is other.__class__ and self.name == other.name
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __lt__(self, other):
         return other.__gt__(self)
 
