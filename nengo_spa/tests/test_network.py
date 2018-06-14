@@ -194,3 +194,13 @@ def test_instance_config():
         net.config[nengo.Ensemble].set_param(
             'param', nengo.params.BoolParam('param', default=False))
         net.config[ens].param = True
+
+
+def test_no_root_spa_network_required():
+    with nengo.Network():  # nengo.Network, not spa.Network!
+        state = spa.State(16)
+        state2 = spa.State(16)
+        # Next line will raise an exception if the two states do not share
+        # the same vocab. They are supposed to share the vocab despite not
+        # being in a spa.Network.
+        state >> state2

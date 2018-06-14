@@ -20,6 +20,17 @@ Release History
    - Fixed
 
 
+0.5.2 (unreleased)
+==================
+
+**Fixed**
+
+- SPA modules will use the same default vocabularies even if not instantiated
+  in the context of a `spa.Network`.
+  (`#174 <https://github.com/nengo/nengo-spa/issues/174>`_,
+  `#185 <https://github.com/nengo/nengo-spa/pull/185>`_)
+
+
 0.5.1 (June 7, 2018)
 ====================
 

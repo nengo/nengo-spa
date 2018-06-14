@@ -1,4 +1,5 @@
 import inspect
+import weakref
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
@@ -198,6 +199,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         vocabularies.
     """
 
+    _master_vocabs = weakref.WeakKeyDictionary()
     vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
 
     _input_types = {}
@@ -210,12 +212,16 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
 
         if vocabs is None:
             vocabs = Config.default(Network, 'vocabs')
+            if vocabs is None and len(Network.context) > 0:
+                vocabs = self._master_vocabs.get(Network.context[0], None)
             if vocabs is None:
                 if seed is not None:
                     rng = np.random.RandomState(seed)
                 else:
                     rng = None
                 vocabs = VocabularyMap(rng=rng)
+                if len(Network.context) > 0:
+                    self.__class__._master_vocabs[Network.context[0]] = vocabs
         self.vocabs = vocabs
         self.config[Network].vocabs = vocabs
 
