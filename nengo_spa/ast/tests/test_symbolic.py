@@ -83,6 +83,22 @@ def test_multiply_fixed_scalar_and_pointer_symbol(rng):
     assert_equal(node.output, vocab.parse('2 * A').v)
 
 
+def test_binding_with_paired_vocabs(rng):
+    v1 = spa.Vocabulary(16, rng=rng)
+    v1.populate('A')
+    v2 = spa.Vocabulary(16, rng=rng)
+    v2.populate('B')
+
+    tv1 = TVocabulary(v1)
+    tv2 = TVocabulary(v2)
+
+    with spa.Network():
+        x = PointerSymbol('A', tv1) * PointerSymbol('B', tv2)
+        node = x.construct()
+    assert_equal(node.output, (v1['A'] * v2['B']).v)
+    assert (id(v1), id(v2)) in x.type.vocab.factors
+
+
 def test_fixed_dot(rng):
     vocab = spa.Vocabulary(16, rng=rng)
     vocab.populate('A; B')

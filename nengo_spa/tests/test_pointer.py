@@ -199,8 +199,7 @@ def test_ops_preserve_vocab(op):
     assert x.vocab is v
 
 
-@pytest.mark.parametrize('op', (
-    'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
+@pytest.mark.parametrize('op', ('a+b', 'a-b', 'a.dot(b)', 'a.compare(b)'))
 def test_ops_check_vocab_compatibility(op):
     a = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841
     b = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841

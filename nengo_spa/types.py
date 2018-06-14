@@ -41,6 +41,9 @@ class Type(object):
             return NotImplemented
         return self.__class__ is other.__class__ and self.name == other.name
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __lt__(self, other):
         return other.__gt__(self)
 
@@ -125,12 +128,15 @@ class TVocabulary(Type):
         if not isinstance(other, Type):
             return NotImplemented
         return (super(TVocabulary, self).__eq__(other) and
-                self.vocab is other.vocab)
+                (self.vocab is other.vocab or
+                 any(f in other.vocab.factors for f in self.vocab.factors)))
 
     def __gt__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return other <= TAnyVocabOfDim(self.vocab.dimensions)
+        return other <= TAnyVocabOfDim(self.vocab.dimensions) or (
+            isinstance(other, TVocabulary) and
+            self.vocab in other.vocab.supersets)
 
 
 def coerce_types(*types):

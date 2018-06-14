@@ -6,7 +6,8 @@ import nengo
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast.base import infer_types, Fixed, TypeCheckedBinaryOp
+from nengo_spa.ast.base import (
+    infer_types, infer_paired_types, Fixed, TypeCheckedBinaryOp)
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
@@ -105,12 +106,12 @@ class PointerSymbol(Symbol):
 
     @symbolic_op
     def __mul__(self, other):
-        type_ = infer_types(self, other)
+        type_ = infer_paired_types(self, other)
         return PointerSymbol(self.expr + '*' + other.expr, type_)
 
     @symbolic_op
     def __rmul__(self, other):
-        type_ = infer_types(self, other)
+        type_ = infer_paired_types(other, self)
         return PointerSymbol(other.expr + '*' + self.expr, type_)
 
     def dot(self, other):

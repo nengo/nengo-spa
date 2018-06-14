@@ -38,6 +38,15 @@ Release History
   (`#169 <https://github.com/nengo/nengo_spa/issues/169>`_,
   `#179 <https://github.com/nengo/nengo_spa/pull/179>`_)
 
+**Added**
+
+- Methods ``join_vocabs`` any ``pair_vocabs`` for construction vocabularies
+  from smaller vocabularies. Furthermore, these vocabularies and subset
+  vocabularies will keep track of their hierarchical relationships to reduce
+  the number of required ``reinterpret`` operations.
+  (`#79 <https://github.com/nengo/nengo_spa/issues/79>`_,
+  `#162 <https://github.com/nengo/nengo_spa/pull/162>`_)
+
 
 0.5.0 (June 1, 2018)
 ====================
@@ -56,9 +65,6 @@ Release History
   similarity could not be obtained.
   (`#117 <https://github.com/nengo/nengo_spa/issues/117>`_,
   `#158 <https://github.com/nengo/nengo_spa/pull/158>`_)
-- Possibility to name Vocabulary instances for debugging.
-  (`#163 <https://github.com/nengo/nengo_spa/issues/163>`_,
-  `#165 <https://github.com/nengo/nengo_spa/pull/165>`_)
 
 **Changed**
 

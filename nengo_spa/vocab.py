@@ -1,4 +1,7 @@
 from collections import Mapping
+from functools import reduce
+import itertools
+import operator
 import re
 import warnings
 
@@ -45,8 +48,8 @@ class Vocabulary(Mapping):
 
     Attributes
     ----------
-    keys : sequence
-        The names of all known semantic pointers (e.g., ``['A', 'B', 'C']``).
+    dimensions : int
+        Dimensionality of the vocabulary.
     max_similarity : float
         When randomly generating pointers, ensure that the cosine of the
         angle between the new pointer and all existing pointers is less
@@ -61,6 +64,11 @@ class Vocabulary(Mapping):
     vectors : ndarray
         All of the semantic pointer vectors in a matrix, in the same order
         as in `keys`.
+    supersets : list
+        List of vocabularies that are considered a superset of this vocabulary.
+    factors : list
+        List of tuples of vocabulary object IDs that yield this vocabulary
+        under a Cartesian product.
     """
 
     def __init__(
@@ -79,6 +87,9 @@ class Vocabulary(Mapping):
         self.rng = rng
         self.name = name
 
+        self.supersets = []
+        self.factors = []
+
     @property
     def vectors(self):
         v = self._vectors.view()
@@ -91,7 +102,7 @@ class Vocabulary(Mapping):
             self.dimensions, name, id(self))
 
     def create_pointer(self, attempts=100, transform=None):
-        """Create a new semantic pointer and add it to the vocabulary.
+        """Create a new semantic pointer (without adding it to the vocabulary).
 
         This will take into account the `max_similarity` attribute.  If a
         pointer satisfying max_similarity is not generated after the specified
@@ -350,7 +361,287 @@ class Vocabulary(Mapping):
         for key in keys:
             subset.add(key, self[key].reinterpret(subset))
 
+        subset.supersets.append(self)
+
         return subset
+
+
+class LazyVocabPairing(Mapping):
+    """Represents a vocabulary of the Cartesian product of other vocabularies.
+
+    All requested Semantic Pointers will only be computed when accessed
+    (without caching). It is not possible to add new Semantic Pointers to this
+    vocabulary representation, but vectors added to the underlying vocabularies
+    will affect this the set of pairs contained in this vocabulary.
+
+    The keys in this vocabulary representation use ``*`` to separate the keys
+    from base vocabularies.
+
+    This class is primarily intended for internal use in Nengo SPA to avoid
+    creating unnecessary and potentially large vocabularies. Users should
+    usually use `.pair_vocabs` instead.
+
+    Parameters
+    ----------
+    vocabs : sequence of `.Vocabulary`
+        Vocabularies to pair.
+
+    Attributes
+    ----------
+    dimensions : int
+        Dimensionality of the vocabulary.
+    vocabs : sequence of `.Vocabulary`
+        Paired vocabulariesn
+    vectors : ndarray
+        All of the semantic pointer vectors in a matrix, in the same order
+        as in `keys`.
+    supersets : list
+        List of vocabularies that are considered a superset of this vocabulary.
+    factors : tuple
+        List of tuples of vocabulary object IDs that yield this vocabulary
+        under a Cartesian product.
+    """
+    def __init__(self, vocabs):
+        vocabs = self.flatten(vocabs)
+
+        if not all(v.dimensions == vocabs[0].dimensions for v in vocabs):
+            raise ValueError(
+                "Can only pair vocabularies with equal dimensionality.")
+
+        self.dimensions = vocabs[0].dimensions
+        self.vocabs = vocabs
+        self.supersets = []
+        self.factors = (tuple(id(v) for v in vocabs),)
+
+    @property
+    def vectors(self):
+        return np.array([v.v for v in self.values()])
+
+    def __str__(self):
+        return 'paired {}-dimensional vocabularies {}'.format(
+            self.dimensions, self.vocabs)
+
+    def _parse_key(self, key):
+        return tuple(x.strip() for x in key.split('*'))
+
+    def __contains__(self, key):
+        parsed_key = self._parse_key(key)
+        if len(parsed_key) != len(self.vocabs):
+            return False
+        return all(x in v for x, v in zip(parsed_key, self.vocabs))
+
+    def __len__(self):
+        return reduce(operator.mul, (len(v) for v in self.vocabs), 1)
+
+    def __iter__(self):
+        return iter('*'.join(x) for x in itertools.product(*(
+            v.keys() for v in self.vocabs)))
+
+    def __getitem__(self, key):
+        if key not in self:
+            raise KeyError()
+        else:
+            parsed_key = self._parse_key(key)
+            return reduce(
+                operator.mul,
+                (v[k].reinterpret(self) for k, v in zip(
+                    parsed_key, self.vocabs)))
+
+    def __hash__(self):
+        return hash(id(self))
+
+    def dot(self, v):
+        """Returns the dot product with all terms in the Vocabulary.
+
+        Parameters
+        ----------
+        v : SemanticPointer or array_like
+            SemanticPointer to calculate dot product with.
+        """
+        if isinstance(v, pointer.SemanticPointer):
+            v = v.v
+        return np.dot(self.vectors, v)
+
+    @classmethod
+    def flatten(cls, vocabs):
+        return sum(
+            (v.vocabs if isinstance(v, cls) else (v,) for v in vocabs), ())
+
+    def to_vocabulary(self, strict=True, key_separator='_'):
+        v = pair_vocabs(
+            self.vocabs, strict=strict, key_separator=key_separator,
+            check_similarity=False)
+        self.supersets.append(v)
+        return v
+
+    class _CallToVocab(NotImplementedError):
+        def __init__(self, msg):
+            super(LazyVocabPairing._CallToVocab, self).__init__(
+                (msg + " Call to_vocabulary() first to create a proper " +
+                 "Vocublary instance.").strip())
+
+    class _CannotAddPointer(_CallToVocab):
+        def __init__(self):
+            super(LazyVocabPairing._CannotAddPointer, self).__init__(
+                "Cannot add Semantic Pointers to LazyVocabPairing.")
+
+    def create_pointer(self, *args, **kwargs):
+        raise self._CannotAddPointer()
+
+    def add(self, *args, **kwargs):
+        raise self._CannotAddPointer()
+
+    def populate(self, *args, **kwargs):
+        raise self._CannotAddPointer()
+
+    def parse(self, text):
+        """Return the SemanticPointer corresponding to given key.
+
+        Note that this only allows the access to with proper keys in this
+        instances of the form ``A*B``. Parsing of arbitrary expressions is not
+        supported and requires the creation of a proper `.Vocabulary` with
+        `.to_vocabulary`.
+        """
+        return self[text]
+
+    def parse_n(self, *texts):
+        """Applies `parse` to each item in *texts* and returns the result."""
+        return [self.parse(t) for t in texts]
+
+    def transform_to(self, *args, **kwargs):
+        raise self._CallToVocab(
+            "Cannot determine transform for LazyVocabPairing.")
+
+    def create_subset(self, *args, **kwargs):
+        raise self._CallToVocab(
+            "Cannot create subset from LazyVocabPairing.")
+
+
+def combine_vocabs(
+        vocabs, strict=True, max_similarity=0.1, rng=None,
+        check_similarity=True):
+    """Combines vocabularies into a single vocabulary.
+
+    The keys in vocabularies that are being combined need to be unique.
+
+    Parameters
+    ----------
+    vocabs : sequence of `.Vocabulary`
+        Vocabularies to combine.
+    strict : bool, optional
+        Whether to automatically create missing semantic pointers when parsing
+        expressions with the returned vocabulary object. If a
+        non-strict vocabulary is asked for a pointer that does not exist within
+        the vocabulary, the missing pointer will be automatically added to the
+        vocabulary. A strict vocabulary will throw an error if asked for a
+        pointer that does not exist in the vocabulary.
+    max_similarity : float, optional
+        When randomly generating pointers, ensure that the cosine of the
+        angle between the new pointer and all existing pointers is less
+        than this amount. If the system is unable to find such a pointer
+        after 100 tries, a warning message is printed.
+    rng : numpy.random.RandomState, optional
+        The random number generator to use to create new vectors.
+    check_similarity : bool, optional
+        If *True*, the function will give a warning if the similarity of any
+        two Semantic Pointers in the combined vocabulary exceeds
+        *max_similarity*.
+
+    Returns
+    -------
+    Vocabulary
+        Combined vocabulary.
+    """
+    if not all(v.dimensions == vocabs[0].dimensions for v in vocabs):
+        raise ValueError(
+            "Can only combine vocabularies with equal dimensionality.")
+
+    combined = Vocabulary(
+        vocabs[0].dimensions, strict=strict, max_similarity=max_similarity,
+        rng=rng)
+    for v in vocabs:
+        for key in v:
+            combined.add(key, v[key].reinterpret(combined))
+
+    if check_similarity:
+        similarities = np.dot(combined.vectors, combined.vectors.T)
+        np.fill_diagonal(similarities, 0.)
+        if np.max(similarities) >= max_similarity:
+            warnings.warn(
+                "Max. similarity ({:.2f}) in the combined vocabulary exceeds "
+                "the threshold ({:.2f}).".format(
+                    np.max(similarities), max_similarity))
+
+    for v in vocabs:
+        v.supersets.append(combined)
+        combined.factors.extend(v.factors)
+    return combined
+
+
+def pair_vocabs(
+        vocabs, strict=True, max_similarity=0.1, rng=None,
+        check_similarity=True, key_separator='_'):
+    """Creates a vocabulary of the Cartesian product of the input vocabularies.
+
+    Parameters
+    ----------
+    vocabs : sequence of `.Vocabulary`
+        Vocabularies to pair up.
+    strict : bool, optional
+        Whether to automatically create missing semantic pointers when parsing
+        expressions with the returned vocabulary object. If a
+        non-strict vocabulary is asked for a pointer that does not exist within
+        the vocabulary, the missing pointer will be automatically added to the
+        vocabulary. A strict vocabulary will throw an error if asked for a
+        pointer that does not exist in the vocabulary.
+    max_similarity : float, optional
+        When randomly generating pointers, ensure that the cosine of the
+        angle between the new pointer and all existing pointers is less
+        than this amount. If the system is unable to find such a pointer
+        after 100 tries, a warning message is printed.
+    rng : numpy.random.RandomState, optional
+        The random number generator to use to create new vectors.
+    check_similarity : bool, optional
+        If *True*, the function will give a warning if the similarity of any
+        two Semantic Pointers in the paired vocabulary exceeds
+        *max_similarity*.
+    key_separator : str, optional
+        Symbol used to concatenate the keys from the input vocabularies. Needs
+        to be valid within Semantic Pointer names (i.e., '*' cannot be used).
+
+    Returns
+    -------
+    Vocabulary
+        Vocabulary with all (Cartesian) pairs.
+    """
+    vocabs = LazyVocabPairing.flatten(vocabs)
+
+    if not all(v.dimensions == vocabs[0].dimensions for v in vocabs):
+        raise ValueError(
+            "Can only pair vocabularies with equal dimensionality.")
+
+    paired = Vocabulary(
+        vocabs[0].dimensions, strict=strict, max_similarity=max_similarity,
+        rng=rng)
+    for pair in itertools.product(*vocabs):
+        paired.add(
+            key_separator.join(pair), reduce(
+                operator.mul,
+                (v[k].reinterpret(paired) for v, k in zip(vocabs, pair))))
+
+    if check_similarity:
+        similarities = np.dot(paired.vectors, paired.vectors.T)
+        np.fill_diagonal(similarities, 0.)
+        if np.max(similarities) >= max_similarity:
+            warnings.warn(
+                "Max. similarity ({:.2f}) in the paired vocabulary exceeds "
+                "the threshold ({:.2f}).".format(
+                    np.max(similarities), max_similarity))
+
+    paired.factors.append(tuple(id(v) for v in vocabs))
+    for f in itertools.product(*([(id(v),)] + v.factors for v in vocabs)):
+        paired.factors.append(sum(f, ()))
+    return paired
 
 
 class VocabularyMap(Mapping):

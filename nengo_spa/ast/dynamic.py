@@ -6,7 +6,8 @@ import nengo
 from nengo.utils.compat import is_number
 import numpy as np
 
-from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
+from nengo_spa.ast.base import (
+    infer_types, infer_paired_types, Node, TypeCheckedBinaryOp)
 from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
@@ -66,8 +67,12 @@ class DynamicNode(Node):
     def __rsub__(self, other):
         return (-self) + other
 
-    def _mul_with_fixed(self, other):
-        infer_types(self, other)
+    def _mul_with_fixed(self, other, swap_inputs=False):
+        if swap_inputs:
+            type_ = infer_paired_types(other, self)
+        else:
+            type_ = infer_paired_types(self, other)
+
         if other.type == TScalar:
             tr = other.value
         elif self.type == TScalar and other.type == TAnyVocab:
@@ -81,10 +86,14 @@ class DynamicNode(Node):
                 tr = other.evaluate().get_convolution_matrix()
         else:
             raise AssertionError("Unexpected node type in multiply.")
-        return Transformed(self, tr, self.type)
+        return Transformed(self, tr, type_)
 
     def _mul_with_dynamic(self, other, swap_inputs=False):
-        type_ = infer_types(self, other)
+        if swap_inputs:
+            type_ = infer_paired_types(other, self)
+        else:
+            type_ = infer_paired_types(self, other)
+
         if type_ == TScalar:
             mul = ProductRealization()
         elif self.type == TScalar or other.type == TScalar:
@@ -111,7 +120,7 @@ class DynamicNode(Node):
     @binary_node_op
     def __rmul__(self, other):
         if isinstance(other, Symbol):
-            return self._mul_with_fixed(other)
+            return self._mul_with_fixed(other, swap_inputs=True)
         else:
             return self._mul_with_dynamic(other, swap_inputs=True)
 

@@ -7,6 +7,7 @@ import nengo_spa as spa
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.examine import similarity
 from nengo_spa.network import create_inhibit_node
+from nengo_spa.testing import sp_close
 from nengo_spa.vocab import VocabularyMap
 
 
@@ -155,6 +156,24 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     plt.ylabel("Similarity")
 
     assert np.mean(spa.similarity(sim.data[p][t], v)) > 0.8
+
+
+def test_auto_subset_vocab_casting(Simulator, rng):
+    v1 = spa.Vocabulary(32, rng=rng)
+    v1.populate('A; B')
+    v2 = v1.create_subset(['A'])
+
+    with spa.Network() as model:
+        a = spa.State(v2)
+        b = spa.State(v1)
+        spa.sym.A >> a
+        a >> b
+        p = nengo.Probe(b.output, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.5)
+
+    assert sp_close(sim.trange(), sim.data[p], v1['A'], skip=0.3)
 
 
 def test_copy_spa(RefSimulator):
