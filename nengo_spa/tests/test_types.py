@@ -32,3 +32,14 @@ def test_coercion_errors():
     with pytest.raises(SpaTypeError) as err:
         coerce_types(Type('x'), Type('y'))
     assert "Incompatible types" in str(err.value)
+
+
+def test_non_equality():
+    v = Vocabulary(16)
+    tv1 = TVocabulary(v)
+    tv2 = TVocabulary(v)
+    tvx = TVocabulary(Vocabulary(16))
+    assert tv1 == tv2
+    assert not (tv1 != tv2)
+    assert tv1 != tvx
+    assert not (tv1 == tvx)
