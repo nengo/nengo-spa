@@ -478,7 +478,7 @@ class LazyVocabPairing(Mapping):
         def __init__(self, msg):
             super(LazyVocabPairing._CallToVocab, self).__init__(
                 (msg + " Call to_vocabulary() first to create a proper " +
-                "Vocublary instance.").strip())
+                 "Vocublary instance.").strip())
 
     class _CannotAddPointer(_CallToVocab):
         def __init__(self):
