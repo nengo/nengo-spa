@@ -1,4 +1,5 @@
 from collections import Mapping
+from keyword import iskeyword
 import re
 import warnings
 
@@ -12,7 +13,8 @@ from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity
 
 
-valid_sp_regex = re.compile('[A-Z][_a-zA-Z0-9]*')
+valid_sp_regex = re.compile('^[A-Z][_a-zA-Z0-9]*$')
+reserved_sp_names = {'None', 'True', 'False'}
 
 
 class Vocabulary(Mapping):
@@ -176,7 +178,8 @@ class Vocabulary(Mapping):
         p : SemanticPointer or array_like
             Semantic Pointer to add.
         """
-        if not valid_sp_regex.match(key):
+        if (not valid_sp_regex.match(key) or iskeyword(key) or
+                key in reserved_sp_names):
             raise SpaParseError(
                 "Invalid Semantic Pointer name {!r}. Valid names are valid "
                 "Python 2 identifiers beginning with a capital letter.".format(

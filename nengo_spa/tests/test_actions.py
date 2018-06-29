@@ -275,7 +275,8 @@ def test_non_default_input_and_output(Simulator, rng):
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3)
+    assert sp_close(
+        sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3, atol=0.3)
 
 
 def test_action_selection(Simulator, rng):

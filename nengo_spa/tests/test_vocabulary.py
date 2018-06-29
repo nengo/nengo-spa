@@ -67,8 +67,15 @@ def test_populate(rng):
     # invalid names: lowercase, unicode
     with pytest.raises(SpaParseError):
         v.populate('x = A')
-    # with pytest.raises(SpaParseError):
-    v.populate(u'Aα = A')
+    with pytest.raises(SpaParseError):
+        v.populate(u'Aα = A')
+
+
+@pytest.mark.parametrize('name', ('None', 'True', 'False'))
+def test_reserved_names(name):
+    v = Vocabulary(16)
+    with pytest.raises(SpaParseError):
+        v.populate(name)
 
 
 def test_populate_with_transform_on_first_vector(rng):

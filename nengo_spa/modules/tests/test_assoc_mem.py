@@ -251,8 +251,8 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     t_item2 = (t > 0.175) & (t < 0.2)
 
     # Modify vocabularies (for plotting purposes)
-    vocab_in.add(in_keys[1], vocab_in.parse(in_keys[1]).v)
-    vocab_out.add(out_keys[0], vocab_out.parse(out_keys[0]).v)
+    vocab_in.add('AxB', vocab_in.parse(in_keys[1]).v)
+    vocab_out.add('CxD', vocab_out.parse(out_keys[0]).v)
 
     plt.subplot(2, 1, 1)
     plt.plot(t, similarity(sim.data[in_p], vocab_in))
