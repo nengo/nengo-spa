@@ -29,6 +29,10 @@ Release History
   in the context of a `spa.Network`.
   (`#174 <https://github.com/nengo/nengo-spa/issues/174>`_,
   `#185 <https://github.com/nengo/nengo-spa/pull/185>`_)
+- Disallow Python keywords, including None, True, and False, as well as unicode
+  characters from Python names.
+  (`#188 <https://github.com/nengo/nengo_spa/pull/188>`_,
+  `#187 <https://github.com/nengo/nengo_spa/issues/187>`_)
 
 
 0.5.1 (June 7, 2018)
