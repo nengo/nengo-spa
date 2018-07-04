@@ -81,6 +81,16 @@ def test_new_action_syntax(Simulator, seed, plt, rng):
     assert valueC[2] < 0.2
 
 
+def test_dummy_action():
+    with spa.Network():
+        with spa.ActionSelection():
+            spa.ifmax(0)
+            spa.ifmax('named-dummy', 0)
+
+            with pytest.raises(ValueError):
+                spa.ifmax('must-provide-condition')
+
+
 def test_dot_product(Simulator, seed, plt):
     d = 16
 

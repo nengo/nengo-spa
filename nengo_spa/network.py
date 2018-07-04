@@ -130,7 +130,7 @@ class SpaOperatorMixin(object):
         return as_ast_node(self).translate(vocab, populate, keys, solver)
 
 
-def ifmax(name, condition, *actions):
+def ifmax(name, condition=None, *actions):
     """Defines a potential action within an `ActionSelection` context.
 
     This implementation allows Nengo objects in addition to AST nodes as
@@ -152,11 +152,14 @@ def ifmax(name, condition, *actions):
         the utility value.
     """
     if not is_string(name):
-        actions = (condition,) + actions
+        if condition is not None:
+            actions = (condition,) + actions
         condition = name
         name = None
 
-    if condition == 0:
+    if condition is None:
+        raise ValueError("Must provide `condition` (though it may be 0).")
+    elif condition == 0:
         condition = Noop(TScalar)
     else:
         condition = as_ast_node(condition)
