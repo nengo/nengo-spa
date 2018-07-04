@@ -33,6 +33,9 @@ Release History
   characters from Python names.
   (`#188 <https://github.com/nengo/nengo_spa/pull/188>`_,
   `#187 <https://github.com/nengo/nengo_spa/issues/187>`_)
+- Allow action rules without name to have no effects.
+  (`#189 <https://github.com/nengo/nengo_spa/issues/189>`_,
+  `#191 <https://github.com/nengo/nengo_spa/pull/191>`_)
 
 
 0.5.1 (June 7, 2018)
