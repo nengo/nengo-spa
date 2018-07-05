@@ -1,6 +1,6 @@
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_integer, is_number, range
+from nengo.utils.compat import is_array, is_integer, is_number, range
 import numpy as np
 
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
@@ -131,7 +131,11 @@ class SemanticPointer(Fixed):
 
         If multiplied by a scalar, we do normal multiplication.
         """
-        if is_number(other):
+        if is_array(other):
+            raise TypeError(
+                "Multiplication of Semantic Pointers with arrays in not "
+                "allowed.")
+        elif is_number(other):
             return SemanticPointer(data=self.v * other, vocab=self.vocab)
         elif isinstance(other, Fixed):
             if other.type == TScalar:

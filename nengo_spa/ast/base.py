@@ -1,5 +1,7 @@
 """Basic classes for abstract syntax trees (ASTs) in Nengo SPA."""
 
+from nengo.utils.compat import is_array
+
 from nengo_spa.types import coerce_types, TAnyVocab, TVocabulary
 
 
@@ -97,7 +99,9 @@ class TypeCheckedBinaryOp(object):
         def checked(inst, other):
             if self.conversion is not None:
                 other = self.conversion(other)
-            if not isinstance(other, self.expected_type):
+            if is_array(other):
+                raise TypeError("Bare array not allowed in SPA operation.")
+            elif not isinstance(other, self.expected_type):
                 return NotImplemented
             return fn(inst, other)
         return checked
