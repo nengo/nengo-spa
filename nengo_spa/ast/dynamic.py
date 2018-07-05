@@ -1,7 +1,5 @@
 """AST classes for dynamic operations (i.e. their output changes over time)."""
 
-import weakref
-
 import nengo
 from nengo.utils.compat import is_number
 import numpy as np
@@ -19,10 +17,6 @@ ProductRealization = None
 ScalarRealization = None
 StateRealization = None
 ThalamusRealization = None
-
-
-input_vocab_registry = weakref.WeakKeyDictionary()
-output_vocab_registry = weakref.WeakKeyDictionary()
 
 
 def as_node(obj):

@@ -9,8 +9,7 @@ import numpy as np
 from nengo_spa.actions import ifmax as actions_ifmax
 from nengo_spa.actions import ModuleInput
 from nengo_spa.ast.base import Node, Noop
-from nengo_spa.ast.dynamic import (
-    input_vocab_registry, ModuleOutput, output_vocab_registry)
+from nengo_spa.ast.dynamic import ModuleOutput
 from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TScalar, TVocabulary
@@ -80,6 +79,56 @@ def as_sink(obj):
         return ModuleInput(input_, TScalar)
     else:
         return ModuleInput(input_, TVocabulary(vocab))
+
+
+class ConnectorRegistry(object):
+    """Registry associating connectors with vocabularies and enable SPA syntax.
+
+    A connector is either an input or output to a SPA module.
+
+    Declaring a Nengo object as connector dynamically changes the class of the
+    instance to inject the `.SpaOperatorMixin` to allow the object to be used
+    in SPA rules. These substituted classes will be cached to use the same
+    type instance where appropriate (i.e. two Nengo objects of identical type A
+    will still be of identical type B after being declared as connectors and
+    B inherits from A and *SpaOperatorMixin*).
+    """
+
+    _type_cache = {}
+
+    def __init__(self):
+        self._registry = weakref.WeakKeyDictionary()
+
+    def __contains__(self, key):
+        return key in self._registry
+
+    def __getitem__(self, key):
+        return self._registry[key]
+
+    def declare_connector(self, obj, vocab):
+        """Declares a connector.
+
+        Parameters
+        ----------
+        obj : nengo.base.NengoObject
+            Nengo object to use as a connector.
+        vocab: Vocabulary
+            Vocabulary to assign to the connector.
+        """
+        try:
+            extended_type = self._type_cache[obj.__class__]
+        except KeyError:
+            extended_type = type(
+                'Connector<%s>' % (obj.__class__.__name__),
+                (obj.__class__, SpaOperatorMixin), {})
+            self._type_cache[obj.__class__] = extended_type
+        obj.__class__ = extended_type
+        self._registry[obj] = vocab
+        return obj
+
+
+input_vocab_registry = ConnectorRegistry()
+output_vocab_registry = ConnectorRegistry()
 
 
 class SpaOperatorMixin(object):
@@ -253,15 +302,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         vocab: Vocabulary
             Vocabulary to assign to the input.
         """
-        try:
-            extended_type = self._input_types[obj.__class__]
-        except KeyError:
-            extended_type = type(
-                'SpaInput<%s>' % obj.__class__.__name__,
-                (obj.__class__, SpaOperatorMixin), {})
-            self._input_types[obj.__class__] = extended_type
-        obj.__class__ = extended_type
-        input_vocab_registry[obj] = vocab
+        return input_vocab_registry.declare_connector(obj, vocab)
 
     def declare_output(self, obj, vocab):
         """ Declares a network output.
@@ -273,16 +314,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         vocab : Vocabulary
             Vocabulary to assign to the output.
         """
-        try:
-            extended_type = self._output_types[obj.__class__]
-        except KeyError:
-            extended_type = type(
-                'SpaOutput<%s>' % obj.__class__.__name__,
-                (obj.__class__, SpaOperatorMixin), {})
-            self._output_types[obj.__class__] = extended_type
-        obj.__class__ = extended_type
-        output_vocab_registry[obj] = vocab
-        return obj
+        return output_vocab_registry.declare_connector(obj, vocab)
 
 
 def create_inhibit_node(net, strength=2., **kwargs):
