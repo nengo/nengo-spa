@@ -46,7 +46,8 @@ def ifmax(name, condition=None, *actions):
     -------
     NengoObject
         Nengo object that can be connected to, to provide additional input to
-        the utility value.
+        the utility value. It is possible (but not necessary) to use SPA style
+        connections of the form ``scalar >> utility`` to this object.
     """
     if not is_string(name):
         if condition is not None:

@@ -330,6 +330,13 @@ def test_action_selection(Simulator, rng):
         sim.trange(), sim.data[p_pointer], vocab['E'], skip=2.3, duration=0.2)
 
 
+def test_spa_connections_to_utilities():
+    with spa.Network():
+        with ActionSelection():
+            utility = spa.ifmax(0.)
+        0.1 >> utility
+
+
 def test_does_not_allow_nesting_of_action_selection():
     with spa.Network():
         with ActionSelection():

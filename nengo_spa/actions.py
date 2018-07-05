@@ -6,7 +6,8 @@ import nengo
 from nengo.utils.compat import is_string
 
 from nengo_spa.ast import dynamic
-from nengo_spa.connectors import ModuleInput, RoutedConnection
+from nengo_spa.connectors import (
+    input_vocab_registry, ModuleInput, RoutedConnection)
 from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.types import TScalar
 
@@ -147,7 +148,8 @@ class ActionSelection(Mapping):
 
     def add_action(self, name, *actions):
         assert ActionSelection.active is self
-        utility = nengo.Node(size_in=1)
+        utility = input_vocab_registry.declare_connector(
+            nengo.Node(size_in=1), None)
         if name is not None:
             self._name2idx[name] = len(self._actions)
         self._utilities.append(utility)
