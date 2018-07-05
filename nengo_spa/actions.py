@@ -4,84 +4,11 @@ from collections import Mapping, OrderedDict
 
 import nengo
 from nengo.utils.compat import is_string
-import numpy as np
 
-from nengo_spa.ast.base import Fixed, infer_types, Node
 from nengo_spa.ast import dynamic
+from nengo_spa.connectors import ModuleInput, RoutedConnection
 from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.types import TScalar
-
-
-class ModuleInput(object):
-    """Represents the input to a module with type information.
-
-    Supports the ``>>`` operator to provide input from an AST node. It will
-    create a simple connection by default, but a `.RoutedConnection` instance
-    if used within the context of an `.ActionSelection` instance.
-
-    Parameters
-    ----------
-    input_ : NengoObject
-        Nengo object that retrieves the module input.
-    type_ : nengo_spa.types.Type
-        Type of the input.
-    """
-
-    def __init__(self, input_, type_):
-        self.input = input_
-        self.type = type_
-
-    def __rrshift__(self, other):
-        if not isinstance(other, Node):
-            return NotImplemented
-        if ActionSelection.active is None:
-            infer_types(self, other)
-            other.connect_to(self.input)
-        else:
-            return RoutedConnection(other, self)
-
-
-class RoutedConnection(object):
-    """Represents a routed connection from an AST node to a `.ModuleInput`.
-
-    A routed connection is passed through an inhibitable channel to allow the
-    routed connection to be disabled.
-
-    Parameters
-    ----------
-    source : nengo_spa.ast.base.Node
-        The AST node providing the source signal.
-    sink : ModuleInput
-        The module input that the source signal should be routed to.
-    """
-
-    _free_floating = set()
-
-    def __init__(self, source, sink):
-        self.type = infer_types(source, sink)
-        self.source = source
-        self.sink = sink
-        RoutedConnection._free_floating.add(self)
-
-    def connect_to(self, sink):
-        return self.source.connect_to(sink)
-
-    def construct(self):
-        return self.connect_to(self.sink.input)
-
-    @property
-    def fixed(self):
-        """Whether the source provides a fixed value."""
-        return isinstance(self.source, Fixed)
-
-    def transform(self):
-        """For a fixed source, returns the transform to implement the output.
-        """
-        assert self.fixed
-        if self.type == TScalar:
-            return self.source.evaluate()
-        else:
-            return np.atleast_2d(self.source.evaluate().v).T
 
 
 class ActionSelection(Mapping):
@@ -153,6 +80,7 @@ class ActionSelection(Mapping):
         assert not self.built
         if ActionSelection.active is None:
             ActionSelection.active = self
+            ModuleInput.routed_mode = True
         else:
             raise SpaActionSelectionError(
                 "Must not nest action selection contexts.")
@@ -160,18 +88,19 @@ class ActionSelection(Mapping):
 
     def __exit__(self, exc_type, exc_value, traceback):
         ActionSelection.active = None
+        ModuleInput.routed_mode = False
         if exc_type is not None:
             return
         self._build()
 
     def _build(self):
         try:
-            if len(RoutedConnection._free_floating) > 0:
+            if len(RoutedConnection.free_floating) > 0:
                 raise SpaActionSelectionError(
                     "All actions in an action selection context must be part "
                     "of an ifmax call.")
         finally:
-            RoutedConnection._free_floating.clear()
+            RoutedConnection.free_floating.clear()
 
         if len(self._utilities) <= 0:
             return
@@ -223,7 +152,7 @@ class ActionSelection(Mapping):
             self._name2idx[name] = len(self._actions)
         self._utilities.append(utility)
         self._actions.append(actions)
-        RoutedConnection._free_floating.difference_update(actions)
+        RoutedConnection.free_floating.difference_update(actions)
         return utility
 
 
