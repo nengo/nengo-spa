@@ -2,9 +2,9 @@ import weakref
 
 import nengo
 from nengo.utils.compat import is_number
+import numpy as np
 
-from nengo_spa.actions import ModuleInput
-from nengo_spa.ast.base import Node
+from nengo_spa.ast.base import Node, infer_types, Fixed
 from nengo_spa.ast.dynamic import ModuleOutput
 from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError
@@ -61,6 +61,79 @@ def as_sink(obj):
         return ModuleInput(input_, TScalar)
     else:
         return ModuleInput(input_, TVocabulary(vocab))
+
+
+class ModuleInput(object):
+    """Represents the input to a module with type information.
+
+    Supports the ``>>`` operator to provide input from an AST node. It will
+    create a simple connection by default, but a `.RoutedConnection` instance
+    if used within the context of an `.ActionSelection` instance.
+
+    Parameters
+    ----------
+    input_ : NengoObject
+        Nengo object that retrieves the module input.
+    type_ : nengo_spa.types.Type
+        Type of the input.
+    """
+    routed_mode = False
+
+    def __init__(self, input_, type_):
+        self.input = input_
+        self.type = type_
+
+    def __rrshift__(self, other):
+        if not isinstance(other, Node):
+            return NotImplemented
+        if self.routed_mode:
+            return RoutedConnection(other, self)
+        else:
+            infer_types(self, other)
+            other.connect_to(self.input)
+
+
+class RoutedConnection(object):
+    """Represents a routed connection from an AST node to a `.ModuleInput`.
+
+    A routed connection is passed through an inhibitable channel to allow the
+    routed connection to be disabled.
+
+    Parameters
+    ----------
+    source : nengo_spa.ast.base.Node
+        The AST node providing the source signal.
+    sink : ModuleInput
+        The module input that the source signal should be routed to.
+    """
+
+    free_floating = set()
+
+    def __init__(self, source, sink):
+        self.type = infer_types(source, sink)
+        self.source = source
+        self.sink = sink
+        RoutedConnection.free_floating.add(self)
+
+    def connect_to(self, sink):
+        return self.source.connect_to(sink)
+
+    def construct(self):
+        return self.connect_to(self.sink.input)
+
+    @property
+    def fixed(self):
+        """Whether the source provides a fixed value."""
+        return isinstance(self.source, Fixed)
+
+    def transform(self):
+        """For a fixed source, returns the transform to implement the output.
+        """
+        assert self.fixed
+        if self.type == TScalar:
+            return self.source.evaluate()
+        else:
+            return np.atleast_2d(self.source.evaluate().v).T
 
 
 class SpaOperatorMixin(object):
