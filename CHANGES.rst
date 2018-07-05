@@ -23,6 +23,13 @@ Release History
 0.6.0 (unreleased)
 ==================
 
+**Added**
+
+- Allow to connect to the utility node returned by `ifmax` with the SPA `>>`
+  operator.
+  (`#190 <https://github.com/nengo/nengo_spa/issues/190>`_,
+  `#194 <https://github.com/nengo/nengo_spa/pull/194>`_)
+
 **Changed**
 
 - Require the ``mapping`` argument for associative memories. In addition to
