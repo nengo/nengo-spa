@@ -10,8 +10,7 @@ from nengo_spa.actions import ifmax as actions_ifmax
 from nengo_spa.actions import ModuleInput
 from nengo_spa.ast.base import Node, Noop
 from nengo_spa.ast.dynamic import (
-    input_network_registry, input_vocab_registry, ModuleOutput,
-    output_vocab_registry)
+    input_vocab_registry, ModuleOutput, output_vocab_registry)
 from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TScalar, TVocabulary
@@ -263,7 +262,6 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
             self._input_types[obj.__class__] = extended_type
         obj.__class__ = extended_type
         input_vocab_registry[obj] = vocab
-        input_network_registry[obj] = self
 
     def declare_output(self, obj, vocab):
         """ Declares a network output.

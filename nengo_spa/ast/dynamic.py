@@ -21,7 +21,6 @@ StateRealization = None
 ThalamusRealization = None
 
 
-input_network_registry = weakref.WeakKeyDictionary()
 input_vocab_registry = weakref.WeakKeyDictionary()
 output_vocab_registry = weakref.WeakKeyDictionary()
 
