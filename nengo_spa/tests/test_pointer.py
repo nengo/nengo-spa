@@ -121,6 +121,8 @@ def test_multiply():
         a * None
     with pytest.raises(Exception):
         a * 'string'
+    with pytest.raises(TypeError):
+        a * np.array([1, 2])
 
 
 def test_compare(rng):

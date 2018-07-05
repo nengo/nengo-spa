@@ -36,6 +36,10 @@ Release History
 - Allow action rules without name to have no effects.
   (`#189 <https://github.com/nengo/nengo_spa/issues/189>`_,
   `#191 <https://github.com/nengo/nengo_spa/pull/191>`_)
+- Raise exception when using NumPy arrays in SPA operations which would give
+  unexpected results.
+  (`#192 <https://github.com/nengo/nengo_spa/issues/192>`_,
+  `#193 <https://github.com/nengo/nengo_spa/pull/193>`_)
 
 
 0.5.1 (June 7, 2018)

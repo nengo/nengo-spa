@@ -1,6 +1,7 @@
 import sys
 
 import nengo
+import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
@@ -61,6 +62,11 @@ def test_binary_operation_on_pointer_symbols(op, rng):
         x = eval("PointerSymbol('A', v)" + op + "PointerSymbol('B', v)")
         node = x.construct()
     assert_equal(node.output, vocab.parse('A' + op + 'B').v)
+
+
+def test_pointer_symbol_mul_with_array():
+    with pytest.raises(TypeError):
+        PointerSymbol('X') * np.array([1, 2])
 
 
 @pytest.mark.parametrize('op', ['+', '-'])
