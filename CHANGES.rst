@@ -29,6 +29,11 @@ Release History
   operator.
   (`#190 <https://github.com/nengo/nengo_spa/issues/190>`_,
   `#194 <https://github.com/nengo/nengo_spa/pull/194>`_)
+- The Semantic Pointer names *AbsorbingElement*, *Identity*, and *Zero* now
+  have a special meaning in *Vocabulary* and *nengo_spa.sym* and will return
+  the respective special Semantic Pointers.
+  (`#195 <https://github.com/nengo/nengo_spa/pull/195>`_,
+  `#176 <https://github.com/nengo/nengo_spa/issues/176>`_)
 
 **Changed**
 

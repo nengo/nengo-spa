@@ -10,7 +10,7 @@ from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import Identity, SemanticPointer
 from nengo_spa.vocab import (
-    VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
+    special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
 
 def test_add(rng):
@@ -71,11 +71,20 @@ def test_populate(rng):
         v.populate(u'Aα = A')
 
 
-@pytest.mark.parametrize('name', ('None', 'True', 'False'))
+@pytest.mark.parametrize('name', (
+    'None', 'True', 'False', 'Zero', 'AbsorbingElement', 'Identity'))
 def test_reserved_names(name):
     v = Vocabulary(16)
     with pytest.raises(SpaParseError):
         v.populate(name)
+
+
+@pytest.mark.parametrize('name,sp', sorted(special_sps.items()))
+def test_special_sps(name, sp):
+    v = Vocabulary(16)
+    assert name in v
+    assert np.allclose(v[name].v, sp(16).v)
+    assert np.allclose(v.parse(name).v, sp(16).v)
 
 
 def test_populate_with_transform_on_first_vector(rng):
