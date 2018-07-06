@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 import nengo
 import nengo_spa as spa
@@ -24,6 +25,7 @@ def test_basic(Simulator, plt, seed):
     assert np.all(output[1:] < -0.8)
 
 
+@pytest.mark.slow
 def test_basal_ganglia(Simulator, seed, plt):
     d = 64
     with spa.Network(seed=seed) as m:

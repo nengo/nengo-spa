@@ -289,6 +289,7 @@ def test_non_default_input_and_output(Simulator, rng):
         sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3, atol=0.3)
 
 
+@pytest.mark.slow
 def test_action_selection(Simulator, rng):
     vocab = spa.Vocabulary(64)
     vocab.populate('A; B; C; D; E; F')
