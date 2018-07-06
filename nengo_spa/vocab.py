@@ -10,11 +10,16 @@ import numpy as np
 
 from nengo_spa import pointer
 from nengo_spa.exceptions import SpaParseError
-from nengo_spa.pointer import Identity
+from nengo_spa.pointer import AbsorbingElement, Identity, Zero
 
 
 valid_sp_regex = re.compile('^[A-Z][_a-zA-Z0-9]*$')
-reserved_sp_names = {'None', 'True', 'False'}
+special_sps = {
+    'AbsorbingElement': AbsorbingElement,
+    'Identity': Identity,
+    'Zero': Zero,
+}
+reserved_sp_names = {'None', 'True', 'False'} | set(special_sps.keys())
 
 
 class Vocabulary(Mapping):
@@ -24,6 +29,10 @@ class Vocabulary(Mapping):
     of the semantic pointers and values as the `.SemanticPointer` objects
     themselves. The names of Semantic Pointers must be valid Python 2
     identifiers starting with a capital letter.
+
+    Every vocabulary knows the special elements *AbsorbingElement*, *Identity*,
+    and *Zero*. However, these are not included in the keys returned by `.keys`
+    or the vectors returned by `.vectors`.
 
     Parameters
     -----------
@@ -141,7 +150,7 @@ class Vocabulary(Mapping):
         return best_p
 
     def __contains__(self, key):
-        return key in self._key2idx
+        return key in special_sps or key in self._key2idx
 
     def __len__(self):
         return len(self._vectors)
@@ -159,6 +168,8 @@ class Vocabulary(Mapping):
         # exception.
         if key == '__tracebackhide__':
             raise KeyError()
+        if key in special_sps:
+            return special_sps[key](self.dimensions, self)
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
         return pointer.SemanticPointer(
@@ -174,7 +185,8 @@ class Vocabulary(Mapping):
         ----------
         key : str
             Name of the Semantic Pointer. Must be a valid Python 2 identifier
-            starting with a capital letter.
+            starting with a capital letter. Must not be *AbsorbingElement*,
+            *Identity*, or *Zero*.
         p : SemanticPointer or array_like
             Semantic Pointer to add.
         """
