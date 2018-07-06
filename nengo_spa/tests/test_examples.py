@@ -18,12 +18,15 @@ _pytest.capture.DontReadFromInput.flush = lambda: None
 
 example_dir = 'docs/examples'
 
-too_slow = ['question',
-            'question_control',
-            'question_memory',
-            'spa_parser',
-            'spa_sequence',
-            'spa_sequence_routed']
+too_slow = [
+    'intro',
+    'intro_coming_from_legacy_spa',
+    'question',
+    'question_control',
+    'question_memory',
+    'spa_parser',
+    'spa_sequence',
+    'spa_sequence_routed']
 
 all_examples, slow_examples, fast_examples = [], [], []
 
