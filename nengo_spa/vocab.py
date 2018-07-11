@@ -9,6 +9,7 @@ from nengo.utils.compat import is_number, is_integer, range
 import numpy as np
 
 from nengo_spa import pointer
+from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import AbsorbingElement, Identity, Zero
 
@@ -77,6 +78,7 @@ class Vocabulary(Mapping):
     def __init__(
             self, dimensions, strict=True, max_similarity=0.1, rng=None,
             name=None):
+        self.algebra = CircularConvolutionAlgebra()
 
         if not is_integer(dimensions) or dimensions < 1:
             raise ValidationError("dimensions must be a positive integer",
@@ -359,7 +361,7 @@ class Vocabulary(Mapping):
         """
         # Make new Vocabulary object
         subset = Vocabulary(self.dimensions, self.strict, self.max_similarity,
-                            self.rng)
+                            self.rng, algebra=self.algebra)
 
         # Copy over the new keys
         for key in keys:

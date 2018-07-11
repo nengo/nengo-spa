@@ -71,7 +71,7 @@ class DynamicNode(Node):
             if self.type == TScalar:
                 tr = other.evaluate().v
             else:
-                tr = other.evaluate().get_convolution_matrix()
+                tr = other.evaluate().get_binding_matrix()
         else:
             raise AssertionError("Unexpected node type in multiply.")
         return Transformed(self, tr, self.type)

@@ -8,6 +8,7 @@ from numpy.testing import assert_equal
 import pytest
 
 import nengo_spa as spa
+from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
@@ -65,8 +66,8 @@ def test_str():
 
 
 @pytest.mark.parametrize('d', [65, 100])
-def test_make_unitary(d, rng):
-    a = SemanticPointer(d, rng=rng)
+def test_make_unitary(algebra, d, rng):
+    a = SemanticPointer(d, rng=rng, algebra=algebra)
     b = a.unitary()
     assert a is not b
     assert np.allclose(1, b.length())
@@ -74,34 +75,34 @@ def test_make_unitary(d, rng):
     assert np.allclose(1, (b * b * b).length())
 
 
-def test_add_sub():
-    a = SemanticPointer(10)
-    b = SemanticPointer(10)
+def test_add_sub(algebra, rng):
+    a = SemanticPointer(10, rng, algebra=algebra)
+    b = SemanticPointer(10, rng, algebra=algebra)
     c = a.copy()
     d = b.copy()
 
     c += b
     d -= -a
 
-    assert np.allclose((a + b).v, a.v + b.v)
+    assert np.allclose((a + b).v, algebra.superpose(a.v, b.v))
     assert np.allclose((a + b).v, c.v)
     assert np.allclose((a + b).v, d.v)
     assert np.allclose((a + b).v, (a - (-b)).v)
 
 
 @pytest.mark.parametrize('d', [64, 65])
-def test_convolution(d, rng):
-    a = SemanticPointer(d, rng=rng)
-    b = SemanticPointer(d, rng=rng)
-    identity = SemanticPointer(np.eye(d)[0])
+def test_binding_and_inversion(algebra, d, rng):
+    a = SemanticPointer(d, rng=rng, algebra=algebra)
+    b = SemanticPointer(d, rng=rng, algebra=algebra)
+    identity = SemanticPointer(np.eye(d)[0], algebra=algebra)
 
     c = a.copy()
     c *= b
 
-    conv_ans = np.fft.irfft(np.fft.rfft(a.v) * np.fft.rfft(b.v), n=d)
+    conv_ans = algebra.bind(a.v, b.v)
 
     assert np.allclose((a * b).v, conv_ans)
-    assert np.allclose(a.convolve(b).v, conv_ans)
+    assert np.allclose(a.bind(b).v, conv_ans)
     assert np.allclose(c.v, conv_ans)
     assert np.allclose((a * identity).v, a.v)
     assert (a * b * ~b).compare(a) > 0.6
@@ -154,13 +155,6 @@ def test_distance(rng):
     assert a.distance(b) > 0.85
 
 
-def test_invert():
-    a = SemanticPointer(50)
-    assert a.v[0] == (~a).v[0]
-    assert a.v[49] == (~a).v[1]
-    assert np.allclose(a.v[1:], (~a).v[:0:-1])
-
-
 def test_len():
     a = SemanticPointer(5)
     assert len(a) == 5
@@ -184,11 +178,11 @@ def test_mse():
     assert np.allclose(((a - b).length() ** 2) / 50, a.mse(b))
 
 
-def test_conv_matrix():
-    a = SemanticPointer(50)
-    b = SemanticPointer(50)
+def test_binding_matrix(algebra, rng):
+    a = SemanticPointer(50, rng, algebra=algebra)
+    b = SemanticPointer(50, rng, algebra=algebra)
 
-    m = b.get_convolution_matrix()
+    m = b.get_binding_matrix()
 
     assert np.allclose((a*b).v, np.dot(m, a.v))
 
@@ -250,6 +244,20 @@ def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
         skip=0.3)
+
+
+@pytest.mark.parametrize('op', ('+', '*'))
+def test_incompatible_algebra(op):
+    class AlgA(CircularConvolutionAlgebra):
+        pass
+
+    class AlgB(CircularConvolutionAlgebra):
+        pass
+
+    a = SemanticPointer(32, algebra=AlgA)  # noqa: F841
+    b = SemanticPointer(32, algebra=AlgB)  # noqa: F841
+    with pytest.raises(TypeError):
+        eval('a' + op + 'b')
 
 
 def test_identity(rng):

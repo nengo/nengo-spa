@@ -215,8 +215,8 @@ def test_readonly(rng):
         v1.parse('D')
 
 
-def test_subset(rng):
-    v1 = Vocabulary(32, rng=rng)
+def test_subset(rng, algebra):
+    v1 = Vocabulary(32, rng=rng, algebra=algebra)
     v1.populate('A; B; C; D; E; F; G')
 
     # Test creating a vocabulary subset
@@ -225,6 +225,8 @@ def test_subset(rng):
     assert_equal(v2['A'].v, v1['A'].v)
     assert_equal(v2['C'].v, v1['C'].v)
     assert_equal(v2['E'].v, v1['E'].v)
+
+    assert v1.algebra is v2.algebra
 
 
 def test_vocabulary_tracking(rng):

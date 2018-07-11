@@ -1,8 +1,9 @@
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_array, is_integer, is_number, range
+from nengo.utils.compat import is_array, is_integer, is_number
 import numpy as np
 
+from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
@@ -21,20 +22,37 @@ class SemanticPointer(Fixed):
     rng : numpy.random.RandomState, optional
         Random number generator used for random generation of a Semantic
         Pointer.
-    vocab : Vocabulary
+    vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
+        Mutually exclusive with the *algebra* argument.
+    algebra = Algebra, optional
+        Algebra used to perform vector symbolic operations on the Semantic
+        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        with the *vocab* argument.
 
     Attributes
     ----------
     v : array_like
         The vector constituting the Semantic Pointer.
+    algebra : Algebra
+        Algebra that defines the vector symbolic operations on this Semantic
+        Pointer.
     vocab : Vocabulary or None
         The vocabulary the this Semantic Pointer is considered to be part of.
     """
 
-    def __init__(self, data, rng=None, vocab=None):
+    def __init__(self, data, rng=None, vocab=None, algebra=None):
         super(SemanticPointer, self).__init__(
             TAnyVocab if vocab is None else TVocabulary(vocab))
+        if algebra is None:
+            if vocab is None:
+                algebra = CircularConvolutionAlgebra
+            else:
+                algebra = vocab.algebra
+        elif vocab is not None:
+            raise ValueError(
+                "vocab and algebra argument are mutually exclusive")
+        self.algebra = algebra
 
         if rng is None:
             rng = np.random
@@ -82,13 +100,8 @@ class SemanticPointer(Fixed):
         the length of Semantic Pointers it is bound with using circular
         convolution.
         """
-        fft_val = np.fft.fft(self.v)
-        fft_imag = fft_val.imag
-        fft_real = fft_val.real
-        fft_norms = np.sqrt(fft_imag ** 2 + fft_real ** 2)
-        fft_unit = fft_val / fft_norms
-        return SemanticPointer(np.array((np.fft.ifft(
-            fft_unit, n=len(self))).real), vocab=self.vocab)
+        return SemanticPointer(
+            self.algebra.make_unitary(self.v), vocab=self.vocab)
 
     def copy(self):
         """Return another semantic pointer with the same data."""
@@ -109,19 +122,25 @@ class SemanticPointer(Fixed):
     def __add__(self, other):
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
-        return SemanticPointer(data=self.v + other.evaluate().v, vocab=vocab)
+        if vocab is None:
+            self._ensure_algebra_match(other)
+        return SemanticPointer(data=self.algebra.superpose(
+            self.v, other.evaluate().v), vocab=vocab)
 
+    @TypeCheckedBinaryOp(Fixed)
     def __radd__(self, other):
-        return self + other
+        type_ = infer_types(self, other)
+        vocab = None if type_ == TAnyVocab else type_.vocab
+        if vocab is None:
+            self._ensure_algebra_match(other)
+        return SemanticPointer(data=self.algebra.superpose(
+            other.evaluate().v, self.v), vocab=vocab)
 
     def __neg__(self):
         return SemanticPointer(data=-self.v, vocab=self.vocab)
 
-    @TypeCheckedBinaryOp(Fixed)
     def __sub__(self, other):
-        type_ = infer_types(self, other)
-        vocab = None if type_ == TAnyVocab else type_.vocab
-        return SemanticPointer(data=self.v - other.evaluate().v, vocab=vocab)
+        return self + (-other)
 
     def __rsub__(self, other):
         return (-self) + other
@@ -142,7 +161,7 @@ class SemanticPointer(Fixed):
                 return SemanticPointer(
                     data=self.v * other.evaluate(), vocab=self.vocab)
             else:
-                return self.convolve(other)
+                return self.bind(other)
         else:
             return NotImplemented
 
@@ -151,7 +170,20 @@ class SemanticPointer(Fixed):
 
         If multiplied by a scalar, we do normal multiplication.
         """
-        return self.__mul__(other)
+        if is_array(other):
+            raise TypeError(
+                "Multiplication of Semantic Pointers with arrays in not "
+                "allowed.")
+        elif is_number(other):
+            return SemanticPointer(data=self.v * other, vocab=self.vocab)
+        elif isinstance(other, Fixed):
+            if other.type == TScalar:
+                return SemanticPointer(
+                    data=self.v * other.evaluate(), vocab=self.vocab)
+            else:
+                return self.rbind(other)
+        else:
+            return NotImplemented
 
     def __invert__(self):
         """Return a reorganized vector that acts as an inverse for convolution.
@@ -162,28 +194,33 @@ class SemanticPointer(Fixed):
         For the vector ``[1, 2, 3, 4, 5]``, the inverse is ``[1, 5, 4, 3, 2]``.
         """
         return SemanticPointer(
-            data=self.v[-np.arange(len(self))], vocab=self.vocab)
+            data=self.algebra.invert(self.v), vocab=self.vocab)
 
-    def convolve(self, other):
-        """Return the circular convolution of two SemanticPointers."""
+    def bind(self, other):
+        """Return the binding of two SemanticPointers."""
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
-        n = len(self)
-        x = np.fft.irfft(
-            np.fft.rfft(self.v) * np.fft.rfft(other.evaluate().v), n=n)
-        return SemanticPointer(data=x, vocab=vocab)
+        if vocab is None:
+            self._ensure_algebra_match(other)
+        return SemanticPointer(
+            data=self.algebra.bind(self.v, other.evaluate().v), vocab=vocab)
 
-    def get_convolution_matrix(self):
-        """Return the matrix that does a circular convolution by this vector.
+    def rbind(self, other):
+        """Return the binding of two SemanticPointers."""
+        type_ = infer_types(self, other)
+        vocab = None if type_ == TAnyVocab else type_.vocab
+        if vocab is None:
+            self._ensure_algebra_match(other)
+        return SemanticPointer(
+            data=self.algebra.bind(other.evaluate().v, self.v), vocab=vocab)
+
+    def get_binding_matrix(self):
+        """Return the matrix that does a binding with this vector.
 
         This should be such that
-        ``A*B == dot(A.get_convolution_matrix(), B.v)``.
+        ``A*B == dot(A.get_binding_matrix(), B.v)``.
         """
-        D = len(self.v)
-        T = []
-        for i in range(D):
-            T.append([self.v[(i - j) % D] for j in range(D)])
-        return np.array(T)
+        return self.algebra.get_binding_matrix(self.v)
 
     def dot(self, other):
         """Return the dot product of the two vectors."""
@@ -230,6 +267,18 @@ class SemanticPointer(Fixed):
             infer_types(self, other)
             other = other.evaluate().v
         return np.sum((self.v - other)**2) / len(self.v)
+
+    def _ensure_algebra_match(self, other):
+        """Check the algebra of the *other*.
+
+        If the *other* parameter is a `SemanticPointer` and uses a different
+        algebra, a `TypeError` will be raised.
+        """
+        if isinstance(other, SemanticPointer):
+            if self.algebra is not other.algebra:
+                raise TypeError(
+                    "Operation not supported for SemanticPointer with "
+                    "different algebra.")
 
 
 class Identity(SemanticPointer):
