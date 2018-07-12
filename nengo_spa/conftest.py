@@ -22,9 +22,5 @@ class TestConfig(object):
 
 
 def pytest_generate_tests(metafunc):
-    marks = [
-        getattr(pytest.mark, m.name)(*m.args, **m.kwargs)
-        for m in getattr(metafunc.function, 'pytestmark', [])]
-
     if 'algebra' in metafunc.funcargnames:
         metafunc.parametrize('algebra', [a for a in TestConfig.algebras])
