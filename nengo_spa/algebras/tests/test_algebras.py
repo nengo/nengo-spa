@@ -45,3 +45,24 @@ def test_get_binding_matrix(algebra, rng):
     m = algebra.get_binding_matrix(b)
 
     assert np.allclose(algebra.bind(a, b), np.dot(m, a))
+
+
+def test_absorbing_element(algebra, rng):
+    a = SemanticPointer(64, rng).v
+    p = algebra.absorbing_element(64)
+    r = algebra.bind(a, p)
+    r /= np.linalg.norm(r)
+    assert np.allclose(p, r) or np.allclose(p, -r)
+
+
+def test_identity_element(algebra, rng):
+    a = SemanticPointer(64, rng).v
+    p = algebra.identity_element(64)
+    assert np.allclose(algebra.bind(a, p), a)
+
+
+def test_zero_element(algebra, rng):
+    a = SemanticPointer(64, rng).v
+    p = algebra.zero_element(64)
+    assert np.all(p == 0.)
+    assert np.allclose(algebra.bind(a, p), 0.)

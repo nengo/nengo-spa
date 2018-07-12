@@ -260,24 +260,15 @@ def test_incompatible_algebra(op):
         eval('a' + op + 'b')
 
 
-def test_identity(rng):
-    p = Identity(64)
-    assert len(p) == 64
-    assert np.sum(p.v) == 1.
-    a = SemanticPointer(64, rng)
-    assert np.allclose(a.v, (a * p).v)
+def test_identity(algebra):
+    assert np.allclose(
+        Identity(64, algebra=algebra).v, algebra.identity_element(64))
 
 
-def test_absorbing_element(rng):
-    p = AbsorbingElement(64)
-    assert len(p) == 64
-    assert p.length() == 1.
-    a = SemanticPointer(64, rng)
-    assert np.allclose(p.v, np.abs((a * p).normalized().v))
-    assert np.allclose(p.v, np.abs((a * -p).normalized().v))
+def test_absorbing_element(algebra):
+    assert np.allclose(
+        AbsorbingElement(64, algebra=algebra).v, algebra.absorbing_element(64))
 
 
-def test_zero():
-    z = Zero(64)
-    assert len(z) == 64
-    assert np.all(z.v == 0.)
+def test_zero(algebra):
+    assert np.allclose(Zero(64, algebra=algebra).v, algebra.zero_element(64))

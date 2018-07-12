@@ -8,7 +8,7 @@ import pytest
 
 from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
-from nengo_spa.pointer import Identity, SemanticPointer
+from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vocab import (
     special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
@@ -136,7 +136,8 @@ def test_parse_n(rng):
     assert np.allclose(parsed[0].v, A.v)
     assert np.allclose(parsed[1].v, (A * B).v)
     assert np.allclose(parsed[2].v, (A + B).v)
-    assert np.allclose(parsed[3].v, 3 * Identity(64).v)
+    # FIXME should give an exception?
+    assert np.allclose(parsed[3].v, 3 * v['Identity'].v)
 
 
 def test_invalid_dimensions():
