@@ -14,8 +14,8 @@ from nengo_spa.testing import sp_close
 
 @pytest.mark.parametrize('op', ['-', '~'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
-def test_unary_operation_on_module(Simulator, op, suffix, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A')
 
     with spa.Network() as model:
@@ -31,8 +31,8 @@ def test_unary_operation_on_module(Simulator, op, suffix, rng):
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
-def test_binary_operation_on_modules(Simulator, op, suffix, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -52,8 +52,8 @@ def test_binary_operation_on_modules(Simulator, op, suffix, rng):
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_pointer_symbol(
-        Simulator, op, order, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+        Simulator, algebra, op, order, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -77,8 +77,8 @@ def test_binary_operation_on_modules_with_pointer_symbol(
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_fixed_pointer(
-        Simulator, op, order, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+        Simulator, algebra, op, order, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
     b = SemanticPointer(vocab['B'].v)  # noqa: F841
 
@@ -100,8 +100,8 @@ def test_binary_operation_on_modules_with_fixed_pointer(
         skip=0.3)
 
 
-def test_complex_rule(Simulator, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_complex_rule(Simulator, algebra, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B; C; D')
 
     with spa.Network() as model:
@@ -121,8 +121,8 @@ def test_complex_rule(Simulator, rng):
         skip=0.3, normalized=True)
 
 
-def test_transformed(Simulator, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_transformed(Simulator, algebra, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -138,8 +138,8 @@ def test_transformed(Simulator, rng):
         normalized=True)
 
 
-def test_transformed_and_pointer_symbol(Simulator, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -155,8 +155,8 @@ def test_transformed_and_pointer_symbol(Simulator, rng):
         normalized=True)
 
 
-def test_transformed_and_network(Simulator, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_transformed_and_network(Simulator, algebra, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B.unitary()')
 
     with spa.Network() as model:
@@ -173,8 +173,8 @@ def test_transformed_and_network(Simulator, rng):
         normalized=True)
 
 
-def test_transformed_and_transformed(Simulator, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+def test_transformed_and_transformed(Simulator, algebra, rng):
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B.unitary(); C')
 
     with spa.Network() as model:

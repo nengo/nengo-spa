@@ -1,5 +1,8 @@
+import nengo
 from nengo.utils.compat import range
 import numpy as np
+
+from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
 class CircularConvolutionAlgebra(object):
@@ -40,6 +43,20 @@ class CircularConvolutionAlgebra(object):
         for i in range(D):
             T.append([v[(i - j) % D] for j in range(D)])
         return np.array(T)
+
+    @classmethod
+    def get_inversion_matrix(cls, d):
+        return np.eye(d)[-np.arange(d)]
+
+    @classmethod
+    def implement_superposition(cls, n_neurons_per_d, d, n):
+        node = nengo.Node(size_in=d)
+        return node, n * (node,), node
+
+    @classmethod
+    def implement_binding(cls, n_neurons_per_d, d, invert_a, invert_b):
+        net = CircularConvolution(n_neurons_per_d, d, invert_a, invert_b)
+        return net, (net.input_a, net.input_b), net.output
 
     @classmethod
     def absorbing_element(cls, d):
