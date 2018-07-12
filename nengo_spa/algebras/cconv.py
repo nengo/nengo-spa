@@ -40,3 +40,17 @@ class CircularConvolutionAlgebra(object):
         for i in range(D):
             T.append([v[(i - j) % D] for j in range(D)])
         return np.array(T)
+
+    @classmethod
+    def absorbing_element(cls, d):
+        return np.ones(d) / np.sqrt(d)
+
+    @classmethod
+    def identity_element(cls, d):
+        data = np.zeros(d)
+        data[0] = 1.
+        return data
+
+    @classmethod
+    def zero_element(cls, d):
+        return np.zeros(d)

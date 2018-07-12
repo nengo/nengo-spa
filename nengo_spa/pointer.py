@@ -44,15 +44,7 @@ class SemanticPointer(Fixed):
     def __init__(self, data, rng=None, vocab=None, algebra=None):
         super(SemanticPointer, self).__init__(
             TAnyVocab if vocab is None else TVocabulary(vocab))
-        if algebra is None:
-            if vocab is None:
-                algebra = CircularConvolutionAlgebra
-            else:
-                algebra = vocab.algebra
-        elif vocab is not None:
-            raise ValueError(
-                "vocab and algebra argument are mutually exclusive")
-        self.algebra = algebra
+        self.algebra = self._get_algebra(vocab, algebra)
 
         if rng is None:
             rng = np.random
@@ -71,6 +63,17 @@ class SemanticPointer(Fixed):
         self.v.setflags(write=False)
 
         self.vocab = vocab
+
+    def _get_algebra(cls, vocab, algebra):
+        if algebra is None:
+            if vocab is None:
+                algebra = CircularConvolutionAlgebra
+            else:
+                algebra = vocab.algebra
+        elif vocab is not None:
+            raise ValueError(
+                "vocab and algebra argument are mutually exclusive")
+        return algebra
 
     def evaluate(self):
         return self
@@ -282,20 +285,24 @@ class SemanticPointer(Fixed):
 
 
 class Identity(SemanticPointer):
-    """Circular convolution identity.
+    """Identity element.
 
     Parameters
     ----------
     n_dimensions : int
         Dimensionality of the identity vector.
-    vocab : Vocabulary
+    vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
+        Mutually exclusive with the *algebra* argument.
+    algebra = Algebra, optional
+        Algebra used to perform vector symbolic operations on the Semantic
+        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        with the `vocab` argument.
     """
 
-    def __init__(self, n_dimensions, vocab=None):
-        data = np.zeros(n_dimensions)
-        data[0] = 1.
-        super(Identity, self).__init__(data, vocab=vocab)
+    def __init__(self, n_dimensions, vocab=None, algebra=None):
+        data = self._get_algebra(vocab, algebra).identity_element(n_dimensions)
+        super(Identity, self).__init__(data, vocab=vocab, algebra=algebra)
 
 
 class AbsorbingElement(SemanticPointer):
@@ -309,12 +316,19 @@ class AbsorbingElement(SemanticPointer):
     ----------
     n_dimensions : int
         Dimensionality of the identity vector.
-    vocab : Vocabulary
+    vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
+        Mutually exclusive with the *algebra* argument.
+    algebra = Algebra, optional
+        Algebra used to perform vector symbolic operations on the Semantic
+        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        with the `vocab` argument.
     """
-    def __init__(self, n_dimensions, vocab=None):
-        data = np.ones(n_dimensions) / np.sqrt(n_dimensions)
-        super(AbsorbingElement, self).__init__(data, vocab=vocab)
+    def __init__(self, n_dimensions, vocab=None, algebra=None):
+        data = self._get_algebra(vocab, algebra).absorbing_element(
+            n_dimensions)
+        super(AbsorbingElement, self).__init__(
+            data, vocab=vocab, algebra=algebra)
 
 
 class Zero(SemanticPointer):
@@ -324,8 +338,14 @@ class Zero(SemanticPointer):
     ----------
     n_dimensions : int
         Dimensionality of the identity vector.
-    vocab : Vocabulary
+    vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
+        Mutually exclusive with the *algebra* argument.
+    algebra = Algebra, optional
+        Algebra used to perform vector symbolic operations on the Semantic
+        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        with the `vocab` argument.
     """
-    def __init__(self, n_dimensions, vocab=None):
-        super(Zero, self).__init__(np.zeros(n_dimensions), vocab=vocab)
+    def __init__(self, n_dimensions, vocab=None, algebra=None):
+        data = self._get_algebra(vocab, algebra).zero_element(n_dimensions)
+        super(Zero, self).__init__(data, vocab=vocab, algebra=algebra)
