@@ -21,11 +21,11 @@ def test_basic():
 
 def test_run(Simulator, algebra, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(32, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
-    with spa.Network(seed=seed, vocabs=VocabularyMap([vocab])) as model:
-        model.bind = spa.Bind(vocab=32)
+    with spa.Network(seed=seed) as model:
+        model.bind = spa.Bind(vocab)
 
         def inputA(t):
             if 0 <= t < 0.1:

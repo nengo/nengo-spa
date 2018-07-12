@@ -60,7 +60,7 @@ class DynamicNode(Node):
     def __rsub__(self, other):
         return (-self) + other
 
-    def _mul_with_fixed(self, other):
+    def _mul_with_fixed(self, other, swap_inputs=False):
         infer_types(self, other)
         if other.type == TScalar:
             tr = other.value
@@ -72,7 +72,8 @@ class DynamicNode(Node):
             if self.type == TScalar:
                 tr = other.evaluate().v
             else:
-                tr = other.evaluate().get_binding_matrix()
+                tr = other.evaluate().get_binding_matrix(
+                    swap_inputs=swap_inputs)
         else:
             raise AssertionError("Unexpected node type in multiply.")
         return Transformed(self, tr, self.type)
@@ -105,7 +106,7 @@ class DynamicNode(Node):
     @binary_node_op
     def __rmul__(self, other):
         if isinstance(other, Symbol):
-            return self._mul_with_fixed(other)
+            return self._mul_with_fixed(other, swap_inputs=True)
         else:
             return self._mul_with_dynamic(other, swap_inputs=True)
 

@@ -42,10 +42,10 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.2,
         atol=0.3)
 
 
@@ -97,7 +97,7 @@ def test_binary_operation_on_modules_with_fixed_pointer(
 
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
-        skip=0.3)
+        skip=0.3, atol=0.3)
 
 
 def test_complex_rule(Simulator, algebra, rng):
@@ -144,14 +144,14 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
 
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
-        x = PointerSymbol('~B') * (PointerSymbol('B') * a)
+        x = (a * PointerSymbol('B')) * PointerSymbol('~B')
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('~B * B * A'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.3,
         normalized=True)
 
 
@@ -162,14 +162,14 @@ def test_transformed_and_network(Simulator, algebra, rng):
     with spa.Network() as model:
         a = spa.Transcode('A', output_vocab=vocab)
         b = spa.Transcode('B', output_vocab=vocab)
-        x = b * (PointerSymbol('~B') * a)
+        x = (a * PointerSymbol('~B')) * b
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('B * ~B * A'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('A * ~B * B'), skip=0.3,
         normalized=True)
 
 
@@ -187,7 +187,7 @@ def test_transformed_and_transformed(Simulator, algebra, rng):
         sim.run(0.5)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('B * A * ~B * C'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('(B * A) * (~B * C)'), skip=0.3,
         normalized=True)
 
 
