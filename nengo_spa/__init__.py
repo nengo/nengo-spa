@@ -12,6 +12,7 @@ from nengo_spa.modules import (
     Product,
     Scalar,
     State,
+    Superposition,
     Thalamus,
     Transcode)
 from nengo_spa.network import create_inhibit_node, ifmax, Network

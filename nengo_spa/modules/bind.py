@@ -8,17 +8,13 @@ from nengo_spa.vocab import VocabularyOrDimParam
 class Bind(Network):
     """Network for binding together two inputs.
 
-    Binding is done with circular convolution. For more details on how
-    this is computed, see the underlying `.CircularConvolution`
-    network.
-
     Parameters
     ----------
     vocab : Vocabulary or int
         The vocabulary to use to interpret the vector. If an integer is given,
         the default vocabulary of that dimensionality will be used.
     neurons_per_dimension : int, optional (Default: 200)
-        Number of neurons to use in each product computation.
+        Number of neurons to use in each dimension.
     invert_a : bool, optional
         Whether to reverse the order of elements in first input.
     invert_b : bool, optional
@@ -56,13 +52,14 @@ class Bind(Network):
         self.invert_b = invert_b
 
         with self:
-            self.cc = nengo_spa.networks.CircularConvolution(
-                self.neurons_per_dimension, self.vocab.dimensions,
-                self.invert_a, self.invert_b)
+            self.binding_net, inputs, output = (
+                self.vocab.algebra.implement_binding(
+                    self.neurons_per_dimension, self.vocab.dimensions,
+                    self.invert_a, self.invert_b))
 
-        self.input_a = self.cc.input_a
-        self.input_b = self.cc.input_b
-        self.output = self.cc.output
+        self.input_a = inputs[0]
+        self.input_b = inputs[1]
+        self.output = output
 
         self.declare_input(self.input_a, self.vocab)
         self.declare_input(self.input_b, self.vocab)

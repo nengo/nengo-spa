@@ -54,6 +54,9 @@ class Vocabulary(Mapping):
         The random number generator to use to create new vectors.
     name : str
         A name to display in the string representation of this vocabulary.
+    algebra : Algebra, optional
+        Defines the vector symbolic operators used for Semantic Pointers in the
+        vocabulary. Defaults to `.CircularConvolutionAlgebra`.
 
     Attributes
     ----------
@@ -73,12 +76,17 @@ class Vocabulary(Mapping):
     vectors : ndarray
         All of the semantic pointer vectors in a matrix, in the same order
         as in `keys`.
+    algebra : Algebra, optional
+        Defines the vector symbolic operators used for Semantic Pointers in the
+        vocabulary.
     """
 
     def __init__(
             self, dimensions, strict=True, max_similarity=0.1, rng=None,
-            name=None):
-        self.algebra = CircularConvolutionAlgebra()
+            name=None, algebra=None):
+        if algebra is None:
+            algebra = CircularConvolutionAlgebra
+        self.algebra = algebra
 
         if not is_integer(dimensions) or dimensions < 1:
             raise ValidationError("dimensions must be a positive integer",

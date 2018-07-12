@@ -26,6 +26,7 @@ from .compare import Compare
 from .product import Product
 from .scalar import Scalar
 from .state import State
+from .superposition import Superposition
 from .thalamus import Thalamus
 from .transcode import Transcode
 
@@ -37,6 +38,7 @@ def _register_default_modules():
     _dynamic.ProductRealization = Product
     _dynamic.ScalarRealization = Scalar
     _dynamic.StateRealization = State
+    _dynamic.SuperpositionRealization = Superposition
     _dynamic.ThalamusRealization = Thalamus
 
 

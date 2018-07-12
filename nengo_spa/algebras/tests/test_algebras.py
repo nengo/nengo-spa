@@ -47,6 +47,12 @@ def test_get_binding_matrix(algebra, rng):
     assert np.allclose(algebra.bind(a, b), np.dot(m, a))
 
 
+def test_get_inversion_matrix(algebra, rng):
+    a = SemanticPointer(50, rng).v
+    m = algebra.get_inversion_matrix(50)
+    assert np.allclose(algebra.invert(a), np.dot(m, a))
+
+
 def test_absorbing_element(algebra, rng):
     a = SemanticPointer(64, rng).v
     p = algebra.absorbing_element(64)

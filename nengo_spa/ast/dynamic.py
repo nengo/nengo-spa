@@ -16,6 +16,7 @@ DotProductRealization = None
 ProductRealization = None
 ScalarRealization = None
 StateRealization = None
+SuperpositionRealization = None
 ThalamusRealization = None
 
 
@@ -32,11 +33,11 @@ class DynamicNode(Node):
     """Base class for AST node with an output that changes over time."""
 
     def __invert__(self):
-        if not hasattr(self.type, 'dimensions'):
+        if not hasattr(self.type, 'vocab'):
             raise SpaTypeError(
-                "Cannot invert semantic pointer of unknown dimensionality.")
-        dimensions = self.type.dimensions
-        transform = np.eye(dimensions)[-np.arange(dimensions)]
+                "Cannot invert semantic pointer with unknown vocabulary.")
+        dimensions = self.type.vocab.dimensions
+        transform = self.type.vocab.algebra.get_inversion_matrix(dimensions)
         return Transformed(self, transform, self.type)
 
     def __neg__(self):
@@ -195,14 +196,24 @@ class Summed(DynamicNode):
         self.sources = sources
 
     def connect_to(self, sink, **kwargs):
-        for s in self.sources:
-            s.connect_to(sink, **kwargs)
+        if self.type == TScalar:
+            for s in self.sources:
+                s.connect_to(sink, **kwargs)
+        else:
+            nengo.Connection(self.construct(), sink, **kwargs)
 
     def construct(self):
-        dimensions = 1 if self.type == TScalar else self.type.dimensions
-        node = nengo.Node(size_in=dimensions)
-        self.connect_to(node, synapse=None)
-        return node
+        if self.type == TScalar:
+            node = nengo.Node(size_in=1)
+            for s in self.sources:
+                s.connect_to(node, synapse=None)
+            return node
+        else:
+            module = SuperpositionRealization(
+                len(self.sources), self.type.vocab)
+            for s, i in zip(self.sources, module.inputs):
+                s.connect_to(i, synapse=None)
+            return module.output
 
 
 class ModuleOutput(DynamicNode):
