@@ -1,5 +1,9 @@
+import nengo
+from nengo.dists import CosineSimilarity
 from nengo.utils.compat import range
 import numpy as np
+
+from nengo_spa.networks.matrix_multiplication import MatrixMult
 
 
 class VtbAlgebra(object):
@@ -70,11 +74,37 @@ class VtbAlgebra(object):
 
     @classmethod
     def implement_superposition(cls, n_neurons_per_d, d, n):
-        raise NotImplementedError()
+        node = nengo.Node(size_in=d)
+        return node, n * (node,), node
 
     @classmethod
     def implement_binding(cls, n_neurons_per_d, d, invert_a, invert_b):
-        raise NotImplementedError()
+        sub_d = cls._get_sub_d(d)
+        shape_left = (sub_d, sub_d)
+        shape_right = (sub_d, 1)
+
+        with nengo.Network() as net:
+            net.input_a = nengo.Node(size_in=d)
+            net.input_b = nengo.Node(size_in=d)
+            net.output = nengo.Node(size_in=d)
+
+            with nengo.Config(nengo.Ensemble) as cfg:
+                cfg[nengo.Ensemble].intercepts = CosineSimilarity(d+2)
+                cfg[nengo.Ensemble].eval_points = CosineSimilarity(d+2)
+                net.matmuls = [
+                    MatrixMult(n_neurons_per_d, shape_left, shape_right)
+                    for i in range(sub_d)]
+
+            for i in range(sub_d):
+                mm = net.matmuls[i]
+                sl = slice(i * sub_d, (i + 1) * sub_d)
+                nengo.Connection(net.input_b, mm.input_left, synapse=None)
+                nengo.Connection(
+                    net.input_a[sl], mm.input_right, synapse=None)
+                nengo.Connection(
+                    mm.output, net.output[sl], transform=np.sqrt(sub_d),
+                    synapse=None)
+        return net, (net.input_a, net.input_b), net.output
 
     @classmethod
     def absorbing_element(cls, d):
