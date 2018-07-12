@@ -13,6 +13,10 @@ class CircularConvolutionAlgebra(object):
     """
 
     @classmethod
+    def is_valid_dimensionality(cls, d):
+        return d > 0
+
+    @classmethod
     def make_unitary(cls, v):
         fft_val = np.fft.fft(v)
         fft_imag = fft_val.imag

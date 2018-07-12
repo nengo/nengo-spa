@@ -65,8 +65,11 @@ def test_str():
     assert str(a) == str(np.array([1., 1.]))
 
 
-@pytest.mark.parametrize('d', [65, 100])
+@pytest.mark.parametrize('d', [64, 65, 100])
 def test_make_unitary(algebra, d, rng):
+    if not algebra.is_valid_dimensionality(d):
+        return
+
     a = SemanticPointer(d, rng=rng, algebra=algebra)
     b = a.unitary()
     assert a is not b
@@ -92,9 +95,12 @@ def test_add_sub(algebra, rng):
 
 @pytest.mark.parametrize('d', [64, 65])
 def test_binding_and_inversion(algebra, d, rng):
+    if not algebra.is_valid_dimensionality(d):
+        return
+
     a = SemanticPointer(d, rng=rng, algebra=algebra)
     b = SemanticPointer(d, rng=rng, algebra=algebra)
-    identity = SemanticPointer(np.eye(d)[0], algebra=algebra)
+    identity = Identity(d, algebra=algebra)
 
     c = a.copy()
     c *= b
@@ -179,8 +185,8 @@ def test_mse():
 
 
 def test_binding_matrix(algebra, rng):
-    a = SemanticPointer(50, rng, algebra=algebra)
-    b = SemanticPointer(50, rng, algebra=algebra)
+    a = SemanticPointer(64, rng, algebra=algebra)
+    b = SemanticPointer(64, rng, algebra=algebra)
 
     m = b.get_binding_matrix()
 
@@ -266,8 +272,12 @@ def test_identity(algebra):
 
 
 def test_absorbing_element(algebra):
-    assert np.allclose(
-        AbsorbingElement(64, algebra=algebra).v, algebra.absorbing_element(64))
+    try:
+        assert np.allclose(
+            AbsorbingElement(64, algebra=algebra).v,
+            algebra.absorbing_element(64))
+    except NotImplementedError:
+        pass
 
 
 def test_zero(algebra):
