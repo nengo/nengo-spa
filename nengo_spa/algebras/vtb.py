@@ -58,10 +58,22 @@ class VtbAlgebra(object):
         return v.reshape((sub_d, sub_d)).T.flatten()
 
     @classmethod
-    def get_binding_matrix(cls, v):
+    def get_binding_matrix(cls, v, swap_inputs=False):
         sub_d = cls._get_sub_d(len(v))
-        return np.sqrt(sub_d) * np.kron(
+        m = np.sqrt(sub_d) * np.kron(
             np.eye(sub_d), v.reshape((sub_d, sub_d)))
+        if swap_inputs:
+            m = np.dot(cls.get_swapping_matrix(len(v)), m)
+        return m
+
+    @classmethod
+    def get_swapping_matrix(cls, d):
+        sub_d = cls._get_sub_d(d)
+        m = np.zeros((d, d))
+        for i in range(d):
+            j = i // sub_d + sub_d * (i % sub_d)
+            m[i, j] = 1.
+        return m
 
     @classmethod
     def get_inversion_matrix(cls, d):

@@ -228,13 +228,13 @@ class SemanticPointer(Fixed):
             data=self.algebra.bind(other.evaluate().v, self.v), vocab=vocab,
             algebra=self.algebra)
 
-    def get_binding_matrix(self):
+    def get_binding_matrix(self, swap_inputs=False):
         """Return the matrix that does a binding with this vector.
 
         This should be such that
         ``A*B == dot(A.get_binding_matrix(), B.v)``.
         """
-        return self.algebra.get_binding_matrix(self.v)
+        return self.algebra.get_binding_matrix(self.v, swap_inputs=swap_inputs)
 
     def dot(self, other):
         """Return the dot product of the two vectors."""
