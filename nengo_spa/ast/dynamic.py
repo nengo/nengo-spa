@@ -82,18 +82,20 @@ class DynamicNode(Node):
         type_ = infer_types(self, other)
         if type_ == TScalar:
             mul = ProductRealization()
+            input_left, input_right = mul.input_a, mul.input_b
         elif self.type == TScalar or other.type == TScalar:
             raise NotImplementedError(
                 "Dynamic scaling of semantic pointer not implemented.")
         else:
             mul = BindRealization(self.type.vocab)
+            input_left, input_right = mul.input_left, mul.input_right
 
         if swap_inputs:
             a, b = other, self
         else:
             a, b = self, other
-        a.connect_to(mul.input_a)
-        b.connect_to(mul.input_b)
+        a.connect_to(input_left)
+        b.connect_to(input_right)
         return ModuleOutput(mul.output, type_)
 
     @binary_node_op
