@@ -189,8 +189,10 @@ def test_binding_matrix(algebra, rng):
     b = SemanticPointer(64, rng, algebra=algebra)
 
     m = b.get_binding_matrix()
+    m_swapped = a.get_binding_matrix(swap_inputs=True)
 
     assert np.allclose((a*b).v, np.dot(m, a.v))
+    assert np.allclose((a*b).v, np.dot(m_swapped, b.v))
 
 
 @pytest.mark.parametrize('op', ('~a', '-a', 'a+a', 'a-a', 'a*a', '2*a'))

@@ -41,7 +41,7 @@ class CircularConvolutionAlgebra(object):
         return v[-np.arange(len(v))]
 
     @classmethod
-    def get_binding_matrix(cls, v):
+    def get_binding_matrix(cls, v, swap_inputs=False):
         D = len(v)
         T = []
         for i in range(D):
