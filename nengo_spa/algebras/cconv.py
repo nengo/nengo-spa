@@ -58,8 +58,9 @@ class CircularConvolutionAlgebra(object):
         return node, n * (node,), node
 
     @classmethod
-    def implement_binding(cls, n_neurons_per_d, d, invert_a, invert_b):
-        net = CircularConvolution(n_neurons_per_d, d, invert_a, invert_b)
+    def implement_binding(cls, n_neurons_per_d, d, unbind_left, unbind_right):
+        net = CircularConvolution(
+            n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_a, net.input_b), net.output
 
     @classmethod

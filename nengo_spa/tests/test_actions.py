@@ -278,8 +278,8 @@ def test_non_default_input_and_output(Simulator, rng):
         a = spa.Transcode('A', output_vocab=vocab)
         b = spa.Transcode('B', output_vocab=vocab)
         bind = spa.Bind(vocab)
-        a.output >> bind.input_a
-        b.output >> bind.input_b
+        a.output >> bind.input_left
+        b.output >> bind.input_right
         p = nengo.Probe(bind.output, synapse=0.03)
 
     with Simulator(model) as sim:

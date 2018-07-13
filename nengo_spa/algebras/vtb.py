@@ -90,15 +90,36 @@ class VtbAlgebra(object):
         return node, n * (node,), node
 
     @classmethod
-    def implement_binding(cls, n_neurons_per_d, d, invert_a, invert_b):
+    def implement_binding(cls, n_neurons_per_d, d, unbind_left, unbind_right):
         sub_d = cls._get_sub_d(d)
         shape_left = (sub_d, sub_d)
         shape_right = (sub_d, 1)
 
         with nengo.Network() as net:
-            net.input_a = nengo.Node(size_in=d)
-            net.input_b = nengo.Node(size_in=d)
+            net.input_left = nengo.Node(size_in=d)
+            net.input_right = nengo.Node(size_in=d)
             net.output = nengo.Node(size_in=d)
+
+            net.mat = nengo.Node(size_in=d)
+            net.vec = nengo.Node(size_in=d)
+
+            if unbind_left and unbind_right:
+                raise ValueError("Cannot unbind both sides at the same time.")
+            elif unbind_left:
+                nengo.Connection(
+                    net.input_left, net.mat,
+                    transform=cls.get_inversion_matrix(d), synapse=None)
+                nengo.Connection(
+                    net.input_right, net.vec,
+                    transform=cls.get_swapping_matrix(d), synapse=None)
+            else:
+                nengo.Connection(net.input_left, net.vec, synapse=None)
+                if unbind_right:
+                    tr = cls.get_inversion_matrix(d)
+                else:
+                    tr = 1.
+                nengo.Connection(
+                    net.input_right, net.mat, transform=tr, synapse=None)
 
             with nengo.Config(nengo.Ensemble) as cfg:
                 cfg[nengo.Ensemble].intercepts = CosineSimilarity(d+2)
@@ -110,13 +131,12 @@ class VtbAlgebra(object):
             for i in range(sub_d):
                 mm = net.matmuls[i]
                 sl = slice(i * sub_d, (i + 1) * sub_d)
-                nengo.Connection(net.input_b, mm.input_left, synapse=None)
-                nengo.Connection(
-                    net.input_a[sl], mm.input_right, synapse=None)
+                nengo.Connection(net.mat, mm.input_left, synapse=None)
+                nengo.Connection(net.vec[sl], mm.input_right, synapse=None)
                 nengo.Connection(
                     mm.output, net.output[sl], transform=np.sqrt(sub_d),
                     synapse=None)
-        return net, (net.input_a, net.input_b), net.output
+        return net, (net.input_left, net.input_right), net.output
 
     @classmethod
     def absorbing_element(cls, d):
