@@ -6,12 +6,19 @@ from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.networks.vtb import VTB
 
 
-class _VtbAlgebra(AbstractAlgebra):
+class VtbAlgebra(AbstractAlgebra):
     """Circular convolution algebra.
 
     Uses element-wise addition for superposition, circular convolution for
     binding with an approximate inverse.
     """
+
+    _instance = None
+
+    def __new__(cls):
+        if type(cls._instance) is not cls:
+            cls._instance = super(VtbAlgebra, cls).__new__(cls)
+        return cls._instance
 
     def is_valid_dimensionality(self, d):
         if d < 1:
@@ -92,6 +99,3 @@ class _VtbAlgebra(AbstractAlgebra):
 
     def zero_element(self, d):
         return np.zeros(d)
-
-
-VtbAlgebra = _VtbAlgebra()

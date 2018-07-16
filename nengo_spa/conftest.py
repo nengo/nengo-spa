@@ -21,7 +21,7 @@ class TestConfig(object):
     module modify these values accordingly.
     """
 
-    algebras = [CircularConvolutionAlgebra, VtbAlgebra]
+    algebras = [CircularConvolutionAlgebra(), VtbAlgebra()]
 
 
 def pytest_generate_tests(metafunc):

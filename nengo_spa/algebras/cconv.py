@@ -6,12 +6,19 @@ from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
-class _CircularConvolutionAlgebra(AbstractAlgebra):
+class CircularConvolutionAlgebra(AbstractAlgebra):
     """Circular convolution algebra.
 
     Uses element-wise addition for superposition, circular convolution for
     binding with an approximate inverse.
     """
+
+    _instance = None
+
+    def __new__(cls):
+        if type(cls._instance) is not cls:
+            cls._instance = super(CircularConvolutionAlgebra, cls).__new__(cls)
+        return cls._instance
 
     def is_valid_dimensionality(self, d):
         return d > 0
@@ -65,6 +72,3 @@ class _CircularConvolutionAlgebra(AbstractAlgebra):
 
     def zero_element(self, d):
         return np.zeros(d)
-
-
-CircularConvolutionAlgebra = _CircularConvolutionAlgebra()
