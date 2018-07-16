@@ -8,7 +8,7 @@ from numpy.testing import assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
@@ -256,14 +256,8 @@ def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
 
 @pytest.mark.parametrize('op', ('+', '*'))
 def test_incompatible_algebra(op):
-    class AlgA(CircularConvolutionAlgebra):
-        pass
-
-    class AlgB(CircularConvolutionAlgebra):
-        pass
-
-    a = SemanticPointer(32, algebra=AlgA)  # noqa: F841
-    b = SemanticPointer(32, algebra=AlgB)  # noqa: F841
+    a = SemanticPointer(32, algebra=AbstractAlgebra())  # noqa: F841
+    b = SemanticPointer(32, algebra=AbstractAlgebra())  # noqa: F841
     with pytest.raises(TypeError):
         eval('a' + op + 'b')
 

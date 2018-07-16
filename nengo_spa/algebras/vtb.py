@@ -2,33 +2,31 @@ import nengo
 from nengo.utils.compat import range
 import numpy as np
 
+from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.networks.vtb import VTB
 
 
-class VtbAlgebra(object):
+class _VtbAlgebra(AbstractAlgebra):
     """Circular convolution algebra.
 
     Uses element-wise addition for superposition, circular convolution for
     binding with an approximate inverse.
     """
 
-    @classmethod
-    def is_valid_dimensionality(cls, d):
+    def is_valid_dimensionality(self, d):
         if d < 1:
             return False
         sub_d = np.sqrt(d)
         return sub_d * sub_d == d
 
-    @classmethod
-    def _get_sub_d(cls, d):
+    def _get_sub_d(self, d):
         sub_d = int(np.sqrt(d))
         if sub_d * sub_d != d:
             raise ValueError("Vector dimensionality must be a square number.")
         return sub_d
 
-    @classmethod
-    def make_unitary(cls, v):
-        sub_d = cls._get_sub_d(len(v))
+    def make_unitary(self, v):
+        sub_d = self._get_sub_d(len(v))
         m = np.array(v.reshape((sub_d, sub_d)))
         for i in range(1, sub_d):
             y = -np.dot(m[:i, i:], m[i, i:])
@@ -38,71 +36,62 @@ class VtbAlgebra(object):
         m /= np.sqrt(sub_d)
         return m.flatten()
 
-    @classmethod
-    def superpose(cls, a, b):
+    def superpose(self, a, b):
         return a + b
 
-    @classmethod
-    def bind(cls, a, b):
+    def bind(self, a, b):
         d = len(a)
         if len(b) != d:
             raise ValueError("Inputs must have same length.")
-        sub_d = cls._get_sub_d(d)
-        m = cls.get_binding_matrix(b)
+        m = self.get_binding_matrix(b)
         return np.dot(m, a)
 
-    @classmethod
-    def invert(cls, v):
-        sub_d = cls._get_sub_d(len(v))
+    def invert(self, v):
+        sub_d = self._get_sub_d(len(v))
         return v.reshape((sub_d, sub_d)).T.flatten()
 
-    @classmethod
-    def get_binding_matrix(cls, v, swap_inputs=False):
-        sub_d = cls._get_sub_d(len(v))
+    def get_binding_matrix(self, v, swap_inputs=False):
+        sub_d = self._get_sub_d(len(v))
         m = np.sqrt(sub_d) * np.kron(
             np.eye(sub_d), v.reshape((sub_d, sub_d)))
         if swap_inputs:
-            m = np.dot(cls.get_swapping_matrix(len(v)), m)
+            m = np.dot(self.get_swapping_matrix(len(v)), m)
         return m
 
-    @classmethod
-    def get_swapping_matrix(cls, d):
-        sub_d = cls._get_sub_d(d)
+    def get_swapping_matrix(self, d):
+        sub_d = self._get_sub_d(d)
         m = np.zeros((d, d))
         for i in range(d):
             j = i // sub_d + sub_d * (i % sub_d)
             m[i, j] = 1.
         return m
 
-    @classmethod
-    def get_inversion_matrix(cls, d):
-        sub_d = cls._get_sub_d(d)
+    def get_inversion_matrix(self, d):
+        sub_d = self._get_sub_d(d)
         m = np.zeros((d, d))
         for i in range(d):
             j = sub_d * i
             m[j % d + j // d, i] = 1.
         return m
 
-    @classmethod
-    def implement_superposition(cls, n_neurons_per_d, d, n):
+    def implement_superposition(self, n_neurons_per_d, d, n):
         node = nengo.Node(size_in=d)
         return node, n * (node,), node
 
-    @classmethod
-    def implement_binding(cls, n_neurons_per_d, d, unbind_left, unbind_right):
+    def implement_binding(self, n_neurons_per_d, d, unbind_left, unbind_right):
         net = VTB(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_left, net.input_right), net.output
 
-    @classmethod
-    def absorbing_element(cls, d):
+    def absorbing_element(self, d):
         raise NotImplementedError(
             "VtbAlgebra does not have any absorbing elements.")
 
-    @classmethod
-    def identity_element(cls, d):
-        sub_d = cls._get_sub_d(d)
+    def identity_element(self, d):
+        sub_d = self._get_sub_d(d)
         return (np.eye(sub_d) / d**0.25).flatten()
 
-    @classmethod
-    def zero_element(cls, d):
+    def zero_element(self, d):
         return np.zeros(d)
+
+
+VtbAlgebra = _VtbAlgebra()
