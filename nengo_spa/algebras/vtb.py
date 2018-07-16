@@ -7,10 +7,42 @@ from nengo_spa.networks.vtb import VTB
 
 
 class VtbAlgebra(AbstractAlgebra):
-    """Circular convolution algebra.
+    r"""Vector-derived Transformation Binding (VTB) algebra.
 
-    Uses element-wise addition for superposition, circular convolution for
-    binding with an approximate inverse.
+    VTB uses elementwise addition for superposition. The binding operation
+    :math:`\mathcal{B}(x, y)` is defined as
+
+    .. math::
+
+       \mathcal{B}(x, y) := V_y x = \left[\begin{array}{ccc}
+           V_y' &    0 &    0 \\
+              0 & V_y' &    0 \\
+              0 &    0 & V_y'
+           \end{array}\right] x
+
+    with
+
+    .. math::
+
+       V_y' = d^{\frac{1}{4}} \left[\begin{array}{cccc}
+           y_1            & y_2            & \dots  & y_{d'}  \\
+           y_{d' + 1}     & y_{d' + 2}     & \dots  & y_{2d'} \\
+           \vdots         & \vdots         & \ddots & \vdots  \\
+           y_{d - d' + 1} & y_{d - d' + 2} & \dots  & y_d
+       \end{array}\right]
+
+    and
+
+    .. math:: d'^2 = d.
+
+    The approximate inverse :math:`y^+` for :math:`y` is permuting the elements
+    such that :math:`V_{y^+} = V_y`.
+
+    Note that VTB requires the vector dimensionality to be square.
+
+    The VTB binding operation is neither associative nor commutative.
+
+    Publications with further information are forthcoming.
     """
 
     _instance = None
@@ -21,6 +53,21 @@ class VtbAlgebra(AbstractAlgebra):
         return cls._instance
 
     def is_valid_dimensionality(self, d):
+        """Checks whether *d* is a valid vector dimensionality.
+
+        For VTB all square numbers are valid dimensionalities.
+
+        Parameters
+        ----------
+        d : int
+            Dimensionality
+
+        Returns
+        -------
+        bool
+            *True*, if *d* is a valid vector dimensionality for the use with
+            the algebra.
+        """
         if d < 1:
             return False
         sub_d = np.sqrt(d)
@@ -66,6 +113,19 @@ class VtbAlgebra(AbstractAlgebra):
         return m
 
     def get_swapping_matrix(self, d):
+        """Get matrix to swap operands in bound state.
+
+        Parameters
+        ----------
+        d : int
+            Dimensionality of vector.
+
+        Returns
+        -------
+        (d, d) ndarry
+            Matrix to multiply with a vector to switch left and right operand
+            in bound state.
+        """
         sub_d = self._get_sub_d(d)
         m = np.zeros((d, d))
         for i in range(d):
@@ -90,6 +150,7 @@ class VtbAlgebra(AbstractAlgebra):
         return net, (net.input_left, net.input_right), net.output
 
     def absorbing_element(self, d):
+        """VTB has no absorbing element except the zero vector."""
         raise NotImplementedError(
             "VtbAlgebra does not have any absorbing elements.")
 
@@ -98,4 +159,19 @@ class VtbAlgebra(AbstractAlgebra):
         return (np.eye(sub_d) / d**0.25).flatten()
 
     def zero_element(self, d):
+        """Return the zero element of dimensionality *d*.
+
+        The zero element produces itself when bound to a different vector.
+        For VTB this is the zero vector.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+
+        Returns
+        -------
+        (d,) ndarray
+            Zero element.
+        """
         return np.zeros(d)

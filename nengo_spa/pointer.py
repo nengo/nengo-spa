@@ -25,7 +25,7 @@ class SemanticPointer(Fixed):
     vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
         Mutually exclusive with the *algebra* argument.
-    algebra = Algebra, optional
+    algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
@@ -34,7 +34,7 @@ class SemanticPointer(Fixed):
     ----------
     v : array_like
         The vector constituting the Semantic Pointer.
-    algebra : Algebra
+    algebra : AbstractAlgebra
         Algebra that defines the vector symbolic operations on this Semantic
         Pointer.
     vocab : Vocabulary or None
@@ -305,7 +305,7 @@ class Identity(SemanticPointer):
     vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
         Mutually exclusive with the *algebra* argument.
-    algebra = Algebra, optional
+    algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the `vocab` argument.
@@ -317,11 +317,11 @@ class Identity(SemanticPointer):
 
 
 class AbsorbingElement(SemanticPointer):
-    r"""Circular convolution absorbing element.
+    r"""Absorbing element.
 
     If :math:`z` denotes the absorbing element, :math:`v \circledast z = c z`,
     where :math:`v` is a Semantic Pointer and :math:`c` is a real-valued
-    scalar.
+    scalar. Furthermore :math:`\|z\| = 1`.
 
     Parameters
     ----------
@@ -330,7 +330,7 @@ class AbsorbingElement(SemanticPointer):
     vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
         Mutually exclusive with the *algebra* argument.
-    algebra = Algebra, optional
+    algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the `vocab` argument.
@@ -343,7 +343,7 @@ class AbsorbingElement(SemanticPointer):
 
 
 class Zero(SemanticPointer):
-    """An all zero Semantic Pointer.
+    """Zero element.
 
     Parameters
     ----------
@@ -352,7 +352,7 @@ class Zero(SemanticPointer):
     vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
         Mutually exclusive with the *algebra* argument.
-    algebra = Algebra, optional
+    algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the `vocab` argument.

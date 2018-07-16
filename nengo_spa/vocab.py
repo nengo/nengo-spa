@@ -54,7 +54,7 @@ class Vocabulary(Mapping):
         The random number generator to use to create new vectors.
     name : str
         A name to display in the string representation of this vocabulary.
-    algebra : Algebra, optional
+    algebra : AbstractAlgebra, optional
         Defines the vector symbolic operators used for Semantic Pointers in the
         vocabulary. Defaults to `.CircularConvolutionAlgebra`.
 
@@ -76,7 +76,7 @@ class Vocabulary(Mapping):
     vectors : ndarray
         All of the semantic pointer vectors in a matrix, in the same order
         as in `keys`.
-    algebra : Algebra, optional
+    algebra : AbstractAlgebra, optional
         Defines the vector symbolic operators used for Semantic Pointers in the
         vocabulary.
     """
