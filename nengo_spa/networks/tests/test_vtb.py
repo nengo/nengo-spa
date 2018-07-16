@@ -10,7 +10,7 @@ from nengo_spa.testing import assert_sp_close
 
 def test_bind(Simulator, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(16, rng=rng, algebra=VtbAlgebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=VtbAlgebra())
     vocab.populate('A; B')
 
     with spa.Network(seed=seed) as model:
@@ -29,7 +29,7 @@ def test_bind(Simulator, seed):
 @pytest.mark.parametrize('side', ('left', 'right'))
 def test_unbind(Simulator, side, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(36, rng=rng, algebra=VtbAlgebra)
+    vocab = spa.Vocabulary(36, rng=rng, algebra=VtbAlgebra())
     vocab.populate('A; B')
 
     with spa.Network(seed=seed) as model:

@@ -67,7 +67,7 @@ class SemanticPointer(Fixed):
     def _get_algebra(cls, vocab, algebra):
         if algebra is None:
             if vocab is None:
-                algebra = CircularConvolutionAlgebra
+                algebra = CircularConvolutionAlgebra()
             else:
                 algebra = vocab.algebra
         elif vocab is not None and vocab.algebra is not algebra:

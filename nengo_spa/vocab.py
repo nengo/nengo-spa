@@ -85,7 +85,7 @@ class Vocabulary(Mapping):
             self, dimensions, strict=True, max_similarity=0.1, rng=None,
             name=None, algebra=None):
         if algebra is None:
-            algebra = CircularConvolutionAlgebra
+            algebra = CircularConvolutionAlgebra()
         self.algebra = algebra
 
         if not is_integer(dimensions) or dimensions < 1:
