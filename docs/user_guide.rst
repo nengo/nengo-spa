@@ -6,3 +6,4 @@ User Guide
    examples/intro.ipynb
    examples/intro_coming_from_legacy_spa.ipynb
    examples/custom_module.ipynb
+   user_guide/algebras

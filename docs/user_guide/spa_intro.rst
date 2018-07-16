@@ -96,6 +96,15 @@ If we want to know the color of the square, we can unbind the *square* vector:
    + \mathit{noise}
 
 
+.. note::
+
+   While circular convolution is the default binding operation in Nengo SPA and
+   has been used widely, other choices are possible, potentially better suited
+   for certain tasks, and also supported by Nengo SPA. The :doc:`algebras`
+   section explains how to use other binding operations. Choices included in
+   Nengo SPA are documented in the API documentation of `nengo_spa.algebras`.
+
+
 An example: Spaun
 ^^^^^^^^^^^^^^^^^
 
