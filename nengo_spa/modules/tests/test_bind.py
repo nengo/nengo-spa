@@ -21,7 +21,7 @@ def test_basic():
 
 def test_run(Simulator, algebra, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network(seed=seed) as model:
@@ -44,10 +44,10 @@ def test_run(Simulator, algebra, seed):
         sim.run(0.2)
 
     error = rmse(vocab.parse("(B*A).normalized()").v, sim.data[p][-1])
-    assert error < 0.1
+    assert error < 0.15
 
     error = rmse(vocab.parse("(A*A).normalized()").v, sim.data[p][100])
-    assert error < 0.1
+    assert error < 0.15
 
 
 @pytest.mark.parametrize('side', ('left', 'right'))

@@ -27,7 +27,7 @@ def test_superpose(algebra, rng):
         assert np.dot(v, r / np.linalg.norm(r)) > 0.6
 
 
-@pytest.mark.parametrize('d', [16, 25])
+@pytest.mark.parametrize('d', [25, 36])
 def test_binding_and_invert(algebra, d, rng):
     a = SemanticPointer(d, rng=rng).v
     b = SemanticPointer(d, rng=rng).v
