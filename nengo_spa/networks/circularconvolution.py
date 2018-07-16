@@ -6,17 +6,6 @@ from nengo.networks.product import Product
 from nengo.utils.compat import range
 
 
-def circconv(a, b, invert_a=False, invert_b=False, axis=-1):
-    """A reference Numpy implementation of circular convolution"""
-    A = np.fft.fft(a, axis=axis)
-    B = np.fft.fft(b, axis=axis)
-    if invert_a:
-        A = A.conj()
-    if invert_b:
-        B = B.conj()
-    return np.fft.ifft(A * B, axis=axis).real
-
-
 def transform_in(dims, align, invert):
     """Create a transform to map the input into the Fourier domain.
 
