@@ -5,7 +5,7 @@ import pytest
 
 from nengo_spa.networks.identity_ensemble_array import IdentityEnsembleArray
 from nengo_spa.pointer import Identity, SemanticPointer
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 @pytest.mark.parametrize('pointer', [Identity, SemanticPointer])
@@ -46,7 +46,7 @@ def test_add_output(Simulator, seed, rng, plt):
         sim.run(0.3)
 
     plt.plot(sim.trange(), np.dot(sim.data[p], -pointer.v))
-    assert sp_close(sim.trange(), sim.data[p], -pointer, skip=0.2, atol=0.3)
+    assert_sp_close(sim.trange(), sim.data[p], -pointer, skip=0.2, atol=0.3)
 
 
 def test_add_output_multiple_fn(Simulator, seed, rng, plt):
@@ -71,7 +71,7 @@ def test_add_output_multiple_fn(Simulator, seed, rng, plt):
     expected = SemanticPointer(v)
 
     plt.plot(sim.trange(), np.dot(sim.data[p], expected.v))
-    assert sp_close(sim.trange(), sim.data[p], expected, skip=0.2, atol=0.3)
+    assert_sp_close(sim.trange(), sim.data[p], expected, skip=0.2, atol=0.3)
 
 
 def test_neuron_connections(Simulator, seed, rng):

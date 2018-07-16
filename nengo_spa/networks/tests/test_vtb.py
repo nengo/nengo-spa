@@ -5,7 +5,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.algebras.vtb import VtbAlgebra
 from nengo_spa.networks.vtb import VTB
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 def test_bind(Simulator, seed):
@@ -22,7 +22,7 @@ def test_bind(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.15, atol=0.3)
 
 
@@ -54,6 +54,6 @@ def test_unbind(Simulator, side, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.15,
         atol=0.3)

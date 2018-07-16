@@ -12,7 +12,7 @@ from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
 from nengo_spa.vocab import Vocabulary
 
@@ -249,7 +249,7 @@ def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
         skip=0.3)
 

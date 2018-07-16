@@ -8,7 +8,7 @@ from nengo_spa import Vocabulary
 from nengo_spa.modules.assoc_mem import (
     ThresholdingAssocMem, WTAAssocMem, IAAssocMem)
 from nengo_spa.examine import similarity
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 filtered_step_fn = lambda x: np.maximum(1. - np.exp(-15. * x), 0.)
@@ -43,8 +43,8 @@ def test_am_basic(Simulator, plt, seed, rng):
     plt.plot(t[t > 0.15], np.ones(t.shape)[t > 0.15] * 0.95, c='g', lw=2)
     plt.ylabel("Output")
 
-    assert sp_close(t, sim.data[in_p], vocab['A'], skip=0.15, atol=0.05)
-    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15)
+    assert_sp_close(t, sim.data[in_p], vocab['A'], skip=0.15, atol=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab['A'], skip=0.15)
 
 
 def test_am_threshold(Simulator, plt, seed, rng):
@@ -85,7 +85,7 @@ def test_am_threshold(Simulator, plt, seed, rng):
     plt.ylabel("Output")
 
     assert np.mean(sim.data[out_p][below_th]) < 0.01
-    assert sp_close(t, sim.data[out_p], vocab2['B'], skip=0.25, duration=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab2['B'], skip=0.25, duration=0.05)
 
 
 def test_am_wta(Simulator, plt, seed, rng):
@@ -130,8 +130,8 @@ def test_am_wta(Simulator, plt, seed, rng):
     plt.plot(t[more_b], np.ones(t.shape)[more_b] * 0.9, c='g', lw=2)
     plt.ylabel("Output")
 
-    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
-    assert sp_close(t, sim.data[out_p], vocab['B'], skip=0.45, duration=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab['B'], skip=0.45, duration=0.05)
 
 
 def test_am_ia(Simulator, plt, seed, rng):
@@ -176,8 +176,8 @@ def test_am_ia(Simulator, plt, seed, rng):
     plt.plot(t[more_b], np.ones(t.shape)[more_b] * 0.9, c='tab:orange', lw=2)
     plt.ylabel("Output")
 
-    assert sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
-    assert sp_close(t, sim.data[out_p], vocab['B'], skip=0.65, duration=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab['A'], skip=0.15, duration=0.05)
+    assert_sp_close(t, sim.data[out_p], vocab['B'], skip=0.65, duration=0.05)
 
 
 def test_am_default_output(Simulator, plt, seed, rng):

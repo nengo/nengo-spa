@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def sp_close(
+def assert_sp_close(
         t, data, target_sp, skip=0., duration=None, atol=0.2,
         normalized=False):
     """Test that the RMSE to a Semantic Pointer is below threshold.
@@ -26,11 +26,6 @@ def sp_close(
     normalize : bool, optional
         Whether to normalize the simulation data to unit length in each
         timestep.
-
-    Returns
-    -------
-    bool
-        *True* if *atol* is not exceeded during the considered time interval.
     """
     if duration is None:
         duration = np.max(t) - skip
@@ -39,5 +34,7 @@ def sp_close(
     if normalized:
         actual /= np.expand_dims(np.linalg.norm(actual, axis=1), 1)
         expected = expected.normalized()
-    return np.all(np.sqrt(np.sum(
-        np.square(actual - expected.v), axis=1)) < atol)
+    error = np.sqrt(np.sum(np.square(actual - expected.v), axis=1))
+    assert np.all(error < atol), \
+        "Absolute tolerance exceeded (mean={}, min={}, max={})".format(
+            np.mean(error), np.min(error), np.max(error))

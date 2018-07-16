@@ -7,5 +7,5 @@ nengo\_spa\.testing
    .. rubric:: Functions
 
    .. autosummary::
-   
-      sp_close
+
+      assert_sp_close
