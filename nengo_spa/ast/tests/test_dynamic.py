@@ -15,7 +15,7 @@ from nengo_spa.testing import sp_close
 @pytest.mark.parametrize('op', ['-', '~'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
 def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A')
 
     with spa.Network() as model:
@@ -24,15 +24,15 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
-    assert sp_close(sim.trange(), sim.data[p], vocab.parse(op + 'A'), skip=0.3)
+    assert sp_close(sim.trange(), sim.data[p], vocab.parse(op + 'A'), skip=0.2)
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
 def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -53,7 +53,7 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_pointer_symbol(
         Simulator, algebra, op, order, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -67,18 +67,18 @@ def test_binary_operation_on_modules_with_pointer_symbol(
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
-        skip=0.3)
+        skip=0.2)
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_fixed_pointer(
         Simulator, algebra, op, order, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
     b = SemanticPointer(vocab['B'].v)  # noqa: F841
 
@@ -93,15 +93,15 @@ def test_binary_operation_on_modules_with_fixed_pointer(
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
-        skip=0.3, atol=0.3)
+        skip=0.2, atol=0.3)
 
 
 def test_complex_rule(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B; C; D')
 
     with spa.Network() as model:
@@ -113,16 +113,16 @@ def test_complex_rule(Simulator, algebra, rng):
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
         sim.trange(), sim.data[p],
         vocab.parse('(0.5 * C * A + 0.5 * D) * (0.5 * B + 0.5 * A)'),
-        skip=0.3, normalized=True)
+        skip=0.2, normalized=True)
 
 
 def test_transformed(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -131,15 +131,15 @@ def test_transformed(Simulator, algebra, rng):
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('B*A'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('B*A'), skip=0.2,
         normalized=True)
 
 
 def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -148,15 +148,15 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.2,
         normalized=True)
 
 
 def test_transformed_and_network(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B.unitary()')
 
     with spa.Network() as model:
@@ -166,15 +166,15 @@ def test_transformed_and_network(Simulator, algebra, rng):
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A * ~B * B'), skip=0.3,
+        sim.trange(), sim.data[p], vocab.parse('A * ~B * B'), skip=0.2,
         normalized=True)
 
 
 def test_transformed_and_transformed(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
     vocab.populate('A; B.unitary(); C')
 
     with spa.Network() as model:
@@ -184,11 +184,11 @@ def test_transformed_and_transformed(Simulator, algebra, rng):
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with nengo.Simulator(model) as sim:
-        sim.run(0.5)
+        sim.run(0.3)
 
     assert sp_close(
-        sim.trange(), sim.data[p], vocab.parse('(B * A) * (~B * C)'), skip=0.3,
-        normalized=True)
+        sim.trange(), sim.data[p], vocab.parse('(B * A) * (~B * C)'), skip=0.2,
+        normalized=True, atol=0.3)
 
 
 def test_pointer_symbol_with_dynamic_scalar(Simulator, rng):
