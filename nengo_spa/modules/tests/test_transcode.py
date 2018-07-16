@@ -6,7 +6,7 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa.modules.transcode import Transcode
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 def test_fixed(Simulator, seed):
@@ -23,9 +23,9 @@ def test_fixed(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.1)
 
-    assert sp_close(sim.trange(), sim.data[p1], model.buffer1.vocab.parse('A'),
+    assert_sp_close(sim.trange(), sim.data[p1], model.buffer1.vocab.parse('A'),
                     skip=0.08)
-    assert sp_close(sim.trange(), sim.data[p2], model.buffer2.vocab.parse('B'),
+    assert_sp_close(sim.trange(), sim.data[p2], model.buffer2.vocab.parse('B'),
                     skip=0.08)
 
 
@@ -53,13 +53,13 @@ def test_time_varying_encode(Simulator, seed):
 
     vocab = model.buffer.vocab
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A'), skip=0.08, duration=0.02)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('B'), skip=0.18, duration=0.02)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('C'), skip=0.28, duration=0.02)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('0'), skip=0.38, duration=0.02)
 
 
@@ -82,8 +82,8 @@ def test_encode_with_input(Simulator, seed):
         sim.run(0.4)
 
     vocab = buffer.vocab
-    assert sp_close(sim.trange(), sim.data[p], vocab.parse('0'), duration=0.2)
-    assert sp_close(
+    assert_sp_close(sim.trange(), sim.data[p], vocab.parse('0'), duration=0.2)
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A'), skip=.38, duration=0.02)
 
 
@@ -101,7 +101,7 @@ def test_transcode(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert sp_close(sim.trange(), sim.data[p],
+    assert_sp_close(sim.trange(), sim.data[p],
                     transcode.output_vocab.parse('B'))
 
 
@@ -114,7 +114,7 @@ def test_passthrough(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert sp_close(sim.trange(), sim.data[p],
+    assert_sp_close(sim.trange(), sim.data[p],
                     passthrough.output_vocab.parse('A'), skip=0.18)
 
 

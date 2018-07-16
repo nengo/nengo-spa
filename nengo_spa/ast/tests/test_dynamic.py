@@ -9,7 +9,7 @@ import nengo_spa as spa
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import SemanticPointer
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 @pytest.mark.parametrize('op', ['-', '~'])
@@ -26,7 +26,7 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(sim.trange(), sim.data[p], vocab.parse(op + 'A'), skip=0.2)
+    assert_sp_close(sim.trange(), sim.data[p], vocab.parse(op + 'A'), skip=0.2)
 
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
@@ -44,7 +44,7 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A' + op + 'B'), skip=0.2,
         atol=0.3)
 
@@ -69,7 +69,7 @@ def test_binary_operation_on_modules_with_pointer_symbol(
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
         skip=0.2)
 
@@ -95,7 +95,7 @@ def test_binary_operation_on_modules_with_fixed_pointer(
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
         skip=0.2, atol=0.3)
 
@@ -115,7 +115,7 @@ def test_complex_rule(Simulator, algebra, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p],
         vocab.parse('(0.5 * C * A + 0.5 * D) * (0.5 * B + 0.5 * A)'),
         skip=0.2, normalized=True)
@@ -133,7 +133,7 @@ def test_transformed(Simulator, algebra, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('B*A'), skip=0.2,
         normalized=True)
 
@@ -150,7 +150,7 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.2,
         normalized=True)
 
@@ -168,7 +168,7 @@ def test_transformed_and_network(Simulator, algebra, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A * ~B * B'), skip=0.2,
         normalized=True)
 
@@ -186,7 +186,7 @@ def test_transformed_and_transformed(Simulator, algebra, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.3)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('(B * A) * (~B * C)'), skip=0.2,
         normalized=True, atol=0.3)
 
@@ -290,4 +290,4 @@ def test_dynamic_translate(Simulator, rng):
     with nengo.Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(sim.trange(), sim.data[p], v2['A'], skip=0.3, atol=0.2)
+    assert_sp_close(sim.trange(), sim.data[p], v2['A'], skip=0.3, atol=0.2)

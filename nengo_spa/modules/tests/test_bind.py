@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 def test_basic():
@@ -76,6 +76,6 @@ def test_unbind(Simulator, algebra, side, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.15,
         atol=0.3)

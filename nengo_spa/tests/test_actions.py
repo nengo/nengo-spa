@@ -7,7 +7,7 @@ import nengo_spa as spa
 from nengo_spa.actions import ActionSelection
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
-from nengo_spa.testing import sp_close
+from nengo_spa.testing import assert_sp_close
 
 
 def test_new_action_syntax(Simulator, seed, plt, rng):
@@ -216,7 +216,7 @@ def test_assignment_of_pointer_symbol(Simulator, rng):
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
+    assert_sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
 
 
 def test_assignment_of_dynamic_scalar(Simulator, rng):
@@ -267,7 +267,7 @@ def test_assignment_of_dynamic_pointer(Simulator, rng):
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
+    assert_sp_close(sim.trange(), sim.data[p], vocab['A'], skip=0.3)
 
 
 def test_non_default_input_and_output(Simulator, rng):
@@ -285,7 +285,7 @@ def test_non_default_input_and_output(Simulator, rng):
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p], vocab.parse('A*B'), skip=0.3, atol=0.3)
 
 
@@ -319,14 +319,14 @@ def test_action_selection(Simulator, rng):
 
     t = sim.trange()
     assert_allclose(sim.data[p_scalar][(0.3 < t) & (t <= 0.5)], 0.5, atol=0.2)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p_pointer], vocab['B'], skip=0.8, duration=0.2)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p_pointer], vocab['C'], skip=1.3, duration=0.2)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p_pointer], vocab['D'], skip=1.8, duration=0.2)
     assert_allclose(sim.data[p_scalar][(2.3 < t) & (t <= 2.5)], 0.25, atol=0.2)
-    assert sp_close(
+    assert_sp_close(
         sim.trange(), sim.data[p_pointer], vocab['E'], skip=2.3, duration=0.2)
 
 
