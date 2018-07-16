@@ -98,7 +98,6 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
         Number of neurons to use in each product computation.
     dimensions : int
         The number of dimensions of the input and output vectors.
-
     invert_a : bool, optional
         Whether to reverse the order of elements in first input.
     invert_b : bool, optional
