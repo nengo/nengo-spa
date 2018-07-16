@@ -34,7 +34,7 @@ def assert_sp_close(
     if normalized:
         actual /= np.expand_dims(np.linalg.norm(actual, axis=1), 1)
         expected = expected.normalized()
-    error = np.sqrt(np.sum(np.square(actual - expected.v), axis=1))
+    error = np.sqrt(np.mean(np.square(actual - expected.v), axis=1))
     assert np.all(error < atol), \
         "Absolute tolerance exceeded (mean={}, min={}, max={})".format(
             np.mean(error), np.min(error), np.max(error))
