@@ -5,8 +5,8 @@ import nengo
 from nengo.utils.numpy import rmse
 
 import nengo_spa
-from nengo_spa.networks.circularconvolution import (
-    circconv, transform_in, transform_out)
+from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
+from nengo_spa.networks.circularconvolution import transform_in, transform_out
 
 
 @pytest.mark.parametrize('invert_a', [True, False])
@@ -14,9 +14,14 @@ from nengo_spa.networks.circularconvolution import (
 def test_circularconv_transforms(invert_a, invert_b, rng):
     """Test the circular convolution transforms"""
     dims = 100
-    x = rng.randn(dims)
-    y = rng.randn(dims)
-    z0 = circconv(x, y, invert_a=invert_a, invert_b=invert_b)
+    x = a = rng.randn(dims)
+    y = b = rng.randn(dims)
+    inv = CircularConvolutionAlgebra.get_inversion_matrix(dims)
+    if invert_a:
+        a = np.dot(inv, a)
+    if invert_b:
+        b = np.dot(inv, b)
+    z0 = CircularConvolutionAlgebra.bind(a, b)
 
     tr_a = transform_in(dims, 'A', invert_a)
     tr_b = transform_in(dims, 'B', invert_b)
@@ -37,7 +42,7 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
 
     a = rng.normal(scale=np.sqrt(1./dims), size=dims) * magnitude
     b = rng.normal(scale=np.sqrt(1./dims), size=dims) * magnitude
-    result = circconv(a, b)
+    result = CircularConvolutionAlgebra.bind(a, b)
 
     model = nengo.Network(label="circular conv", seed=seed)
     model.config[nengo.Ensemble].neuron_type = nengo.LIFRate()
@@ -72,7 +77,7 @@ def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
     b = rng.normal(scale=np.sqrt(1./dims), size=dims)
     a /= np.linalg.norm(a)
     b /= np.linalg.norm(b)
-    result = circconv(a, b)
+    result = CircularConvolutionAlgebra.bind(a, b)
 
     model = nengo.Network(label="circular conv", seed=seed)
     model.config[nengo.Ensemble].neuron_type = nengo.LIFRate()
