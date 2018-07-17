@@ -25,6 +25,15 @@ Release History
 
 **Added**
 
+- Support for algebras that allow to use binding operations other than circular
+  convolution. This includes an implementation of vector-derived transformation
+  binding (VTB) and the ``nengo_spa.networks.VTB`` network to perform this
+  particular binding operation.
+  (`#69 <https://github.com/nengo/nengo_spa/issues/69>`__,
+  `#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
+- Added a matrix multiplication network ``nengo_spa.networks.MatrixMult`` based
+  on the nengo-extras implementation.
+  (`#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
 - Allow to connect to the utility node returned by `ifmax` with the SPA `>>`
   operator.
   (`#190 <https://github.com/nengo/nengo_spa/issues/190>`_,
@@ -41,6 +50,21 @@ Release History
   dictionaries and the string ``'by-key'``, a sequence of strings can be passed
   in to create an auto-associative memory.
   (`#177 <https://github.com/nengo/nengo_spa/pull/177>`_)
+- Renamed ``input_a`` and ``input_b`` of the ``nengo_spa.Bind`` module to
+  ``input_left`` and ``input_right`` to account for non-commutative binding
+  methods where the order of operands matters. Also, renamed the ``invert_a``
+  and ``invert_b`` arguments to ``unbind_left`` and ``unbind_right`` to reflect
+  that some binding methods might not have inverse vectors, but might still be
+  able to do unbinding.
+  (`#69 <https://github.com/nengo/nengo_spa/issues/69>`__,
+  `#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
+
+**Removed**
+
+- Removed ``nengo_spa.networks.circularconvolution.circconv`` because
+  ``nengo_spa.algebras.CircularConvolutionAlgebra`` provides the same
+  functionality.
+  (`#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
 
 
 0.5.2 (July 6, 2018)
