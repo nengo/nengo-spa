@@ -2,7 +2,7 @@ import nengo
 import numpy as np
 
 
-def MatrixMult(n_neurons, shape_left, shape_right, net=None):
+def MatrixMult(n_neurons, shape_left, shape_right, **kwargs):
     """Computes the matrix product A*B.
 
     Both matrices need to be two dimensional.
@@ -22,15 +22,19 @@ def MatrixMult(n_neurons, shape_left, shape_right, net=None):
         Shape of the A input matrix.
     shape_right : tuple
         Shape of the B input matrix.
-    net : Network, optional (Default: None)
-        A network in which the network components will be built.
-        This is typically used to provide a custom set of Nengo object
-        defaults through modifying ``net.config``.
+    kwargs : dict
+        Arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------
     net : Network
-        The newly built matrix multiplication network, or the provided ``net``.
+        The newly built matrix multiplication network with attributes:
+
+         * **input_left** (`nengo.Node`): The left matrix (A) to multiply.
+         * **input_right** (`nengo.Node`): The left matrix (A) to multiply.
+         * **C** (`nengo.networks.Product`): The product network doing the
+           matrix multiplication.
+         * **output** (`nengo.node`): The resulting matrix result.
     """
 
     if len(shape_left) != 2:
@@ -43,13 +47,10 @@ def MatrixMult(n_neurons, shape_left, shape_right, net=None):
             "Matrix dimensions {} and  {} are incompatible".format(
                 shape_left, shape_right))
 
-    if net is None:
-        net = nengo.Network(label="Matrix multiplication")
-
     size_left = np.prod(shape_left)
     size_right = np.prod(shape_right)
 
-    with net:
+    with nengo.Network(**kwargs) as net:
         net.input_left = nengo.Node(size_in=size_left)
         net.input_right = nengo.Node(size_in=size_right)
 

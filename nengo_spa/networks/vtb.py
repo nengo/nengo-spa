@@ -95,6 +95,7 @@ def VTB(n_neurons, dimensions, unbind_left=False, unbind_right=False,
            bound.
          * **mat** (`nengo.Node`): Representation of the matrix :math:`V_y'`.
          * **vec** (`nengo.Node`): Representation of the vector :math:`y`.
+         * **matmuls** (`list`): Matrix multiplication networks.
          * **output** (`nengo.Node`): The resulting bound vector.
     """
     sub_d = calc_sub_d(dimensions)
