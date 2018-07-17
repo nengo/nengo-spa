@@ -130,7 +130,7 @@ example of an SPA to date.
 
 Let us consider how the model would perform a single run of one of the cognitive
 tasks (`see a video of Spaun running this task
-<http://nengo.ca/build-a-brain/task7>`_). This is analogous to the `Raven's
+<https://xchoo.github.io/spaun2.0/>`_). This is analogous to the `Raven's
 Matrix <https://en.wikipedia.org/wiki/Raven's_Progressive_Matrices>`_ task,
 which requires people to figure out a pattern in the input, and apply that
 pattern to new input to produce novel output. For instance given the following
@@ -180,4 +180,4 @@ All of the control-like steps (e.g. “compared with”, “inferred”, and rou
 information through the system), are implemented by a biologically plausible
 basal ganglia model. This is one example of the 8 different tasks that Spaun is
 able to perform. Videos for all tasks can be found `here
-<http://nengo.ca/build-a-brain/spaunvideos/>`_.
+<http://www.nengo.ca/build-a-brain/spaunvideos/>`_.
