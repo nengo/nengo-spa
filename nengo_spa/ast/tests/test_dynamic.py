@@ -12,6 +12,27 @@ from nengo_spa.pointer import SemanticPointer
 from nengo_spa.testing import assert_sp_close
 
 
+def test_scalar_addition(Simulator):
+    with spa.Network() as model:
+        a = spa.Scalar()
+        b = spa.Scalar()
+
+        0.3 >> a
+        0.2 >> b
+        n1 = (a + b).construct()
+        n2 = nengo.Node(size_in=1)
+        (a + b).connect_to(n2)
+
+        p1 = nengo.Probe(n1, synapse=0.03)
+        p2 = nengo.Probe(n2, synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert np.all(np.abs(sim.data[p1][sim.trange() > 0.2] - 0.5) < 0.1)
+    assert np.all(np.abs(sim.data[p2][sim.trange() > 0.2] - 0.5) < 0.1)
+
+
 @pytest.mark.parametrize('op', ['-', '~'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
 def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):

@@ -38,6 +38,13 @@ def test_binding_and_invert(algebra, d, rng):
     assert np.dot(a, r / np.linalg.norm(r)) > 0.6
 
 
+def test_dimensionality_mismatch_exception(algebra):
+    with pytest.raises(ValueError):
+        algebra.bind(np.ones(16), np.ones(25))
+    with pytest.raises(ValueError):
+        algebra.superpose(np.ones(16), np.ones(25))
+
+
 def test_get_binding_matrix(algebra, rng):
     a = SemanticPointer(16, rng).v
     b = SemanticPointer(16, rng).v

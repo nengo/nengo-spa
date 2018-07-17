@@ -8,6 +8,16 @@ def test_is_singleton():
     assert VtbAlgebra() is VtbAlgebra()
 
 
+def test_is_valid_dimensionality():
+    assert not VtbAlgebra().is_valid_dimensionality(-1)
+    assert not VtbAlgebra().is_valid_dimensionality(0)
+    assert not VtbAlgebra().is_valid_dimensionality(15)
+    assert not VtbAlgebra().is_valid_dimensionality(24)
+    assert VtbAlgebra().is_valid_dimensionality(1)
+    assert VtbAlgebra().is_valid_dimensionality(16)
+    assert VtbAlgebra().is_valid_dimensionality(25)
+
+
 def test_get_swapping_matrix(rng):
     a = SemanticPointer(64, rng, algebra=VtbAlgebra()).v
     b = SemanticPointer(64, rng, algebra=VtbAlgebra()).v
