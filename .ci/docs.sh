@@ -16,6 +16,8 @@ if [[ "$COMMAND" == "install" ]]; then
     conda install matplotlib scipy
     pip install ghp-import
     pip install -e .[docs]
+elif [[ "$COMMAND" == "check" ]]; then
+    sphinx-build -b linkcheck -vW -D nbsphinx_execute=never docs docs/_build
 elif [[ "$COMMAND" == "run" ]]; then
     rm "$HOME/.ipython/profile_default/ipython_config.py"
     sphinx-build -vW docs docs/_build
