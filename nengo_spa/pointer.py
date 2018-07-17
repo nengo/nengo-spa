@@ -126,21 +126,23 @@ class SemanticPointer(Fixed):
 
     @TypeCheckedBinaryOp(Fixed)
     def __add__(self, other):
-        type_ = infer_types(self, other)
-        vocab = None if type_ == TAnyVocab else type_.vocab
-        if vocab is None:
-            self._ensure_algebra_match(other)
-        return SemanticPointer(data=self.algebra.superpose(
-            self.v, other.evaluate().v), vocab=vocab, algebra=self.algebra)
+        return self._add(other, swap=False)
 
     @TypeCheckedBinaryOp(Fixed)
     def __radd__(self, other):
+        return self._add(other, swap=True)
+
+    def _add(self, other, swap=False):
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
         if vocab is None:
             self._ensure_algebra_match(other)
-        return SemanticPointer(data=self.algebra.superpose(
-            other.evaluate().v, self.v), vocab=vocab, algebra=self.algebra)
+        a, b = self.v, other.evaluate().v
+        if swap:
+            a, b = b, a
+        return SemanticPointer(
+            data=self.algebra.superpose(a, b), vocab=vocab,
+            algebra=self.algebra)
 
     def __neg__(self):
         return SemanticPointer(
@@ -157,28 +159,16 @@ class SemanticPointer(Fixed):
 
         If multiplied by a scalar, we do normal multiplication.
         """
-        if is_array(other):
-            raise TypeError(
-                "Multiplication of Semantic Pointers with arrays in not "
-                "allowed.")
-        elif is_number(other):
-            return SemanticPointer(
-                data=self.v * other, vocab=self.vocab, algebra=self.algebra)
-        elif isinstance(other, Fixed):
-            if other.type == TScalar:
-                return SemanticPointer(
-                    data=self.v * other.evaluate(), vocab=self.vocab,
-                    algebra=self.algebra)
-            else:
-                return self.bind(other)
-        else:
-            return NotImplemented
+        return self._mul(other, swap=False)
 
     def __rmul__(self, other):
         """Multiplication of two SemanticPointers is circular convolution.
 
         If multiplied by a scalar, we do normal multiplication.
         """
+        return self._mul(other, swap=True)
+
+    def _mul(self, other, swap=False):
         if is_array(other):
             raise TypeError(
                 "Multiplication of Semantic Pointers with arrays in not "
@@ -192,7 +182,7 @@ class SemanticPointer(Fixed):
                     data=self.v * other.evaluate(), vocab=self.vocab,
                     algebra=self.algebra)
             else:
-                return self.rbind(other)
+                return self._bind(other, swap=swap)
         else:
             return NotImplemented
 
@@ -210,23 +200,22 @@ class SemanticPointer(Fixed):
 
     def bind(self, other):
         """Return the binding of two SemanticPointers."""
-        type_ = infer_types(self, other)
-        vocab = None if type_ == TAnyVocab else type_.vocab
-        if vocab is None:
-            self._ensure_algebra_match(other)
-        return SemanticPointer(
-            data=self.algebra.bind(self.v, other.evaluate().v), vocab=vocab,
-            algebra=self.algebra)
+        return self._bind(other, swap=False)
 
     def rbind(self, other):
         """Return the binding of two SemanticPointers."""
+        return self._bind(other, swap=True)
+
+    def _bind(self, other, swap=False):
         type_ = infer_types(self, other)
         vocab = None if type_ == TAnyVocab else type_.vocab
         if vocab is None:
             self._ensure_algebra_match(other)
+        a, b = self.v, other.evaluate().v
+        if swap:
+            a, b = b, a
         return SemanticPointer(
-            data=self.algebra.bind(other.evaluate().v, self.v), vocab=vocab,
-            algebra=self.algebra)
+            data=self.algebra.bind(a, b), vocab=vocab, algebra=self.algebra)
 
     def get_binding_matrix(self, swap_inputs=False):
         """Return the matrix that does a binding with this vector.
