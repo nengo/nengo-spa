@@ -5,16 +5,17 @@ import pytest
 
 from nengo_spa.networks.identity_ensemble_array import IdentityEnsembleArray
 from nengo_spa.pointer import Identity, SemanticPointer
+from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 
 
-@pytest.mark.parametrize('pointer', [Identity, SemanticPointer])
+@pytest.mark.parametrize('pointer', [Identity, UnitLengthVectors])
 def test_identity_ensemble_array(Simulator, seed, rng, pointer):
     d = 64
-    try:
-        v = pointer(d, rng=rng).v
-    except TypeError:
+    if issubclass(pointer, SemanticPointer):
         v = pointer(d).v
+    else:
+        v = next(pointer(d, rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
@@ -32,11 +33,11 @@ def test_identity_ensemble_array(Simulator, seed, rng, pointer):
 
 def test_add_output(Simulator, seed, rng, plt):
     d = 8
-    pointer = SemanticPointer(d, rng=rng)
+    pointer = next(UnitLengthVectors(d, rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
-        input_node = nengo.Node(pointer.v)
+        input_node = nengo.Node(pointer)
         nengo.Connection(input_node, ea.input)
         out = ea.add_output('const', lambda x: -x)
         assert ea.const is out
@@ -45,17 +46,18 @@ def test_add_output(Simulator, seed, rng, plt):
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    plt.plot(sim.trange(), np.dot(sim.data[p], -pointer.v))
-    assert_sp_close(sim.trange(), sim.data[p], -pointer, skip=0.2, atol=0.3)
+    plt.plot(sim.trange(), np.dot(sim.data[p], -pointer))
+    assert_sp_close(sim.trange(), sim.data[p], SemanticPointer(-pointer),
+                    skip=0.2, atol=0.3)
 
 
 def test_add_output_multiple_fn(Simulator, seed, rng, plt):
     d = 8
-    pointer = SemanticPointer(d, rng=rng)
+    pointer = next(UnitLengthVectors(d, rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
-        input_node = nengo.Node(pointer.v)
+        input_node = nengo.Node(pointer)
         nengo.Connection(input_node, ea.input)
         out = ea.add_output(
             'const', (lambda x: -x, lambda x: .5 * x, lambda x: x))
@@ -65,22 +67,22 @@ def test_add_output_multiple_fn(Simulator, seed, rng, plt):
     with Simulator(model) as sim:
         sim.run(0.3)
 
-    v = np.array(pointer.v)
-    v[0] *= -1.
-    v[1:4] *= .5
-    expected = SemanticPointer(v)
+    expected = np.array(pointer)
+    expected[0] *= -1.
+    expected[1:4] *= .5
 
-    plt.plot(sim.trange(), np.dot(sim.data[p], expected.v))
-    assert_sp_close(sim.trange(), sim.data[p], expected, skip=0.2, atol=0.3)
+    plt.plot(sim.trange(), np.dot(sim.data[p], expected))
+    assert_sp_close(sim.trange(), sim.data[p], SemanticPointer(expected),
+                    skip=0.2, atol=0.3)
 
 
 def test_neuron_connections(Simulator, seed, rng):
     d = 8
-    pointer = SemanticPointer(d, rng=rng)
+    pointer = next(UnitLengthVectors(d, rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
-        input_node = nengo.Node(pointer.v)
+        input_node = nengo.Node(pointer)
         nengo.Connection(input_node, ea.input)
 
         bias = nengo.Node(1)

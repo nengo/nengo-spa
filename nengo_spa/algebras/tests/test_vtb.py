@@ -2,6 +2,7 @@ import numpy as np
 
 from nengo_spa.algebras.vtb import VtbAlgebra
 from nengo_spa.pointer import SemanticPointer
+from nengo_spa.vector_generation import UnitLengthVectors
 
 
 def test_is_singleton():
@@ -19,8 +20,9 @@ def test_is_valid_dimensionality():
 
 
 def test_get_swapping_matrix(rng):
-    a = SemanticPointer(64, rng, algebra=VtbAlgebra()).v
-    b = SemanticPointer(64, rng, algebra=VtbAlgebra()).v
+    gen = UnitLengthVectors(64, rng)
+    a = SemanticPointer(next(gen), algebra=VtbAlgebra()).v
+    b = SemanticPointer(next(gen), algebra=VtbAlgebra()).v
 
     m = VtbAlgebra().get_swapping_matrix(64)
     assert np.allclose(

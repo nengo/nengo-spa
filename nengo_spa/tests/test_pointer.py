@@ -12,6 +12,7 @@ from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
+from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
 from nengo_spa.vocab import Vocabulary
@@ -26,10 +27,6 @@ def test_init():
 
     a = SemanticPointer(list(range(100)))
     assert len(a) == 100
-
-    a = SemanticPointer(27)
-    assert len(a) == 27
-    assert np.allclose(a.length(), 1)
 
     with pytest.raises(ValidationError):
         a = SemanticPointer(np.zeros((2, 2)))
@@ -46,10 +43,10 @@ def test_init():
         a = SemanticPointer(int)
 
 
-def test_length():
+def test_length(rng):
     a = SemanticPointer([1, 1])
     assert np.allclose(a.length(), np.sqrt(2))
-    a = SemanticPointer(10)*1.2
+    a = SemanticPointer(next(UnitLengthVectors(10, rng))) * 1.2
     assert np.allclose(a.length(), 1.2)
 
 
@@ -70,7 +67,7 @@ def test_make_unitary(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
 
-    a = SemanticPointer(d, rng=rng, algebra=algebra)
+    a = SemanticPointer(next(UnitLengthVectors(d, rng)), algebra=algebra)
     b = a.unitary()
     assert a is not b
     assert np.allclose(1, b.length())
@@ -79,8 +76,9 @@ def test_make_unitary(algebra, d, rng):
 
 
 def test_add_sub(algebra, rng):
-    a = SemanticPointer(10, rng, algebra=algebra)
-    b = SemanticPointer(10, rng, algebra=algebra)
+    gen = UnitLengthVectors(10, rng)
+    a = SemanticPointer(next(gen), algebra=algebra)
+    b = SemanticPointer(next(gen), algebra=algebra)
     c = a.copy()
     d = b.copy()
 
@@ -98,8 +96,10 @@ def test_binding_and_inversion(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
 
-    a = SemanticPointer(d, rng=rng, algebra=algebra)
-    b = SemanticPointer(d, rng=rng, algebra=algebra)
+    gen = UnitLengthVectors(d, rng)
+
+    a = SemanticPointer(next(gen), algebra=algebra)
+    b = SemanticPointer(next(gen), algebra=algebra)
     identity = Identity(d, algebra=algebra)
 
     c = a.copy()
@@ -115,7 +115,7 @@ def test_binding_and_inversion(algebra, d, rng):
 
 
 def test_multiply():
-    a = SemanticPointer(50)
+    a = SemanticPointer(next(UnitLengthVectors(50)))
 
     assert np.allclose((a * 5).v, a.v * 5)
     assert np.allclose((5 * a).v, a.v * 5)
@@ -133,8 +133,9 @@ def test_multiply():
 
 
 def test_compare(rng):
-    a = SemanticPointer(50, rng=rng) * 10
-    b = SemanticPointer(50, rng=rng) * 0.1
+    gen = UnitLengthVectors(50, rng)
+    a = SemanticPointer(next(gen)) * 10
+    b = SemanticPointer(next(gen)) * 0.1
 
     assert a.compare(a) > 0.99
     assert a.compare(b) < 0.2
@@ -142,27 +143,30 @@ def test_compare(rng):
 
 
 def test_dot(rng):
-    a = SemanticPointer(50, rng=rng) * 1.1
-    b = SemanticPointer(50, rng=rng) * (-1.5)
+    gen = UnitLengthVectors(50, rng)
+    a = SemanticPointer(next(gen)) * 1.1
+    b = SemanticPointer(next(gen)) * (-1.5)
     assert np.allclose(a.dot(b), np.dot(a.v, b.v))
 
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_matmul(rng):
-    a = SemanticPointer(50, rng=rng) * 1.1
-    b = SemanticPointer(50, rng=rng) * (-1.5)
+    gen = UnitLengthVectors(50, rng)
+    a = SemanticPointer(next(gen)) * 1.1
+    b = SemanticPointer(next(gen)) * (-1.5)
     assert np.allclose(eval('a @ b'), np.dot(a.v, b.v))
 
 
 def test_distance(rng):
-    a = SemanticPointer(50, rng=rng)
-    b = SemanticPointer(50, rng=rng)
+    gen = UnitLengthVectors(50, rng)
+    a = SemanticPointer(next(gen))
+    b = SemanticPointer(next(gen))
     assert a.distance(a) < 1e-5
     assert a.distance(b) > 0.85
 
 
 def test_len():
-    a = SemanticPointer(5)
+    a = SemanticPointer(next(UnitLengthVectors(5)))
     assert len(a) == 5
 
     a = SemanticPointer(list(range(10)))
@@ -170,7 +174,7 @@ def test_len():
 
 
 def test_copy():
-    a = SemanticPointer(5)
+    a = SemanticPointer(next(UnitLengthVectors(5)))
     b = a.copy()
     assert a is not b
     assert a.v is not b.v
@@ -178,15 +182,17 @@ def test_copy():
 
 
 def test_mse():
-    a = SemanticPointer(50)
-    b = SemanticPointer(50)
+    gen = UnitLengthVectors(50)
+    a = SemanticPointer(next(gen))
+    b = SemanticPointer(next(gen))
 
     assert np.allclose(((a - b).length() ** 2) / 50, a.mse(b))
 
 
 def test_binding_matrix(algebra, rng):
-    a = SemanticPointer(64, rng, algebra=algebra)
-    b = SemanticPointer(64, rng, algebra=algebra)
+    gen = UnitLengthVectors(64, rng)
+    a = SemanticPointer(next(gen), algebra=algebra)
+    b = SemanticPointer(next(gen), algebra=algebra)
 
     m = b.get_binding_matrix()
     m_swapped = a.get_binding_matrix(swap_inputs=True)
@@ -198,7 +204,7 @@ def test_binding_matrix(algebra, rng):
 @pytest.mark.parametrize('op', ('~a', '-a', 'a+a', 'a-a', 'a*a', '2*a'))
 def test_ops_preserve_vocab(op):
     v = Vocabulary(50)
-    a = SemanticPointer(50, vocab=v)  # noqa: F841
+    a = SemanticPointer(next(UnitLengthVectors(50)), vocab=v)  # noqa: F841
     x = eval(op)
     assert x.vocab is v
 
@@ -206,8 +212,9 @@ def test_ops_preserve_vocab(op):
 @pytest.mark.parametrize('op', (
     'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
 def test_ops_check_vocab_compatibility(op):
-    a = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841
-    b = SemanticPointer(50, vocab=Vocabulary(50))  # noqa: F841
+    gen = UnitLengthVectors(50)
+    a = SemanticPointer(next(gen), vocab=Vocabulary(50))  # noqa: F841
+    b = SemanticPointer(next(gen), vocab=Vocabulary(50))  # noqa: F841
     with pytest.raises(SpaTypeError):
         eval(op)
 
@@ -215,15 +222,16 @@ def test_ops_check_vocab_compatibility(op):
 @pytest.mark.parametrize('op', (
     'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
 def test_none_vocab_is_always_compatible(op):
+    gen = UnitLengthVectors(50)
     v = Vocabulary(50)
-    a = SemanticPointer(50, vocab=v)  # noqa: F841
-    b = SemanticPointer(50, vocab=None)  # noqa: F841
+    a = SemanticPointer(next(gen), vocab=v)  # noqa: F841
+    b = SemanticPointer(next(gen), vocab=None)  # noqa: F841
     eval(op)  # no assertion, just checking that no exception is raised
 
 
 def test_fixed_pointer_network_creation(rng):
     with spa.Network():
-        A = SemanticPointer(16)
+        A = SemanticPointer(next(UnitLengthVectors(16)))
         node = A.construct()
     assert_equal(node.output, A.v)
 
@@ -256,8 +264,9 @@ def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
 
 @pytest.mark.parametrize('op', ('+', '*'))
 def test_incompatible_algebra(op):
-    a = SemanticPointer(32, algebra=AbstractAlgebra())  # noqa: F841
-    b = SemanticPointer(32, algebra=AbstractAlgebra())  # noqa: F841
+    gen = UnitLengthVectors(32)
+    a = SemanticPointer(next(gen), algebra=AbstractAlgebra())  # noqa: F841
+    b = SemanticPointer(next(gen), algebra=AbstractAlgebra())  # noqa: F841
     with pytest.raises(TypeError):
         eval('a' + op + 'b')
 
