@@ -12,6 +12,7 @@ from nengo_spa import pointer
 from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import AbsorbingElement, Identity, Zero
+from nengo_spa.vector_generation import UnitLengthVectors
 
 
 valid_sp_regex = re.compile('^[A-Z][_a-zA-Z0-9]*$')
@@ -50,8 +51,10 @@ class Vocabulary(Mapping):
         angle between the new pointer and all existing pointers is less
         than this amount. If the system is unable to find such a pointer
         after 100 tries, a warning message is printed.
-    rng : numpy.random.RandomState, optional
-        The random number generator to use to create new vectors.
+    pointer_gen : generator or np.random.RandomState, optional
+        Generator used to create vectors for new Semantic Pointers. Defaults to
+        `.UnitLengthVectors`. If a `np.random.RandomState` is passed, it will
+        be used by `.UnitLengthVectors`.
     name : str
         A name to display in the string representation of this vocabulary.
     algebra : AbstractAlgebra, optional
@@ -82,8 +85,8 @@ class Vocabulary(Mapping):
     """
 
     def __init__(
-            self, dimensions, strict=True, max_similarity=0.1, rng=None,
-            name=None, algebra=None):
+            self, dimensions, strict=True, max_similarity=0.1,
+            pointer_gen=None, name=None, algebra=None):
         if algebra is None:
             algebra = CircularConvolutionAlgebra()
         self.algebra = algebra
@@ -91,13 +94,19 @@ class Vocabulary(Mapping):
         if not is_integer(dimensions) or dimensions < 1:
             raise ValidationError("dimensions must be a positive integer",
                                   attr='dimensions', obj=self)
+
+        if pointer_gen is None:
+            pointer_gen = UnitLengthVectors(dimensions)
+        elif isinstance(pointer_gen, np.random.RandomState):
+            pointer_gen = UnitLengthVectors(dimensions, pointer_gen)
+
         self.dimensions = dimensions
         self.strict = strict
         self.max_similarity = max_similarity
         self._key2idx = {}
         self._keys = []
         self._vectors = np.zeros((0, dimensions), dtype=float)
-        self.rng = rng
+        self.pointer_gen = pointer_gen
         self.name = name
 
     @property
@@ -137,8 +146,7 @@ class Vocabulary(Mapping):
         best_p = None
         best_sim = np.inf
         for _ in range(attempts):
-            p = pointer.SemanticPointer(
-                self.dimensions, rng=self.rng, vocab=self)
+            p = pointer.SemanticPointer(next(self.pointer_gen), vocab=self)
             if transform is not None:
                 p = eval('p.' + transform, dict(self), {'p': p})
             if len(self) == 0:
@@ -369,7 +377,7 @@ class Vocabulary(Mapping):
         """
         # Make new Vocabulary object
         subset = Vocabulary(self.dimensions, self.strict, self.max_similarity,
-                            self.rng, algebra=self.algebra)
+                            pointer_gen=self.pointer_gen, algebra=self.algebra)
 
         # Copy over the new keys
         for key in keys:
@@ -463,7 +471,8 @@ class VocabularyMap(Mapping):
         """
         if dimensions not in self._vocabs:
             self._vocabs[dimensions] = Vocabulary(
-                dimensions, strict=False, rng=self.rng)
+                dimensions, strict=False,
+                pointer_gen=UnitLengthVectors(dimensions, self.rng))
         return self._vocabs[dimensions]
 
     def __iter__(self):

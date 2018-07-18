@@ -232,7 +232,7 @@ def test_fixed_pointer_network_creation(rng):
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
         Simulator, op, order, rng):
-    vocab = spa.Vocabulary(64, rng=rng)
+    vocab = spa.Vocabulary(64, pointer_gen=rng)
     vocab.populate('A; B')
     a = PointerSymbol('A', TVocabulary(vocab))  # noqa: F841
     b = SemanticPointer(vocab['B'].v)  # noqa: F841

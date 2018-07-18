@@ -47,7 +47,7 @@ def test_pairs():
 
 
 def test_text(rng):
-    v = Vocabulary(64, rng=rng)
+    v = Vocabulary(64, pointer_gen=rng)
     v.populate('A; B; C; D; E; F')
     x = v.parse('A+B+C')
     y = v.parse('-D-E-F')
