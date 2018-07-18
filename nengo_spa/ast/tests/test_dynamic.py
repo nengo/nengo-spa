@@ -36,7 +36,7 @@ def test_scalar_addition(Simulator):
 @pytest.mark.parametrize('op', ['-', '~'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
 def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A')
 
     with spa.Network() as model:
@@ -53,7 +53,7 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 @pytest.mark.parametrize('suffix', ['', '.output'])
 def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -74,7 +74,7 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_pointer_symbol(
         Simulator, algebra, op, order, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -99,7 +99,7 @@ def test_binary_operation_on_modules_with_pointer_symbol(
 @pytest.mark.parametrize('order', ['AB', 'BA'])
 def test_binary_operation_on_modules_with_fixed_pointer(
         Simulator, algebra, op, order, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
     b = SemanticPointer(vocab['B'].v)  # noqa: F841
 
@@ -122,7 +122,7 @@ def test_binary_operation_on_modules_with_fixed_pointer(
 
 
 def test_complex_rule(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B; C; D')
 
     with spa.Network() as model:
@@ -143,7 +143,7 @@ def test_complex_rule(Simulator, algebra, rng):
 
 
 def test_transformed(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -160,7 +160,7 @@ def test_transformed(Simulator, algebra, rng):
 
 
 def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -177,7 +177,7 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
 
 
 def test_transformed_and_network(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B.unitary()')
 
     with spa.Network() as model:
@@ -195,7 +195,7 @@ def test_transformed_and_network(Simulator, algebra, rng):
 
 
 def test_transformed_and_transformed(Simulator, algebra, rng):
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B.unitary(); C')
 
     with spa.Network() as model:
@@ -220,7 +220,7 @@ def test_pointer_symbol_with_dynamic_scalar(Simulator, rng):
 
 
 def test_dot(Simulator, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -239,7 +239,7 @@ def test_dot(Simulator, rng):
 
 
 def test_dot_with_fixed(Simulator, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -259,7 +259,7 @@ def test_dot_with_fixed(Simulator, rng):
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_matmul(Simulator, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -279,7 +279,7 @@ def test_dot_matmul(Simulator, rng):
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_with_fixed_matmul(Simulator, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
@@ -298,9 +298,9 @@ def test_dot_with_fixed_matmul(Simulator, rng):
 
 
 def test_dynamic_translate(Simulator, rng):
-    v1 = spa.Vocabulary(64, rng=rng)
+    v1 = spa.Vocabulary(64, pointer_gen=rng)
     v1.populate('A; B')
-    v2 = spa.Vocabulary(64, rng=rng)
+    v2 = spa.Vocabulary(64, pointer_gen=rng)
     v2.populate('A; B')
 
     with spa.Network() as model:

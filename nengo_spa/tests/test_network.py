@@ -132,9 +132,9 @@ def test_no_magic_vocab_transform():
     (16, 32, 'translate(a, v2)', 'v2'),
     (16, 32, 'translate(a, v2, solver=nengo.solvers.Lstsq())', 'v2')])
 def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
-    v1 = spa.Vocabulary(d1, rng=rng)
+    v1 = spa.Vocabulary(d1, pointer_gen=rng)
     v1.populate('A')
-    v2 = spa.Vocabulary(d2, rng=rng)
+    v2 = spa.Vocabulary(d2, pointer_gen=rng)
     v2.populate('A')
 
     with spa.Network() as model:

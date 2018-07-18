@@ -18,7 +18,7 @@ def test_am_basic(Simulator, plt, seed, rng):
     """Basic associative memory test."""
 
     d = 64
-    vocab = Vocabulary(d, rng=rng)
+    vocab = Vocabulary(d, pointer_gen=rng)
     vocab.populate('A; B; C; D')
 
     with spa.Network('model', seed=seed) as m:
@@ -50,11 +50,11 @@ def test_am_basic(Simulator, plt, seed, rng):
 def test_am_threshold(Simulator, plt, seed, rng):
     """Associative memory thresholding with differing input/output vocabs."""
     d = 64
-    vocab = Vocabulary(d, rng=rng)
+    vocab = Vocabulary(d, pointer_gen=rng)
     vocab.populate('A; B; C; D')
 
     d2 = int(d / 2)
-    vocab2 = Vocabulary(d2, rng=rng)
+    vocab2 = Vocabulary(d2, pointer_gen=rng)
     vocab2.populate('A; B; C; D')
 
     def input_func(t):
@@ -92,7 +92,7 @@ def test_am_wta(Simulator, plt, seed, rng):
     """Test the winner-take-all ability of the associative memory."""
 
     d = 64
-    vocab = Vocabulary(d, rng=rng)
+    vocab = Vocabulary(d, pointer_gen=rng)
     vocab.populate('A; B; C; D')
 
     def input_func(t):
@@ -138,7 +138,7 @@ def test_am_ia(Simulator, plt, seed, rng):
     """Test the winner-take-all ability of the IA memory."""
 
     d = 64
-    vocab = Vocabulary(d, rng=rng)
+    vocab = Vocabulary(d, pointer_gen=rng)
     vocab.populate('A; B; C; D')
 
     def input_func(t):
@@ -182,7 +182,7 @@ def test_am_ia(Simulator, plt, seed, rng):
 
 def test_am_default_output(Simulator, plt, seed, rng):
     d = 64
-    vocab = Vocabulary(d, rng=rng)
+    vocab = Vocabulary(d, pointer_gen=rng)
     vocab.populate('A; B; C; D')
 
     def input_func(t):
@@ -224,8 +224,8 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
     """Provide semantic pointer expressions as input and output keys."""
     d = 64
 
-    vocab_in = Vocabulary(d, rng=rng)
-    vocab_out = Vocabulary(d, rng=rng)
+    vocab_in = Vocabulary(d, pointer_gen=rng)
+    vocab_out = Vocabulary(d, pointer_gen=rng)
 
     vocab_in.populate('A; B')
     vocab_out.populate('C; D')

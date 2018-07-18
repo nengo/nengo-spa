@@ -21,7 +21,7 @@ def test_basic():
 
 def test_run(Simulator, algebra, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(32, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(32, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network(seed=seed, vocabs=VocabularyMap([vocab])) as model:

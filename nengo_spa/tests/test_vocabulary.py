@@ -9,12 +9,13 @@ import pytest
 from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.pointer import SemanticPointer
+from nengo_spa.vector_generation import AxisAlignedVectors
 from nengo_spa.vocab import (
     special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
 
 def test_add(rng):
-    v = Vocabulary(3, rng=rng)
+    v = Vocabulary(3, pointer_gen=rng)
     v.add('A', [1, 2, 3])
     v.add('B', [4, 5, 6])
     v.add('C', [7, 8, 9])
@@ -22,7 +23,7 @@ def test_add(rng):
 
 
 def test_populate(rng):
-    v = Vocabulary(64, rng=rng)
+    v = Vocabulary(64, pointer_gen=rng)
 
     v.populate('')
     v.populate(' \r\n\t')
@@ -71,6 +72,12 @@ def test_populate(rng):
         v.populate(u'Aα = A')
 
 
+def test_pointer_gen():
+    v = Vocabulary(32, pointer_gen=AxisAlignedVectors(32))
+    v.populate('A; B; C')
+    assert np.all(v.vectors == np.eye(32)[:3])
+
+
 @pytest.mark.parametrize('name', (
     'None', 'True', 'False', 'Zero', 'AbsorbingElement', 'Identity'))
 def test_reserved_names(name):
@@ -88,7 +95,7 @@ def test_special_sps(name, sp):
 
 
 def test_populate_with_transform_on_first_vector(rng):
-    v = Vocabulary(64, rng=rng)
+    v = Vocabulary(64, pointer_gen=rng)
 
     v.populate('A.unitary()')
     assert 'A' in v
@@ -96,7 +103,7 @@ def test_populate_with_transform_on_first_vector(rng):
 
 
 def test_populate_with_transform_on_nonstrict_vocab(rng):
-    v = Vocabulary(64, rng=rng, strict=False)
+    v = Vocabulary(64, pointer_gen=rng, strict=False)
 
     v.populate('A.unitary()')
     assert 'A' in v
@@ -104,7 +111,7 @@ def test_populate_with_transform_on_nonstrict_vocab(rng):
 
 
 def test_parse(rng):
-    v = Vocabulary(64, rng=rng)
+    v = Vocabulary(64, pointer_gen=rng)
     v.populate('A; B; C')
     A = v.parse('A')
     B = v.parse('B')
@@ -127,7 +134,7 @@ def test_parse(rng):
 
 
 def test_parse_n(rng):
-    v = Vocabulary(64, rng=rng)
+    v = Vocabulary(64, pointer_gen=rng)
     v.populate('A; B; C')
     A = v.parse('A')
     B = v.parse('B')
@@ -150,7 +157,7 @@ def test_invalid_dimensions():
 
 
 def test_capital(rng):
-    v = Vocabulary(16, rng=rng)
+    v = Vocabulary(16, pointer_gen=rng)
     with pytest.raises(SpaParseError):
         v.parse('a')
     with pytest.raises(SpaParseError):
@@ -159,8 +166,8 @@ def test_capital(rng):
 
 @pytest.mark.parametrize('solver', [None, nengo.solvers.Lstsq()])
 def test_transform(recwarn, rng, solver):
-    v1 = Vocabulary(32, strict=False, rng=rng)
-    v2 = Vocabulary(64, strict=False, rng=rng)
+    v1 = Vocabulary(32, strict=False, pointer_gen=rng)
+    v2 = Vocabulary(64, strict=False, pointer_gen=rng)
     v1.populate('A; B; C')
     v2.populate('A; B; C')
     A = v1['A']
@@ -199,7 +206,7 @@ def test_transform(recwarn, rng, solver):
 
 
 def test_create_pointer_warning(rng):
-    v = Vocabulary(2, rng=rng)
+    v = Vocabulary(2, pointer_gen=rng)
 
     # five pointers shouldn't fit
     with pytest.warns(UserWarning):
@@ -207,7 +214,7 @@ def test_create_pointer_warning(rng):
 
 
 def test_readonly(rng):
-    v1 = Vocabulary(32, rng=rng)
+    v1 = Vocabulary(32, pointer_gen=rng)
     v1.populate('A;B;C')
 
     v1.readonly = True
@@ -217,7 +224,7 @@ def test_readonly(rng):
 
 
 def test_subset(rng, algebra):
-    v1 = Vocabulary(32, rng=rng, algebra=algebra)
+    v1 = Vocabulary(32, pointer_gen=rng, algebra=algebra)
     v1.populate('A; B; C; D; E; F; G')
 
     # Test creating a vocabulary subset
@@ -231,7 +238,7 @@ def test_subset(rng, algebra):
 
 
 def test_vocabulary_tracking(rng):
-    v = Vocabulary(32, rng=rng)
+    v = Vocabulary(32, pointer_gen=rng)
     v.populate('A')
 
     assert v['A'].vocab is v
@@ -284,7 +291,7 @@ def test_vocabulary_set(rng):
     new = vs.get_or_create(16)
     assert vs[16] is new
     assert new.dimensions == 16
-    assert new.rng is rng
+    assert new.pointer_gen.rng is rng
 
 
 def test_vocabulary_map_param():

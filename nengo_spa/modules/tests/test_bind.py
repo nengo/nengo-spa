@@ -21,7 +21,7 @@ def test_basic():
 
 def test_run(Simulator, algebra, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(16, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network(seed=seed) as model:
@@ -53,7 +53,7 @@ def test_run(Simulator, algebra, seed):
 @pytest.mark.parametrize('side', ('left', 'right'))
 def test_unbind(Simulator, algebra, side, seed):
     rng = np.random.RandomState(seed)
-    vocab = spa.Vocabulary(64, rng=rng, algebra=algebra)
+    vocab = spa.Vocabulary(64, pointer_gen=rng, algebra=algebra)
     vocab.populate('A; B')
 
     with spa.Network(seed=seed) as model:

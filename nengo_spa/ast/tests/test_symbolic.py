@@ -32,7 +32,7 @@ def test_unary_minus_on_scalar(rng):
 
 
 def test_pointer_symbol_network_creation(rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A')
 
     with spa.Network():
@@ -43,7 +43,7 @@ def test_pointer_symbol_network_creation(rng):
 
 @pytest.mark.parametrize('op', ['-', '~'])
 def test_unary_operation_on_pointer_symbol(op, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A')
 
     with spa.Network():
@@ -54,7 +54,7 @@ def test_unary_operation_on_pointer_symbol(op, rng):
 
 @pytest.mark.parametrize('op', ['+', '-', '*'])
 def test_binary_operation_on_pointer_symbols(op, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network():
@@ -71,7 +71,7 @@ def test_pointer_symbol_mul_with_array():
 
 @pytest.mark.parametrize('op', ['+', '-'])
 def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A')
 
     with spa.Network():
@@ -80,7 +80,7 @@ def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
 
 
 def test_multiply_fixed_scalar_and_pointer_symbol(rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A')
 
     with spa.Network():
@@ -90,7 +90,7 @@ def test_multiply_fixed_scalar_and_pointer_symbol(rng):
 
 
 def test_fixed_dot(rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     v = TVocabulary(vocab)
@@ -102,7 +102,7 @@ def test_fixed_dot(rng):
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_fixed_dot_matmul(rng):
-    vocab = spa.Vocabulary(16, rng=rng)
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     v = TVocabulary(vocab)  # noqa: F841
@@ -111,9 +111,9 @@ def test_fixed_dot_matmul(rng):
 
 
 def test_translate(rng):
-    v1 = spa.Vocabulary(16, rng=rng)
+    v1 = spa.Vocabulary(16, pointer_gen=rng)
     v1.populate('A; B')
-    v2 = spa.Vocabulary(16, rng=rng)
+    v2 = spa.Vocabulary(16, pointer_gen=rng)
     v2.populate('A; B')
 
     assert_allclose(
@@ -122,9 +122,9 @@ def test_translate(rng):
 
 
 def test_reinterpret(rng):
-    v1 = spa.Vocabulary(16, rng=rng)
+    v1 = spa.Vocabulary(16, pointer_gen=rng)
     v1.populate('A; B')
-    v2 = spa.Vocabulary(16, rng=rng)
+    v2 = spa.Vocabulary(16, pointer_gen=rng)
     v2.populate('A; B')
 
     assert_equal(
