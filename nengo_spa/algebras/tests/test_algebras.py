@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 
-from nengo_spa.pointer import SemanticPointer
+from nengo_spa.vector_generation import UnitLengthVectors
 
 
 @pytest.mark.parametrize('d', [16, 25])
 def test_make_unitary(algebra, d, rng):
-    a = SemanticPointer(d, rng=rng).v
+    a = next(UnitLengthVectors(d, rng))
     b = algebra.make_unitary(a)
     for i in range(3):
         assert np.allclose(1, np.linalg.norm(a))
@@ -16,8 +16,9 @@ def test_make_unitary(algebra, d, rng):
 
 
 def test_superpose(algebra, rng):
-    a = SemanticPointer(16, rng).v
-    b = np.array(SemanticPointer(16, rng).v)
+    gen = UnitLengthVectors(16, rng)
+    a = next(gen)
+    b = next(gen)
     # Orthogonalize
     b -= np.dot(a, b) * a
     b /= np.linalg.norm(b)
@@ -29,8 +30,9 @@ def test_superpose(algebra, rng):
 
 @pytest.mark.parametrize('d', [25, 36])
 def test_binding_and_invert(algebra, d, rng):
-    a = SemanticPointer(d, rng=rng).v
-    b = SemanticPointer(d, rng=rng).v
+    gen = UnitLengthVectors(d, rng)
+    a = next(gen)
+    b = next(gen)
     bound = algebra.bind(a, b)
     r = algebra.bind(bound, algebra.invert(b))
     for v in (a, b):
@@ -46,8 +48,9 @@ def test_dimensionality_mismatch_exception(algebra):
 
 
 def test_get_binding_matrix(algebra, rng):
-    a = SemanticPointer(16, rng).v
-    b = SemanticPointer(16, rng).v
+    gen = UnitLengthVectors(16, rng)
+    a = next(gen)
+    b = next(gen)
 
     m = algebra.get_binding_matrix(b)
 
@@ -55,13 +58,13 @@ def test_get_binding_matrix(algebra, rng):
 
 
 def test_get_inversion_matrix(algebra, rng):
-    a = SemanticPointer(16, rng).v
+    a = next(UnitLengthVectors(16, rng))
     m = algebra.get_inversion_matrix(16)
     assert np.allclose(algebra.invert(a), np.dot(m, a))
 
 
 def test_absorbing_element(algebra, rng):
-    a = SemanticPointer(16, rng).v
+    a = next(UnitLengthVectors(16, rng))
     try:
         p = algebra.absorbing_element(16)
         r = algebra.bind(a, p)
@@ -72,13 +75,13 @@ def test_absorbing_element(algebra, rng):
 
 
 def test_identity_element(algebra, rng):
-    a = SemanticPointer(16, rng).v
+    a = next(UnitLengthVectors(16, rng))
     p = algebra.identity_element(16)
     assert np.allclose(algebra.bind(a, p), a)
 
 
 def test_zero_element(algebra, rng):
-    a = SemanticPointer(16, rng).v
+    a = next(UnitLengthVectors(16, rng))
     p = algebra.zero_element(16)
     assert np.all(p == 0.)
     assert np.allclose(algebra.bind(a, p), 0.)

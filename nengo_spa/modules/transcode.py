@@ -64,7 +64,7 @@ class TranscodeFunctionParam(Parameter):
         t = 0.
         if obj.input_vocab is not None:
             args = (t, SemanticPointer(
-                obj.input_vocab.dimensions, vocab=obj.input_vocab))
+                np.zeros(obj.input_vocab.dimensions), vocab=obj.input_vocab))
         elif obj.size_in is not None:
             args = (t, np.zeros(obj.size_in))
         else:

@@ -8,7 +8,6 @@ import pytest
 
 from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
-from nengo_spa.pointer import SemanticPointer
 from nengo_spa.vector_generation import AxisAlignedVectors
 from nengo_spa.vocab import (
     special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
@@ -243,11 +242,6 @@ def test_vocabulary_tracking(rng):
 
     assert v['A'].vocab is v
     assert v.parse('2 * A').vocab is v
-
-    v.add('B', SemanticPointer(32))
-    v.add('C', SemanticPointer(32, vocab=v))
-    with pytest.raises(ValidationError):
-        v.add('D', SemanticPointer(32, vocab=Vocabulary(32)))
 
 
 def test_vocabulary_set(rng):

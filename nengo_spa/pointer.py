@@ -1,6 +1,6 @@
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_array, is_integer, is_number
+from nengo.utils.compat import is_array, is_number
 import numpy as np
 
 from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
@@ -16,9 +16,8 @@ class SemanticPointer(Fixed):
 
     Parameters
     ----------
-    data : int or array_like
-        The vector constituting the Semantic Pointer. If an integer is given,
-        a random unit-length vector will be generated.
+    data : array_like
+        The vector constituting the Semantic Pointer.
     rng : numpy.random.RandomState, optional
         Random number generator used for random generation of a Semantic
         Pointer.
@@ -49,17 +48,9 @@ class SemanticPointer(Fixed):
         if rng is None:
             rng = np.random
 
-        if is_integer(data):
-            if data < 1:
-                raise ValidationError("Number of dimensions must be a "
-                                      "positive int", attr='data', obj=self)
-
-            self.v = rng.randn(data)
-            self.v /= np.linalg.norm(self.v)
-        else:
-            self.v = np.array(data, dtype=float)
-            if len(self.v.shape) != 1:
-                raise ValidationError("'data' must be a vector", 'data', self)
+        self.v = np.array(data, dtype=float)
+        if len(self.v.shape) != 1:
+            raise ValidationError("'data' must be a vector", 'data', self)
         self.v.setflags(write=False)
 
         self.vocab = vocab
