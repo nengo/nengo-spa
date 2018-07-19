@@ -68,6 +68,9 @@ class CircularConvolutionAlgebra(AbstractAlgebra):
         fft_imag = fft_val.imag
         fft_real = fft_val.real
         fft_norms = np.sqrt(fft_imag ** 2 + fft_real ** 2)
+        invalid = fft_norms <= 0.
+        fft_val[invalid] = 1.
+        fft_norms[invalid] = 1.
         fft_unit = fft_val / fft_norms
         return np.array((np.fft.ifft(fft_unit, n=len(v))).real)
 
