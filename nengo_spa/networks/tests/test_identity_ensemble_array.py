@@ -27,7 +27,7 @@ def test_identity_ensemble_array(Simulator, seed, rng, pointer):
         sim.run(0.3)
 
     actual = np.mean(sim.data[p][sim.trange() > 0.2], axis=0)
-    assert np.abs(v[0] - actual[0]) < 0.1
+    assert np.abs(v[0] - actual[0]) < 0.15
     assert np.linalg.norm(v - actual) < 0.2
 
 
