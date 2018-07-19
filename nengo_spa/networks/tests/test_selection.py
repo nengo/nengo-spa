@@ -42,9 +42,9 @@ def test_ia(Simulator, plt, seed):
     plt.xlabel("Time")
 
     first_selection = np.logical_and(0.15 < t, t < 0.4)
-    assert np.all(sim.data[out_p][first_selection, 0] > 0.85)
+    assert np.all(sim.data[out_p][first_selection, 0] > 0.8)
     assert_allclose(sim.data[out_p][first_selection, 1:], 0., atol=0.05)
-    assert np.all(sim.data[out_p][t > 0.95, 3] > 0.85)
+    assert np.all(sim.data[out_p][t > 0.95, 3] > 0.8)
     assert_allclose(sim.data[out_p][t > 0.95, :3], 0., atol=0.05)
 
 
