@@ -16,6 +16,13 @@ from nengo_spa.modules import (
     Thalamus,
     Transcode)
 from nengo_spa.network import create_inhibit_node, ifmax, Network
+from nengo_spa.pointer import SemanticPointer
+from nengo_spa.vector_generation import (
+    AxisAlignedVectors,
+    ExpectedUnitLengthVectors,
+    OrthonormalVectors,
+    UnitaryVectors,
+    UnitLengthVectors)
 from nengo_spa.vocab import Vocabulary
 
 
