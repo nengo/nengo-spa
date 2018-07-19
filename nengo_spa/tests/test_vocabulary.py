@@ -335,3 +335,11 @@ def test_vocabulary_or_dim_param():
 
     with pytest.raises(ValidationError):
         obj.vocab = 0
+
+
+def test_pointer_names():
+    v = Vocabulary(16)
+    v.populate('A; B')
+
+    assert v['A'].name == 'A'
+    assert v.parse('A*B').name == '(A)*(B)'
