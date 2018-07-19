@@ -58,9 +58,9 @@ def test_normalized():
     assert np.allclose(b.length(), 1)
 
 
-def test_str():
-    a = SemanticPointer([1, 1])
-    assert str(a) == str(np.array([1., 1.]))
+def test_normalized_zero():
+    a = SemanticPointer([0, 0]).normalized()
+    assert np.allclose(a.v, [0, 0])
 
 
 @pytest.mark.parametrize('d', [64, 65, 100])
@@ -180,6 +180,9 @@ def test_copy():
     assert a is not b
     assert a.v is not b.v
     assert np.allclose(a.v, b.v)
+    assert a.algebra is b.algebra
+    assert a.vocab is b.vocab
+    assert a.name is b.name
 
 
 def test_mse():
@@ -288,3 +291,25 @@ def test_absorbing_element(algebra):
 
 def test_zero(algebra):
     assert np.allclose(Zero(64, algebra=algebra).v, algebra.zero_element(64))
+
+
+def test_name():
+    a = SemanticPointer(np.ones(4), name='a')
+    b = SemanticPointer(np.ones(4), name='b')
+    unnamed = SemanticPointer(np.ones(4), name=None)
+
+    assert str(a) == "SemanticPointer<a>"
+    assert repr(a) == (
+        "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
+            a.v, a.vocab, a.algebra, a.name))
+
+    assert (-a).name == "-(a)"
+    assert (~a).name == "~(a)"
+    assert a.normalized().name == "(a).normalized()"
+    assert a.unitary().name == "(a).unitary()"
+    assert (a + b).name == "(a)+(b)"
+    assert (a * b).name == "(a)*(b)"
+    assert (2. * a).name == "(2.0)*(a)"
+
+    assert (a + unnamed).name is None
+    assert (a * unnamed).name is None

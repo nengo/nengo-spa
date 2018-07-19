@@ -198,7 +198,7 @@ class Vocabulary(Mapping):
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
         return semantic_pointer.SemanticPointer(
-            self._vectors[self._key2idx[key]], vocab=self)
+            self._vectors[self._key2idx[key]], vocab=self, name=key)
 
     def __hash__(self):
         return hash(id(self))

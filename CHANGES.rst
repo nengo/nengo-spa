@@ -48,6 +48,11 @@ Release History
   the respective special Semantic Pointers.
   (`#195 <https://github.com/nengo/nengo_spa/pull/195>`_,
   `#176 <https://github.com/nengo/nengo_spa/issues/176>`_)
+- *SemanticPointer* instance can now track names for improved labeling in Nengo
+  GUI.
+  (`#202 <https://github.com/nengo/nengo_spa/pull/202>`_,
+  `#184 <https://github.com/nengo/nengo_spa/issues/184>`_)
+
 
 **Changed**
 
