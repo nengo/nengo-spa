@@ -31,6 +31,11 @@ Release History
   particular binding operation.
   (`#69 <https://github.com/nengo/nengo_spa/issues/69>`__,
   `#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
+- Added generators for vectors with different properties that can be used to
+  define how vectors are created in a vocabulary (e.g., axis-aligned,
+  orthogonal, unitary).
+  (`#201 <https://github.com/nengo/nengo_spa/pull/201>`_,
+  `#129 <https://github.com/nengo/nengo_spa/issues/129>`_)
 - Added a matrix multiplication network ``nengo_spa.networks.MatrixMult`` based
   on the nengo-extras implementation.
   (`#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
@@ -50,6 +55,8 @@ Release History
   dictionaries and the string ``'by-key'``, a sequence of strings can be passed
   in to create an auto-associative memory.
   (`#177 <https://github.com/nengo/nengo_spa/pull/177>`_)
+- Changed the ``rng`` argument for ``Vocabulary`` to ``pointer_gen``.
+  (`#201 <https://github.com/nengo/nengo_spa/pull/201>`_)
 - Renamed ``input_a`` and ``input_b`` of the ``nengo_spa.Bind`` module to
   ``input_left`` and ``input_right`` to account for non-commutative binding
   methods where the order of operands matters. Also, renamed the ``invert_a``
@@ -65,6 +72,10 @@ Release History
   ``nengo_spa.algebras.CircularConvolutionAlgebra`` provides the same
   functionality.
   (`#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
+- The ``SemanticPointer`` class does no longer accept a single integer as
+  dimensionality to create a random vector. Use the new generators in
+  ``nengo_spa.vector_generation`` instead.
+  (`#201 <https://github.com/nengo/nengo_spa/pull/201>`_)
 
 
 0.5.2 (July 6, 2018)
