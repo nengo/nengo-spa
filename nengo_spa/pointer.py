@@ -297,7 +297,7 @@ class Identity(SemanticPointer):
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
-        with the `vocab` argument.
+        with the *vocab* argument.
     """
 
     def __init__(self, n_dimensions, vocab=None, algebra=None):
@@ -322,7 +322,7 @@ class AbsorbingElement(SemanticPointer):
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
-        with the `vocab` argument.
+        with the *vocab* argument.
     """
     def __init__(self, n_dimensions, vocab=None, algebra=None):
         data = self._get_algebra(vocab, algebra).absorbing_element(
@@ -344,7 +344,7 @@ class Zero(SemanticPointer):
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
-        with the `vocab` argument.
+        with the *vocab* argument.
     """
     def __init__(self, n_dimensions, vocab=None, algebra=None):
         data = self._get_algebra(vocab, algebra).zero_element(n_dimensions)

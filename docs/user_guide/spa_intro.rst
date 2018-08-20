@@ -99,10 +99,11 @@ If we want to know the color of the square, we can unbind the *square* vector:
 .. note::
 
    While circular convolution is the default binding operation in Nengo SPA and
-   has been used widely, other choices are possible, potentially better suited
-   for certain tasks, and also supported by Nengo SPA. The :doc:`algebras`
-   section explains how to use other binding operations. Choices included in
-   Nengo SPA are documented in the API documentation of `nengo_spa.algebras`.
+   has been used widely, other choices are possible. Other choices supported by
+   Nengo SPA are potentially better suited for certain tasks. The
+   :doc:`algebras` section explains how to use other binding operations. Choices
+   included in Nengo SPA are documented in the API documentation of
+   `nengo_spa.algebras`.
 
 
 An example: Spaun
@@ -180,4 +181,4 @@ All of the control-like steps (e.g. “compared with”, “inferred”, and rou
 information through the system), are implemented by a biologically plausible
 basal ganglia model. This is one example of the 8 different tasks that Spaun is
 able to perform. Videos for all tasks can be found `here
-<http://www.nengo.ca/build-a-brain/spaunvideos/>`_.
+<https://xchoo.github.io/spaun2.0/videos.html>`_.
