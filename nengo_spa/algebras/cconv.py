@@ -24,7 +24,7 @@ class CircularConvolutionAlgebra(AbstractAlgebra):
     .. math:: c = DFT^{-1} ( DFT(a) \odot DFT(b) )
 
     where :math:`DFT` is the Discrete Fourier Transform operator, and
-    :math:`DFT^{-1}` is its inverse. This network uses this method.
+    :math:`DFT^{-1}` is its inverse.
 
     Circular convolution as a binding operation is associative, commutative,
     distributive.
