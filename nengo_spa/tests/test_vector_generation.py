@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from nengo_spa.algebras import CircularConvolutionAlgebra
 from nengo_spa.pointer import SemanticPointer
@@ -38,3 +39,26 @@ def test_expected_unit_length_vectors(rng):
     g = ExpectedUnitLengthVectors(64, rng)
     assert np.abs(np.mean(
         [np.linalg.norm(next(g)) for i in range(50)]) - 1.) < 0.1
+
+
+@pytest.mark.parametrize('vg', (
+    AxisAlignedVectors,
+    ExpectedUnitLengthVectors,
+    OrthonormalVectors,
+    UnitLengthVectors,
+    lambda d: UnitaryVectors(d, algebra=CircularConvolutionAlgebra())))
+def test_instantiation_without_rng(vg):
+    d = 64
+    assert len(next(vg(d))) == d
+
+
+@pytest.mark.parametrize('vg', (
+    AxisAlignedVectors,
+    ExpectedUnitLengthVectors,
+    OrthonormalVectors,
+    UnitLengthVectors,
+    lambda d: UnitaryVectors(d, algebra=CircularConvolutionAlgebra())))
+def test_iter(vg):
+    d = 64
+    x = vg(d)
+    assert iter(x) is x
