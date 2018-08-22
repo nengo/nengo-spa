@@ -179,10 +179,10 @@ def test_exception_when_no_vocabularies_are_given():
 
 @pytest.mark.parametrize('value', [
     'String',
-    spa.pointer.Zero(32),
+    spa.semantic_pointer.Zero(32),
     spa.sym.Symbol,
     lambda t: 'String',
-    lambda t: spa.pointer.Zero(32),
+    lambda t: spa.semantic_pointer.Zero(32),
     lambda t: spa.sym.Symbol,
 ])
 def test_output_types(Simulator, value):

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from nengo_spa.algebras import CircularConvolutionAlgebra
-from nengo_spa.pointer import SemanticPointer
+from nengo_spa.algebras import HrrAlgebra
+from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.vector_generation import (
     AxisAlignedVectors, ExpectedUnitLengthVectors, OrthonormalVectors,
     UnitLengthVectors, UnitaryVectors)
@@ -20,7 +20,7 @@ def test_unit_length_pointers(rng):
 
 
 def test_unitary_pointers(rng):
-    algebra = CircularConvolutionAlgebra()
+    algebra = HrrAlgebra()
     g = UnitaryVectors(64, algebra, rng)
     a = SemanticPointer(next(g), algebra)
     b = SemanticPointer(next(g), algebra)
@@ -46,7 +46,7 @@ def test_expected_unit_length_vectors(rng):
     ExpectedUnitLengthVectors,
     OrthonormalVectors,
     UnitLengthVectors,
-    lambda d: UnitaryVectors(d, algebra=CircularConvolutionAlgebra())))
+    lambda d: UnitaryVectors(d, algebra=HrrAlgebra())))
 def test_instantiation_without_rng(vg):
     d = 64
     assert len(next(vg(d))) == d
@@ -57,7 +57,7 @@ def test_instantiation_without_rng(vg):
     ExpectedUnitLengthVectors,
     OrthonormalVectors,
     UnitLengthVectors,
-    lambda d: UnitaryVectors(d, algebra=CircularConvolutionAlgebra())))
+    lambda d: UnitaryVectors(d, algebra=HrrAlgebra())))
 def test_iter(vg):
     d = 64
     x = vg(d)

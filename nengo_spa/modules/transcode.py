@@ -8,8 +8,8 @@ import numpy as np
 
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.network import Network
-from nengo_spa.pointer import SemanticPointer
-from nengo_spa.vocab import VocabularyOrDimParam
+from nengo_spa.semantic_pointer import SemanticPointer
+from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class SpArrayExtractor(object):

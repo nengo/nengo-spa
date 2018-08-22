@@ -7,7 +7,7 @@ import nengo_spa as spa
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.examine import similarity
 from nengo_spa.network import create_inhibit_node
-from nengo_spa.vocab import VocabularyMap
+from nengo_spa.vocabulary import VocabularyMap
 
 
 class SpaCommunicationChannel(spa.Network):
@@ -106,8 +106,7 @@ def test_vocab_config():
     with spa.Network() as model:
         with spa.Network() as model.shared_vocabs:
             pass
-        with spa.Network(
-                vocabs=spa.vocab.VocabularyMap()) as model.non_shared_vocabs:
+        with spa.Network(vocabs=VocabularyMap()) as model.non_shared_vocabs:
             pass
 
     assert model.shared_vocabs.vocabs is model.vocabs

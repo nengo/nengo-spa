@@ -51,7 +51,7 @@ Commonly used classes and functions are accessible at the top level of the
 .. autosummary::
    :nosignatures:
 
-   nengo_spa.vocab.Vocabulary
+   nengo_spa.vocabulary.Vocabulary
 
 
 SPA Modules

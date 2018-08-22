@@ -8,8 +8,8 @@ import nengo.utils.numpy as npext
 from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_iterable
 
-from nengo_spa.pointer import SemanticPointer
-from nengo_spa.vocab import Vocabulary
+from nengo_spa.semantic_pointer import SemanticPointer
+from nengo_spa.vocabulary import Vocabulary
 
 
 def similarity(data, vocab, normalize=False):

@@ -15,7 +15,7 @@ any other Nengo SPA features.
 
 from nengo_spa.ast import dynamic as _dynamic
 
-from .assoc_mem import (
+from .associative_memory import (
     AssociativeMemory,
     IAAssocMem,
     ThresholdingAssocMem,

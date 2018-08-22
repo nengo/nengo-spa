@@ -1,5 +1,5 @@
 """Algebras define the specific superposition and (un)binding operations."""
 
 from .base import AbstractAlgebra
-from .cconv import CircularConvolutionAlgebra
-from .vtb import VtbAlgebra
+from .hrr_algebra import HrrAlgebra
+from .vtb_algebra import VtbAlgebra

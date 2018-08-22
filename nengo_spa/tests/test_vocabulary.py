@@ -9,7 +9,7 @@ import pytest
 from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.vector_generation import AxisAlignedVectors
-from nengo_spa.vocab import (
+from nengo_spa.vocabulary import (
     special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
 
 

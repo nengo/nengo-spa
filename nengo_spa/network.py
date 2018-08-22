@@ -6,12 +6,12 @@ from nengo.config import Config, SupportDefaultsMixin
 from nengo.utils.compat import is_string
 import numpy as np
 
-from nengo_spa.actions import ifmax as actions_ifmax
+from nengo_spa.action_selection import ifmax as actions_ifmax
 from nengo_spa.ast.base import Noop
 from nengo_spa.connectors import (
     as_ast_node, input_vocab_registry, output_vocab_registry, SpaOperatorMixin)
 from nengo_spa.types import TScalar
-from nengo_spa.vocab import VocabularyMap, VocabularyMapParam
+from nengo_spa.vocabulary import VocabularyMap, VocabularyMapParam
 
 
 class _AutoConfig(object):

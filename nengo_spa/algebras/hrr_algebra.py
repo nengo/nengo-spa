@@ -6,8 +6,8 @@ from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
-class CircularConvolutionAlgebra(AbstractAlgebra):
-    r"""Circular convolution algebra.
+class HrrAlgebra(AbstractAlgebra):
+    r"""Holographic Reduced Representations (HRRs) algebra.
 
     Uses element-wise addition for superposition, circular convolution for
     binding with an approximate inverse.
@@ -41,7 +41,7 @@ class CircularConvolutionAlgebra(AbstractAlgebra):
 
     def __new__(cls):
         if type(cls._instance) is not cls:
-            cls._instance = super(CircularConvolutionAlgebra, cls).__new__(cls)
+            cls._instance = super(HrrAlgebra, cls).__new__(cls)
         return cls._instance
 
     def is_valid_dimensionality(self, d):

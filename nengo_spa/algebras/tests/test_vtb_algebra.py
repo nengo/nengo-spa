@@ -1,7 +1,7 @@
 import numpy as np
 
-from nengo_spa.algebras.vtb import VtbAlgebra
-from nengo_spa.pointer import SemanticPointer
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
+from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.vector_generation import UnitLengthVectors
 
 

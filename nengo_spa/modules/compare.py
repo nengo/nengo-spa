@@ -3,7 +3,7 @@ from nengo.params import Default, IntParam
 import numpy as np
 
 from nengo_spa.network import Network
-from nengo_spa.vocab import VocabularyOrDimParam
+from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class Compare(Network):

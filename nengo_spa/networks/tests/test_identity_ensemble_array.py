@@ -4,7 +4,7 @@ from numpy.testing import assert_almost_equal
 import pytest
 
 from nengo_spa.networks.identity_ensemble_array import IdentityEnsembleArray
-from nengo_spa.pointer import Identity, SemanticPointer
+from nengo_spa.semantic_pointer import Identity, SemanticPointer
 from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 

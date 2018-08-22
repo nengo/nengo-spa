@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.algebras.vtb import VtbAlgebra
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 from nengo_spa.networks.vtb import VTB
 from nengo_spa.testing import assert_sp_close
 
