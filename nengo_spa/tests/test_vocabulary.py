@@ -77,6 +77,12 @@ def test_pointer_gen():
     assert np.all(v.vectors == np.eye(32)[:3])
 
 
+@pytest.mark.parametrize('pointer_gen', ('string', 123))
+def test_invalid_pointer_gen(pointer_gen):
+    with pytest.raises(ValidationError):
+        Vocabulary(32, pointer_gen=pointer_gen)
+
+
 @pytest.mark.parametrize('name', (
     'None', 'True', 'False', 'Zero', 'AbsorbingElement', 'Identity'))
 def test_reserved_names(name):
