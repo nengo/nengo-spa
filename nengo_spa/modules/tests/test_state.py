@@ -114,7 +114,7 @@ def test_represent_identity(Simulator, seed):
     d = 32
     with spa.Network(seed=seed) as model:
         memory = spa.State(d, represent_identity=True)
-        spa.pointer.Identity(d) >> memory
+        spa.semantic_pointer.Identity(d) >> memory
         p = nengo.Probe(memory.output, synapse=0.03)
 
     with Simulator(model) as sim:

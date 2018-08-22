@@ -4,7 +4,7 @@ import nengo
 from nengo.utils.numpy import rmse
 
 import nengo_spa as spa
-from nengo_spa.vocab import VocabularyMap
+from nengo_spa.vocabulary import VocabularyMap
 
 
 def test_basic():

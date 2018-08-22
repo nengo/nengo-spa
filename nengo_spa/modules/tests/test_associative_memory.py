@@ -5,7 +5,7 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa import Vocabulary
-from nengo_spa.modules.assoc_mem import (
+from nengo_spa.modules.associative_memory import (
     ThresholdingAssocMem, WTAAssocMem, IAAssocMem)
 from nengo_spa.examine import similarity
 from nengo_spa.testing import assert_sp_close

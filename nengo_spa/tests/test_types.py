@@ -3,7 +3,7 @@ import pytest
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import (
     coerce_types, TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary, Type)
-from nengo_spa.vocab import Vocabulary
+from nengo_spa.vocabulary import Vocabulary
 
 
 def test_coercion():

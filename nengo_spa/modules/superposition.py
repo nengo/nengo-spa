@@ -1,7 +1,7 @@
 from nengo.params import Default, IntParam
 
 from nengo_spa.network import Network
-from nengo_spa.vocab import VocabularyOrDimParam
+from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class Superposition(Network):

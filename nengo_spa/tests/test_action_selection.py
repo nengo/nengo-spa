@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.actions import ActionSelection
+from nengo_spa.action_selection import ActionSelection
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.testing import assert_sp_close

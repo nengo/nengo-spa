@@ -5,7 +5,7 @@ from nengo.params import BoolParam, Default, IntParam, NumberParam
 
 from nengo_spa.network import Network
 from nengo_spa.networks import IdentityEnsembleArray
-from nengo_spa.vocab import VocabularyOrDimParam
+from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class State(Network):

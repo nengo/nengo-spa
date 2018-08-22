@@ -11,11 +11,12 @@ import nengo_spa as spa
 from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.pointer import AbsorbingElement, Identity, SemanticPointer, Zero
+from nengo_spa.semantic_pointer import (
+    AbsorbingElement, Identity, SemanticPointer, Zero)
 from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
-from nengo_spa.vocab import Vocabulary
+from nengo_spa.vocabulary import Vocabulary
 
 
 def test_init():
@@ -162,7 +163,7 @@ def test_distance(rng):
     a = SemanticPointer(next(gen))
     b = SemanticPointer(next(gen))
     assert a.distance(a) < 1e-5
-    assert a.distance(b) > 0.85
+    assert a.distance(b) > 0.7
 
 
 def test_len():

@@ -6,8 +6,8 @@ from nengo.conftest import (  # pylint: disable=unused-import
 from nengo.utils.testing import Plotter
 import pytest
 
-from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
-from nengo_spa.algebras.vtb import VtbAlgebra
+from nengo_spa.algebras.hrr_algebra import HrrAlgebra
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 
 
 class TestConfig(object):
@@ -21,7 +21,7 @@ class TestConfig(object):
     module modify these values accordingly.
     """
 
-    algebras = [CircularConvolutionAlgebra(), VtbAlgebra()]
+    algebras = [HrrAlgebra(), VtbAlgebra()]
 
 
 def pytest_generate_tests(metafunc):

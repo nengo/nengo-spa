@@ -8,7 +8,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.pointer import SemanticPointer
+from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.testing import assert_sp_close
 
 

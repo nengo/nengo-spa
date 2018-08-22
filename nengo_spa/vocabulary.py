@@ -9,10 +9,10 @@ from nengo.utils.compat import (
     is_number, is_integer, is_iterable, is_string, range)
 import numpy as np
 
-from nengo_spa import pointer
-from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
+from nengo_spa import semantic_pointer
+from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.exceptions import SpaParseError
-from nengo_spa.pointer import AbsorbingElement, Identity, Zero
+from nengo_spa.semantic_pointer import AbsorbingElement, Identity, Zero
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -89,7 +89,7 @@ class Vocabulary(Mapping):
             self, dimensions, strict=True, max_similarity=0.1,
             pointer_gen=None, name=None, algebra=None):
         if algebra is None:
-            algebra = CircularConvolutionAlgebra()
+            algebra = HrrAlgebra()
         self.algebra = algebra
 
         if not is_integer(dimensions) or dimensions < 1:
@@ -152,7 +152,8 @@ class Vocabulary(Mapping):
         best_p = None
         best_sim = np.inf
         for _ in range(attempts):
-            p = pointer.SemanticPointer(next(self.pointer_gen), vocab=self)
+            p = semantic_pointer.SemanticPointer(
+                next(self.pointer_gen), vocab=self)
             if transform is not None:
                 p = eval('p.' + transform, dict(self), {'p': p})
             if len(self) == 0:
@@ -196,7 +197,7 @@ class Vocabulary(Mapping):
             return special_sps[key](self.dimensions, self)
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
-        return pointer.SemanticPointer(
+        return semantic_pointer.SemanticPointer(
             self._vectors[self._key2idx[key]], vocab=self)
 
     def __hash__(self):
@@ -220,8 +221,8 @@ class Vocabulary(Mapping):
                 "Invalid Semantic Pointer name {!r}. Valid names are valid "
                 "Python 2 identifiers beginning with a capital letter.".format(
                     key))
-        if not isinstance(p, pointer.SemanticPointer):
-            p = pointer.SemanticPointer(p, vocab=self)
+        if not isinstance(p, semantic_pointer.SemanticPointer):
+            p = semantic_pointer.SemanticPointer(p, vocab=self)
 
         if key in self._key2idx:
             raise ValidationError("The semantic pointer %r already exists"
@@ -302,7 +303,7 @@ class Vocabulary(Mapping):
 
         if is_number(value):
             value *= Identity(self.dimensions)
-        elif not isinstance(value, pointer.SemanticPointer):
+        elif not isinstance(value, semantic_pointer.SemanticPointer):
             raise SpaParseError(
                 "The result of parsing '%s' is not a SemanticPointer." % text)
         return value
@@ -319,7 +320,7 @@ class Vocabulary(Mapping):
         v : SemanticPointer or array_like
             SemanticPointer to calculate dot product with.
         """
-        if isinstance(v, pointer.SemanticPointer):
+        if isinstance(v, semantic_pointer.SemanticPointer):
             v = v.v
         return np.dot(self._vectors, v)
 

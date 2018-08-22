@@ -3,7 +3,7 @@ from nengo.exceptions import ValidationError
 from nengo.utils.compat import is_array, is_number
 import numpy as np
 
-from nengo_spa.algebras.cconv import CircularConvolutionAlgebra
+from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
@@ -58,7 +58,7 @@ class SemanticPointer(Fixed):
     def _get_algebra(cls, vocab, algebra):
         if algebra is None:
             if vocab is None:
-                algebra = CircularConvolutionAlgebra()
+                algebra = HrrAlgebra()
             else:
                 algebra = vocab.algebra
         elif vocab is not None and vocab.algebra is not algebra:

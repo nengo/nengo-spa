@@ -1,7 +1,7 @@
 nengo\_spa\.pointer
 ===================
 
-.. automodule:: nengo_spa.pointer
+.. automodule:: nengo_spa.semantic_pointer
    :exclude-members: SemanticPointer
    :show-inheritance:
 

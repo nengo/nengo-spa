@@ -8,5 +8,5 @@ nengo\_spa\.algebras
    .. autosummary::
 
       AbstractAlgebra
-      CircularConvolutionAlgebra
+      HrrAlgebra
       VtbAlgebra
