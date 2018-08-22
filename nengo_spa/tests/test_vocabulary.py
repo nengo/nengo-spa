@@ -179,14 +179,14 @@ def test_transform(recwarn, rng, solver):
     # Expected: np.dot(t, C.v) ~= v2.parse('C')
     t = v1.transform_to(v2, solver=solver)
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
-    assert v2.parse('C+B').compare(np.dot(t, C.v + B.v)) > 0.9
+    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.85
+    assert v2.parse('C+B').compare(np.dot(t, C.v + B.v)) > 0.85
 
     # Test transform from v1 to v2 (only 'A' and 'B')
     t = v1.transform_to(v2, keys=['A', 'B'], solver=solver)
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.9
-    assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.9
+    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.85
+    assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.85
 
     # Test warns on missing keys
     v1.populate('D')
@@ -196,7 +196,7 @@ def test_transform(recwarn, rng, solver):
 
     # Test populating missing keys
     t = v1.transform_to(v2, populate=True, solver=solver)
-    assert v2.parse('D').compare(np.dot(t, D.v)) > 0.9
+    assert v2.parse('D').compare(np.dot(t, D.v)) > 0.85
 
     # Test ignores missing keys in source vocab
     v2.populate('E')
