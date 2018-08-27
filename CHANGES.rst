@@ -87,6 +87,15 @@ Release History
   (`#201 <https://github.com/nengo/nengo_spa/pull/201>`_)
 
 
+**Fixed**
+
+- Raise an exception instead of returning incorrect results from
+  ``prob_cleanup``. Also, fix the function's incorrect documentation.
+  (`#203 <https://github.com/nengo/nengo_spa/issues/203>`__,
+  `#206 <https://github.com/nengo/nengo_spa/pull/206>`__)
+
+
+
 0.5.2 (July 6, 2018)
 ====================
 
