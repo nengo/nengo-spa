@@ -126,12 +126,7 @@ class VtbAlgebra(AbstractAlgebra):
             Matrix to multiply with a vector to switch left and right operand
             in bound state.
         """
-        sub_d = self._get_sub_d(d)
-        m = np.zeros((d, d))
-        for i in range(d):
-            j = i // sub_d + sub_d * (i % sub_d)
-            m[i, j] = 1.
-        return m
+        return self.get_inversion_matrix(d)
 
     def get_inversion_matrix(self, d):
         sub_d = self._get_sub_d(d)
