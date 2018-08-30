@@ -98,7 +98,9 @@ Release History
   ``prob_cleanup``. Also, fix the function's incorrect documentation.
   (`#203 <https://github.com/nengo/nengo_spa/issues/203>`__,
   `#206 <https://github.com/nengo/nengo_spa/pull/206>`__)
-
+- Fix ``nengo_spa.ActionSelection.keys()`` when no named actions have been
+  provided.
+  (`#210 <https://github.com/nengo/nengo_spa/pull/210>`_)
 
 
 0.5.2 (July 6, 2018)
