@@ -20,11 +20,19 @@
 Implementation of the Semantic Pointer Architecture for Nengo
 *************************************************************
 
+The `Semantic Pointer Architecture
+<https://www.nengo.ai/nengo-spa/user_guide/spa_intro.html>`_ provides an
+approach to building cognitive models implemented with large-scale spiking
+neural networks.
+
 Project status
 ==============
 
-- All of the core functionality is implemented, but some of the API might still
-  be subject to changes.
+- All of the core functionality is implemented and most of the API should be
+  fairly stable.
+- While basic integration with the Nengo GUI works, it should be improved in
+  the future. However, those improvements will mostly depend on Nengo GUI
+  providing an appropriate plugin system.
 
 Installation
 ============
