@@ -25,6 +25,24 @@ The `Semantic Pointer Architecture
 approach to building cognitive models implemented with large-scale spiking
 neural networks.
 
+Feature highlights
+==================
+
+- Write arbitrarily complex expressions with type checking involving neurally
+  represented and static Semantic Pointers like
+  ``dot((role * filler + BiasVector) * tag, cmp) >> target``. Nengo SPA will
+  take care of implementing the required neural networks.
+- Quickly implement action selection systems based on a biological plausible
+  model of the basal ganglia and thalamus.
+- Neural representations are optimized for representing Semantic Pointers.
+- Support for using different binding methods with algebras. Nengo SPA ships
+  with implementations of circular convolution (default) and vector-derived
+  transformation binding (VTB), which is particularly suitable for deep
+  structures. Different binding operations/algebras can be mixed in a single
+  model.
+- Seamless integration with non-SPA Nengo models.
+
+
 Project status
 ==============
 
