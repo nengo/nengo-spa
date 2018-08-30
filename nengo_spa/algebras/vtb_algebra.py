@@ -130,11 +130,7 @@ class VtbAlgebra(AbstractAlgebra):
 
     def get_inversion_matrix(self, d):
         sub_d = self._get_sub_d(d)
-        m = np.zeros((d, d))
-        for i in range(d):
-            j = sub_d * i
-            m[j % d + j // d, i] = 1.
-        return m
+        return np.eye(d).reshape(d, sub_d, sub_d).T.reshape(d, d)
 
     def implement_superposition(self, n_neurons_per_d, d, n):
         node = nengo.Node(size_in=d)
