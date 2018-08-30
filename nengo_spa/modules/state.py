@@ -28,7 +28,7 @@ class State(Network):
     feedback : float, optional (Default: 0.0)
         Gain of feedback connection. Set to 1.0 for perfect memory,
         or 0.0 for no memory. Values in between will create a decaying memory.
-    represent_identity : bool, optional
+    represent_cc_identity : bool, optional
         Whether to use optimizations to better represent the circular
         convolution identity vector. If activated, the `.IdentityEnsembleArray`
         will be used internally, otherwise a normal
@@ -54,12 +54,12 @@ class State(Network):
     feedback = NumberParam('feedback', default=.0, readonly=True)
     feedback_synapse = NumberParam(
         'feedback_synapse', default=.1, readonly=True)
-    represent_identity = BoolParam(
-        'represent_identity', default=True, readonly=True)
+    represent_cc_identity = BoolParam(
+        'represent_cc_identity', default=True, readonly=True)
 
     def __init__(self, vocab=Default, subdimensions=Default,
                  neurons_per_dimension=Default, feedback=Default,
-                 represent_identity=Default,
+                 represent_cc_identity=Default,
                  feedback_synapse=Default, **kwargs):
         kwargs.setdefault('label', "State")
         super(State, self).__init__(**kwargs)
@@ -69,7 +69,7 @@ class State(Network):
         self.neurons_per_dimension = neurons_per_dimension
         self.feedback = feedback
         self.feedback_synapse = feedback_synapse
-        self.represent_identity = represent_identity
+        self.represent_cc_identity = represent_cc_identity
 
         dimensions = self.vocab.dimensions
 
@@ -80,7 +80,7 @@ class State(Network):
                 attr='dimensions', obj=self)
 
         with self:
-            if self.represent_identity:
+            if self.represent_cc_identity:
                 self.state_ensembles = IdentityEnsembleArray(
                     self.neurons_per_dimension, dimensions, self.subdimensions,
                     label='state')

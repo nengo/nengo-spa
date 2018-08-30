@@ -79,6 +79,11 @@ Release History
   able to do unbinding.
   (`#69 <https://github.com/nengo/nengo_spa/issues/69>`__,
   `#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
+- Renamed the ``nengo_spa.State`` parameter ``represent_identity`` to
+  ``represent_cc_identity`` to reflect that it only optimizes for the circular
+  convolution identity, but not the identity for other binding operations.
+  (`#212 <https://github.com/nengo/nengo_spa/pull/212>`_)
+
 
 **Removed**
 
