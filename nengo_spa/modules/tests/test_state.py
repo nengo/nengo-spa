@@ -7,7 +7,7 @@ import nengo_spa as spa
 def test_neurons():
     with spa.Network():
         state = spa.State(
-            vocab=16, neurons_per_dimension=2, represent_identity=False)
+            vocab=16, neurons_per_dimension=2, represent_cc_identity=False)
 
     assert len(state.state_ensembles.ensembles) == 1
     assert state.state_ensembles.ensembles[0].n_neurons == 16 * 2
@@ -15,7 +15,7 @@ def test_neurons():
     with spa.Network():
         state = spa.State(
             vocab=16, subdimensions=1, neurons_per_dimension=2,
-            represent_identity=False)
+            represent_cc_identity=False)
 
     assert len(state.state_ensembles.ensembles) == 16
     assert state.state_ensembles.ensembles[0].n_neurons == 2
@@ -110,10 +110,10 @@ def test_memory_run_decay(Simulator, plt, seed):
     assert data[t == 0.299, 0] < 0.4
 
 
-def test_represent_identity(Simulator, seed):
+def test_represent_cc_identity(Simulator, seed):
     d = 32
     with spa.Network(seed=seed) as model:
-        memory = spa.State(d, represent_identity=True)
+        memory = spa.State(d, represent_cc_identity=True)
         spa.semantic_pointer.Identity(d) >> memory
         p = nengo.Probe(memory.output, synapse=0.03)
 
