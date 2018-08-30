@@ -106,6 +106,12 @@ Release History
 - Fix ``nengo_spa.ActionSelection.keys()`` when no named actions have been
   provided.
   (`#210 <https://github.com/nengo/nengo_spa/pull/210>`_)
+- Do not create an unnecessary compare network when computing a dot product
+  with a ``SemanticPointer`` instance.
+  (`#202 <https://github.com/nengo/nengo_spa/pull/202>`__)
+- Handle ``SemanticPointer`` instances correctly as first argument to
+  ``nengo_spa.dot``.
+  (`#202 <https://github.com/nengo/nengo_spa/pull/202>`__)
 
 
 0.5.2 (July 6, 2018)

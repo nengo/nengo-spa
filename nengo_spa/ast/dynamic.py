@@ -5,7 +5,7 @@ from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
-from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol, Symbol
+from nengo_spa.ast.symbolic import Fixed, FixedScalar, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
 
@@ -119,7 +119,7 @@ class DynamicNode(Node):
         if self.type == TScalar or other.type == TScalar:
             raise SpaTypeError("Cannot do a dot product with a scalar.")
 
-        if isinstance(other, PointerSymbol):
+        if isinstance(other, Fixed):
             tr = np.atleast_2d(other.evaluate().v)
             return Transformed(self, tr, TScalar)
         else:

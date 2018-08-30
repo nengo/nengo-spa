@@ -238,15 +238,19 @@ def test_dot(Simulator, rng):
     assert np.all(sim.data[p][0.8 < t] < 0.2)
 
 
-def test_dot_with_fixed(Simulator, rng):
+@pytest.mark.parametrize('a', ("PointerSymbol('A')", "vocab['A']"))
+def test_dot_with_fixed(Simulator, rng, a):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate('A; B')
 
     with spa.Network() as model:
-        a = PointerSymbol('A')
+        a = eval(a)
         b = spa.Transcode(
             lambda t: 'A' if t <= 0.5 else 'B', output_vocab=vocab)
+        network_count = len(model.all_networks)
         x = spa.dot(a, b)
+        # transform should suffice, no new networks should be created
+        assert len(model.all_networks) == network_count
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with nengo.Simulator(model) as sim:

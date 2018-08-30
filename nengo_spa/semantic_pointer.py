@@ -265,7 +265,10 @@ class SemanticPointer(Fixed):
         if isinstance(other, Fixed):
             infer_types(self, other)
             other = other.evaluate().v
-        return np.dot(self.v, other)
+        if is_array(other):
+            return np.dot(self.v, other)
+        else:
+            return other.dot(self)
 
     def __matmul__(self, other):
         return self.dot(other)
