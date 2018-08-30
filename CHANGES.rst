@@ -52,6 +52,8 @@ Release History
   GUI.
   (`#202 <https://github.com/nengo/nengo_spa/pull/202>`_,
   `#184 <https://github.com/nengo/nengo_spa/issues/184>`_)
+- Label the utility nodes for the action selection.
+  (`#202 <https://github.com/nengo/nengo_spa/pull/202>`__)
 
 
 **Changed**
