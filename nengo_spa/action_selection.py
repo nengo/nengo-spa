@@ -149,10 +149,12 @@ class ActionSelection(Mapping):
 
     def add_action(self, name, *actions):
         assert ActionSelection.active is self
-        utility = input_vocab_registry.declare_connector(
-            nengo.Node(size_in=1), None)
         if name is not None:
             self._name2idx[name] = len(self._actions)
+        else:
+            name = str(len(self._actions))
+        utility = input_vocab_registry.declare_connector(
+            nengo.Node(size_in=1, label="Utility for action " + name), None)
         self._utilities.append(utility)
         self._actions.append(actions)
         RoutedConnection.free_floating.difference_update(actions)
