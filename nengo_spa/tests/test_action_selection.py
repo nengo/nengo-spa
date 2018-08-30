@@ -378,3 +378,15 @@ def test_naming_of_actions():
     assert action_sel['name2'] is u2
     for i, u in enumerate((u0, u1, u2)):
         assert action_sel[i] is u
+
+
+def test_action_selection_keys_corner_cases():
+    with spa.Network():
+        with ActionSelection() as action_sel:
+            pass
+    assert list(action_sel.keys()) == []
+
+    with spa.Network():
+        with ActionSelection() as action_sel:
+            spa.ifmax(0.)
+    assert list(action_sel.keys()) == [0]

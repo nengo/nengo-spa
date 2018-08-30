@@ -135,6 +135,7 @@ class ActionSelection(Mapping):
     def __iter__(self):
         # Given not all actions have names, there will actions whose keys
         # will be numbers and not names.
+        i = -1
         for i, (name, v) in enumerate(self._name2idx.items()):
             while i < v:
                 yield i
