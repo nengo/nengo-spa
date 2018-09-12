@@ -148,6 +148,9 @@ def test_dot(rng):
     a = SemanticPointer(next(gen)) * 1.1
     b = SemanticPointer(next(gen)) * (-1.5)
     assert np.allclose(a.dot(b), np.dot(a.v, b.v))
+    assert np.allclose(a.dot(b.v), np.dot(a.v, b.v))
+    assert np.allclose(a.dot(list(b.v)), np.dot(a.v, b.v))
+    assert np.allclose(a.dot(tuple(b.v)), np.dot(a.v, b.v))
 
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
