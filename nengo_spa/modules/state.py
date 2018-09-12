@@ -20,11 +20,13 @@ class State(Network):
         The vocabulary to use to interpret the vector. If an integer is given,
         the default vocabulary of that dimensionality will be used.
     subdimensions : int, optional (Default: 16)
-        Size of the individual ensembles making up the vector.
-        Must divide *dimensions* evenly.
-    neurons_per_dimensions : int, optional (Default: 50)
-        Number of neurons per dimension. Total number in an ensemble will be
-        ``neurons_per_dimensions * subdimensions``.
+        The dimension of the individual ensembles making up the vector.
+        Must divide *dimensions* evenly. The number of sub-ensembles
+        will be ``dimensions // subdimensions``.
+    neurons_per_dimension : int, optional (Default: 50)
+        Number of neurons per dimension. Each ensemble will have
+        ``neurons_per_dimension * subdimensions`` neurons, for a total of
+        ``neurons_per_dimension * dimensions`` neurons.
     feedback : float, optional (Default: 0.0)
         Gain of feedback connection. Set to 1.0 for perfect memory,
         or 0.0 for no memory. Values in between will create a decaying memory.
