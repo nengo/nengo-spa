@@ -18,9 +18,6 @@ class SemanticPointer(Fixed):
     ----------
     data : array_like
         The vector constituting the Semantic Pointer.
-    rng : numpy.random.RandomState, optional
-        Random number generator used for random generation of a Semantic
-        Pointer.
     vocab : Vocabulary, optional
         Vocabulary that the Semantic Pointer is considered to be part of.
         Mutually exclusive with the *algebra* argument.
@@ -44,13 +41,10 @@ class SemanticPointer(Fixed):
         Name of the Semantic Pointer.
     """
 
-    def __init__(self, data, rng=None, vocab=None, algebra=None, name=None):
+    def __init__(self, data, vocab=None, algebra=None, name=None):
         super(SemanticPointer, self).__init__(
             TAnyVocab if vocab is None else TVocabulary(vocab))
         self.algebra = self._get_algebra(vocab, algebra)
-
-        if rng is None:
-            rng = np.random
 
         self.v = np.array(data, dtype=float)
         if len(self.v.shape) != 1:

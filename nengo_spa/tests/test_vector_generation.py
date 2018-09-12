@@ -22,9 +22,9 @@ def test_unit_length_pointers(rng):
 def test_unitary_pointers(rng):
     algebra = HrrAlgebra()
     g = UnitaryVectors(64, algebra, rng)
-    a = SemanticPointer(next(g), algebra)
-    b = SemanticPointer(next(g), algebra)
-    c = SemanticPointer(next(g), algebra)
+    a = SemanticPointer(next(g), algebra=algebra)
+    b = SemanticPointer(next(g), algebra=algebra)
+    c = SemanticPointer(next(g), algebra=algebra)
     assert np.allclose(a.compare(c), (a * b).compare(c * b))
 
 
