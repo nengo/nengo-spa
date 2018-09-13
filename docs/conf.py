@@ -46,6 +46,11 @@ intersphinx_mapping = {
 # -- sphinx.ext.todo
 todo_include_todos = True
 
+# linkcheck
+linkcheck_ignore = [
+    r'^https?://www\.amazon\..*$',
+]
+
 # -- nbsphinx
 nbsphinx_allow_errors = False
 nbsphinx_timeout = 300
