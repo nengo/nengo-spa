@@ -32,7 +32,7 @@ docs_require = [
     "jupyter_client",
     "sphinx",
     "nbsphinx",
-    "sphinx_rtd_theme>=0.4.2",
+    "nengo_sphinx_theme",
 ]
 optional_requires = [
     "scipy"
@@ -67,7 +67,7 @@ setup(
         "nengo>=2.7,<4.0",
         "numpy>=1.8",
     ],
-    extras_require = {
+    extras_require={
         "all": docs_require + optional_requires + tests_require,
         "docs": docs_require,
         "optional": optional_requires,
