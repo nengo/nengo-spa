@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-0.6.0 (unreleased)
-==================
+0.6.0 (September 17, 2018)
+==========================
 
 **Added**
 
@@ -60,11 +60,13 @@ Release History
 
 - A number of module names have been changed for better naming consistency.
   In particular,
+
   - ``nengo_spa.actions`` to ``nengo_spa.action_selection``,
   - ``nengo_spa.pointer`` to ``nengo_spa.semantic_pointer``,
   - ``nengo_spa.vocab`` to ``nengo_spa.vocabulary``,
   - and ``nengo_spa.modules.assoc_mem`` to
     ``nengo_spa.modules.associative_memory``.
+
   (`#199 <https://github.com/nengo/nengo_spa/issues/199>`_,
   `#205 <https://github.com/nengo/nengo_spa/pull/205>`_)
 - Require the ``mapping`` argument for associative memories. In addition to
