@@ -32,7 +32,7 @@ docs_require = [
     "jupyter_client",
     "sphinx",
     "nbsphinx",
-    "sphinx_rtd_theme",
+    "sphinx_rtd_theme>=0.4.2",
 ]
 optional_requires = [
     "scipy"
