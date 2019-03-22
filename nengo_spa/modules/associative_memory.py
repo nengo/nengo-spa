@@ -52,6 +52,8 @@ class AssociativeMemory(Network):
         See `nengo.Network` for more details.
     vocabs : VocabularyMap, optional
         Maps dimensionalities to the corresponding default vocabularies.
+    selection_net_args : dict
+        Additional arguments that will passed to the *selection_net*.
     """
     input_vocab = VocabularyOrDimParam(
         'input_vocab', default=None, readonly=True)
