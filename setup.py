@@ -40,7 +40,7 @@ optional_requires = [
 tests_require = [
     "jupyter",
     "matplotlib>=2.0",
-    "pytest>=2.3",
+    "pytest>=2.3, <4.0",
 ]
 
 setup(
