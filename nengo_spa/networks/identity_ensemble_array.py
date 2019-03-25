@@ -172,8 +172,8 @@ class IdentityEnsembleArray(nengo.Network):
         """
         if is_iterable(function):
             function = list(function)
-            if (len(function) != 3 and
-                    len(function) != self.remainder.n_ensembles + 2):
+            if (len(function) != 3
+                    and len(function) != self.remainder.n_ensembles + 2):
                 raise ValidationError(
                     "Must provide one function per ensemble or one function "
                     "each for the first ensemble, the second ensembles, and "

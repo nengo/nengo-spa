@@ -1,9 +1,9 @@
 import pytest
 
 import nengo
-import nengo_spa as spa
-
 import numpy as np
+
+import nengo_spa as spa
 
 
 def test_thalamus_basic(Simulator, plt, seed):

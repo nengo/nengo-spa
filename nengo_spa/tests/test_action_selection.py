@@ -351,7 +351,7 @@ def test_action_selection_enforces_connections_to_be_part_of_action():
         state2 = spa.State(16)
         with pytest.raises(SpaActionSelectionError):
             with ActionSelection():
-                    state1 >> state2
+                state1 >> state2
 
 
 def test_action_selection_is_not_built_on_exception():

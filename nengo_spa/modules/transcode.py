@@ -53,8 +53,8 @@ class TranscodeFunctionParam(Parameter):
             return fn
         elif callable(fn):
             return self.coerce_callable(obj, fn)
-        elif not obj.input_vocab and (is_string(fn) or
-                                      isinstance(fn, pointer_cls)):
+        elif not obj.input_vocab and (is_string(fn)
+                                      or isinstance(fn, pointer_cls)):
             return fn
         else:
             raise ValidationError("Invalid output type {!r}".format(

@@ -75,8 +75,8 @@ def IA(
 
     bar_beta = 1. + radius * feedback_timescale / accum_timescale
     feedback_tr = (
-        np.eye(n_ensembles) - bar_beta * (1. - np.eye(n_ensembles)) /
-        feedback_timescale)
+        np.eye(n_ensembles) - bar_beta * (1. - np.eye(n_ensembles))
+        / feedback_timescale)
 
     with nengo.Network(**kwargs) as net:
         net.accumulators = Thresholding(

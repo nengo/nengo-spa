@@ -91,8 +91,8 @@ class TAnyVocabOfDim(Type):
     def __eq__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return (super(TAnyVocabOfDim, self).__eq__(other) and
-                self.dimensions == other.dimensions)
+        return (super(TAnyVocabOfDim, self).__eq__(other)
+                and self.dimensions == other.dimensions)
 
     def __gt__(self, other):
         if not isinstance(other, Type):
@@ -127,8 +127,8 @@ class TVocabulary(Type):
     def __eq__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return (super(TVocabulary, self).__eq__(other) and
-                self.vocab is other.vocab)
+        return (super(TVocabulary, self).__eq__(other)
+                and self.vocab is other.vocab)
 
     def __gt__(self, other):
         if not isinstance(other, Type):
@@ -148,12 +148,12 @@ def coerce_types(*types):
     type_ = max(types)
     if not all(t <= type_ for t in types):
         offender = next(iter(t for t in types if not t <= type_))
-        if (hasattr(offender, 'vocab') and hasattr(type_, 'vocab') and
-                offender.vocab is not type_.vocab):
+        if (hasattr(offender, 'vocab') and hasattr(type_, 'vocab')
+                and offender.vocab is not type_.vocab):
             reason = "Different vocabularies"
-        elif (hasattr(offender, 'dimensions') and
-                hasattr(type_, 'dimensions') and
-                offender.dimensions != type_.dimensions):
+        elif (hasattr(offender, 'dimensions')
+                and hasattr(type_, 'dimensions')
+                and offender.dimensions != type_.dimensions):
             reason = "Dimensionality mismatch"
         else:
             reason = "Incompatible types"
