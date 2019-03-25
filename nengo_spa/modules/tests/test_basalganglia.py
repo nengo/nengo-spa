@@ -58,8 +58,8 @@ def test_basal_ganglia(Simulator, seed, plt):
             spa.ifmax(
                 2 * spa.dot(m.vision, spa.sym.CAT * 0.5),
                 spa.sym.D >> m.motor)
-            spa.ifmax(spa.dot(m.vision, spa.sym.CAT) + 0.5 -
-                      spa.dot(m.vision, spa.sym.CAT), spa.sym.E >> m.motor)
+            spa.ifmax(spa.dot(m.vision, spa.sym.CAT) + 0.5
+                      - spa.dot(m.vision, spa.sym.CAT), spa.sym.E >> m.motor)
             spa.ifmax(
                 spa.dot(m.vision, spa.sym.PARROT) + m.compare,
                 spa.sym.F >> m.motor)

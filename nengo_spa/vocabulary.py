@@ -215,8 +215,8 @@ class Vocabulary(Mapping):
         p : SemanticPointer or array_like
             Semantic Pointer to add.
         """
-        if (not valid_sp_regex.match(key) or iskeyword(key) or
-                key in reserved_sp_names):
+        if (not valid_sp_regex.match(key) or iskeyword(key)
+                or key in reserved_sp_names):
             raise SpaParseError(
                 "Invalid Semantic Pointer name {!r}. Valid names are valid "
                 "Python 2 identifiers beginning with a capital letter.".format(
@@ -492,8 +492,8 @@ class VocabularyMap(Mapping):
         if isinstance(vocab, int):
             return vocab in self._vocabs
         else:
-            return (vocab.dimensions in self._vocabs and
-                    self._vocabs[vocab.dimensions] is vocab)
+            return (vocab.dimensions in self._vocabs
+                    and self._vocabs[vocab.dimensions] is vocab)
 
 
 class VocabularyMapParam(nengo.params.Parameter):
