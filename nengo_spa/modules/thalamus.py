@@ -51,8 +51,8 @@ class Thalamus(Network):
         Minimum value for gating neurons.
     synapse_to-gate : float, optional (Default: 0.002)
         Synaptic filter for controlling a gate.
-    kwargs : dict
-        Passed through to `nengo_spa.Network`.
+    **kwargs : dict
+        Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes
     ----------

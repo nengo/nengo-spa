@@ -24,8 +24,8 @@ class IdentityEnsembleArray(nengo.Network):
         Total number of dimensions. Must be a multiple of *subdimensions*.
     subdimensions : int
         Maximum number of dimensions per ensemble.
-    kwargs : dict
-        Arguments to pass through to the `nengo.Network` constructor.
+    **kwargs : dict
+        Keyword arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------
