@@ -144,7 +144,7 @@ class Transcode(Network):
         Input size. Mutually exclusive with *input_vocab*.
     size_out : int, optional (Default: None)
         Output size. Mutually exclusive with *output_vocab*.
-    kwargs : dict
+    **kwargs : dict
         Additional keyword arguments passed to `nengo_spa.Network`.
 
     Attributes

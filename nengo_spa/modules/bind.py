@@ -18,7 +18,7 @@ class Bind(Network):
         Whether to unbind the left input.
     unbind_right : bool, optional
         Whether to unbind the right input.
-    kwargs : dict
+    **kwargs : dict
         Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes

@@ -38,7 +38,7 @@ class State(Network):
         *subdimensions*.
     feedback_synapse : float, optional (Default: 0.1)
         The synapse on the feedback connection.
-    kwargs : dict
+    **kwargs : dict
         Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes

@@ -22,8 +22,8 @@ def MatrixMult(n_neurons, shape_left, shape_right, **kwargs):
         Shape of the A input matrix.
     shape_right : tuple
         Shape of the B input matrix.
-    kwargs : dict
-        Arguments to pass through to the `nengo.Network` constructor.
+    **kwargs : dict
+        Keyword arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------

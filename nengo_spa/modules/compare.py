@@ -16,7 +16,7 @@ class Compare(Network):
         the default vocabulary of that dimensionality will be used.
     neurons_per_dimension : int, optional (Default: 200)
         Number of neurons to use in each product computation.
-    kwargs : dict
+    **kwargs : dict
         Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes

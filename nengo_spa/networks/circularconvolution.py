@@ -109,8 +109,8 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
         The expected magnitude of the vectors to be convolved.
         This value is used to determine the radius of the ensembles
         computing the element-wise product.
-    kwargs : dict
-        Arguments to pass through to the `nengo.Network` constructor.
+    **kwargs : dict
+        Keyword arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------

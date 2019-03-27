@@ -82,8 +82,8 @@ def VTB(n_neurons, dimensions, unbind_left=False, unbind_right=False,
         Whether to unbind the left input vector from the right input vector.
     unbind_right : bool
         Whether to unbind the right input vector from the left input vector.
-    kwargs : dict
-        Arguments to pass through to the `nengo.Network` constructor.
+    **kwargs : dict
+        Keyword arguments to pass through to the `nengo.Network` constructor.
 
     Returns
     -------
