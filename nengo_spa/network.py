@@ -176,7 +176,7 @@ def create_inhibit_node(net, strength=2., **kwargs):
         Network to inhibit.
     strength : float
         Strength of the inhibition.
-    kwargs : dict
+    **kwargs : dict
         Additional keyword arguments for the created connections from the node
         to the inhibited ensemble neurons.
 

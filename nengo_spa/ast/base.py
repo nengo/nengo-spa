@@ -39,7 +39,7 @@ class Node(object):
         ----------
         sink : NengoObject
             Nengo object to connect to and transmit the result to.
-        kwargs : dict
+        **kwargs : dict
             Additional keyword arguments to pass to `nengo.Connection`.
         """
         raise NotImplementedError()

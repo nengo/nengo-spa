@@ -98,8 +98,8 @@ class BasalGanglia(Network):
         Synapse for connections corresponding to biological connections
         to GABA receptors (i.e., connections from StrD1 to GPi, StrD2 to GPe,
         and GPe to GPi and STN).
-    kwargs
-        Passed through the `nengo_spa.Network`.
+    **kwargs : dict
+        Keyword arguments passed through the `nengo_spa.Network`.
 
     Attributes
     ----------

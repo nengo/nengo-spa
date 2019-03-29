@@ -11,7 +11,7 @@ class Product(Network):
     ----------
     n_neurons : int, optional (Default: 200)
         Number of neurons to use in product computation.
-    kwargs : dict
+    **kwargs : dict
         Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes

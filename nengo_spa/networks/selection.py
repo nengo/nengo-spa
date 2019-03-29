@@ -48,8 +48,8 @@ def IA(
         The `nengo.presets.ThresholdingEnsembles` *intercept_width* parameter.
     radius : float, optional
         The representational radius of the ensembles.
-    kwargs : dict
-        Passed on to `nengo.Network`.
+    **kwargs : dict
+        Keyword arguments passed on to `nengo.Network`.
 
     Returns
     -------
@@ -131,8 +131,8 @@ def Thresholding(
         Function to apply to the thresholded values.
     radius : float, optional
         The representational radius of the ensembles.
-    kwargs : dict
-        Arguments passed on to `nengo.Network`.
+    **kwargs : dict
+        Keyword arguments passed on to `nengo.Network`.
 
     Returns
     -------
@@ -179,8 +179,8 @@ def WTA(n_neurons, n_ensembles, inhibit_scale=1.0, inhibit_synapse=0.005,
         Scaling of the lateral inhibition.
     inhibit_synapse : Synapse or float, optional
         Synapse on the recurrent connection for lateral inhibition.
-    kwargs : dict
-        Arguments passed on to `Thresholding`.
+    **kwargs : dict
+        Keyword arguments passed on to `Thresholding`.
 
     Returns
     -------

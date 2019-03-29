@@ -11,7 +11,7 @@ class Scalar(Network):
     ----------
     n_neurons : int, optional (Default: 50)
         Number of neurons to represent the scalar.
-    kwargs : dict
+    **kwargs : dict
         Keyword arguments passed through to `nengo_spa.Network`.
 
     Attributes

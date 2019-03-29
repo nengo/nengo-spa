@@ -52,6 +52,8 @@ class AssociativeMemory(Network):
         See `nengo.Network` for more details.
     vocabs : VocabularyMap, optional
         Maps dimensionalities to the corresponding default vocabularies.
+    **selection_net_kwargs : dict
+        Additional keyword arguments that will passed to the *selection_net*.
     """
     input_vocab = VocabularyOrDimParam(
         'input_vocab', default=None, readonly=True)
@@ -61,7 +63,7 @@ class AssociativeMemory(Network):
     def __init__(
             self, selection_net, input_vocab, output_vocab=None, mapping=None,
             n_neurons=50, label="Associative memory", seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
+            add_to_container=None, vocabs=None, **selection_net_kwargs):
         super(AssociativeMemory, self).__init__(
             label=label, seed=seed, add_to_container=add_to_container,
             vocabs=vocabs)
@@ -104,7 +106,7 @@ class AssociativeMemory(Network):
         with self:
             self.selection = selection_net(
                 n_neurons=n_neurons, n_ensembles=len(input_vectors),
-                label="selection", **selection_net_args)
+                label="selection", **selection_net_kwargs)
             self.input = nengo.Node(size_in=self.input_vocab.dimensions,
                                     label="input")
             self.output = nengo.Node(size_in=self.output_vocab.dimensions,
@@ -157,13 +159,13 @@ class IAAssocMem(AssociativeMemory):
     def __init__(
             self, input_vocab, output_vocab=None, mapping=None,
             n_neurons=50, label="IA associative memory", seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
+            add_to_container=None, vocabs=None, **selection_net_kwargs):
         super(IAAssocMem, self).__init__(
             selection_net=IA,
             input_vocab=input_vocab, output_vocab=output_vocab,
             mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_args)
+            **selection_net_kwargs)
         self.input_reset = self.selection.input_reset
         self.declare_input(self.input_reset, None)
 
@@ -176,14 +178,14 @@ class ThresholdingAssocMem(AssociativeMemory):
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,
             n_neurons=50, label="Thresholding associative memory", seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
-        selection_net_args['threshold'] = threshold
+            add_to_container=None, vocabs=None, **selection_net_kwargs):
+        selection_net_kwargs['threshold'] = threshold
         super(ThresholdingAssocMem, self).__init__(
             selection_net=Thresholding,
             input_vocab=input_vocab, output_vocab=output_vocab,
             mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_args)
+            **selection_net_kwargs)
 
 
 class WTAAssocMem(AssociativeMemory):
@@ -194,11 +196,11 @@ class WTAAssocMem(AssociativeMemory):
     def __init__(
             self, threshold, input_vocab, output_vocab=None, mapping=None,
             n_neurons=50, label="WTA associative memory", seed=None,
-            add_to_container=None, vocabs=None, **selection_net_args):
-        selection_net_args['threshold'] = threshold
+            add_to_container=None, vocabs=None, **selection_net_kwargs):
+        selection_net_kwargs['threshold'] = threshold
         super(WTAAssocMem, self).__init__(
             selection_net=WTA,
             input_vocab=input_vocab, output_vocab=output_vocab,
             mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
             add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_args)
+            **selection_net_kwargs)
