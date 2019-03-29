@@ -1,7 +1,7 @@
-nengo\_spa\.vocab
-=================
+nengo\_spa\.vocabulary
+======================
 
-.. automodule:: nengo_spa.vocab
+.. automodule:: nengo_spa.vocabulary
 
    .. rubric:: Classes
 
