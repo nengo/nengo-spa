@@ -12,7 +12,7 @@
 
 |
 
-.. image:: https://www.nengo.ai/design/_images/full-light2.svg
+.. image:: https://www.nengo.ai/design/_images/nengo-spa-full-light.svg
    :alt: Nengo SPA logo
    :width: 300px
 
