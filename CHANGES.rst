@@ -20,8 +20,14 @@ Release History
    - Fixed
 
 
-0.6.1 (unreleased)
-==================
+0.6.1 (April 26, 2019)
+======================
+
+**Changed**
+
+- Minor documentation improvements.
+  (`#217 <https://github.com/nengo/nengo_spa/pull/217>`__,
+  `#218 <https://github.com/nengo/nengo_spa/pull/218>`__)
 
 
 0.6.0 (September 17, 2018)
