@@ -1,0 +1,62 @@
+project_name: Nengo SPA
+pkg_name: nengo_spa
+repo_name: nengo/nengo-spa
+
+travis_yml:
+  python: 3.7
+  global_vars:
+      NUMPY: numpy
+      SCIPY: scipy
+      DIST: bionic
+  jobs:
+    - script: static
+      dist: $DIST
+    - script: docs
+      dist: xenial
+    - script: test  # min supported Python + Numpy versions
+      python: 3.5
+      env:
+          NUMPY: numpy>=1.10,<1.11
+          SCIPY: scipy>=1.0,<1.1
+    - script: test
+      python: 3.6
+    - script: test
+      python: 3.8
+      dist: $DIST
+    - script: test-coverage
+      dist: $DIST
+    - script: test-no-scipy
+      dist: $DIST
+  pypi_user: jgosmann
+  deploy_dists:
+    - sdist
+    - bdist_wheel
+
+codecov_yml:
+  abs_target: 90%
+  diff_target: 90%
+
+ci_scripts:
+  - template: static
+    pip_install:
+      - flake8
+    post_commands:
+      - flake8 -v nengo_spa
+  - template: test
+    pip_install:
+      - $NUMPY
+      - $SCIPY
+  - output_name: test-coverage
+    template: test
+    pip_install:
+      - $NUMPY
+      - $SCIPY
+    coverage: true
+  - output_name: test-no-scipy
+    template: test
+    pip_install:
+      - $NUMPY
+  - template: docs
+    pip_install:
+      - matplotlib
+      - $SCIPY

@@ -64,10 +64,10 @@ setup(
         "numpy>=1.8",
     ],
     install_requires = [
-        "nengo>=2.7,<4.0",
+        "nengo>=2.7,<4",
         "numpy>=1.8",
     ],
-    extras_require={
+    extras_require = {
         "all": docs_require + optional_requires + tests_require,
         "docs": docs_require,
         "optional": optional_requires,
@@ -81,9 +81,9 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: Free for non-commercial use",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
 )
