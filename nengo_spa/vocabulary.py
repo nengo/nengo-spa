@@ -1,4 +1,3 @@
-from collections import Mapping
 from keyword import iskeyword
 import re
 import warnings
@@ -10,6 +9,7 @@ from nengo.utils.compat import (
 import numpy as np
 
 from nengo_spa import semantic_pointer
+from nengo_spa._compat.abc import Mapping
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, Zero
