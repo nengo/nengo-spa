@@ -314,5 +314,5 @@ def test_enforces_at_least_one_item(cls_and_args):
     cls, args = cls_and_args
     with spa.Network() as model:
         model.vocabs.get_or_create(32).populate('A')
-        with pytest.raises(ValidationError, message='At least one'):
+        with pytest.raises(ValidationError, match='At least one'):
             cls(*args, input_vocab=32, mapping=[])
