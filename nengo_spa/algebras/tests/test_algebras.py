@@ -30,14 +30,19 @@ def test_superpose(algebra, rng):
 
 @pytest.mark.parametrize('d', [25, 36])
 def test_binding_and_invert(algebra, d, rng):
-    gen = UnitLengthVectors(d, rng)
-    a = next(gen)
-    b = next(gen)
-    bound = algebra.bind(a, b)
-    r = algebra.bind(bound, algebra.invert(b))
-    for v in (a, b):
-        assert np.dot(v, bound / np.linalg.norm(b)) < 0.7
-    assert np.dot(a, r / np.linalg.norm(r)) > 0.6
+    dissimilarity_passed = 0
+    unbinding_passed = 0
+    for i in range(10):
+        gen = UnitLengthVectors(d, rng)
+        a = next(gen)
+        b = next(gen)
+        bound = algebra.bind(a, b)
+        r = algebra.bind(bound, algebra.invert(b))
+        for v in (a, b):
+            dissimilarity_passed += np.dot(v, bound / np.linalg.norm(b)) < 0.7
+        unbinding_passed += np.dot(a, r / np.linalg.norm(r)) > 0.6
+    assert dissimilarity_passed >= 2 * 8
+    assert unbinding_passed >= 8
 
 
 def test_dimensionality_mismatch_exception(algebra):
