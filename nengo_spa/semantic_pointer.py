@@ -282,9 +282,39 @@ class SemanticPointer(Fixed):
         return np.dot(self.v, other) / scale
 
     def reinterpret(self, vocab):
+        """Reinterpret the Semantic Pointer as part of vocabulary *vocab*.
+
+        The *vocab* parameter can be set to *None* to clear the associated
+        vocabulary and allow the *source* to be interpreted as part of the
+        vocabulary of any Semantic Pointer it is combined with.
+        """
         return SemanticPointer(self.v, vocab=vocab, name=self.name)
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
+        """Translate the Semantic Pointer to vocabulary *vocab*.
+
+        The translation of a Semantic Pointer uses some form of projection to
+        convert the Semantic Pointer to a Semantic Pointer of another
+        vocabulary. By default the outer products of terms in the source and
+        target vocabulary are used, but if *solver* is given, it is used to
+        find a least squares solution for this projection.
+
+        Parameters
+        ----------
+        vocab : Vocabulary
+            Target vocabulary.
+        populate : bool, optional
+            Whether the target vocabulary should be populated with missing
+            keys.  This is done by default, but with a warning. Set this
+            explicitly to *True* or *False* to silence the warning or raise an
+            error.
+        keys : list, optional
+            All keys to translate. If *None*, all keys in the source vocabulary
+            will be translated.
+        solver : nengo.Solver, optional
+            If given, the solver will be used to solve the least squares
+            problem to provide a better projection for the translation.
+        """
         tr = self.vocab.transform_to(vocab, populate, solver)
         return SemanticPointer(
             np.dot(tr, self.evaluate().v), vocab=vocab, name=self.name)
