@@ -1,5 +1,5 @@
-nengo\_spa\.pointer
-===================
+nengo\_spa\.semantic_pointer
+============================
 
 .. automodule:: nengo_spa.semantic_pointer
    :exclude-members: SemanticPointer
