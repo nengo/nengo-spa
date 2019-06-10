@@ -20,6 +20,17 @@ Release History
    - Fixed
 
 
+0.6.2 (unreleased)
+==================
+
+**Added**
+
+- Add previously missing documentation on the ``vector_generation`` module as
+  well as the ``reinterpret`` and ``translate`` methods of ``SemanticPointer``.
+  (`#228 <https://github.com/nengo/nengo_spa/issues/228>`__,
+  `#229 <https://github.com/nengo/nengo_spa/pull/229>`__)
+
+
 0.6.1 (April 26, 2019)
 ======================
 
