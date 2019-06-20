@@ -92,6 +92,7 @@ class ActionSelection(Mapping):
         ActionSelection.active = None
         ModuleInput.routed_mode = False
         if exc_type is not None:
+            RoutedConnection.free_floating.clear()
             return
         self._build()
 

@@ -390,3 +390,18 @@ def test_action_selection_keys_corner_cases():
         with ActionSelection() as action_sel:
             spa.ifmax(0.)
     assert list(action_sel.keys()) == [0]
+
+
+def test_action_selection_is_side_effect_free_if_exception_is_raised():
+    with spa.Network():
+        state_a = spa.State(32)
+        state_b = spa.State(32)
+        state_c = spa.State(64)
+
+        with pytest.raises(SpaTypeError):
+            with ActionSelection():
+                spa.ifmax(1, state_a >> state_b, state_a >> state_c)
+
+        with ActionSelection():
+            pass
+            # should not raise
