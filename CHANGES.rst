@@ -31,6 +31,13 @@ Release History
   `#229 <https://github.com/nengo/nengo_spa/pull/229>`__)
 
 
+**Fixed**
+
+- Nengo SPA is now compatible with pytest 4. Support for earlier versions has
+  been dropped.
+  (`#227 <https://github.com/nengo/nengo_spa/pull/227>`__)
+
+
 0.6.1 (April 26, 2019)
 ======================
 
