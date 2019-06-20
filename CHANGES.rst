@@ -33,6 +33,10 @@ Release History
 
 **Fixed**
 
+- Fixed a bug where an exception within an ``ActionSelection`` block would
+  lead to every subsequent ``ActionSelection`` block to raise an exception.
+  (`#230 <https://github.com/nengo/nengo_spa/issues/230>`__,
+  `#231 <https://github.com/nengo/nengo_spa/pull/231>`__)
 - Nengo SPA is now compatible with pytest 4. Support for earlier versions has
   been dropped.
   (`#227 <https://github.com/nengo/nengo_spa/pull/227>`__)
