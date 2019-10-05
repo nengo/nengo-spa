@@ -23,6 +23,11 @@ Release History
 0.6.3 (unreleased)
 ==================
 
+**Changed**
+
+- Ensure compatibility with Nengo 3.
+  (`#225 <https://github.com/nengo/nengo_spa/issues/225>`__,
+  `#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
 
 
 0.6.2 (June 21, 2019)

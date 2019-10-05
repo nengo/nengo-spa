@@ -3,7 +3,7 @@ import os
 import pytest
 import _pytest.capture
 
-from nengo.utils.ipython import read_nb
+from nbformat import read as read_nb
 from nengo.utils.stdlib import execfile
 
 # Monkeypatch _pytest.capture.DontReadFromInput
@@ -33,7 +33,7 @@ all_examples, slow_examples, fast_examples = [], [], []
 
 def load_example(example):
     with open(example + '.ipynb', 'r') as f:
-        nb = read_nb(f)
+        nb = read_nb(f, 4)
     return nb
 
 

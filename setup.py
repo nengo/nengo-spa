@@ -40,7 +40,10 @@ optional_requires = [
 tests_require = [
     "jupyter",
     "matplotlib>=2.0",
-    "pytest>=4.0,<5"
+    "nbformat",
+    "pytest>=4.0,<5",
+    "pytest-plt",
+    "pytest-rng"
 ]
 
 setup(
@@ -61,7 +64,7 @@ setup(
         "numpy>=1.8",
     ],
     install_requires = [
-        "nengo>=2.7,<3.0",
+        "nengo>=2.7,<4.0",
         "numpy>=1.8",
     ],
     extras_require = {
