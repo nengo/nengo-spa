@@ -1,5 +1,5 @@
 import nengo
-from nengo.utils.numpy import rmse
+from nengo.utils.numpy import rms
 import numpy as np
 import pytest
 
@@ -43,10 +43,10 @@ def test_run(Simulator, algebra, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    error = rmse(vocab.parse("(B*A).normalized()").v, sim.data[p][-1])
+    error = rms(vocab.parse("(B*A).normalized()").v - sim.data[p][-1])
     assert error < 0.15
 
-    error = rmse(vocab.parse("(A*A).normalized()").v, sim.data[p][100])
+    error = rms(vocab.parse("(A*A).normalized()").v - sim.data[p][100])
     assert error < 0.15
 
 

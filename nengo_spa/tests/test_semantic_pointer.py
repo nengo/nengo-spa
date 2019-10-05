@@ -283,7 +283,8 @@ def test_identity(algebra):
         Identity(64, algebra=algebra).v, algebra.identity_element(64))
 
 
-def test_absorbing_element(algebra):
+def test_absorbing_element(algebra, plt):
+    plt.plot([0, 1], [0, 1])
     try:
         assert np.allclose(
             AbsorbingElement(64, algebra=algebra).v,

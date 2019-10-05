@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 import nengo
-from nengo.utils.numpy import rmse
+from nengo.utils.numpy import rms
 
 import nengo_spa
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
@@ -64,8 +64,8 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     with Simulator(model) as sim:
         sim.run(0.01)
 
-    error = rmse(result, sim.data[res_p][-1]) / (magnitude ** 2)
-    error_bad = rmse(result, sim.data[res_p_bad][-1]) / (magnitude ** 2)
+    error = rms(result - sim.data[res_p][-1]) / (magnitude ** 2)
+    error_bad = rms(result - sim.data[res_p_bad][-1]) / (magnitude ** 2)
 
     assert error < 0.2
     assert error_bad > 0.1
@@ -92,6 +92,6 @@ def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
     with Simulator(model) as sim:
         sim.run(0.01)
 
-    error = rmse(result, sim.data[res_p][-1])
+    error = rms(result - sim.data[res_p][-1])
 
     assert error < 0.2

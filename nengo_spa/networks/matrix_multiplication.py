@@ -80,9 +80,11 @@ def MatrixMult(n_neurons, shape_left, shape_right, **kwargs):
             transform_right[c_index][k + j * shape_right[1]] = 1
 
         nengo.Connection(
-            net.input_left, net.C.A, transform=transform_left, synapse=None)
+            net.input_left, net.C.input_a, transform=transform_left,
+            synapse=None)
         nengo.Connection(
-            net.input_right, net.C.B, transform=transform_right, synapse=None)
+            net.input_right, net.C.input_b, transform=transform_right,
+            synapse=None)
 
         # Now do the appropriate summing
         size_output = shape_left[0] * shape_right[1]

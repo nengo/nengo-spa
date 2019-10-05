@@ -156,7 +156,7 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     assert np.mean(spa.similarity(sim.data[p][t], v)) > 0.8
 
 
-def test_copy_spa(RefSimulator):
+def test_copy_spa(Simulator):
     with spa.Network() as original:
         original.state = spa.State(16)
         spa.sym.A >> original.state
@@ -164,7 +164,7 @@ def test_copy_spa(RefSimulator):
     cp = original.copy()
 
     # Check that it still builds.
-    with RefSimulator(cp):
+    with Simulator(cp):
         pass
 
 

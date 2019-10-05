@@ -77,8 +77,8 @@ def test_thresholding_array(Simulator, plt, seed):
 
     assert np.all(sim.data[out_p][t > 0.15, :2] > 0.9)
     assert np.all(sim.data[out_p][t > 0.15, 2:] < 0.001)
-    assert_allclose(sim.data[thresholded_p][t > 0.15, 0], 0.6, atol=0.05)
-    assert_allclose(sim.data[thresholded_p][t > 0.15, 1], 0.3, atol=0.05)
+    assert_allclose(sim.data[thresholded_p][t > 0.15, 0], 0.6, atol=0.06)
+    assert_allclose(sim.data[thresholded_p][t > 0.15, 1], 0.3, atol=0.06)
     assert np.all(sim.data[thresholded_p][t > 0.15, 2:] < 0.001)
 
 
