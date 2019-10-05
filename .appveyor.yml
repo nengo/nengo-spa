@@ -12,7 +12,7 @@ install:
   - conda config --add channels conda-forge
   - conda update -q conda
   - conda info -a
-  - conda install numpy==1.13 matplotlib jupyter pytest pywinpty
+  - conda install numpy==1.16 matplotlib jupyter pytest pywinpty
   - pip install nengo
 
 build: false  # Not a C# project
