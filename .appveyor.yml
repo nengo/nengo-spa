@@ -1,6 +1,5 @@
 environment:
   matrix:
-    - PYTHON: "C:\\Miniconda"
     - PYTHON: "C:\\Miniconda36"
     - PYTHON: "C:\\Miniconda36-x64"
 

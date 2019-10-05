@@ -19,9 +19,6 @@ env:
 matrix:
   include:
     - env: PYTHON="3.7" STATIC="true"
-    - env: PYTHON="2.7" COVERAGE="true"
-    - env: PYTHON="2.7" NUMPY="1.8"  # minimum supported NumPy
-    - env: PYTHON="3.4" NUMPY="1.11"  # 1.12 not packaged for py34 in conda
     - env: PYTHON="3.5" NUMPY="1.15"  # 1.16 not packaged for py35 in conda
     - env: PYTHON="3.6"
     - env: PYTHON="3.7" COVERAGE="true"

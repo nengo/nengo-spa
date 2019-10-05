@@ -20,7 +20,7 @@ Release History
    - Fixed
 
 
-0.6.3 (unreleased)
+0.7.0 (unreleased)
 ==================
 
 **Changed**
@@ -28,6 +28,12 @@ Release History
 - Ensure compatibility with Nengo 3.
   (`#225 <https://github.com/nengo/nengo_spa/issues/225>`__,
   `#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
+
+
+**Removed**
+
+- Dropped support for Python 2.7 and 3.4.
+  (`#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
 
 
 0.6.2 (June 21, 2019)
