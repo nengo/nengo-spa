@@ -16,7 +16,7 @@ if [[ "$COMMAND" == "install" ]]; then
     if [[ "$SCIPY" == "true" ]]; then
         conda install scipy
     fi
-    pip install 'pytest>=4,<5' pytest-xdist nengo=="$NENGO"
+    pip install 'pytest>=4,<5' pytest-xdist pytest-plt pytest-rng nengo=="$NENGO"
     pip install -e .
 elif [[ "$COMMAND" == "run" ]]; then
     python -c "import numpy; numpy.show_config()"
