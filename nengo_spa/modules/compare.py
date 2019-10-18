@@ -34,7 +34,6 @@ class Compare(Network):
         'neurons_per_dimension', default=200, low=1, readonly=True)
 
     def __init__(self, vocab=Default, neurons_per_dimension=Default, **kwargs):
-        kwargs.setdefault('label', "Compare")
         super(Compare, self).__init__(**kwargs)
 
         self.vocab = vocab

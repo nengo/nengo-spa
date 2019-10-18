@@ -84,7 +84,6 @@ class Thalamus(Network):
                  synapse_bg=Default, neurons_channel_dim=Default,
                  synapse_channel=Default, neurons_gate=Default,
                  threshold_gate=Default, synapse_to_gate=Default, **kwargs):
-        kwargs.setdefault('label', "Thalamus")
         super(Thalamus, self).__init__(**kwargs)
 
         self.action_count = action_count
