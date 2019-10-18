@@ -39,7 +39,6 @@ class Bind(Network):
 
     def __init__(self, vocab=Default, neurons_per_dimension=Default,
                  unbind_left=Default, unbind_right=Default, **kwargs):
-        kwargs.setdefault('label', "Bind")
         super(Bind, self).__init__(**kwargs)
 
         self.vocab = vocab

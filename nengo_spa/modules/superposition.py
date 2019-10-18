@@ -34,7 +34,6 @@ class Superposition(Network):
 
     def __init__(self, n_inputs, vocab=Default, neurons_per_dimension=Default,
                  **kwargs):
-        kwargs.setdefault('label', "Superposition")
         super(Superposition, self).__init__(**kwargs)
 
         self.vocab = vocab
