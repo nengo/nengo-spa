@@ -28,6 +28,16 @@ Release History
 - Ensure compatibility with Nengo 3.
   (`#225 <https://github.com/nengo/nengo_spa/issues/225>`__,
   `#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
+- Modules and networks no longer set a default label. This will give
+  more useful labels by default in Nengo GUI (assuming the latest dev
+  version).
+  (`#234 <https://github.com/nengo/nengo_spa/issues/234>`__,
+  `#235 <https://github.com/nengo/nengo_spa/pull/235>`__)
+- All networks have been converted to classes. This will give
+  more useful labels by default in Nengo GUI (assuming the latest dev
+  version).
+  (`#234 <https://github.com/nengo/nengo_spa/issues/234>`__,
+  `#235 <https://github.com/nengo/nengo_spa/pull/235>`__)
 
 
 **Removed**
