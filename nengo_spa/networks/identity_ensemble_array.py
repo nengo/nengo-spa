@@ -27,13 +27,12 @@ class IdentityEnsembleArray(nengo.Network):
     **kwargs : dict
         Keyword arguments to pass through to the `nengo.Network` constructor.
 
-    Returns
-    -------
-    nengo.Network
-        Network with attributes:
-
-        * **input** (`nengo.Node`): Input node.
-        * **output** (`nengo.Node`): Output node.
+    Attributes
+    ----------
+    input : nengo.Node
+        Input node.
+    output : nengo.Node
+        Output node.
     """
     def __init__(
             self, neurons_per_dimension, dimensions, subdimensions, **kwargs):

@@ -74,8 +74,7 @@ def dft_half(n):
     return np.exp((-2.j * np.pi / n) * (w[:, None] * x[None, :]))
 
 
-def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
-                        input_magnitude=1.0, **kwargs):
+class CircularConvolution(nengo.Network):
     r"""Compute the circular convolution of two vectors.
 
     The circular convolution :math:`c` of vectors :math:`a` and :math:`b`
@@ -112,16 +111,17 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
     **kwargs : dict
         Keyword arguments to pass through to the `nengo.Network` constructor.
 
-    Returns
-    -------
-    nengo.Network
-        The newly built product network with attributes:
-
-         * **input_a** (`nengo.Node`): The first vector to be convolved.
-         * **input_b** (`nengo.Node`): The second vector to be convolved.
-         * **product** (`nengo.networks.Product`): Network created to do the
-           element-wise product of the :math:`DFT` components.
-         * **output** (`nengo.Node`): The resulting convolved vector.
+    Attributes
+    ----------
+    input_a : nengo.Node
+        The first vector to be convolved.
+    input_b : nengo.Node
+        The second vector to be convolved.
+    product : nengo.networks.Product
+        Network created to do the element-wise product of the :math:`DFT`
+        components.
+    output : nengo.Node
+        The resulting convolved vector.
 
     Examples
     --------
@@ -165,25 +165,29 @@ def CircularConvolution(n_neurons, dimensions, invert_a=False, invert_b=False,
     only the real part of :math:`c` since the imaginary part
     is analytically zero.
     """
-    kwargs.setdefault('label', "CircularConvolution")
 
-    tr_a = transform_in(dimensions, 'A', invert_a)
-    tr_b = transform_in(dimensions, 'B', invert_b)
-    tr_out = transform_out(dimensions)
+    def __init__(self, n_neurons, dimensions, invert_a=False, invert_b=False,
+                 input_magnitude=1.0, **kwargs):
+        super().__init__(**kwargs)
 
-    with nengo.Network(**kwargs) as net:
-        net.input_a = nengo.Node(size_in=dimensions, label="input_a")
-        net.input_b = nengo.Node(size_in=dimensions, label="input_b")
-        net.product = Product(
-            n_neurons, tr_out.shape[1],
-            input_magnitude=2 * input_magnitude / np.sqrt(2.))
-        net.output = nengo.Node(size_in=dimensions, label="output")
+        tr_a = transform_in(dimensions, 'A', invert_a)
+        tr_b = transform_in(dimensions, 'B', invert_b)
+        tr_out = transform_out(dimensions)
 
-        nengo.Connection(
-            net.input_a, net.product.input_a, transform=tr_a, synapse=None)
-        nengo.Connection(
-            net.input_b, net.product.input_b, transform=tr_b, synapse=None)
-        nengo.Connection(
-            net.product.output, net.output, transform=tr_out, synapse=None)
+        with self:
+            self.input_a = nengo.Node(size_in=dimensions, label="input_a")
+            self.input_b = nengo.Node(size_in=dimensions, label="input_b")
+            self.product = Product(
+                n_neurons, tr_out.shape[1],
+                input_magnitude=2 * input_magnitude / np.sqrt(2.))
+            self.output = nengo.Node(size_in=dimensions, label="output")
 
-    return net
+            nengo.Connection(
+                self.input_a, self.product.input_a, transform=tr_a,
+                synapse=None)
+            nengo.Connection(
+                self.input_b, self.product.input_b, transform=tr_b,
+                synapse=None)
+            nengo.Connection(
+                self.product.output, self.output, transform=tr_out,
+                synapse=None)
