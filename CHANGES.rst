@@ -20,14 +20,15 @@ Release History
    - Fixed
 
 
-0.7.0 (unreleased)
+1.0.0 (unreleased)
 ==================
 
 **Changed**
 
 - Ensure compatibility with Nengo 3.
   (`#225 <https://github.com/nengo/nengo_spa/issues/225>`__,
-  `#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
+  `#233 <https://github.com/nengo/nengo_spa/pull/233>`__,
+  `#236 <https://github.com/nengo/nengo_spa/pull/236>`__)
 - Modules and networks no longer set a default label. This will give
   more useful labels by default in Nengo GUI (assuming the latest dev
   version).
@@ -43,7 +44,8 @@ Release History
 **Removed**
 
 - Dropped support for Python 2.7 and 3.4.
-  (`#233 <https://github.com/nengo/nengo_spa/pull/233>`__)
+  (`#233 <https://github.com/nengo/nengo_spa/pull/233>`__,
+  `#236 <https://github.com/nengo/nengo_spa/pull/236>`__)
 
 
 0.6.2 (June 21, 2019)

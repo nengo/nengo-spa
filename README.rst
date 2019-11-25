@@ -46,11 +46,11 @@ Feature highlights
 Project status
 ==============
 
-- All of the core functionality is implemented and most of the API should be
-  fairly stable.
+- All of the core functionality is implemented and the API is stable.
 - While basic integration with the Nengo GUI works, it should be improved in
-  the future. However, those improvements will mostly depend on Nengo GUI
-  providing an appropriate plugin system.
+  the future. However, this will not be pursued until major improvements to
+  Nengo GUI are released.
+
 
 Installation
 ============
@@ -62,7 +62,11 @@ To install Nengo SPA::
 
     pip install nengo-spa
 
-Nengo SPA is tested to work on Python 2.7 and 3.4+.
+Nengo SPA is tested to work on Python 3.5+.
+
+If you need support for Python 2.7 or 3.4, Nengo SPA 0.6.2 is the last version
+with support for these earlier Python versions.
+
 
 Documentation
 =============
