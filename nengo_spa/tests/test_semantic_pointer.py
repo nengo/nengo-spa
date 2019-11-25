@@ -2,7 +2,6 @@ import sys
 
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import range
 import numpy as np
 from numpy.testing import assert_equal
 import pytest

@@ -1,5 +1,4 @@
 import nengo
-from nengo.utils.compat import range
 import numpy as np
 
 from nengo_spa.algebras.base import AbstractAlgebra

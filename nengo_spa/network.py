@@ -3,7 +3,6 @@ import weakref
 
 import nengo
 from nengo.config import Config, SupportDefaultsMixin
-from nengo.utils.compat import is_string
 import numpy as np
 
 from nengo_spa.action_selection import ifmax as actions_ifmax
@@ -49,7 +48,7 @@ def ifmax(name, condition=None, *actions):
         the utility value. It is possible (but not necessary) to use SPA style
         connections of the form ``scalar >> utility`` to this object.
     """
-    if not is_string(name):
+    if not isinstance(name, str):
         if condition is not None:
             actions = (condition,) + actions
         condition = name

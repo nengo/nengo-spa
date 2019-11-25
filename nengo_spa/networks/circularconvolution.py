@@ -3,7 +3,6 @@ import numpy as np
 import nengo
 from nengo.exceptions import ValidationError
 from nengo.networks.product import Product
-from nengo.utils.compat import range
 
 
 def transform_in(dims, align, invert):

@@ -6,9 +6,9 @@ import numpy as np
 
 import nengo.utils.numpy as npext
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_iterable
 
 from nengo_spa.semantic_pointer import SemanticPointer
+from nengo_spa.typechecks import is_iterable
 from nengo_spa.vocabulary import Vocabulary
 
 
