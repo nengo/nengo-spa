@@ -1,10 +1,10 @@
 """Implementation of action syntax."""
 
+from collections.abc import Mapping
 from collections import OrderedDict
 
 import nengo
 
-from nengo_spa._compat.abc import Mapping
 from nengo_spa.ast import dynamic
 from nengo_spa.connectors import (
     input_vocab_registry, ModuleInput, RoutedConnection)
