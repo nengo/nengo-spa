@@ -2,9 +2,10 @@ import warnings
 
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_iterable
 from nengo.utils.network import with_self
 import numpy as np
+
+from nengo_spa.typechecks import is_iterable
 
 
 class IdentityEnsembleArray(nengo.Network):

@@ -2,7 +2,6 @@ import nengo
 from nengo.config import Default
 from nengo.exceptions import ValidationError
 from nengo.params import IntParam, Parameter
-from nengo.utils.compat import is_string
 from nengo.utils.stdlib import checked_call
 import numpy as np
 
@@ -19,7 +18,7 @@ class SpArrayExtractor(object):
     def __call__(self, value):
         if isinstance(value, PointerSymbol):
             value = value.expr
-        if is_string(value):
+        if isinstance(value, str):
             value = self.vocab.parse(value)
         if isinstance(value, SemanticPointer):
             value = value.v
@@ -53,8 +52,7 @@ class TranscodeFunctionParam(Parameter):
             return fn
         elif callable(fn):
             return self.coerce_callable(obj, fn)
-        elif not obj.input_vocab and (is_string(fn)
-                                      or isinstance(fn, pointer_cls)):
+        elif not obj.input_vocab and isinstance(fn, (str, pointer_cls)):
             return fn
         else:
             raise ValidationError("Invalid output type {!r}".format(
@@ -95,7 +93,7 @@ class TranscodeFunctionParam(Parameter):
             if output_vocab is not None:
                 fn = make_parse_func(fn, output_vocab)
             return fn
-        elif is_string(fn) or isinstance(fn, (SemanticPointer, PointerSymbol)):
+        elif isinstance(fn, (str, SemanticPointer, PointerSymbol)):
             return SpArrayExtractor(output_vocab)(fn)
         else:
             raise ValueError("Invalid output type {!r}".format(type(fn)))

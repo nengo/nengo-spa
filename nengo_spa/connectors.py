@@ -1,13 +1,13 @@
 import weakref
 
 import nengo
-from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.ast.base import Node, infer_types, Fixed
 from nengo_spa.ast.dynamic import ModuleOutput
 from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.typechecks import is_number
 from nengo_spa.types import TScalar, TVocabulary
 
 

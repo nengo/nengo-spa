@@ -4,8 +4,6 @@ import warnings
 
 import nengo
 from nengo.exceptions import NengoWarning, ValidationError
-from nengo.utils.compat import (
-    is_number, is_integer, is_iterable, is_string, range)
 import numpy as np
 
 from nengo_spa import semantic_pointer
@@ -13,6 +11,7 @@ from nengo_spa._compat.abc import Mapping
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, Zero
+from nengo_spa.typechecks import is_number, is_integer, is_iterable
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -101,7 +100,7 @@ class Vocabulary(Mapping):
         elif isinstance(pointer_gen, np.random.RandomState):
             pointer_gen = UnitLengthVectors(dimensions, pointer_gen)
 
-        if not is_iterable(pointer_gen) or is_string(pointer_gen):
+        if not is_iterable(pointer_gen) or isinstance(pointer_gen, str):
             raise ValidationError(
                 "pointer_gen must be iterable or RandomState",
                 attr='pointer_gen', obj=self)

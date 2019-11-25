@@ -3,7 +3,6 @@
 from collections import OrderedDict
 
 import nengo
-from nengo.utils.compat import is_string
 
 from nengo_spa._compat.abc import Mapping
 from nengo_spa.ast import dynamic
@@ -130,7 +129,7 @@ class ActionSelection(Mapping):
         self.built = True
 
     def __getitem__(self, key):
-        if is_string(key):
+        if isinstance(key, str):
             key = self._name2idx[key]
         return self._utilities[key]
 

@@ -1,12 +1,12 @@
 """AST classes for dynamic operations (i.e. their output changes over time)."""
 
 import nengo
-from nengo.utils.compat import is_number
 import numpy as np
 
 from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
 from nengo_spa.ast.symbolic import Fixed, FixedScalar, Symbol
 from nengo_spa.exceptions import SpaTypeError
+from nengo_spa.typechecks import is_number
 from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
 
 

@@ -1,10 +1,10 @@
 import nengo
 from nengo.exceptions import ValidationError
-from nengo.utils.compat import is_array, is_array_like, is_number
 import numpy as np
 
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
+from nengo_spa.typechecks import is_array, is_array_like, is_number
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
