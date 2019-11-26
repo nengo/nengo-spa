@@ -117,7 +117,7 @@ a programmer. Essentially, it is a fixed model that integrates perception,
 cognition, and action across several different tasks. Spaun is the most complex
 example of an SPA to date.
 
-.. figure:: spa_1.png
+.. figure:: spa-1.png
    :alt: High-level depicitoin of the Spaun model.
 
    A high-level depiction of the Spaun model, with all of the central features
@@ -171,7 +171,7 @@ something like this:
 
 .. _spa_2:
 
-.. figure:: spa_2.png
+.. figure:: spa-2.png
    :alt: Example input and output from Spaun.
 
    Example input and output from Spaun. a) Handwritten numbers used as input.
