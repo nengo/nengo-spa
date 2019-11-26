@@ -7,11 +7,11 @@ of how ``nengo_spa`` works.
 .. toctree::
 
    examples/convolution
-   examples/associative_memory
+   examples/associative-memory
    examples/question
-   examples/question_control
-   examples/question_memory
-   examples/spa_sequence
-   examples/spa_sequence_routed
-   examples/spa_parser
-   examples/vocabulary_casting
+   examples/question-control
+   examples/question-memory
+   examples/spa-sequence
+   examples/spa-sequence-routed
+   examples/spa-parser
+   examples/vocabulary-casting

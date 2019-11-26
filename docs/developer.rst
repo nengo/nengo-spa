@@ -6,5 +6,5 @@ Developer Guide
    :maxdepth: 2
  
    contributing
-   dev_syntax
+   dev-syntax
    license

@@ -68,8 +68,8 @@ Next steps
 ----------
 
 * If you are unfamiliar with the Semantic Pointer Architecture, start with the
-  :ref:`/user_guide/spa_intro.rst`.
+  :ref:`/user-guide/spa-intro.rst`.
 * If you are new to building SPA models with Nengo, read the
   :ref:`/examples/intro.ipynb`.
 * If you have used the legacy SPA module included in core Nengo, read the
-  tutorial on :ref:`/examples/intro_coming_from_legacy_spa.ipynb`.
+  tutorial on :ref:`/examples/intro-coming-from-legacy-spa.ipynb`.

@@ -58,10 +58,10 @@ class ActionSelection(Mapping):
 
     Further action selection examples:
 
-      * :ref:`/examples/question_control.ipynb`
-      * :ref:`/examples/spa_parser.ipynb`
-      * :ref:`/examples/spa_sequence.ipynb`
-      * :ref:`/examples/spa_sequence_routed.ipynb`
+      * :ref:`/examples/question-control.ipynb`
+      * :ref:`/examples/spa-parser.ipynb`
+      * :ref:`/examples/spa-sequence.ipynb`
+      * :ref:`/examples/spa-sequence-routed.ipynb`
     """
 
     active = None
