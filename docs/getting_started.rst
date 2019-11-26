@@ -16,14 +16,14 @@ nengo_spa`` again.
 Nengo SPA only depends on `core Nengo
 <https://www.nengo.ai/nengo/index.html>`_ (which depends on `NumPy
 <http://www.numpy.org/>`_). Please check the `Nengo documentation
-<https://www.nengo.ai/nengo/getting_started.html#installation>`__ for
+<https://www.nengo.ai/nengo/getting-started.html#installation>`__ for
 instructions on how to install Nengo or NumPy.
 
 We also suggest that you install `SciPy <https://www.scipy.org/>`_ to obtain the
 best accuracy in your networks and access to all Nengo SPA features. We
 recommend installing SciPy with the same method that you used to install NumPy.
 Check the `Nengo documentation
-<https://www.nengo.ai/nengo/getting_started.html#installing-numpy>`__ and
+<https://www.nengo.ai/nengo/getting-started.html#installing-numpy>`__ and
 `SciPy documentation <https://www.scipy.org/install.html>`_ for available
 installation methods.
 
