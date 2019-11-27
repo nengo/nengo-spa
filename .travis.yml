@@ -9,7 +9,7 @@ notifications:
 
 env:
   global:
-    - NENGO="2.7"
+    - NENGO="3.0"
     - NUMPY="1.17"
     - SCIPY="true"
     - COVERAGE="false"
@@ -21,6 +21,7 @@ matrix:
     - env: PYTHON="3.7" STATIC="true"
     - env: PYTHON="3.5" NUMPY="1.15"  # 1.16 not packaged for py35 in conda
     - env: PYTHON="3.6"
+    - env: PYTHON="3.7" NENGO="2.7"
     - env: PYTHON="3.7" COVERAGE="true"
     - env: PYTHON="3.7" SCIPY="false"
     - env: PYTHON="3.7" DOCS="true"

@@ -12,7 +12,7 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install numpy==1.16 matplotlib jupyter pytest pywinpty
-  - pip install https://github.com/nengo/nengo/archive/master.zip
+  - pip install nengo
 
 build: false  # Not a C# project
 
