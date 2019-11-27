@@ -6,12 +6,12 @@ Installation
 
 To install Nengo SPA, we recommend using ``pip``::
 
-    pip install nengo_spa
+    pip install nengo-spa
 
 ``pip`` will do its best to install all of Nengo's requirements when it
 installs Nengo SPA. However, if anything goes wrong during this process, you
 can install Nengo SPA's requirements manually before doing ``pip install
-nengo_spa`` again.
+nengo-spa`` again.
 
 Nengo SPA only depends on `core Nengo
 <https://www.nengo.ai/nengo/index.html>`_ (which depends on `NumPy
