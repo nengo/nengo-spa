@@ -80,11 +80,15 @@ html_title = "Nengo SPA {0} docs".format(release)
 html_static_path = ['_static']
 html_favicon = os.path.join('_static', 'favicon.ico')
 html_logo = os.path.join('_static', 'full-light.svg')
-html_sidebars = { '**': ['sidebar.html'] }
 html_use_smartypants = True
 htmlhelp_basename = 'Nengodoc'
 html_last_updated_fmt = ''  # Suppress 'Last updated on:' timestamp
 html_show_sphinx = False
+html_theme_options = {
+    "nengo_logo": "nengo-spa-full-light.svg",
+    "nengo_logo_color": "#d40000",
+    "analytics_id": "UA-41658423-2",
+}
 
 # -- Options for LaTeX output -------------------------------------------------
 
