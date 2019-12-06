@@ -79,7 +79,6 @@ html_theme = 'nengo_sphinx_theme'
 html_title = "Nengo SPA {0} docs".format(release)
 html_static_path = ['_static']
 html_favicon = os.path.join('_static', 'favicon.ico')
-html_logo = os.path.join('_static', 'full-light.svg')
 html_use_smartypants = True
 htmlhelp_basename = 'Nengodoc'
 html_last_updated_fmt = ''  # Suppress 'Last updated on:' timestamp
