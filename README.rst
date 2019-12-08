@@ -2,10 +2,6 @@
   :target: https://travis-ci.org/nengo/nengo-spa
   :alt: Travis-CI build status
 
-.. image:: https://ci.appveyor.com/api/projects/status/5blofvbh8305w75g/branch/master?svg=true
-  :target: https://ci.appveyor.com/project/jgosmann/nengo-spa/branch/master
-  :alt: AppVeyor build status
-
 .. image:: https://img.shields.io/codecov/c/github/nengo/nengo-spa/master.svg
   :target: https://codecov.io/gh/nengo/nengo-spa/branch/master
   :alt: Test coverage
