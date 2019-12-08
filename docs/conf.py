@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'nbsphinx',
+    'nengo_sphinx_theme.ext.redirects',
 ]
 
 default_role = 'py:obj'
@@ -88,6 +89,25 @@ html_theme_options = {
     "nengo_logo_color": "#d40000",
     "analytics_id": "UA-41658423-2",
 }
+html_redirects = [
+    (old, old.replace('_', '-')) for old in
+    (
+        'dev_syntax.html',
+        'examples/associative_memory.html',
+        'examples/custom_module.html',
+        'examples/intro_coming_from_legacy_spa.html',
+        'examples/question_control.html',
+        'examples/question_memory.html',
+        'examples/spa_parser.html',
+        'examples/spa_sequence_routed.html',
+        'examples/spa_sequence.html',
+        'examples/vocabulary_casting.html',
+        'getting_started.html',
+        'user_guide.html',
+        'user_guide/algebras.html',
+        'user_guide/spa_intro.html',
+    )
+]
 
 # -- Options for LaTeX output -------------------------------------------------
 

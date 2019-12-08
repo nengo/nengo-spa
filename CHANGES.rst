@@ -20,6 +20,16 @@ Release History
    - Fixed
 
 
+1.0.1 (unreleased)
+==================
+
+**Changed**
+
+- Add redirects from old URLs to documentation.
+  (`#237 <https://github.com/nengo/nengo_spa/issues/237>`__,
+  `#238 <https://github.com/nengo/nengo_spa/pull/238>`__)
+
+
 1.0.0 (December 12, 2019)
 =========================
 
