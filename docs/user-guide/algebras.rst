@@ -5,7 +5,7 @@ Nengo SPA uses elementwise addition for superposition and circular convolution
 for binding (`.CircularConvolutionAlgebra`) by default. However, other choices are
 viable. In Nengo SPA we call such a specific choice of such operators an
 *algebra*. It is easy to change the algebra that is used by Nengo SPA as it is
-tied to the vocabulary. To use a different algebra is suffices to manually
+tied to the vocabulary. To use a different algebra, it suffices to manually
 create a vocabulary with the desired algebra and use this in your model::
 
     import nengo
