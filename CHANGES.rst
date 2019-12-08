@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-1.0.0 (unreleased)
-==================
+1.0.0 (December 12, 2019)
+=========================
 
 **Changed**
 
