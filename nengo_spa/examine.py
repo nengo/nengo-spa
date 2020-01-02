@@ -40,8 +40,9 @@ def similarity(data, vocab, normalize=False):
             vocab = [p.v for p in vocab]
         vectors = np.array(vocab, copy=False, ndmin=2)
     else:
-        raise ValidationError("%r object is not a valid vocabulary"
-                              % (type(vocab).__name__), attr='vocab')
+        raise ValidationError(
+            "%r object is not a valid vocabulary" % (type(vocab).__name__), attr="vocab"
+        )
 
     dots = np.dot(vectors, data.T)
 
@@ -72,11 +73,19 @@ def pairs(vocab):
     ['A*B', 'A*C', 'B*C']
     """
 
-    return set(x + '*' + y for x, y in combinations(vocab.keys(), 2))
+    return set(x + "*" + y for x, y in combinations(vocab.keys(), 2))
 
 
-def text(v, vocab, minimum_count=1, maximum_count=None,
-         threshold=0.1, join=';', terms=None, normalize=False):
+def text(
+    v,
+    vocab,
+    minimum_count=1,
+    maximum_count=None,
+    threshold=0.1,
+    join=";",
+    terms=None,
+    normalize=False,
+):
     """Return a human-readable text version of the provided vector.
 
     This is meant to give a quick text version of a vector for display
@@ -131,4 +140,4 @@ def text(v, vocab, minimum_count=1, maximum_count=None,
         else:
             break
 
-    return join.join(['%0.2f%s' % (sim, key) for (sim, key) in r])
+    return join.join(["%0.2f%s" % (sim, key) for (sim, key) in r])

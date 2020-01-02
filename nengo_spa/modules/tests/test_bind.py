@@ -22,16 +22,16 @@ def test_basic():
 def test_run(Simulator, algebra, seed):
     rng = np.random.RandomState(seed)
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
-    vocab.populate('A; B')
+    vocab.populate("A; B")
 
     with spa.Network(seed=seed) as model:
         model.bind = spa.Bind(vocab)
 
         def inputA(t):
             if 0 <= t < 0.1:
-                return 'A'
+                return "A"
             else:
-                return 'B'
+                return "B"
 
         model.input = spa.Transcode(inputA, output_vocab=vocab)
         model.input >> model.bind.input_left
@@ -50,21 +50,21 @@ def test_run(Simulator, algebra, seed):
     assert error < 0.15
 
 
-@pytest.mark.parametrize('side', ('left', 'right'))
+@pytest.mark.parametrize("side", ("left", "right"))
 def test_unbind(Simulator, algebra, side, seed):
     rng = np.random.RandomState(seed)
     vocab = spa.Vocabulary(64, pointer_gen=rng, algebra=algebra)
-    vocab.populate('A; B')
+    vocab.populate("A; B")
 
     with spa.Network(seed=seed) as model:
         model.bind = spa.Bind(
-            vocab, unbind_left=(side == 'left'),
-            unbind_right=(side == 'right'))
+            vocab, unbind_left=(side == "left"), unbind_right=(side == "right")
+        )
 
-        if side == 'left':
+        if side == "left":
             spa.sym.B >> model.bind.input_left
             spa.sym.B * spa.sym.A >> model.bind.input_right
-        elif side == 'right':
+        elif side == "right":
             spa.sym.A * spa.sym.B >> model.bind.input_left
             spa.sym.B >> model.bind.input_right
         else:
@@ -77,5 +77,5 @@ def test_unbind(Simulator, algebra, side, seed):
         sim.run(0.2)
 
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A * B * ~B'), skip=0.15,
-        atol=0.3)
+        sim.trange(), sim.data[p], vocab.parse("A * B * ~B"), skip=0.15, atol=0.3
+    )

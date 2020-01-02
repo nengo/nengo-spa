@@ -27,13 +27,15 @@ class Superposition(Network):
         Output.
     """
 
-    vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)
+    vocab = VocabularyOrDimParam("vocab", default=None, readonly=True)
     neurons_per_dimension = IntParam(
-        'neurons_per_dimension', default=200, low=1, readonly=True)
-    n_inputs = IntParam('n_inputs', optional=False, low=1, readonly=True)
+        "neurons_per_dimension", default=200, low=1, readonly=True
+    )
+    n_inputs = IntParam("n_inputs", optional=False, low=1, readonly=True)
 
-    def __init__(self, n_inputs, vocab=Default, neurons_per_dimension=Default,
-                 **kwargs):
+    def __init__(
+        self, n_inputs, vocab=Default, neurons_per_dimension=Default, **kwargs
+    ):
         super(Superposition, self).__init__(**kwargs)
 
         self.vocab = vocab
@@ -41,10 +43,13 @@ class Superposition(Network):
         self.n_inputs = n_inputs
 
         with self:
-            self.superposition_net, self.inputs, self.output = (
-                self.vocab.algebra.implement_superposition(
-                    self.neurons_per_dimension, self.vocab.dimensions,
-                    self.n_inputs))
+            (
+                self.superposition_net,
+                self.inputs,
+                self.output,
+            ) = self.vocab.algebra.implement_superposition(
+                self.neurons_per_dimension, self.vocab.dimensions, self.n_inputs
+            )
 
         for inp in self.inputs:
             self.declare_input(inp, self.vocab)

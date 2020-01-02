@@ -28,6 +28,7 @@ class SpArrayExtractor(object):
 def make_sp_func(fn, vocab):
     def sp_func(t, v):
         return fn(t, SemanticPointer(v, vocab=vocab))
+
     return sp_func
 
 
@@ -55,14 +56,19 @@ class TranscodeFunctionParam(Parameter):
         elif not obj.input_vocab and isinstance(fn, (str, pointer_cls)):
             return fn
         else:
-            raise ValidationError("Invalid output type {!r}".format(
-                type(fn)), attr=self.name, obj=obj)
+            raise ValidationError(
+                "Invalid output type {!r}".format(type(fn)), attr=self.name, obj=obj
+            )
 
     def coerce_callable(self, obj, fn):
-        t = 0.
+        t = 0.0
         if obj.input_vocab is not None:
-            args = (t, SemanticPointer(
-                np.zeros(obj.input_vocab.dimensions), vocab=obj.input_vocab))
+            args = (
+                t,
+                SemanticPointer(
+                    np.zeros(obj.input_vocab.dimensions), vocab=obj.input_vocab
+                ),
+            )
         elif obj.size_in is not None:
             args = (t, np.zeros(obj.size_in))
         else:
@@ -75,12 +81,17 @@ class TranscodeFunctionParam(Parameter):
                 raise ValidationError(
                     "Transcode function %r is expected to accept exactly 2 "
                     "arguments: time as a float, and a SemanticPointer",
-                    attr=self.name, obj=obj)
+                    attr=self.name,
+                    obj=obj,
+                )
             else:
                 raise ValidationError(
                     "Transcode function %r is expected to accept exactly 1 or "
                     "2 arguments: time as a float, and optionally the input "
-                    "data as NumPy array.", attr=self.name, obj=obj)
+                    "data as NumPy array.",
+                    attr=self.name,
+                    obj=obj,
+                )
         return fn
 
     @classmethod
@@ -154,19 +165,26 @@ class Transcode(Network):
     """
 
     function = TranscodeFunctionParam(
-        'function', optional=True, default=None, readonly=True)
+        "function", optional=True, default=None, readonly=True
+    )
     input_vocab = VocabularyOrDimParam(
-        'input_vocab', optional=True, default=None, readonly=True)
+        "input_vocab", optional=True, default=None, readonly=True
+    )
     output_vocab = VocabularyOrDimParam(
-        'output_vocab', optional=True, default=None, readonly=True)
-    size_in = IntParam(
-        'size_in', optional=True, default=None, readonly=True)
-    size_out = IntParam(
-        'size_out', optional=True, default=None, readonly=True)
+        "output_vocab", optional=True, default=None, readonly=True
+    )
+    size_in = IntParam("size_in", optional=True, default=None, readonly=True)
+    size_out = IntParam("size_out", optional=True, default=None, readonly=True)
 
     def __init__(
-            self, function=Default, input_vocab=Default, output_vocab=Default,
-            size_in=Default, size_out=Default, **kwargs):
+        self,
+        function=Default,
+        input_vocab=Default,
+        output_vocab=Default,
+        size_in=Default,
+        size_out=Default,
+        **kwargs
+    ):
         super(Transcode, self).__init__(**kwargs)
 
         # Vocabs need to be set before function which accesses vocab for
@@ -180,22 +198,34 @@ class Transcode(Network):
             raise ValidationError(
                 "At least one of input_vocab and output_vocab needs to be "
                 "set. If neither the input nor the output is a Semantic "
-                "Pointer, use a basic nengo.Node instead.", self)
+                "Pointer, use a basic nengo.Node instead.",
+                self,
+            )
         if self.input_vocab is not None and self.size_in is not None:
             raise ValidationError(
-                "The input_vocab and size_in arguments are mutually "
-                "exclusive.", 'size_in', self)
+                "The input_vocab and size_in arguments are mutually " "exclusive.",
+                "size_in",
+                self,
+            )
         if self.output_vocab is not None and self.size_out is not None:
             raise ValidationError(
-                "The output_vocab and size_out arguments are mutually "
-                "exclusive.", 'size_in', self)
+                "The output_vocab and size_out arguments are mutually " "exclusive.",
+                "size_in",
+                self,
+            )
 
         self.function = function
 
-        node_size_in = (self.input_vocab.dimensions
-                        if self.input_vocab is not None else self.size_in)
-        node_size_out = (self.output_vocab.dimensions
-                         if self.output_vocab is not None else self.size_out)
+        node_size_in = (
+            self.input_vocab.dimensions
+            if self.input_vocab is not None
+            else self.size_in
+        )
+        node_size_out = (
+            self.output_vocab.dimensions
+            if self.output_vocab is not None
+            else self.size_out
+        )
         if self.function is None:
             if node_size_in is None:
                 node_size_in = self.output_vocab.dimensions
@@ -204,8 +234,11 @@ class Transcode(Network):
         with self:
             self.node = nengo.Node(
                 TranscodeFunctionParam.to_node_output(
-                    self.function, self.input_vocab, self.output_vocab),
-                size_in=node_size_in, size_out=node_size_out)
+                    self.function, self.input_vocab, self.output_vocab
+                ),
+                size_in=node_size_in,
+                size_out=node_size_out,
+            )
             self.input = self.node
             self.output = self.node
 

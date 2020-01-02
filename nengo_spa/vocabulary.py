@@ -15,13 +15,13 @@ from nengo_spa.typechecks import is_number, is_integer, is_iterable
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
-valid_sp_regex = re.compile('^[A-Z][_a-zA-Z0-9]*$')
+valid_sp_regex = re.compile("^[A-Z][_a-zA-Z0-9]*$")
 special_sps = {
-    'AbsorbingElement': AbsorbingElement,
-    'Identity': Identity,
-    'Zero': Zero,
+    "AbsorbingElement": AbsorbingElement,
+    "Identity": Identity,
+    "Zero": Zero,
 }
-reserved_sp_names = {'None', 'True', 'False'} | set(special_sps.keys())
+reserved_sp_names = {"None", "True", "False"} | set(special_sps.keys())
 
 
 class Vocabulary(Mapping):
@@ -85,15 +85,22 @@ class Vocabulary(Mapping):
     """
 
     def __init__(
-            self, dimensions, strict=True, max_similarity=0.1,
-            pointer_gen=None, name=None, algebra=None):
+        self,
+        dimensions,
+        strict=True,
+        max_similarity=0.1,
+        pointer_gen=None,
+        name=None,
+        algebra=None,
+    ):
         if algebra is None:
             algebra = HrrAlgebra()
         self.algebra = algebra
 
         if not is_integer(dimensions) or dimensions < 1:
-            raise ValidationError("dimensions must be a positive integer",
-                                  attr='dimensions', obj=self)
+            raise ValidationError(
+                "dimensions must be a positive integer", attr="dimensions", obj=self
+            )
 
         if pointer_gen is None:
             pointer_gen = UnitLengthVectors(dimensions)
@@ -103,7 +110,9 @@ class Vocabulary(Mapping):
         if not is_iterable(pointer_gen) or isinstance(pointer_gen, str):
             raise ValidationError(
                 "pointer_gen must be iterable or RandomState",
-                attr='pointer_gen', obj=self)
+                attr="pointer_gen",
+                obj=self,
+            )
 
         self.dimensions = dimensions
         self.strict = strict
@@ -121,9 +130,10 @@ class Vocabulary(Mapping):
         return v
 
     def __str__(self):
-        name = '' if self.name is None else '"{}" '.format(self.name)
-        return '{}-dimensional vocab {}at 0x{:x}'.format(
-            self.dimensions, name, id(self))
+        name = "" if self.name is None else '"{}" '.format(self.name)
+        return "{}-dimensional vocab {}at 0x{:x}".format(
+            self.dimensions, name, id(self)
+        )
 
     def create_pointer(self, attempts=100, transform=None):
         """Create a new semantic pointer and add it to the vocabulary.
@@ -151,10 +161,9 @@ class Vocabulary(Mapping):
         best_p = None
         best_sim = np.inf
         for _ in range(attempts):
-            p = semantic_pointer.SemanticPointer(
-                next(self.pointer_gen), vocab=self)
+            p = semantic_pointer.SemanticPointer(next(self.pointer_gen), vocab=self)
             if transform is not None:
-                p = eval('p.' + transform, dict(self), {'p': p})
+                p = eval("p." + transform, dict(self), {"p": p})
             if len(self) == 0:
                 best_p = p
                 break
@@ -167,10 +176,10 @@ class Vocabulary(Mapping):
                         break
         else:
             warnings.warn(
-                'Could not create a semantic pointer with '
-                'max_similarity=%1.2f (D=%d, M=%d, similarity=%1.2f)'
-                % (self.max_similarity, self.dimensions,
-                   len(self._key2idx), best_sim))
+                "Could not create a semantic pointer with "
+                "max_similarity=%1.2f (D=%d, M=%d, similarity=%1.2f)"
+                % (self.max_similarity, self.dimensions, len(self._key2idx), best_sim)
+            )
         return best_p
 
     def __contains__(self, key):
@@ -190,14 +199,15 @@ class Vocabulary(Mapping):
         # exception. By raising a KeyError we indicate that there is no
         # __tracebackhide__ attribute on this object and preserve the relevant
         # exception.
-        if key == '__tracebackhide__':
+        if key == "__tracebackhide__":
             raise KeyError()
         if key in special_sps:
             return special_sps[key](self.dimensions, self)
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
         return semantic_pointer.SemanticPointer(
-            self._vectors[self._key2idx[key]], vocab=self, name=key)
+            self._vectors[self._key2idx[key]], vocab=self, name=key
+        )
 
     def __hash__(self):
         return hash(id(self))
@@ -214,22 +224,25 @@ class Vocabulary(Mapping):
         p : SemanticPointer or array_like
             Semantic Pointer to add.
         """
-        if (not valid_sp_regex.match(key) or iskeyword(key)
-                or key in reserved_sp_names):
+        if not valid_sp_regex.match(key) or iskeyword(key) or key in reserved_sp_names:
             raise SpaParseError(
                 "Invalid Semantic Pointer name {!r}. Valid names are valid "
-                "Python 2 identifiers beginning with a capital letter.".format(
-                    key))
+                "Python 2 identifiers beginning with a capital letter.".format(key)
+            )
         if not isinstance(p, semantic_pointer.SemanticPointer):
             p = semantic_pointer.SemanticPointer(p, vocab=self)
 
         if key in self._key2idx:
-            raise ValidationError("The semantic pointer %r already exists"
-                                  % key, attr='', obj=self)
+            raise ValidationError(
+                "The semantic pointer %r already exists" % key, attr="", obj=self
+            )
         if p.vocab is not None and p.vocab is not self:
             raise ValidationError(
                 "Cannot add a semantic pointer that belongs to a different "
-                "vocabulary.", attr='', obj=self)
+                "vocabulary.",
+                attr="",
+                obj=self,
+            )
 
         self._key2idx[key] = len(self._key2idx)
         self._keys.append(key)
@@ -263,9 +276,9 @@ class Vocabulary(Mapping):
         if len(pointers.strip()) <= 0:
             return  # Do nothing (and don't fail) for empty string.
 
-        for p_expr in pointers.split(';'):
-            assign_split = p_expr.split('=', 1)
-            modifier_split = p_expr.split('.', 1)
+        for p_expr in pointers.split(";"):
+            assign_split = p_expr.split("=", 1)
+            modifier_split = p_expr.split(".", 1)
             if len(assign_split) > 1:
                 name, value_expr = assign_split
                 value = eval(value_expr.strip(), {}, self)
@@ -298,13 +311,16 @@ class Vocabulary(Mapping):
         except NameError as err:
             raise SpaParseError(
                 "Error parsing expression {expr!r} with {vocab}: {msg}".format(
-                    expr=text, vocab=self, msg=str(err)))
+                    expr=text, vocab=self, msg=str(err)
+                )
+            )
 
         if is_number(value):
             value *= Identity(self.dimensions)
         elif not isinstance(value, semantic_pointer.SemanticPointer):
             raise SpaParseError(
-                "The result of parsing '%s' is not a SemanticPointer." % text)
+                "The result of parsing '%s' is not a SemanticPointer." % text
+            )
         return value
 
     def parse_n(self, *texts):
@@ -352,14 +368,17 @@ class Vocabulary(Mapping):
 
         if len(missing_keys) > 0:
             if populate is None:
-                warnings.warn(NengoWarning(
-                    "The transform_to source vocabulary has keys not existent "
-                    "in the target vocabulary. These will be ignored. Use the "
-                    "`populate=False` keyword argument to silence this "
-                    "warning or `populate=True` to automatically add missing "
-                    "keys to the target vocabulary."))
+                warnings.warn(
+                    NengoWarning(
+                        "The transform_to source vocabulary has keys not existent "
+                        "in the target vocabulary. These will be ignored. Use the "
+                        "`populate=False` keyword argument to silence this "
+                        "warning or `populate=True` to automatically add missing "
+                        "keys to the target vocabulary."
+                    )
+                )
             elif populate:
-                other.populate(';'.join(missing_keys))
+                other.populate(";".join(missing_keys))
                 missing_keys = set()
 
         from_vocab = self.create_subset(keys - missing_keys).vectors
@@ -382,8 +401,13 @@ class Vocabulary(Mapping):
             new vocabulary.
         """
         # Make new Vocabulary object
-        subset = Vocabulary(self.dimensions, self.strict, self.max_similarity,
-                            pointer_gen=self.pointer_gen, algebra=self.algebra)
+        subset = Vocabulary(
+            self.dimensions,
+            self.strict,
+            self.max_similarity,
+            pointer_gen=self.pointer_gen,
+            algebra=self.algebra,
+        )
 
         # Copy over the new keys
         for key in keys:
@@ -419,7 +443,8 @@ class VocabularyMap(Mapping):
         except (AttributeError, TypeError):
             raise ValueError(
                 "The `vocabs` argument requires a list of Vocabulary "
-                "instances or `None`.")
+                "instances or `None`."
+            )
 
     def add(self, vocab):
         """Add a vocabulary to the map.
@@ -432,9 +457,11 @@ class VocabularyMap(Mapping):
             Vocabulary to add.
         """
         if vocab.dimensions in self._vocabs:
-            warnings.warn("Duplicate vocabularies with dimension %d. "
-                          "Using the last entry in the vocab list with "
-                          "that dimensionality." % vocab.dimensions)
+            warnings.warn(
+                "Duplicate vocabularies with dimension %d. "
+                "Using the last entry in the vocab list with "
+                "that dimensionality." % vocab.dimensions
+            )
         self._vocabs[vocab.dimensions] = vocab
 
     def __delitem__(self, dimensions):
@@ -477,8 +504,10 @@ class VocabularyMap(Mapping):
         """
         if dimensions not in self._vocabs:
             self._vocabs[dimensions] = Vocabulary(
-                dimensions, strict=False,
-                pointer_gen=UnitLengthVectors(dimensions, self.rng))
+                dimensions,
+                strict=False,
+                pointer_gen=UnitLengthVectors(dimensions, self.rng),
+            )
         return self._vocabs[dimensions]
 
     def __iter__(self):
@@ -491,8 +520,10 @@ class VocabularyMap(Mapping):
         if isinstance(vocab, int):
             return vocab in self._vocabs
         else:
-            return (vocab.dimensions in self._vocabs
-                    and self._vocabs[vocab.dimensions] is vocab)
+            return (
+                vocab.dimensions in self._vocabs
+                and self._vocabs[vocab.dimensions] is vocab
+            )
 
 
 class VocabularyMapParam(nengo.params.Parameter):
@@ -510,8 +541,10 @@ class VocabularyMapParam(nengo.params.Parameter):
             except ValueError:
                 raise ValidationError(
                     "Must be of type 'VocabularyMap' or compatible "
-                    "(got type %r)."
-                    % type(vocab_set).__name__, attr=self.name, obj=instance)
+                    "(got type %r)." % type(vocab_set).__name__,
+                    attr=self.name,
+                    obj=instance,
+                )
 
         return vocab_set
 
@@ -535,10 +568,15 @@ class VocabularyOrDimParam(nengo.params.Parameter):
                 if value < 1:
                     raise ValidationError(
                         "Vocabulary dimensionality must be at least 1.",
-                        attr=self.name, obj=instance)
+                        attr=self.name,
+                        obj=instance,
+                    )
                 value = instance.vocabs.get_or_create(value)
             elif not isinstance(value, Vocabulary):
                 raise ValidationError(
                     "Must be of type 'Vocabulary' or an integer (got type %r)."
-                    % type(value).__name__, attr=self.name, obj=instance)
+                    % type(value).__name__,
+                    attr=self.name,
+                    obj=instance,
+                )
         return value

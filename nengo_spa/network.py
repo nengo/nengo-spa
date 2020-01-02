@@ -8,7 +8,11 @@ import numpy as np
 from nengo_spa.action_selection import ifmax as actions_ifmax
 from nengo_spa.ast.base import Noop
 from nengo_spa.connectors import (
-    as_ast_node, input_vocab_registry, output_vocab_registry, SpaOperatorMixin)
+    as_ast_node,
+    input_vocab_registry,
+    output_vocab_registry,
+    SpaOperatorMixin,
+)
 from nengo_spa.types import TScalar
 from nengo_spa.vocabulary import VocabularyMap, VocabularyMapParam
 
@@ -100,18 +104,17 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
     """
 
     _master_vocabs = weakref.WeakKeyDictionary()
-    vocabs = VocabularyMapParam('vocabs', default=None, optional=False)
+    vocabs = VocabularyMapParam("vocabs", default=None, optional=False)
 
     _input_types = {}
     _output_types = {}
 
-    def __init__(
-            self, label=None, seed=None, add_to_container=None, vocabs=None):
+    def __init__(self, label=None, seed=None, add_to_container=None, vocabs=None):
         super(Network, self).__init__(label, seed, add_to_container)
         self.config.configures(Network)
 
         if vocabs is None:
-            vocabs = Config.default(Network, 'vocabs')
+            vocabs = Config.default(Network, "vocabs")
             if vocabs is None and len(Network.context) > 0:
                 vocabs = self._master_vocabs.get(Network.context[0], None)
             if vocabs is None:
@@ -166,7 +169,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         return output_vocab_registry.declare_connector(obj, vocab)
 
 
-def create_inhibit_node(net, strength=2., **kwargs):
+def create_inhibit_node(net, strength=2.0, **kwargs):
     """Creates a node that inhibits all ensembles in a network.
 
     Parameters
@@ -188,6 +191,8 @@ def create_inhibit_node(net, strength=2., **kwargs):
     inhibit_node = nengo.Node(size_in=1)
     for e in net.all_ensembles:
         nengo.Connection(
-            inhibit_node, e.neurons,
-            transform=-strength * np.ones((e.n_neurons, 1), **kwargs))
+            inhibit_node,
+            e.neurons,
+            transform=-strength * np.ones((e.n_neurons, 1), **kwargs),
+        )
     return inhibit_node

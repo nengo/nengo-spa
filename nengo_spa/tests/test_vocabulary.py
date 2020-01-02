@@ -10,88 +10,93 @@ from nengo_spa import Vocabulary
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.vector_generation import AxisAlignedVectors
 from nengo_spa.vocabulary import (
-    special_sps, VocabularyMap, VocabularyMapParam, VocabularyOrDimParam)
+    special_sps,
+    VocabularyMap,
+    VocabularyMapParam,
+    VocabularyOrDimParam,
+)
 
 
 def test_add(rng):
     v = Vocabulary(3, pointer_gen=rng)
-    v.add('A', [1, 2, 3])
-    v.add('B', [4, 5, 6])
-    v.add('C', [7, 8, 9])
+    v.add("A", [1, 2, 3])
+    v.add("B", [4, 5, 6])
+    v.add("C", [7, 8, 9])
     assert np.allclose(v.vectors, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 
 def test_populate(rng):
     v = Vocabulary(64, pointer_gen=rng)
 
-    v.populate('')
-    v.populate(' \r\n\t')
+    v.populate("")
+    v.populate(" \r\n\t")
     assert len(v) == 0
 
-    v.populate('A')
-    assert 'A' in v
+    v.populate("A")
+    assert "A" in v
 
-    v.populate('B; C')
-    assert 'B' in v
-    assert 'C' in v
+    v.populate("B; C")
+    assert "B" in v
+    assert "C" in v
 
-    v.populate('D.unitary()')
-    assert 'D' in v
-    np.testing.assert_almost_equal(np.linalg.norm(v['D'].v), 1.)
-    np.testing.assert_almost_equal(np.linalg.norm((v['D'] * v['D']).v), 1.)
+    v.populate("D.unitary()")
+    assert "D" in v
+    np.testing.assert_almost_equal(np.linalg.norm(v["D"].v), 1.0)
+    np.testing.assert_almost_equal(np.linalg.norm((v["D"] * v["D"]).v), 1.0)
 
-    v.populate('E = A + 2 * B')
-    assert np.allclose(v['E'].v, v.parse('A + 2 * B').v)
-    assert np.linalg.norm(v['E'].v) > 2.
+    v.populate("E = A + 2 * B")
+    assert np.allclose(v["E"].v, v.parse("A + 2 * B").v)
+    assert np.linalg.norm(v["E"].v) > 2.0
 
-    v.populate('F = (A + 2 * B).normalized()')
-    assert np.allclose(v['F'].v, v.parse('A + 2 * B').normalized().v)
-    np.testing.assert_almost_equal(np.linalg.norm(v['F'].v), 1.)
+    v.populate("F = (A + 2 * B).normalized()")
+    assert np.allclose(v["F"].v, v.parse("A + 2 * B").normalized().v)
+    np.testing.assert_almost_equal(np.linalg.norm(v["F"].v), 1.0)
 
-    v.populate('G = A; H')
-    assert np.allclose(v['G'].v, v['A'].v)
-    assert 'H' in v
+    v.populate("G = A; H")
+    assert np.allclose(v["G"].v, v["A"].v)
+    assert "H" in v
 
     # Assigning non-existing pointer
     with pytest.raises(NameError):
-        v.populate('I = J')
+        v.populate("I = J")
 
     # Redefining
     with pytest.raises(ValidationError):
-        v.populate('H = A')
+        v.populate("H = A")
 
     # Calling non existing function
     with pytest.raises(AttributeError):
-        v.populate('I = H.invalid()')
+        v.populate("I = H.invalid()")
 
     # invalid names: lowercase, unicode
     with pytest.raises(SpaParseError):
-        v.populate('x = A')
+        v.populate("x = A")
     with pytest.raises(SpaParseError):
-        v.populate(u'Aα = A')
+        v.populate(u"Aα = A")
 
 
 def test_pointer_gen():
     v = Vocabulary(32, pointer_gen=AxisAlignedVectors(32))
-    v.populate('A; B; C')
+    v.populate("A; B; C")
     assert np.all(v.vectors == np.eye(32)[:3])
 
 
-@pytest.mark.parametrize('pointer_gen', ('string', 123))
+@pytest.mark.parametrize("pointer_gen", ("string", 123))
 def test_invalid_pointer_gen(pointer_gen):
     with pytest.raises(ValidationError):
         Vocabulary(32, pointer_gen=pointer_gen)
 
 
-@pytest.mark.parametrize('name', (
-    'None', 'True', 'False', 'Zero', 'AbsorbingElement', 'Identity'))
+@pytest.mark.parametrize(
+    "name", ("None", "True", "False", "Zero", "AbsorbingElement", "Identity")
+)
 def test_reserved_names(name):
     v = Vocabulary(16)
     with pytest.raises(SpaParseError):
         v.populate(name)
 
 
-@pytest.mark.parametrize('name,sp', sorted(special_sps.items()))
+@pytest.mark.parametrize("name,sp", sorted(special_sps.items()))
 def test_special_sps(name, sp):
     v = Vocabulary(16)
     assert name in v
@@ -102,36 +107,36 @@ def test_special_sps(name, sp):
 def test_populate_with_transform_on_first_vector(rng):
     v = Vocabulary(64, pointer_gen=rng)
 
-    v.populate('A.unitary()')
-    assert 'A' in v
-    assert np.allclose(v['A'].v, v['A'].unitary().v)
+    v.populate("A.unitary()")
+    assert "A" in v
+    assert np.allclose(v["A"].v, v["A"].unitary().v)
 
 
 def test_populate_with_transform_on_nonstrict_vocab(rng):
     v = Vocabulary(64, pointer_gen=rng, strict=False)
 
-    v.populate('A.unitary()')
-    assert 'A' in v
-    assert np.allclose(v['A'].v, v['A'].unitary().v)
+    v.populate("A.unitary()")
+    assert "A" in v
+    assert np.allclose(v["A"].v, v["A"].unitary().v)
 
 
 def test_parse(rng):
     v = Vocabulary(64, pointer_gen=rng)
-    v.populate('A; B; C')
-    A = v.parse('A')
-    B = v.parse('B')
-    C = v.parse('C')
-    assert np.allclose((A * B).v, v.parse('A * B').v)
-    assert np.allclose((A * ~B).v, v.parse('A * ~B').v)
-    assert np.allclose((A + B).v, v.parse('A + B').v)
-    assert np.allclose((A - (B*C)*3 + ~C).v, v.parse('A-(B*C)*3+~C').v)
+    v.populate("A; B; C")
+    A = v.parse("A")
+    B = v.parse("B")
+    C = v.parse("C")
+    assert np.allclose((A * B).v, v.parse("A * B").v)
+    assert np.allclose((A * ~B).v, v.parse("A * ~B").v)
+    assert np.allclose((A + B).v, v.parse("A + B").v)
+    assert np.allclose((A - (B * C) * 3 + ~C).v, v.parse("A-(B*C)*3+~C").v)
 
-    assert np.allclose(v.parse('0').v, np.zeros(64))
-    assert np.allclose(v.parse('1').v, np.eye(64)[0])
-    assert np.allclose(v.parse('1.7').v, np.eye(64)[0] * 1.7)
+    assert np.allclose(v.parse("0").v, np.zeros(64))
+    assert np.allclose(v.parse("1").v, np.eye(64)[0])
+    assert np.allclose(v.parse("1.7").v, np.eye(64)[0] * 1.7)
 
     with pytest.raises(SyntaxError):
-        v.parse('A((')
+        v.parse("A((")
     with pytest.raises(SpaParseError):
         v.parse('"hello"')
     with pytest.raises(SpaParseError):
@@ -140,16 +145,16 @@ def test_parse(rng):
 
 def test_parse_n(rng):
     v = Vocabulary(64, pointer_gen=rng)
-    v.populate('A; B; C')
-    A = v.parse('A')
-    B = v.parse('B')
+    v.populate("A; B; C")
+    A = v.parse("A")
+    B = v.parse("B")
 
-    parsed = v.parse_n('A', 'A*B', 'A+B', '3')
+    parsed = v.parse_n("A", "A*B", "A+B", "3")
     assert np.allclose(parsed[0].v, A.v)
     assert np.allclose(parsed[1].v, (A * B).v)
     assert np.allclose(parsed[2].v, (A + B).v)
     # FIXME should give an exception?
-    assert np.allclose(parsed[3].v, 3 * v['Identity'].v)
+    assert np.allclose(parsed[3].v, 3 * v["Identity"].v)
 
 
 def test_invalid_dimensions():
@@ -164,20 +169,20 @@ def test_invalid_dimensions():
 def test_capital(rng):
     v = Vocabulary(16, pointer_gen=rng)
     with pytest.raises(SpaParseError):
-        v.parse('a')
+        v.parse("a")
     with pytest.raises(SpaParseError):
-        v.parse('A+B+C+a')
+        v.parse("A+B+C+a")
 
 
-@pytest.mark.parametrize('solver', [None, nengo.solvers.Lstsq()])
+@pytest.mark.parametrize("solver", [None, nengo.solvers.Lstsq()])
 def test_transform(recwarn, rng, solver):
     v1 = Vocabulary(32, strict=False, pointer_gen=rng)
     v2 = Vocabulary(64, strict=False, pointer_gen=rng)
-    v1.populate('A; B; C')
-    v2.populate('A; B; C')
-    A = v1['A']
-    B = v1['B']
-    C = v1['C']
+    v1.populate("A; B; C")
+    v2.populate("A; B; C")
+    A = v1["A"]
+    B = v1["B"]
+    C = v1["C"]
 
     # Test transform from v1 to v2 (full vocbulary)
     # Expected: np.dot(t, A.v) ~= v2.parse('A')
@@ -185,29 +190,29 @@ def test_transform(recwarn, rng, solver):
     # Expected: np.dot(t, C.v) ~= v2.parse('C')
     t = v1.transform_to(v2, solver=solver)
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.85
-    assert v2.parse('C+B').compare(np.dot(t, C.v + B.v)) > 0.85
+    assert v2.parse("A").compare(np.dot(t, A.v)) > 0.85
+    assert v2.parse("C+B").compare(np.dot(t, C.v + B.v)) > 0.85
 
     # Test transform from v1 to v2 (only 'A' and 'B')
-    t = v1.transform_to(v2, keys=['A', 'B'], solver=solver)
+    t = v1.transform_to(v2, keys=["A", "B"], solver=solver)
 
-    assert v2.parse('A').compare(np.dot(t, A.v)) > 0.85
-    assert v2.parse('B').compare(np.dot(t, C.v + B.v)) > 0.85
+    assert v2.parse("A").compare(np.dot(t, A.v)) > 0.85
+    assert v2.parse("B").compare(np.dot(t, C.v + B.v)) > 0.85
 
     # Test warns on missing keys
-    v1.populate('D')
-    D = v1['D']
+    v1.populate("D")
+    D = v1["D"]
     with pytest.warns(NengoWarning):
         v1.transform_to(v2, solver=solver)
 
     # Test populating missing keys
     t = v1.transform_to(v2, populate=True, solver=solver)
-    assert v2.parse('D').compare(np.dot(t, D.v)) > 0.85
+    assert v2.parse("D").compare(np.dot(t, D.v)) > 0.85
 
     # Test ignores missing keys in source vocab
-    v2.populate('E')
+    v2.populate("E")
     v1.transform_to(v2, populate=True, solver=solver)
-    assert 'E' not in v1
+    assert "E" not in v1
 
 
 def test_create_pointer_warning(rng):
@@ -215,39 +220,39 @@ def test_create_pointer_warning(rng):
 
     # five pointers shouldn't fit
     with pytest.warns(UserWarning):
-        v.populate('A; B; C; D; E')
+        v.populate("A; B; C; D; E")
 
 
 def test_readonly(rng):
     v1 = Vocabulary(32, pointer_gen=rng)
-    v1.populate('A;B;C')
+    v1.populate("A;B;C")
 
     v1.readonly = True
 
     with pytest.raises(ValueError):
-        v1.parse('D')
+        v1.parse("D")
 
 
 def test_subset(rng, algebra):
     v1 = Vocabulary(32, pointer_gen=rng, algebra=algebra)
-    v1.populate('A; B; C; D; E; F; G')
+    v1.populate("A; B; C; D; E; F; G")
 
     # Test creating a vocabulary subset
-    v2 = v1.create_subset(['A', 'C', 'E'])
-    assert list(v2.keys()) == ['A', 'C', 'E']
-    assert_equal(v2['A'].v, v1['A'].v)
-    assert_equal(v2['C'].v, v1['C'].v)
-    assert_equal(v2['E'].v, v1['E'].v)
+    v2 = v1.create_subset(["A", "C", "E"])
+    assert list(v2.keys()) == ["A", "C", "E"]
+    assert_equal(v2["A"].v, v1["A"].v)
+    assert_equal(v2["C"].v, v1["C"].v)
+    assert_equal(v2["E"].v, v1["E"].v)
 
     assert v1.algebra is v2.algebra
 
 
 def test_vocabulary_tracking(rng):
     v = Vocabulary(32, pointer_gen=rng)
-    v.populate('A')
+    v.populate("A")
 
-    assert v['A'].vocab is v
-    assert v.parse('2 * A').vocab is v
+    assert v["A"].vocab is v
+    assert v.parse("2 * A").vocab is v
 
 
 def test_vocabulary_set(rng):
@@ -296,7 +301,7 @@ def test_vocabulary_set(rng):
 
 def test_vocabulary_map_param():
     class Test(object):
-        vocab_map = VocabularyMapParam('vocab_map', readonly=False)
+        vocab_map = VocabularyMapParam("vocab_map", readonly=False)
 
     obj = Test()
     vm = VocabularyMap()
@@ -311,7 +316,7 @@ def test_vocabulary_map_param():
     assert obj.vocab_map[32] is v32
 
     with pytest.raises(ValidationError):
-        obj.vocab_map = 'incompatible'
+        obj.vocab_map = "incompatible"
 
 
 def test_vocabulary_or_dim_param():
@@ -320,7 +325,7 @@ def test_vocabulary_or_dim_param():
 
     class Test(object):
         vocabs = VocabularyMap([v16])
-        vocab = VocabularyOrDimParam('vocab', readonly=False)
+        vocab = VocabularyOrDimParam("vocab", readonly=False)
 
     obj = Test()
 
@@ -331,7 +336,7 @@ def test_vocabulary_or_dim_param():
     assert obj.vocab is v16
 
     with pytest.raises(ValidationError):
-        obj.vocab = 'incompatible'
+        obj.vocab = "incompatible"
 
     with pytest.raises(ValidationError):
         obj.vocab = 0
@@ -339,7 +344,7 @@ def test_vocabulary_or_dim_param():
 
 def test_pointer_names():
     v = Vocabulary(16)
-    v.populate('A; B')
+    v.populate("A; B")
 
-    assert v['A'].name == 'A'
-    assert v.parse('A*B').name == '(A)*(B)'
+    assert v["A"].name == "A"
+    assert v.parse("A*B").name == "(A)*(B)"

@@ -9,8 +9,7 @@ from nengo_spa.networks.matrix_multiplication import MatrixMult
 def calc_sub_d(dimensions):
     sub_d = int(np.sqrt(dimensions))
     if sub_d * sub_d != dimensions:
-        raise ValidationError(
-            "Dimensions must be a square number.", 'dimensions')
+        raise ValidationError("Dimensions must be a square number.", "dimensions")
     return sub_d
 
 
@@ -19,7 +18,7 @@ def inversion_matrix(dimensions):
     m = np.zeros((dimensions, dimensions))
     for i in range(dimensions):
         j = sub_d * i
-        m[j % dimensions + j // dimensions, i] = 1.
+        m[j % dimensions + j // dimensions, i] = 1.0
     return m
 
 
@@ -28,7 +27,7 @@ def swapping_matrix(dimensions):
     m = np.zeros((dimensions, dimensions))
     for i in range(dimensions):
         j = i // sub_d + sub_d * (i % sub_d)
-        m[i, j] = 1.
+        m[i, j] = 1.0
     return m
 
 
@@ -99,8 +98,10 @@ class VTB(nengo.Network):
     output : nengo.Node
         The resulting bound vector.
     """
-    def __init__(self, n_neurons, dimensions, unbind_left=False,
-                 unbind_right=False, **kwargs):
+
+    def __init__(
+        self, n_neurons, dimensions, unbind_left=False, unbind_right=False, **kwargs
+    ):
         super().__init__(**kwargs)
 
         sub_d = calc_sub_d(dimensions)
@@ -120,28 +121,31 @@ class VTB(nengo.Network):
                 raise ValueError("Cannot unbind both sides at the same time.")
             elif unbind_left:
                 nengo.Connection(
-                    self.input_left, self.mat,
-                    transform=inversion_matrix(dimensions), synapse=None)
+                    self.input_left,
+                    self.mat,
+                    transform=inversion_matrix(dimensions),
+                    synapse=None,
+                )
                 nengo.Connection(
-                    self.input_right, self.vec,
-                    transform=swapping_matrix(dimensions), synapse=None)
+                    self.input_right,
+                    self.vec,
+                    transform=swapping_matrix(dimensions),
+                    synapse=None,
+                )
             else:
                 nengo.Connection(self.input_left, self.vec, synapse=None)
                 if unbind_right:
                     tr = inversion_matrix(dimensions)
                 else:
-                    tr = 1.
-                nengo.Connection(
-                    self.input_right, self.mat, transform=tr, synapse=None)
+                    tr = 1.0
+                nengo.Connection(self.input_right, self.mat, transform=tr, synapse=None)
 
             with nengo.Config(nengo.Ensemble) as cfg:
-                cfg[nengo.Ensemble].intercepts = CosineSimilarity(
-                    dimensions + 2)
-                cfg[nengo.Ensemble].eval_points = CosineSimilarity(
-                    dimensions + 2)
+                cfg[nengo.Ensemble].intercepts = CosineSimilarity(dimensions + 2)
+                cfg[nengo.Ensemble].eval_points = CosineSimilarity(dimensions + 2)
                 self.matmuls = [
-                    MatrixMult(n_neurons, shape_left, shape_right)
-                    for i in range(sub_d)]
+                    MatrixMult(n_neurons, shape_left, shape_right) for i in range(sub_d)
+                ]
 
             for i in range(sub_d):
                 mm = self.matmuls[i]
@@ -149,5 +153,5 @@ class VTB(nengo.Network):
                 nengo.Connection(self.mat, mm.input_left, synapse=None)
                 nengo.Connection(self.vec[sl], mm.input_right, synapse=None)
                 nengo.Connection(
-                    mm.output, self.output[sl], transform=np.sqrt(sub_d),
-                    synapse=None)
+                    mm.output, self.output[sl], transform=np.sqrt(sub_d), synapse=None
+                )

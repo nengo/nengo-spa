@@ -2,7 +2,13 @@ import pytest
 
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import (
-    coerce_types, TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary, Type)
+    coerce_types,
+    TAnyVocab,
+    TScalar,
+    TAnyVocabOfDim,
+    TVocabulary,
+    Type,
+)
 from nengo_spa.vocabulary import Vocabulary
 
 
@@ -30,7 +36,7 @@ def test_coercion_errors():
     assert "Dimensionality mismatch" in str(err.value)
 
     with pytest.raises(SpaTypeError) as err:
-        coerce_types(Type('x'), Type('y'))
+        coerce_types(Type("x"), Type("y"))
     assert "Incompatible types" in str(err.value)
 
 

@@ -66,24 +66,34 @@ class Thalamus(Network):
         Output from the *actions* ensembles.
     """
 
-    neurons_action = IntParam('neurons_action', default=50)
-    threshold_action = NumberParam('threshold_action', default=0.2)
-    mutual_inhibit = NumberParam('mutual_inhibit', default=1.)
-    route_inhibit = NumberParam('route_inhibit', default=3.)
-    synapse_inhibit = SynapseParam('synapse_inhibit', default=Lowpass(0.008))
-    synapse_bg = SynapseParam('synapse_bg', default=Lowpass(0.008))
-    neurons_channel_dim = IntParam('neurons_channel_dim', default=50)
-    synapse_channel = SynapseParam('synapse_channel', default=Lowpass(0.01))
-    neurons_gate = IntParam('neurons_gate', default=40)
-    threshold_gate = NumberParam('threshold_gate', default=0.3)
-    synapse_to_gate = SynapseParam('synapse_to_gate', default=Lowpass(0.002))
+    neurons_action = IntParam("neurons_action", default=50)
+    threshold_action = NumberParam("threshold_action", default=0.2)
+    mutual_inhibit = NumberParam("mutual_inhibit", default=1.0)
+    route_inhibit = NumberParam("route_inhibit", default=3.0)
+    synapse_inhibit = SynapseParam("synapse_inhibit", default=Lowpass(0.008))
+    synapse_bg = SynapseParam("synapse_bg", default=Lowpass(0.008))
+    neurons_channel_dim = IntParam("neurons_channel_dim", default=50)
+    synapse_channel = SynapseParam("synapse_channel", default=Lowpass(0.01))
+    neurons_gate = IntParam("neurons_gate", default=40)
+    threshold_gate = NumberParam("threshold_gate", default=0.3)
+    synapse_to_gate = SynapseParam("synapse_to_gate", default=Lowpass(0.002))
 
-    def __init__(self, action_count, neurons_action=Default,
-                 threshold_action=Default, mutual_inhibit=Default,
-                 route_inhibit=Default, synapse_inhibit=Default,
-                 synapse_bg=Default, neurons_channel_dim=Default,
-                 synapse_channel=Default, neurons_gate=Default,
-                 threshold_gate=Default, synapse_to_gate=Default, **kwargs):
+    def __init__(
+        self,
+        action_count,
+        neurons_action=Default,
+        threshold_action=Default,
+        mutual_inhibit=Default,
+        route_inhibit=Default,
+        synapse_inhibit=Default,
+        synapse_bg=Default,
+        neurons_channel_dim=Default,
+        synapse_channel=Default,
+        neurons_gate=Default,
+        threshold_gate=Default,
+        synapse_to_gate=Default,
+        **kwargs
+    ):
         super(Thalamus, self).__init__(**kwargs)
 
         self.action_count = action_count
@@ -99,7 +109,7 @@ class Thalamus(Network):
         self.synapse_to_gate = synapse_to_gate
         self.synapse_bg = synapse_bg
 
-        self.gates = {}     # gating ensembles per action (created as needed)
+        self.gates = {}  # gating ensembles per action (created as needed)
         self.channels = []  # channels to pass data between networks
 
         self.gate_in_connections = {}
@@ -110,16 +120,21 @@ class Thalamus(Network):
 
         with self:
             self.actions = nengo.networks.EnsembleArray(
-                self.neurons_action, self.action_count,
+                self.neurons_action,
+                self.action_count,
                 intercepts=nengo.dists.Uniform(self.threshold_action, 1),
-                encoders=nengo.dists.Choice([[1.0]]), label="actions")
+                encoders=nengo.dists.Choice([[1.0]]),
+                label="actions",
+            )
             nengo.Connection(
-                self.actions.output, self.actions.input,
-                transform=(
-                    np.eye(self.action_count) - 1) * self.mutual_inhibit)
+                self.actions.output,
+                self.actions.input,
+                transform=(np.eye(self.action_count) - 1) * self.mutual_inhibit,
+            )
             self.bias = nengo.Node([1], label="thalamus bias")
-            nengo.Connection(self.bias, self.actions.input,
-                             transform=np.ones((self.action_count, 1)))
+            nengo.Connection(
+                self.bias, self.actions.input, transform=np.ones((self.action_count, 1))
+            )
 
         self.input = self.actions.input
         self.output = self.actions.output
@@ -147,21 +162,27 @@ class Thalamus(Network):
             The constructed gate.
         """
         if label is None:
-            label = 'gate[%d]' % index
+            label = "gate[%d]" % index
         intercepts = Uniform(self.threshold_gate, 1)
         self.gates[index] = gate = nengo.Ensemble(
-            self.neurons_gate, dimensions=1, intercepts=intercepts,
-            label=label, encoders=[[1]] * self.neurons_gate)
+            self.neurons_gate,
+            dimensions=1,
+            intercepts=intercepts,
+            label=label,
+            encoders=[[1]] * self.neurons_gate,
+        )
         nengo.Connection(bias, gate, synapse=None)
 
         self.gate_in_connections[index] = nengo.Connection(
-            self.actions.ensembles[index], self.gates[index],
-            synapse=self.synapse_to_gate, transform=-1)
+            self.actions.ensembles[index],
+            self.gates[index],
+            synapse=self.synapse_to_gate,
+            transform=-1,
+        )
 
         return self.gates[index]
 
-    def construct_channel(
-            self, sink, type_, label=None):
+    def construct_channel(self, sink, type_, label=None):
         """Construct a channel.
 
         Channels are an additional neural population in-between a source
@@ -183,21 +204,23 @@ class Thalamus(Network):
             The constructed channel.
         """
         if label is None:
-            label = 'channel'
+            label = "channel"
         if type_ == TScalar:
             channel = dynamic.ScalarRealization()
         else:
             channel = dynamic.StateRealization(vocab=type_.vocab)
 
         self.channels.append(channel)
-        self.channel_out_connections.append(nengo.Connection(
-            channel.output, sink, synapse=self.synapse_channel))
+        self.channel_out_connections.append(
+            nengo.Connection(channel.output, sink, synapse=self.synapse_channel)
+        )
         return channel
 
     def connect_bg(self, bg):
         """Connect a basal ganglia network to this thalamus."""
         self.bg_connection = nengo.Connection(
-            bg.output, self.input, synapse=self.synapse_bg)
+            bg.output, self.input, synapse=self.synapse_bg
+        )
 
     def connect_gate(self, index, channel):
         """Connect a gate to a channel for information routing.
@@ -216,10 +239,10 @@ class Thalamus(Network):
         else:
             raise NotImplementedError()
 
-        inhibit = ([[-self.route_inhibit]] * (target.size_in))
+        inhibit = [[-self.route_inhibit]] * (target.size_in)
         self.gate_out_connections[index] = nengo.Connection(
-            self.gates[index], target, transform=inhibit,
-            synapse=self.synapse_inhibit)
+            self.gates[index], target, transform=inhibit, synapse=self.synapse_inhibit
+        )
 
     def connect_fixed(self, index, target, transform):
         """Create connection to route fixed value.
@@ -234,7 +257,8 @@ class Thalamus(Network):
             Transform to apply to apply to the connection.
         """
         self.fixed_connections[index] = self.connect(
-            self.actions.ensembles[index], target, transform)
+            self.actions.ensembles[index], target, transform
+        )
 
     def connect(self, source, target, transform):
         """Create connection.
@@ -251,4 +275,5 @@ class Thalamus(Network):
             Transform to apply to the connection.
         """
         return nengo.Connection(
-            source, target, transform=transform, synapse=self.synapse_channel)
+            source, target, transform=transform, synapse=self.synapse_channel
+        )

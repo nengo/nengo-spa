@@ -33,9 +33,10 @@ class DynamicNode(Node):
     """Base class for AST node with an output that changes over time."""
 
     def __invert__(self):
-        if not hasattr(self.type, 'vocab'):
+        if not hasattr(self.type, "vocab"):
             raise SpaTypeError(
-                "Cannot invert semantic pointer with unknown vocabulary.")
+                "Cannot invert semantic pointer with unknown vocabulary."
+            )
         dimensions = self.type.vocab.dimensions
         transform = self.type.vocab.algebra.get_inversion_matrix(dimensions)
         return Transformed(self, transform, self.type)
@@ -67,13 +68,13 @@ class DynamicNode(Node):
         elif self.type == TScalar and other.type == TAnyVocab:
             raise SpaTypeError(
                 "Cannot infer vocabulary for fixed pointer when multiplying "
-                "with scalar.")
+                "with scalar."
+            )
         elif isinstance(other.type, TVocabulary):
             if self.type == TScalar:
                 tr = other.evaluate().v
             else:
-                tr = other.evaluate().get_binding_matrix(
-                    swap_inputs=swap_inputs)
+                tr = other.evaluate().get_binding_matrix(swap_inputs=swap_inputs)
         else:
             raise AssertionError("Unexpected node type in multiply.")
         return Transformed(self, tr, self.type)
@@ -85,7 +86,8 @@ class DynamicNode(Node):
             input_left, input_right = mul.input_a, mul.input_b
         elif self.type == TScalar or other.type == TScalar:
             raise NotImplementedError(
-                "Dynamic scaling of semantic pointer not implemented.")
+                "Dynamic scaling of semantic pointer not implemented."
+            )
         else:
             mul = BindRealization(self.type.vocab)
             input_left, input_right = mul.input_left, mul.input_right
@@ -139,9 +141,12 @@ class DynamicNode(Node):
 
     def reinterpret(self, vocab=None):
         return Transformed(
-            self, np.eye(self.type.dimensions),
+            self,
+            np.eye(self.type.dimensions),
             TAnyVocabOfDim(self.type.dimensions)
-            if vocab is None else TVocabulary(vocab))
+            if vocab is None
+            else TVocabulary(vocab),
+        )
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
         tr = self.type.vocab.transform_to(vocab, populate, keys, solver)
@@ -167,8 +172,8 @@ class Transformed(DynamicNode):
         self.transform = transform
 
     def connect_to(self, sink, **kwargs):
-        if 'transform' in kwargs:
-            transform = np.dot(kwargs.pop('transform'), self.transform)
+        if "transform" in kwargs:
+            transform = np.dot(kwargs.pop("transform"), self.transform)
         else:
             transform = self.transform
         return self.source.connect_to(sink, transform=transform, **kwargs)
@@ -212,8 +217,7 @@ class Summed(DynamicNode):
                 s.connect_to(node, synapse=None)
             return node
         else:
-            module = SuperpositionRealization(
-                len(self.sources), self.type.vocab)
+            module = SuperpositionRealization(len(self.sources), self.type.vocab)
             for s, i in zip(self.sources, module.inputs):
                 s.connect_to(i, synapse=None)
             return module.output

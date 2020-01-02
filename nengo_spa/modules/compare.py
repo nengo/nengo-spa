@@ -29,9 +29,10 @@ class Compare(Network):
         Output.
     """
 
-    vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)
+    vocab = VocabularyOrDimParam("vocab", default=None, readonly=True)
     neurons_per_dimension = IntParam(
-        'neurons_per_dimension', default=200, low=1, readonly=True)
+        "neurons_per_dimension", default=200, low=1, readonly=True
+    )
 
     def __init__(self, vocab=Default, neurons_per_dimension=Default, **kwargs):
         super(Compare, self).__init__(**kwargs)
@@ -42,14 +43,20 @@ class Compare(Network):
         with self:
             with nengo.Config(nengo.Ensemble) as cfg:
                 cfg[nengo.Ensemble].eval_points = nengo.dists.CosineSimilarity(
-                    self.vocab.dimensions + 2)
+                    self.vocab.dimensions + 2
+                )
                 cfg[nengo.Ensemble].intercepts = nengo.dists.CosineSimilarity(
-                    self.vocab.dimensions + 2)
+                    self.vocab.dimensions + 2
+                )
                 self.product = nengo.networks.Product(
-                    self.neurons_per_dimension, self.vocab.dimensions)
-            self.output = nengo.Node(size_in=1, label='output')
-            nengo.Connection(self.product.output, self.output,
-                             transform=np.ones((1, self.vocab.dimensions)))
+                    self.neurons_per_dimension, self.vocab.dimensions
+                )
+            self.output = nengo.Node(size_in=1, label="output")
+            nengo.Connection(
+                self.product.output,
+                self.output,
+                transform=np.ones((1, self.vocab.dimensions)),
+            )
 
         self.input_a = self.product.input_a
         self.input_b = self.product.input_b

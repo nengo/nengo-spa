@@ -35,17 +35,18 @@ def test_basal_ganglia(Simulator, seed, plt):
 
         def input(t):
             if t < 0.1:
-                return '0'
+                return "0"
             elif t < 0.2:
-                return 'CAT'
+                return "CAT"
             elif t < 0.3:
-                return 'DOG*~CAT'
+                return "DOG*~CAT"
             elif t < 0.4:
-                return 'PARROT'
+                return "PARROT"
             elif t < 0.5:
-                return 'MOUSE'
+                return "MOUSE"
             else:
-                return '0'
+                return "0"
+
         m.encode = spa.Transcode(input, output_vocab=d)
 
         # test all acceptable condition formats
@@ -53,29 +54,31 @@ def test_basal_ganglia(Simulator, seed, plt):
             spa.ifmax(0.5, spa.sym.A >> m.motor)
             spa.ifmax(spa.dot(m.vision, spa.sym.CAT), spa.sym.B >> m.motor)
             spa.ifmax(
-                spa.dot(m.vision * spa.sym.CAT, spa.sym.DOG),
-                spa.sym.C >> m.motor)
+                spa.dot(m.vision * spa.sym.CAT, spa.sym.DOG), spa.sym.C >> m.motor
+            )
+            spa.ifmax(2 * spa.dot(m.vision, spa.sym.CAT * 0.5), spa.sym.D >> m.motor)
             spa.ifmax(
-                2 * spa.dot(m.vision, spa.sym.CAT * 0.5),
-                spa.sym.D >> m.motor)
-            spa.ifmax(spa.dot(m.vision, spa.sym.CAT) + 0.5
-                      - spa.dot(m.vision, spa.sym.CAT), spa.sym.E >> m.motor)
+                spa.dot(m.vision, spa.sym.CAT) + 0.5 - spa.dot(m.vision, spa.sym.CAT),
+                spa.sym.E >> m.motor,
+            )
             spa.ifmax(
-                spa.dot(m.vision, spa.sym.PARROT) + m.compare,
-                spa.sym.F >> m.motor)
+                spa.dot(m.vision, spa.sym.PARROT) + m.compare, spa.sym.F >> m.motor
+            )
             spa.ifmax(
                 0.5 * spa.dot(m.vision, spa.sym.MOUSE) + 0.5 * m.compare,
-                spa.sym.G >> m.motor)
+                spa.sym.G >> m.motor,
+            )
             spa.ifmax(
                 (spa.dot(m.vision, spa.sym.MOUSE) - m.compare) * 0.5,
-                spa.sym.H >> m.motor)
+                spa.sym.H >> m.motor,
+            )
 
         m.encode >> m.vision
         spa.sym.SHOOP >> m.compare.input_a
         spa.sym.SHOOP >> m.compare.input_b
         bg = actions.bg
 
-        p = nengo.Probe(bg.input, 'output', synapse=0.03)
+        p = nengo.Probe(bg.input, "output", synapse=0.03)
 
     with Simulator(m) as sim:
         sim.run(0.5)
@@ -83,7 +86,7 @@ def test_basal_ganglia(Simulator, seed, plt):
 
     plt.plot(t, sim.data[p])
     plt.legend(["A", "B", "C", "D", "E", "F", "G", "H"])
-    plt.title('Basal Ganglia output')
+    plt.title("Basal Ganglia output")
 
     # assert the basal ganglia is prioritizing things correctly
     # Motor F
@@ -118,8 +121,7 @@ def test_constructed_input_connections_are_accessible():
         model.state2 = spa.State()
 
         with spa.ActionSelection() as actions:
-            spa.ifmax(
-                spa.dot(model.state1, spa.sym.A), spa.sym.A >> model.state2)
+            spa.ifmax(spa.dot(model.state1, spa.sym.A), spa.sym.A >> model.state2)
         bg = actions.bg
 
         assert isinstance(bg.input_connections[0], nengo.Connection)

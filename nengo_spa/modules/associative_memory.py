@@ -54,67 +54,85 @@ class AssociativeMemory(Network):
     **selection_net_kwargs : dict
         Additional keyword arguments that will passed to the *selection_net*.
     """
-    input_vocab = VocabularyOrDimParam(
-        'input_vocab', default=None, readonly=True)
-    output_vocab = VocabularyOrDimParam(
-        'output_vocab', default=None, readonly=True)
+
+    input_vocab = VocabularyOrDimParam("input_vocab", default=None, readonly=True)
+    output_vocab = VocabularyOrDimParam("output_vocab", default=None, readonly=True)
 
     def __init__(
-            self, selection_net, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_kwargs):
+        self,
+        selection_net,
+        input_vocab,
+        output_vocab=None,
+        mapping=None,
+        n_neurons=50,
+        label=None,
+        seed=None,
+        add_to_container=None,
+        vocabs=None,
+        **selection_net_kwargs
+    ):
         super(AssociativeMemory, self).__init__(
-            label=label, seed=seed, add_to_container=add_to_container,
-            vocabs=vocabs)
+            label=label, seed=seed, add_to_container=add_to_container, vocabs=vocabs
+        )
 
         if output_vocab is None:
             output_vocab = input_vocab
         elif mapping is None:
             raise ValidationError(
                 "The mapping argument needs to be provided if an output "
-                "vocabulary is given.", attr='mapping', obj=self)
+                "vocabulary is given.",
+                attr="mapping",
+                obj=self,
+            )
         self.input_vocab = input_vocab
         self.output_vocab = output_vocab
 
         if mapping is None:
             raise TypeError("Must provide 'mapping' argument.")
-        elif mapping == 'by-key':
+        elif mapping == "by-key":
             mapping = self.input_vocab.keys()
         elif isinstance(mapping, str):
             raise ValidationError(
                 "The mapping argument must be a dictionary, the string "
-                "'by-key' or a sequence of strings.", attr='mapping', obj=self)
+                "'by-key' or a sequence of strings.",
+                attr="mapping",
+                obj=self,
+            )
 
-        if not hasattr(mapping, 'keys'):
+        if not hasattr(mapping, "keys"):
             mapping = {k: k for k in mapping}
 
         if len(mapping) < 1:
             raise ValidationError(
-                "At least one item must be provided with the mapping "
-                "argument.", attr='mapping', obj=self)
+                "At least one item must be provided with the mapping " "argument.",
+                attr="mapping",
+                obj=self,
+            )
 
         input_keys = mapping.keys()
         input_vectors = [self.input_vocab.parse(key).v for key in input_keys]
         output_keys = [mapping[k] for k in input_keys]
-        output_vectors = [
-            self.output_vocab.parse(key).v for key in output_keys]
+        output_vectors = [self.output_vocab.parse(key).v for key in output_keys]
 
         input_vectors = np.asarray(input_vectors)
         output_vectors = np.asarray(output_vectors)
 
         with self:
             self.selection = selection_net(
-                n_neurons=n_neurons, n_ensembles=len(input_vectors),
-                label="selection", **selection_net_kwargs)
-            self.input = nengo.Node(size_in=self.input_vocab.dimensions,
-                                    label="input")
-            self.output = nengo.Node(size_in=self.output_vocab.dimensions,
-                                     label="output")
+                n_neurons=n_neurons,
+                n_ensembles=len(input_vectors),
+                label="selection",
+                **selection_net_kwargs
+            )
+            self.input = nengo.Node(size_in=self.input_vocab.dimensions, label="input")
+            self.output = nengo.Node(
+                size_in=self.output_vocab.dimensions, label="output"
+            )
 
+            nengo.Connection(self.input, self.selection.input, transform=input_vectors)
             nengo.Connection(
-                self.input, self.selection.input, transform=input_vectors)
-            nengo.Connection(
-                self.selection.output, self.output, transform=output_vectors.T)
+                self.selection.output, self.output, transform=output_vectors.T
+            )
 
         self.declare_input(self.input, self.input_vocab)
         self.declare_output(self.output, self.output_vocab)
@@ -133,21 +151,23 @@ class AssociativeMemory(Network):
         n_neurons : int, optional
             Number of neurons used to represent the default Semantic Pointer.
         """
-        assert not hasattr(self, 'default_ens'), \
-            "Can add default output only once."
+        assert not hasattr(self, "default_ens"), "Can add default output only once."
 
-        with nengo.presets.ThresholdingEnsembles(0.):
-            setattr(self, 'default_ens',
-                    nengo.Ensemble(n_neurons, 1, label="default"))
-        setattr(self, 'bias', nengo.Node(1., label="bias"))
+        with nengo.presets.ThresholdingEnsembles(0.0):
+            setattr(self, "default_ens", nengo.Ensemble(n_neurons, 1, label="default"))
+        setattr(self, "bias", nengo.Node(1.0, label="bias"))
         nengo.Connection(self.bias, self.default_ens)
         nengo.Connection(
-            self.default_ens, self.output,
-            transform=np.atleast_2d(self.output_vocab.parse(key).v).T)
+            self.default_ens,
+            self.output,
+            transform=np.atleast_2d(self.output_vocab.parse(key).v).T,
+        )
         nengo.Connection(
-            self.selection.output, self.default_ens,
-            transform=-np.ones(
-                (1, self.selection.output.size_out)) / min_activation_value)
+            self.selection.output,
+            self.default_ens,
+            transform=-np.ones((1, self.selection.output.size_out))
+            / min_activation_value,
+        )
 
 
 class IAAssocMem(AssociativeMemory):
@@ -155,16 +175,31 @@ class IAAssocMem(AssociativeMemory):
 
     See `AssociativeMemory` and `.IA` for more information.
     """
+
     def __init__(
-            self, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_kwargs):
+        self,
+        input_vocab,
+        output_vocab=None,
+        mapping=None,
+        n_neurons=50,
+        label=None,
+        seed=None,
+        add_to_container=None,
+        vocabs=None,
+        **selection_net_kwargs
+    ):
         super(IAAssocMem, self).__init__(
             selection_net=IA,
-            input_vocab=input_vocab, output_vocab=output_vocab,
-            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
-            add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_kwargs)
+            input_vocab=input_vocab,
+            output_vocab=output_vocab,
+            mapping=mapping,
+            n_neurons=n_neurons,
+            label=label,
+            seed=seed,
+            add_to_container=add_to_container,
+            vocabs=vocabs,
+            **selection_net_kwargs
+        )
         self.input_reset = self.selection.input_reset
         self.declare_input(self.input_reset, None)
 
@@ -174,17 +209,33 @@ class ThresholdingAssocMem(AssociativeMemory):
 
     See `AssociativeMemory` and `.Thresholding` for more information.
     """
+
     def __init__(
-            self, threshold, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_kwargs):
-        selection_net_kwargs['threshold'] = threshold
+        self,
+        threshold,
+        input_vocab,
+        output_vocab=None,
+        mapping=None,
+        n_neurons=50,
+        label=None,
+        seed=None,
+        add_to_container=None,
+        vocabs=None,
+        **selection_net_kwargs
+    ):
+        selection_net_kwargs["threshold"] = threshold
         super(ThresholdingAssocMem, self).__init__(
             selection_net=Thresholding,
-            input_vocab=input_vocab, output_vocab=output_vocab,
-            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
-            add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_kwargs)
+            input_vocab=input_vocab,
+            output_vocab=output_vocab,
+            mapping=mapping,
+            n_neurons=n_neurons,
+            label=label,
+            seed=seed,
+            add_to_container=add_to_container,
+            vocabs=vocabs,
+            **selection_net_kwargs
+        )
 
 
 class WTAAssocMem(AssociativeMemory):
@@ -192,14 +243,30 @@ class WTAAssocMem(AssociativeMemory):
 
     See `AssociativeMemory` and `.WTA` for more information.
     """
+
     def __init__(
-            self, threshold, input_vocab, output_vocab=None, mapping=None,
-            n_neurons=50, label=None, seed=None,
-            add_to_container=None, vocabs=None, **selection_net_kwargs):
-        selection_net_kwargs['threshold'] = threshold
+        self,
+        threshold,
+        input_vocab,
+        output_vocab=None,
+        mapping=None,
+        n_neurons=50,
+        label=None,
+        seed=None,
+        add_to_container=None,
+        vocabs=None,
+        **selection_net_kwargs
+    ):
+        selection_net_kwargs["threshold"] = threshold
         super(WTAAssocMem, self).__init__(
             selection_net=WTA,
-            input_vocab=input_vocab, output_vocab=output_vocab,
-            mapping=mapping, n_neurons=n_neurons, label=label, seed=seed,
-            add_to_container=add_to_container, vocabs=vocabs,
-            **selection_net_kwargs)
+            input_vocab=input_vocab,
+            output_vocab=output_vocab,
+            mapping=mapping,
+            n_neurons=n_neurons,
+            label=label,
+            seed=seed,
+            add_to_container=add_to_container,
+            vocabs=vocabs,
+            **selection_net_kwargs
+        )

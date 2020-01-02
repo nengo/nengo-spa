@@ -39,6 +39,7 @@ class UnitLengthVectors(object):
     rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
     """
+
     def __init__(self, d, rng=None):
         if rng is None:
             rng = np.random.RandomState()
@@ -70,6 +71,7 @@ class UnitaryVectors(object):
     rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
     """
+
     def __init__(self, d, algebra, rng=None):
         if rng is None:
             rng = np.random.RandomState()
@@ -98,6 +100,7 @@ class OrthonormalVectors(object):
     rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
     """
+
     def __init__(self, d, rng=None):
         if rng is None:
             rng = np.random.RandomState()
@@ -142,6 +145,7 @@ class ExpectedUnitLengthVectors(object):
     rng : numpy.random.RandomState, optional
         The random number generator to use to create new vectors.
     """
+
     def __init__(self, d, rng=None):
         if rng is None:
             rng = np.random.RandomState()

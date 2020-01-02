@@ -10,8 +10,7 @@ import nengo_spa as spa
 from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
-from nengo_spa.semantic_pointer import (
-    AbsorbingElement, Identity, SemanticPointer, Zero)
+from nengo_spa.semantic_pointer import AbsorbingElement, Identity, SemanticPointer, Zero
 from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
@@ -62,7 +61,7 @@ def test_normalized_zero():
     assert np.allclose(a.v, [0, 0])
 
 
-@pytest.mark.parametrize('d', [64, 65, 100])
+@pytest.mark.parametrize("d", [64, 65, 100])
 def test_make_unitary(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
@@ -91,7 +90,7 @@ def test_add_sub(algebra, rng):
     assert np.allclose((a + b).v, (a - (-b)).v)
 
 
-@pytest.mark.parametrize('d', [64, 65])
+@pytest.mark.parametrize("d", [64, 65])
 def test_binding_and_inversion(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
@@ -127,7 +126,7 @@ def test_multiply():
     with pytest.raises(Exception):
         a * None
     with pytest.raises(Exception):
-        a * 'string'
+        a * "string"
     with pytest.raises(TypeError):
         a * np.array([1, 2])
 
@@ -157,7 +156,7 @@ def test_dot_matmul(rng):
     gen = UnitLengthVectors(50, rng)
     a = SemanticPointer(next(gen)) * 1.1
     b = SemanticPointer(next(gen)) * (-1.5)
-    assert np.allclose(eval('a @ b'), np.dot(a.v, b.v))
+    assert np.allclose(eval("a @ b"), np.dot(a.v, b.v))
 
 
 def test_distance(rng):
@@ -203,11 +202,11 @@ def test_binding_matrix(algebra, rng):
     m = b.get_binding_matrix()
     m_swapped = a.get_binding_matrix(swap_inputs=True)
 
-    assert np.allclose((a*b).v, np.dot(m, a.v))
-    assert np.allclose((a*b).v, np.dot(m_swapped, b.v))
+    assert np.allclose((a * b).v, np.dot(m, a.v))
+    assert np.allclose((a * b).v, np.dot(m_swapped, b.v))
 
 
-@pytest.mark.parametrize('op', ('~a', '-a', 'a+a', 'a-a', 'a*a', '2*a'))
+@pytest.mark.parametrize("op", ("~a", "-a", "a+a", "a-a", "a*a", "2*a"))
 def test_ops_preserve_vocab(op):
     v = Vocabulary(50)
     a = SemanticPointer(next(UnitLengthVectors(50)), vocab=v)  # noqa: F841
@@ -215,8 +214,7 @@ def test_ops_preserve_vocab(op):
     assert x.vocab is v
 
 
-@pytest.mark.parametrize('op', (
-    'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
+@pytest.mark.parametrize("op", ("a+b", "a-b", "a*b", "a.dot(b)", "a.compare(b)"))
 def test_ops_check_vocab_compatibility(op):
     gen = UnitLengthVectors(50)
     a = SemanticPointer(next(gen), vocab=Vocabulary(50))  # noqa: F841
@@ -225,8 +223,7 @@ def test_ops_check_vocab_compatibility(op):
         eval(op)
 
 
-@pytest.mark.parametrize('op', (
-    'a+b', 'a-b', 'a*b', 'a.dot(b)', 'a.compare(b)'))
+@pytest.mark.parametrize("op", ("a+b", "a-b", "a*b", "a.dot(b)", "a.compare(b)"))
 def test_none_vocab_is_always_compatible(op):
     gen = UnitLengthVectors(50)
     v = Vocabulary(50)
@@ -242,52 +239,52 @@ def test_fixed_pointer_network_creation(rng):
     assert_equal(node.output, A.v)
 
 
-@pytest.mark.parametrize('op', ['+', '-', '*'])
-@pytest.mark.parametrize('order', ['AB', 'BA'])
+@pytest.mark.parametrize("op", ["+", "-", "*"])
+@pytest.mark.parametrize("order", ["AB", "BA"])
 def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
-        Simulator, op, order, rng):
+    Simulator, op, order, rng
+):
     vocab = spa.Vocabulary(64, pointer_gen=rng)
-    vocab.populate('A; B')
-    a = PointerSymbol('A', TVocabulary(vocab))  # noqa: F841
-    b = SemanticPointer(vocab['B'].v)  # noqa: F841
+    vocab.populate("A; B")
+    a = PointerSymbol("A", TVocabulary(vocab))  # noqa: F841
+    b = SemanticPointer(vocab["B"].v)  # noqa: F841
 
     with spa.Network() as model:
-        if order == 'AB':
-            x = eval('a' + op + 'b')
-        elif order == 'BA':
-            x = eval('b' + op + 'a')
+        if order == "AB":
+            x = eval("a" + op + "b")
+        elif order == "BA":
+            x = eval("b" + op + "a")
         else:
-            raise ValueError('Invalid order argument.')
+            raise ValueError("Invalid order argument.")
         p = nengo.Probe(x.construct(), synapse=0.03)
 
     with Simulator(model) as sim:
         sim.run(0.5)
 
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]),
-        skip=0.3)
+        sim.trange(), sim.data[p], vocab.parse(order[0] + op + order[1]), skip=0.3
+    )
 
 
-@pytest.mark.parametrize('op', ('+', '*'))
+@pytest.mark.parametrize("op", ("+", "*"))
 def test_incompatible_algebra(op):
     gen = UnitLengthVectors(32)
     a = SemanticPointer(next(gen), algebra=AbstractAlgebra())  # noqa: F841
     b = SemanticPointer(next(gen), algebra=AbstractAlgebra())  # noqa: F841
     with pytest.raises(TypeError):
-        eval('a' + op + 'b')
+        eval("a" + op + "b")
 
 
 def test_identity(algebra):
-    assert np.allclose(
-        Identity(64, algebra=algebra).v, algebra.identity_element(64))
+    assert np.allclose(Identity(64, algebra=algebra).v, algebra.identity_element(64))
 
 
 def test_absorbing_element(algebra, plt):
     plt.plot([0, 1], [0, 1])
     try:
         assert np.allclose(
-            AbsorbingElement(64, algebra=algebra).v,
-            algebra.absorbing_element(64))
+            AbsorbingElement(64, algebra=algebra).v, algebra.absorbing_element(64)
+        )
     except NotImplementedError:
         pass
 
@@ -297,14 +294,16 @@ def test_zero(algebra):
 
 
 def test_name():
-    a = SemanticPointer(np.ones(4), name='a')
-    b = SemanticPointer(np.ones(4), name='b')
+    a = SemanticPointer(np.ones(4), name="a")
+    b = SemanticPointer(np.ones(4), name="b")
     unnamed = SemanticPointer(np.ones(4), name=None)
 
     assert str(a) == "SemanticPointer<a>"
     assert repr(a) == (
         "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
-            a.v, a.vocab, a.algebra, a.name))
+            a.v, a.vocab, a.algebra, a.name
+        )
+    )
 
     assert (-a).name == "-(a)"
     assert (~a).name == "~(a)"
@@ -312,7 +311,7 @@ def test_name():
     assert a.unitary().name == "(a).unitary()"
     assert (a + b).name == "(a)+(b)"
     assert (a * b).name == "(a)*(b)"
-    assert (2. * a).name == "(2.0)*(a)"
+    assert (2.0 * a).name == "(2.0)*(a)"
 
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None

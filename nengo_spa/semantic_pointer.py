@@ -43,12 +43,13 @@ class SemanticPointer(Fixed):
 
     def __init__(self, data, vocab=None, algebra=None, name=None):
         super(SemanticPointer, self).__init__(
-            TAnyVocab if vocab is None else TVocabulary(vocab))
+            TAnyVocab if vocab is None else TVocabulary(vocab)
+        )
         self.algebra = self._get_algebra(vocab, algebra)
 
         self.v = np.array(data, dtype=float)
         if len(self.v.shape) != 1:
-            raise ValidationError("'data' must be a vector", 'data', self)
+            raise ValidationError("'data' must be a vector", "data", self)
         self.v.setflags(write=False)
 
         self.vocab = vocab
@@ -61,8 +62,7 @@ class SemanticPointer(Fixed):
             else:
                 algebra = vocab.algebra
         elif vocab is not None and vocab.algebra is not algebra:
-            raise ValueError(
-                "vocab and algebra argument are mutually exclusive")
+            raise ValueError("vocab and algebra argument are mutually exclusive")
         return algebra
 
     def _get_unary_name(self, op):
@@ -102,11 +102,14 @@ class SemanticPointer(Fixed):
         The original object is not modified.
         """
         nrm = np.linalg.norm(self.v)
-        if nrm <= 0.:
-            nrm = 1.
+        if nrm <= 0.0:
+            nrm = 1.0
         return SemanticPointer(
-            self.v / nrm, vocab=self.vocab, algebra=self.algebra,
-            name=self._get_method_name("normalized"))
+            self.v / nrm,
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_method_name("normalized"),
+        )
 
     def unitary(self):
         """Make the Semantic Pointer unitary and return it as a new object.
@@ -118,14 +121,17 @@ class SemanticPointer(Fixed):
         convolution.
         """
         return SemanticPointer(
-            self.algebra.make_unitary(self.v), vocab=self.vocab,
-            algebra=self.algebra, name=self._get_method_name("unitary"))
+            self.algebra.make_unitary(self.v),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_method_name("unitary"),
+        )
 
     def copy(self):
         """Return another semantic pointer with the same data."""
         return SemanticPointer(
-            data=self.v, vocab=self.vocab, algebra=self.algebra,
-            name=self.name)
+            data=self.v, vocab=self.vocab, algebra=self.algebra, name=self.name
+        )
 
     def length(self):
         """Return the L2 norm of the vector."""
@@ -142,9 +148,9 @@ class SemanticPointer(Fixed):
             return repr(self)
 
     def __repr__(self):
-        return (
-            "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
-                self.v, self.vocab, self.algebra, self.name))
+        return "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
+            self.v, self.vocab, self.algebra, self.name
+        )
 
     @TypeCheckedBinaryOp(Fixed)
     def __add__(self, other):
@@ -164,14 +170,19 @@ class SemanticPointer(Fixed):
         if swap:
             a, b = b, a
         return SemanticPointer(
-            data=self.algebra.superpose(a, b), vocab=vocab,
+            data=self.algebra.superpose(a, b),
+            vocab=vocab,
             algebra=self.algebra,
-            name=self._get_binary_name(other_pointer, "+", swap))
+            name=self._get_binary_name(other_pointer, "+", swap),
+        )
 
     def __neg__(self):
         return SemanticPointer(
-            data=-self.v, vocab=self.vocab, algebra=self.algebra,
-            name=self._get_unary_name("-"))
+            data=-self.v,
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_unary_name("-"),
+        )
 
     def __sub__(self, other):
         return self + (-other)
@@ -196,18 +207,23 @@ class SemanticPointer(Fixed):
     def _mul(self, other, swap=False):
         if is_array(other):
             raise TypeError(
-                "Multiplication of Semantic Pointers with arrays in not "
-                "allowed.")
+                "Multiplication of Semantic Pointers with arrays in not " "allowed."
+            )
         elif is_number(other):
             return SemanticPointer(
-                data=self.v * other, vocab=self.vocab, algebra=self.algebra,
-                name=self._get_binary_name(other, "*", swap))
+                data=self.v * other,
+                vocab=self.vocab,
+                algebra=self.algebra,
+                name=self._get_binary_name(other, "*", swap),
+            )
         elif isinstance(other, Fixed):
             if other.type == TScalar:
                 return SemanticPointer(
-                    data=self.v * other.evaluate(), vocab=self.vocab,
+                    data=self.v * other.evaluate(),
+                    vocab=self.vocab,
                     algebra=self.algebra,
-                    name=self._get_binary_name(other, "*", swap))
+                    name=self._get_binary_name(other, "*", swap),
+                )
             else:
                 return self._bind(other, swap=swap)
         else:
@@ -222,8 +238,11 @@ class SemanticPointer(Fixed):
         For the vector ``[1, 2, 3, 4, 5]``, the inverse is ``[1, 5, 4, 3, 2]``.
         """
         return SemanticPointer(
-            data=self.algebra.invert(self.v), vocab=self.vocab,
-            algebra=self.algebra, name=self._get_unary_name("~"))
+            data=self.algebra.invert(self.v),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_unary_name("~"),
+        )
 
     def bind(self, other):
         """Return the binding of two SemanticPointers."""
@@ -243,8 +262,11 @@ class SemanticPointer(Fixed):
         if swap:
             a, b = b, a
         return SemanticPointer(
-            data=self.algebra.bind(a, b), vocab=vocab, algebra=self.algebra,
-            name=self._get_binary_name(other_pointer, "*", swap))
+            data=self.algebra.bind(a, b),
+            vocab=vocab,
+            algebra=self.algebra,
+            name=self._get_binary_name(other_pointer, "*", swap),
+        )
 
     def get_binding_matrix(self, swap_inputs=False):
         """Return the matrix that does a binding with this vector.
@@ -317,7 +339,8 @@ class SemanticPointer(Fixed):
         """
         tr = self.vocab.transform_to(vocab, populate, solver)
         return SemanticPointer(
-            np.dot(tr, self.evaluate().v), vocab=vocab, name=self.name)
+            np.dot(tr, self.evaluate().v), vocab=vocab, name=self.name
+        )
 
     def distance(self, other):
         """Return a distance measure between the vectors.
@@ -332,7 +355,7 @@ class SemanticPointer(Fixed):
         if isinstance(other, SemanticPointer):
             infer_types(self, other)
             other = other.evaluate().v
-        return np.sum((self.v - other)**2) / len(self.v)
+        return np.sum((self.v - other) ** 2) / len(self.v)
 
     def _ensure_algebra_match(self, other):
         """Check the algebra of the *other*.
@@ -344,7 +367,8 @@ class SemanticPointer(Fixed):
             if self.algebra is not other.algebra:
                 raise TypeError(
                     "Operation not supported for SemanticPointer with "
-                    "different algebra.")
+                    "different algebra."
+                )
 
 
 class Identity(SemanticPointer):
@@ -366,7 +390,8 @@ class Identity(SemanticPointer):
     def __init__(self, n_dimensions, vocab=None, algebra=None):
         data = self._get_algebra(vocab, algebra).identity_element(n_dimensions)
         super(Identity, self).__init__(
-            data, vocab=vocab, algebra=algebra, name="Identity")
+            data, vocab=vocab, algebra=algebra, name="Identity"
+        )
 
 
 class AbsorbingElement(SemanticPointer):
@@ -388,11 +413,12 @@ class AbsorbingElement(SemanticPointer):
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
     """
+
     def __init__(self, n_dimensions, vocab=None, algebra=None):
-        data = self._get_algebra(vocab, algebra).absorbing_element(
-            n_dimensions)
+        data = self._get_algebra(vocab, algebra).absorbing_element(n_dimensions)
         super(AbsorbingElement, self).__init__(
-            data, vocab=vocab, algebra=algebra, name="AbsorbingElement")
+            data, vocab=vocab, algebra=algebra, name="AbsorbingElement"
+        )
 
 
 class Zero(SemanticPointer):
@@ -410,7 +436,7 @@ class Zero(SemanticPointer):
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
     """
+
     def __init__(self, n_dimensions, vocab=None, algebra=None):
         data = self._get_algebra(vocab, algebra).zero_element(n_dimensions)
-        super(Zero, self).__init__(
-            data, vocab=vocab, algebra=algebra, name="Zero")
+        super(Zero, self).__init__(data, vocab=vocab, algebra=algebra, name="Zero")

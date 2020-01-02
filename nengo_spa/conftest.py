@@ -1,13 +1,16 @@
 try:
     from pytest_nengo import (  # pylint: disable=unused-import
-        pytest_configure, pytest_runtest_setup)
+        pytest_configure,
+        pytest_runtest_setup,
+    )
 except ImportError:
     import nengo
     import pytest
 
-    @pytest.fixture(scope='session')
+    @pytest.fixture(scope="session")
     def Simulator(request):
         return nengo.Simulator
+
 
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.algebras.vtb_algebra import VtbAlgebra
@@ -28,5 +31,5 @@ class TestConfig(object):
 
 
 def pytest_generate_tests(metafunc):
-    if 'algebra' in metafunc.fixturenames:
-        metafunc.parametrize('algebra', [a for a in TestConfig.algebras])
+    if "algebra" in metafunc.fixturenames:
+        metafunc.parametrize("algebra", [a for a in TestConfig.algebras])

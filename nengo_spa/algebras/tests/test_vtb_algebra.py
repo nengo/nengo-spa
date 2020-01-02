@@ -25,5 +25,4 @@ def test_get_swapping_matrix(rng):
     b = SemanticPointer(next(gen), algebra=VtbAlgebra()).v
 
     m = VtbAlgebra().get_swapping_matrix(64)
-    assert np.allclose(
-        VtbAlgebra().bind(a, b), np.dot(m, VtbAlgebra().bind(b, a)))
+    assert np.allclose(VtbAlgebra().bind(a, b), np.dot(m, VtbAlgebra().bind(b, a)))

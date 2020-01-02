@@ -5,7 +5,10 @@ from nengo_spa.ast.symbolic import sym
 from nengo_spa.operators import dot, reinterpret, translate
 from nengo_spa.examine import pairs, similarity, text
 from nengo_spa.modules import (
-    AssociativeMemory, IAAssocMem, ThresholdingAssocMem, WTAAssocMem,
+    AssociativeMemory,
+    IAAssocMem,
+    ThresholdingAssocMem,
+    WTAAssocMem,
     BasalGanglia,
     Bind,
     Compare,
@@ -14,7 +17,8 @@ from nengo_spa.modules import (
     State,
     Superposition,
     Thalamus,
-    Transcode)
+    Transcode,
+)
 from nengo_spa.network import create_inhibit_node, ifmax, Network
 from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.vector_generation import (
@@ -22,7 +26,8 @@ from nengo_spa.vector_generation import (
     ExpectedUnitLengthVectors,
     OrthonormalVectors,
     UnitaryVectors,
-    UnitLengthVectors)
+    UnitLengthVectors,
+)
 from nengo_spa.vocabulary import Vocabulary
 
 

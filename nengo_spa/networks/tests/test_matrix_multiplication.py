@@ -27,8 +27,8 @@ def test_matrix_mult(Simulator, seed, rng, plt):
     t = sim.trange()
     plt.plot(t, sim.data[p])
     for d in np.dot(left_mat, right_mat).flatten():
-        plt.axhline(d, color='k')
+        plt.axhline(d, color="k")
 
-    atol, rtol = .15, .01
+    atol, rtol = 0.15, 0.01
     ideal = np.dot(left_mat, right_mat).ravel()
     assert np.allclose(sim.data[p][-1], ideal, atol=atol, rtol=rtol)

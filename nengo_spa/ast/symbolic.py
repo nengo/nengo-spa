@@ -70,7 +70,8 @@ class PointerSymbol(Symbol):
         if not isinstance(self.type, TVocabulary):
             raise SpaTypeError(
                 "Cannot evaluate a symbolic semantic pointer expression "
-                "without knowing the vocabulary.")
+                "without knowing the vocabulary."
+            )
         return self.type.vocab.parse(self.expr)
 
     @property
@@ -78,17 +79,17 @@ class PointerSymbol(Symbol):
         return self._expr
 
     def __invert__(self):
-        return PointerSymbol('~' + self.expr, self.type)
+        return PointerSymbol("~" + self.expr, self.type)
 
     def __neg__(self):
-        return PointerSymbol('-' + self.expr, self.type)
+        return PointerSymbol("-" + self.expr, self.type)
 
     def __add__(self, other):
         other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + '+' + other.expr, type_)
+        return PointerSymbol(self.expr + "+" + other.expr, type_)
 
     def __radd__(self, other):
         return self + other
@@ -98,7 +99,7 @@ class PointerSymbol(Symbol):
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + '-' + other.expr, type_)
+        return PointerSymbol(self.expr + "-" + other.expr, type_)
 
     def __rsub__(self, other):
         return (-self) + other
@@ -106,12 +107,12 @@ class PointerSymbol(Symbol):
     @symbolic_op
     def __mul__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + '*' + other.expr, type_)
+        return PointerSymbol(self.expr + "*" + other.expr, type_)
 
     @symbolic_op
     def __rmul__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(other.expr + '*' + self.expr, type_)
+        return PointerSymbol(other.expr + "*" + self.expr, type_)
 
     def dot(self, other):
         other = as_symbolic_node(other)
@@ -157,7 +158,7 @@ class PointerSymbolFactory(object):
         return PointerSymbol(key)
 
     def __call__(self, expr):
-        return PointerSymbol(re.sub(r'\s+', '', expr))
+        return PointerSymbol(re.sub(r"\s+", "", expr))
 
 
 sym = PointerSymbolFactory()

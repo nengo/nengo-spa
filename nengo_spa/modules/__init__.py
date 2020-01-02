@@ -19,7 +19,8 @@ from .associative_memory import (
     AssociativeMemory,
     IAAssocMem,
     ThresholdingAssocMem,
-    WTAAssocMem)
+    WTAAssocMem,
+)
 from .basalganglia import BasalGanglia
 from .bind import Bind
 from .compare import Compare

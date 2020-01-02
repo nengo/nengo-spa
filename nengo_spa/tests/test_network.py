@@ -11,10 +11,8 @@ from nengo_spa.vocabulary import VocabularyMap
 
 
 class SpaCommunicationChannel(spa.Network):
-    def __init__(
-            self, dimensions, label=None, seed=None, add_to_container=None):
-        super(SpaCommunicationChannel, self).__init__(
-            label, seed, add_to_container)
+    def __init__(self, dimensions, label=None, seed=None, add_to_container=None):
+        super(SpaCommunicationChannel, self).__init__(label, seed, add_to_container)
 
         with self:
             self.state_in = spa.State(dimensions)
@@ -68,7 +66,7 @@ def test_hierarchical(Simulator, seed, plt):
         sim.run(0.5)
 
     t = sim.trange() > 0.2
-    v = model.vocabs[d].parse('A').v
+    v = model.vocabs[d].parse("A").v
 
     plt.plot(sim.trange(), similarity(sim.data[p], v))
     plt.xlabel("t [s]")
@@ -93,7 +91,7 @@ def test_hierarchical_actions(Simulator, seed, plt):
         sim.run(0.5)
 
     t = sim.trange() > 0.2
-    v = model.vocabs[d].parse('A').v
+    v = model.vocabs[d].parse("A").v
 
     plt.plot(sim.trange(), similarity(sim.data[p], v))
     plt.xlabel("t [s]")
@@ -125,16 +123,20 @@ def test_no_magic_vocab_transform():
             model.a >> model.b
 
 
-@pytest.mark.parametrize('d1,d2,method,lookup', [
-    (16, 16, 'reinterpret(a, v2)', 'v1'),
-    (16, 16, 'reinterpret(a)', 'v1'),
-    (16, 32, 'translate(a, v2)', 'v2'),
-    (16, 32, 'translate(a, v2, solver=nengo.solvers.Lstsq())', 'v2')])
+@pytest.mark.parametrize(
+    "d1,d2,method,lookup",
+    [
+        (16, 16, "reinterpret(a, v2)", "v1"),
+        (16, 16, "reinterpret(a)", "v1"),
+        (16, 32, "translate(a, v2)", "v2"),
+        (16, 32, "translate(a, v2, solver=nengo.solvers.Lstsq())", "v2"),
+    ],
+)
 def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
     v1 = spa.Vocabulary(d1, pointer_gen=rng)
-    v1.populate('A')
+    v1.populate("A")
     v2 = spa.Vocabulary(d2, pointer_gen=rng)
-    v2.populate('A')
+    v2.populate("A")
 
     with spa.Network() as model:
         a = spa.State(vocab=v1)
@@ -147,7 +149,7 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
         sim.run(0.5)
 
     t = sim.trange() > 0.2
-    v = locals()[lookup].parse('A').v
+    v = locals()[lookup].parse("A").v
 
     plt.plot(sim.trange(), spa.similarity(sim.data[p], v))
     plt.xlabel("t [s]")
@@ -174,8 +176,7 @@ def test_create_inhibit_node(Simulator, plt):
         bias = nengo.Node(1)
         inhibit_node = create_inhibit_node(ea)
         nengo.Connection(bias, inhibit_node)
-        nengo.Connection(
-            bias, ea.input, transform=np.ones((ea.n_ensembles, 1)))
+        nengo.Connection(bias, ea.input, transform=np.ones((ea.n_ensembles, 1)))
         p = nengo.Probe(ea.output, synapse=0.01)
 
     with Simulator(model) as sim:
@@ -184,14 +185,15 @@ def test_create_inhibit_node(Simulator, plt):
     plt.plot(sim.trange(), sim.data[p])
     plt.xlabel("Time [s]")
 
-    assert_allclose(sim.data[p][sim.trange() > 0.1], 0., atol=1e-3)
+    assert_allclose(sim.data[p][sim.trange() > 0.1], 0.0, atol=1e-3)
 
 
 def test_instance_config():
     with spa.Network() as net:
         ens = nengo.Ensemble(10, 1)
         net.config[nengo.Ensemble].set_param(
-            'param', nengo.params.BoolParam('param', default=False))
+            "param", nengo.params.BoolParam("param", default=False)
+        )
         net.config[ens].param = True
 
 

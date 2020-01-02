@@ -6,8 +6,7 @@ from collections import OrderedDict
 import nengo
 
 from nengo_spa.ast import dynamic
-from nengo_spa.connectors import (
-    input_vocab_registry, ModuleInput, RoutedConnection)
+from nengo_spa.connectors import input_vocab_registry, ModuleInput, RoutedConnection
 from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.types import TScalar
 
@@ -83,8 +82,7 @@ class ActionSelection(Mapping):
             ActionSelection.active = self
             ModuleInput.routed_mode = True
         else:
-            raise SpaActionSelectionError(
-                "Must not nest action selection contexts.")
+            raise SpaActionSelectionError("Must not nest action selection contexts.")
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -100,14 +98,15 @@ class ActionSelection(Mapping):
             if len(RoutedConnection.free_floating) > 0:
                 raise SpaActionSelectionError(
                     "All actions in an action selection context must be part "
-                    "of an ifmax call.")
+                    "of an ifmax call."
+                )
         finally:
             RoutedConnection.free_floating.clear()
 
         if len(self._utilities) <= 0:
             return
 
-        self.bias = nengo.Node(1., label="bias")
+        self.bias = nengo.Node(1.0, label="bias")
         self.bg = dynamic.BasalGangliaRealization(len(self._utilities))
         self.thalamus = dynamic.ThalamusRealization(len(self._utilities))
         self.thalamus.connect_bg(self.bg)
@@ -119,11 +118,13 @@ class ActionSelection(Mapping):
             for effect in action:
                 if effect.fixed:
                     self.thalamus.connect_fixed(
-                        index, effect.sink.input, transform=effect.transform())
+                        index, effect.sink.input, transform=effect.transform()
+                    )
                 else:
                     self.thalamus.construct_gate(index, self.bias)
                     channel = self.thalamus.construct_channel(
-                        effect.sink.input, effect.type)
+                        effect.sink.input, effect.type
+                    )
                     effect.connect_to(channel.input)
                     self.thalamus.connect_gate(index, channel)
         self.built = True
@@ -155,7 +156,8 @@ class ActionSelection(Mapping):
         else:
             name = str(len(self._actions))
         utility = input_vocab_registry.declare_connector(
-            nengo.Node(size_in=1, label="Utility for action " + name), None)
+            nengo.Node(size_in=1, label="Utility for action " + name), None
+        )
         self._utilities.append(utility)
         self._actions.append(actions)
         RoutedConnection.free_floating.difference_update(actions)
@@ -182,15 +184,18 @@ def ifmax(name, condition, *actions):
     """
     if ActionSelection.active is None:
         raise SpaActionSelectionError(
-            "ifmax must be used within the context of an ActionSelection "
-            "instance.")
+            "ifmax must be used within the context of an ActionSelection " "instance."
+        )
     if condition.type != TScalar:
         raise SpaTypeError(
             "ifmax condition must evaluate to a scalar, but got {}.".format(
-                condition.type))
+                condition.type
+            )
+        )
     if any(not isinstance(a, RoutedConnection) for a in actions):
         raise SpaActionSelectionError(
-            "ifmax actions must be routing expressions like 'a >> b'.")
+            "ifmax actions must be routing expressions like 'a >> b'."
+        )
 
     utility = ActionSelection.active.add_action(name, *actions)
     condition.connect_to(utility)

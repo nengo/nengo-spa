@@ -67,47 +67,77 @@ class IA(nengo.Network):
        In Proceedings of the 39th Annual Conference of the Cognitive Science
        Society. London, UK, 2017. Cognitive Science Society.
     """
-    def __init__(self, n_neurons, n_ensembles, accum_threshold=0.8,
-                 accum_neuron_ratio=0.7, accum_timescale=0.2,
-                 feedback_timescale=0.005, accum_synapse=0.1, ff_synapse=0.005,
-                 intercept_width=0.15, radius=1., **kwargs):
+
+    def __init__(
+        self,
+        n_neurons,
+        n_ensembles,
+        accum_threshold=0.8,
+        accum_neuron_ratio=0.7,
+        accum_timescale=0.2,
+        feedback_timescale=0.005,
+        accum_synapse=0.1,
+        ff_synapse=0.005,
+        intercept_width=0.15,
+        radius=1.0,
+        **kwargs
+    ):
         super().__init__(**kwargs)
 
         n_accum_neurons = int(accum_neuron_ratio * n_neurons)
         n_thresholding_neurons = n_neurons - n_accum_neurons
 
-        bar_beta = 1. + radius * feedback_timescale / accum_timescale
+        bar_beta = 1.0 + radius * feedback_timescale / accum_timescale
         feedback_tr = (
-            np.eye(n_ensembles) - bar_beta * (1. - np.eye(n_ensembles))
-            / feedback_timescale)
+            np.eye(n_ensembles)
+            - bar_beta * (1.0 - np.eye(n_ensembles)) / feedback_timescale
+        )
 
         with self:
             self.accumulators = Thresholding(
-                n_accum_neurons, n_ensembles, threshold=0.,
-                intercept_width=intercept_width, radius=radius)
+                n_accum_neurons,
+                n_ensembles,
+                threshold=0.0,
+                intercept_width=intercept_width,
+                radius=radius,
+            )
             self.thresholding = Thresholding(
-                n_thresholding_neurons, n_ensembles, threshold=accum_threshold,
-                intercept_width=intercept_width, radius=radius,
-                function=lambda x: x > accum_threshold)
+                n_thresholding_neurons,
+                n_ensembles,
+                threshold=accum_threshold,
+                intercept_width=intercept_width,
+                radius=radius,
+                function=lambda x: x > accum_threshold,
+            )
 
             nengo.Connection(
-                self.accumulators.output, self.accumulators.input,
-                synapse=accum_synapse)
+                self.accumulators.output, self.accumulators.input, synapse=accum_synapse
+            )
             nengo.Connection(
-                self.accumulators.output, self.thresholding.input,
-                synapse=ff_synapse)
+                self.accumulators.output, self.thresholding.input, synapse=ff_synapse
+            )
             nengo.Connection(
-                self.thresholding.output, self.accumulators.input,
-                synapse=accum_synapse, transform=accum_synapse * feedback_tr)
+                self.thresholding.output,
+                self.accumulators.input,
+                synapse=accum_synapse,
+                transform=accum_synapse * feedback_tr,
+            )
 
             self.input_reset = nengo.Node(size_in=1)
             nengo.Connection(
-                self.input_reset, self.accumulators.input, synapse=None,
-                transform=-radius * np.ones((n_ensembles, 1)) / accum_synapse)
+                self.input_reset,
+                self.accumulators.input,
+                synapse=None,
+                transform=-radius * np.ones((n_ensembles, 1)) / accum_synapse,
+            )
 
             self.input = nengo.Node(size_in=n_ensembles)
-            nengo.Connection(self.input, self.accumulators.input, synapse=None,
-                             transform=1. / accum_timescale)
+            nengo.Connection(
+                self.input,
+                self.accumulators.input,
+                synapse=None,
+                transform=1.0 / accum_timescale,
+            )
             self.output = self.thresholding.output
 
 
@@ -144,19 +174,31 @@ class Thresholding(nengo.Network):
         The raw thresholded value (before applying *function* or correcting for
         the shift produced by the thresholding).
     """
-    def __init__(self, n_neurons, n_ensembles, threshold, intercept_width=0.15,
-                 function=None, radius=1., **kwargs):
+
+    def __init__(
+        self,
+        n_neurons,
+        n_ensembles,
+        threshold,
+        intercept_width=0.15,
+        function=None,
+        radius=1.0,
+        **kwargs
+    ):
         super().__init__(**kwargs)
 
         with self:
             with nengo.presets.ThresholdingEnsembles(
-                    0., intercept_width, radius=radius):
-                self.thresholding = nengo.networks.EnsembleArray(
-                    n_neurons, n_ensembles)
+                0.0, intercept_width, radius=radius
+            ):
+                self.thresholding = nengo.networks.EnsembleArray(n_neurons, n_ensembles)
 
-            self.bias = nengo.Node(1.)
-            nengo.Connection(self.bias, self.thresholding.input,
-                             transform=-threshold * np.ones((n_ensembles, 1)))
+            self.bias = nengo.Node(1.0)
+            nengo.Connection(
+                self.bias,
+                self.thresholding.input,
+                transform=-threshold * np.ones((n_ensembles, 1)),
+            )
 
             self.input = self.thresholding.input
             self.thresholded = self.thresholding.output
@@ -164,7 +206,7 @@ class Thresholding(nengo.Network):
             if function is None:
                 function = lambda x: x
             function = lambda x, function=function: function(x + threshold)
-            self.output = self.thresholding.add_output('function', function)
+            self.output = self.thresholding.add_output("function", function)
 
 
 class WTA(Thresholding):
@@ -193,12 +235,16 @@ class WTA(Thresholding):
         The raw thresholded value (before applying *function* or correcting for
         the shift produced by the thresholding).
     """
-    def __init__(self, n_neurons, n_ensembles, inhibit_scale=1.0,
-                 inhibit_synapse=0.005, **kwargs):
+
+    def __init__(
+        self, n_neurons, n_ensembles, inhibit_scale=1.0, inhibit_synapse=0.005, **kwargs
+    ):
         super().__init__(n_neurons, n_ensembles, **kwargs)
 
         with self:
             nengo.Connection(
-                self.thresholded, self.input,
-                transform=inhibit_scale * (np.eye(n_ensembles) - 1.),
-                synapse=inhibit_synapse)
+                self.thresholded,
+                self.input,
+                transform=inhibit_scale * (np.eye(n_ensembles) - 1.0),
+                synapse=inhibit_synapse,
+            )

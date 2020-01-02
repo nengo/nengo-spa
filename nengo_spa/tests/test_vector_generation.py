@@ -4,8 +4,12 @@ import pytest
 from nengo_spa.algebras import HrrAlgebra
 from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.vector_generation import (
-    AxisAlignedVectors, ExpectedUnitLengthVectors, OrthonormalVectors,
-    UnitLengthVectors, UnitaryVectors)
+    AxisAlignedVectors,
+    ExpectedUnitLengthVectors,
+    OrthonormalVectors,
+    UnitLengthVectors,
+    UnitaryVectors,
+)
 
 
 def test_axis_aligned_pointers():
@@ -16,7 +20,7 @@ def test_axis_aligned_pointers():
 def test_unit_length_pointers(rng):
     g = UnitLengthVectors(64, rng)
     for i in range(10):
-        assert np.allclose(np.linalg.norm(next(g)), 1.)
+        assert np.allclose(np.linalg.norm(next(g)), 1.0)
 
 
 def test_unitary_pointers(rng):
@@ -37,27 +41,34 @@ def test_orthonormal_pointers(rng):
 
 def test_expected_unit_length_vectors(rng):
     g = ExpectedUnitLengthVectors(64, rng)
-    assert np.abs(np.mean(
-        [np.linalg.norm(next(g)) for i in range(50)]) - 1.) < 0.1
+    assert np.abs(np.mean([np.linalg.norm(next(g)) for i in range(50)]) - 1.0) < 0.1
 
 
-@pytest.mark.parametrize('vg', (
-    AxisAlignedVectors,
-    ExpectedUnitLengthVectors,
-    OrthonormalVectors,
-    UnitLengthVectors,
-    lambda d: UnitaryVectors(d, algebra=HrrAlgebra())))
+@pytest.mark.parametrize(
+    "vg",
+    (
+        AxisAlignedVectors,
+        ExpectedUnitLengthVectors,
+        OrthonormalVectors,
+        UnitLengthVectors,
+        lambda d: UnitaryVectors(d, algebra=HrrAlgebra()),
+    ),
+)
 def test_instantiation_without_rng(vg):
     d = 64
     assert len(next(vg(d))) == d
 
 
-@pytest.mark.parametrize('vg', (
-    AxisAlignedVectors,
-    ExpectedUnitLengthVectors,
-    OrthonormalVectors,
-    UnitLengthVectors,
-    lambda d: UnitaryVectors(d, algebra=HrrAlgebra())))
+@pytest.mark.parametrize(
+    "vg",
+    (
+        AxisAlignedVectors,
+        ExpectedUnitLengthVectors,
+        OrthonormalVectors,
+        UnitLengthVectors,
+        lambda d: UnitaryVectors(d, algebra=HrrAlgebra()),
+    ),
+)
 def test_iter(vg):
     d = 64
     x = vg(d)

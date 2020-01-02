@@ -31,14 +31,21 @@ class Bind(Network):
         Output.
     """
 
-    vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)
+    vocab = VocabularyOrDimParam("vocab", default=None, readonly=True)
     neurons_per_dimension = IntParam(
-        'neurons_per_dimension', default=200, low=1, readonly=True)
-    unbind_left = BoolParam('unbind_left', default=False, readonly=True)
-    unbind_right = BoolParam('unbind_right', default=False, readonly=True)
+        "neurons_per_dimension", default=200, low=1, readonly=True
+    )
+    unbind_left = BoolParam("unbind_left", default=False, readonly=True)
+    unbind_right = BoolParam("unbind_right", default=False, readonly=True)
 
-    def __init__(self, vocab=Default, neurons_per_dimension=Default,
-                 unbind_left=Default, unbind_right=Default, **kwargs):
+    def __init__(
+        self,
+        vocab=Default,
+        neurons_per_dimension=Default,
+        unbind_left=Default,
+        unbind_right=Default,
+        **kwargs
+    ):
         super(Bind, self).__init__(**kwargs)
 
         self.vocab = vocab
@@ -47,10 +54,12 @@ class Bind(Network):
         self.unbind_right = unbind_right
 
         with self:
-            self.binding_net, inputs, output = (
-                self.vocab.algebra.implement_binding(
-                    self.neurons_per_dimension, self.vocab.dimensions,
-                    self.unbind_left, self.unbind_right))
+            self.binding_net, inputs, output = self.vocab.algebra.implement_binding(
+                self.neurons_per_dimension,
+                self.vocab.dimensions,
+                self.unbind_left,
+                self.unbind_right,
+            )
 
         self.input_left = inputs[0]
         self.input_right = inputs[1]

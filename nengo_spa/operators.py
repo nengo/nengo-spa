@@ -15,14 +15,16 @@ equivalent to for example ``a + b`` trying ``a.__add__(b)`` first and then
 def dot(a, b):
     """Dot-product between *a* and *b*."""
     result = NotImplemented
-    if hasattr(a, 'dot'):
+    if hasattr(a, "dot"):
         result = a.dot(b)
-    if result is NotImplemented and hasattr(b, 'dot'):
+    if result is NotImplemented and hasattr(b, "dot"):
         result = b.rdot(a)
     if result is NotImplemented:
         raise TypeError(
             "'dot' not supported between instances of '{}' and '{}'".format(
-                type(a), type(b)))
+                type(a), type(b)
+            )
+        )
     return result
 
 
@@ -33,7 +35,7 @@ def reinterpret(source, vocab=None):
     vocabulary and allow the *source* to be interpreted as part of the
     vocabulary of any Semantic Pointer it is combined with.
     """
-    if hasattr(source, 'reinterpret'):
+    if hasattr(source, "reinterpret"):
         return source.reinterpret(vocab)
     else:
         raise TypeError("bad operand type for 'reinterpret'")
@@ -65,7 +67,7 @@ def translate(source, vocab, populate=None, keys=None, solver=None):
         If given, the solver will be used to solve the least squares problem to
         provide a better projection for the translation.
     """
-    if hasattr(source, 'translate'):
+    if hasattr(source, "translate"):
         return source.translate(vocab, populate, keys, solver)
     else:
         raise TypeError("bad operand type for 'translate'")

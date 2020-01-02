@@ -16,7 +16,7 @@ def as_ast_node(obj):
         return obj
     elif is_number(obj):
         return FixedScalar(obj)
-    elif isinstance(obj, nengo.Network) and hasattr(obj, 'output'):
+    elif isinstance(obj, nengo.Network) and hasattr(obj, "output"):
         output = obj.output
     else:
         output = obj
@@ -25,10 +25,9 @@ def as_ast_node(obj):
         # Trying to create weakref on access of weak dict can raise TypeError
         vocab = output_vocab_registry[output]
     except (KeyError, TypeError):
-        if getattr(output, 'size_out', 0) == 1:
+        if getattr(output, "size_out", 0) == 1:
             return ModuleOutput(output, TScalar)
-        err = SpaTypeError("{} was not registered as a SPA output.".format(
-            output))
+        err = SpaTypeError("{} was not registered as a SPA output.".format(output))
         err.__suppress_context__ = True
         raise err
     finally:
@@ -41,7 +40,7 @@ def as_ast_node(obj):
 
 
 def as_sink(obj):
-    if isinstance(obj, nengo.Network) and hasattr(obj, 'input'):
+    if isinstance(obj, nengo.Network) and hasattr(obj, "input"):
         input_ = obj.input
     else:
         input_ = obj
@@ -50,8 +49,7 @@ def as_sink(obj):
         # Trying to create weakref on access of weak dict can raise TypeError
         vocab = input_vocab_registry[input_]
     except (KeyError, TypeError):
-        err = SpaTypeError("{} was not registered as a SPA input.".format(
-            input_))
+        err = SpaTypeError("{} was not registered as a SPA input.".format(input_))
         err.__suppress_context__ = True
         raise err
     finally:
@@ -77,6 +75,7 @@ class ModuleInput(object):
     type_ : nengo_spa.types.Type
         Type of the input.
     """
+
     routed_mode = False
 
     def __init__(self, input_, type_):
@@ -147,25 +146,27 @@ class SpaOperatorMixin(object):
     def __define_unary_op(op):
         def op_impl(self):
             return getattr(as_ast_node(self), op)()
+
         return op_impl
 
     @staticmethod
     def __define_binary_op(op):
         def op_impl(self, other):
             return getattr(as_ast_node(self), op)(as_ast_node(other))
+
         return op_impl
 
-    __invert__ = __define_unary_op.__func__('__invert__')
-    __neg__ = __define_unary_op.__func__('__neg__')
+    __invert__ = __define_unary_op.__func__("__invert__")
+    __neg__ = __define_unary_op.__func__("__neg__")
 
-    __add__ = __define_binary_op.__func__('__add__')
-    __radd__ = __define_binary_op.__func__('__radd__')
-    __sub__ = __define_binary_op.__func__('__sub__')
-    __rsub__ = __define_binary_op.__func__('__rsub__')
-    __mul__ = __define_binary_op.__func__('__mul__')
-    __rmul__ = __define_binary_op.__func__('__rmul__')
-    __matmul__ = __define_binary_op.__func__('__matmul__')
-    __rmatmul__ = __define_binary_op.__func__('__rmatmul__')
+    __add__ = __define_binary_op.__func__("__add__")
+    __radd__ = __define_binary_op.__func__("__radd__")
+    __sub__ = __define_binary_op.__func__("__sub__")
+    __rsub__ = __define_binary_op.__func__("__rsub__")
+    __mul__ = __define_binary_op.__func__("__mul__")
+    __rmul__ = __define_binary_op.__func__("__rmul__")
+    __matmul__ = __define_binary_op.__func__("__matmul__")
+    __rmatmul__ = __define_binary_op.__func__("__rmatmul__")
 
     def __rshift__(self, other):
         return as_ast_node(self) >> as_sink(other)
@@ -173,8 +174,8 @@ class SpaOperatorMixin(object):
     def __rrshift__(self, other):
         return as_ast_node(other) >> as_sink(self)
 
-    dot = __define_binary_op.__func__('dot')
-    rdot = __define_binary_op.__func__('rdot')
+    dot = __define_binary_op.__func__("dot")
+    rdot = __define_binary_op.__func__("rdot")
 
     def reinterpret(self, vocab=None):
         return as_ast_node(self).reinterpret(vocab)
@@ -221,8 +222,10 @@ class ConnectorRegistry(object):
             extended_type = self._type_cache[obj.__class__]
         except KeyError:
             extended_type = type(
-                'Connector<%s>' % (obj.__class__.__name__),
-                (obj.__class__, SpaOperatorMixin), {})
+                "Connector<%s>" % (obj.__class__.__name__),
+                (obj.__class__, SpaOperatorMixin),
+                {},
+            )
             self._type_cache[obj.__class__] = extended_type
         obj.__class__ = extended_type
         self._registry[obj] = vocab

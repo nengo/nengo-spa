@@ -36,17 +36,18 @@ class MatrixMult(nengo.Network):
     output : nengo.node
         The resulting matrix result.
     """
+
     def __init__(self, n_neurons, shape_left, shape_right, **kwargs):
         if len(shape_left) != 2:
-            raise ValueError(
-                "Shape {} is not two dimensional.".format(shape_left))
+            raise ValueError("Shape {} is not two dimensional.".format(shape_left))
         if len(shape_right) != 2:
-            raise ValueError(
-                "Shape {} is not two dimensional.".format(shape_right))
+            raise ValueError("Shape {} is not two dimensional.".format(shape_right))
         if shape_left[1] != shape_right[0]:
             raise ValueError(
                 "Matrix dimensions {} and  {} are incompatible".format(
-                    shape_left, shape_right))
+                    shape_left, shape_right
+                )
+            )
 
         super().__init__(**kwargs)
 
@@ -78,16 +79,19 @@ class MatrixMult(nengo.Network):
             transform_right = np.zeros((size_c, size_right))
 
             for i, j, k in np.ndindex(shape_left[0], *shape_right):
-                c_index = (j + k * shape_right[0] + i * size_right)
+                c_index = j + k * shape_right[0] + i * size_right
                 transform_left[c_index][j + i * shape_right[0]] = 1
                 transform_right[c_index][k + j * shape_right[1]] = 1
 
             nengo.Connection(
-                self.input_left, self.C.input_a, transform=transform_left,
-                synapse=None)
+                self.input_left, self.C.input_a, transform=transform_left, synapse=None
+            )
             nengo.Connection(
-                self.input_right, self.C.input_b, transform=transform_right,
-                synapse=None)
+                self.input_right,
+                self.C.input_b,
+                transform=transform_right,
+                synapse=None,
+            )
 
             # Now do the appropriate summing
             size_output = shape_left[0] * shape_right[1]
@@ -100,5 +104,5 @@ class MatrixMult(nengo.Network):
                 transform_c[i // shape_right[0]][i] = 1
 
             nengo.Connection(
-                self.C.output, self.output, transform=transform_c,
-                synapse=None)
+                self.C.output, self.output, transform=transform_c, synapse=None
+            )

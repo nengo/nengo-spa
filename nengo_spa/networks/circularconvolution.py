@@ -20,8 +20,8 @@ def transform_in(dims, align, invert):
     invert : bool
         Whether to reverse the order of elements.
     """
-    if align not in ('A', 'B'):
-        raise ValidationError("'align' must be either 'A' or 'B'", 'align')
+    if align not in ("A", "B"):
+        raise ValidationError("'align' must be either 'A' or 'B'", "align")
 
     dims2 = 4 * (dims // 2 + 1)
     tr = np.zeros((dims2, dims))
@@ -29,7 +29,7 @@ def transform_in(dims, align, invert):
 
     for i in range(dims2):
         row = dft[i // 4] if not invert else dft[i // 4].conj()
-        if align == 'A':
+        if align == "A":
             tr[i] = row.real if i % 2 == 0 else row.imag
         else:  # align == 'B'
             tr[i] = row.real if i % 4 == 0 or i % 4 == 3 else row.imag
@@ -39,18 +39,18 @@ def transform_in(dims, align, invert):
 
 
 def transform_out(dims):
-    dims2 = (dims // 2 + 1)
+    dims2 = dims // 2 + 1
     tr = np.zeros((dims2, 4, dims))
     idft = dft_half(dims).conj()
 
     for i in range(dims2):
-        row = idft[i] if i == 0 or 2*i == dims else 2*idft[i]
+        row = idft[i] if i == 0 or 2 * i == dims else 2 * idft[i]
         tr[i, 0] = row.real
         tr[i, 1] = -row.real
         tr[i, 2] = -row.imag
         tr[i, 3] = -row.imag
 
-    tr = tr.reshape(4*dims2, dims)
+    tr = tr.reshape(4 * dims2, dims)
     remove_imag_rows(tr)
     # IDFT has a 1/D scaling factor
     tr /= dims
@@ -70,7 +70,7 @@ def remove_imag_rows(tr):
 def dft_half(n):
     x = np.arange(n)
     w = np.arange(n // 2 + 1)
-    return np.exp((-2.j * np.pi / n) * (w[:, None] * x[None, :]))
+    return np.exp((-2.0j * np.pi / n) * (w[:, None] * x[None, :]))
 
 
 class CircularConvolution(nengo.Network):
@@ -165,28 +165,37 @@ class CircularConvolution(nengo.Network):
     is analytically zero.
     """
 
-    def __init__(self, n_neurons, dimensions, invert_a=False, invert_b=False,
-                 input_magnitude=1.0, **kwargs):
+    def __init__(
+        self,
+        n_neurons,
+        dimensions,
+        invert_a=False,
+        invert_b=False,
+        input_magnitude=1.0,
+        **kwargs
+    ):
         super().__init__(**kwargs)
 
-        tr_a = transform_in(dimensions, 'A', invert_a)
-        tr_b = transform_in(dimensions, 'B', invert_b)
+        tr_a = transform_in(dimensions, "A", invert_a)
+        tr_b = transform_in(dimensions, "B", invert_b)
         tr_out = transform_out(dimensions)
 
         with self:
             self.input_a = nengo.Node(size_in=dimensions, label="input_a")
             self.input_b = nengo.Node(size_in=dimensions, label="input_b")
             self.product = Product(
-                n_neurons, tr_out.shape[1],
-                input_magnitude=2 * input_magnitude / np.sqrt(2.))
+                n_neurons,
+                tr_out.shape[1],
+                input_magnitude=2 * input_magnitude / np.sqrt(2.0),
+            )
             self.output = nengo.Node(size_in=dimensions, label="output")
 
             nengo.Connection(
-                self.input_a, self.product.input_a, transform=tr_a,
-                synapse=None)
+                self.input_a, self.product.input_a, transform=tr_a, synapse=None
+            )
             nengo.Connection(
-                self.input_b, self.product.input_b, transform=tr_b,
-                synapse=None)
+                self.input_b, self.product.input_b, transform=tr_b, synapse=None
+            )
             nengo.Connection(
-                self.product.output, self.output, transform=tr_out,
-                synapse=None)
+                self.product.output, self.output, transform=tr_out, synapse=None
+            )

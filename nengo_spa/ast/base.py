@@ -28,6 +28,7 @@ class Node(object):
     type_ : nengo_spa.types.Type
         Type that the node evaluates to.
     """
+
     def __init__(self, type_):
         self.type = type_
 
@@ -88,7 +89,7 @@ class TypeCheckedBinaryOp(object):
         Used to convert *other* before checking its type.
     """
 
-    __slots__ = ['expected_type', 'conversion']
+    __slots__ = ["expected_type", "conversion"]
 
     def __init__(self, expected_type, conversion=None):
         self.expected_type = expected_type
@@ -103,4 +104,5 @@ class TypeCheckedBinaryOp(object):
             elif not isinstance(other, self.expected_type):
                 return NotImplemented
             return fn(inst, other)
+
         return checked

@@ -24,55 +24,55 @@ def test_product_of_scalars(Simulator):
     with Simulator(model) as sim:
         sim.run(0.5)
 
-    assert_allclose(sim.data[p][sim.trange() > 0.3], .25, atol=0.2)
+    assert_allclose(sim.data[p][sim.trange() > 0.3], 0.25, atol=0.2)
 
 
 def test_unary_minus_on_scalar(rng):
-    assert (-FixedScalar(1.)).evaluate() == -1.
+    assert (-FixedScalar(1.0)).evaluate() == -1.0
 
 
 def test_pointer_symbol_network_creation(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A')
+    vocab.populate("A")
 
     with spa.Network():
-        A = PointerSymbol('A', TVocabulary(vocab))
+        A = PointerSymbol("A", TVocabulary(vocab))
         node = A.construct()
-    assert_equal(node.output, vocab['A'].v)
+    assert_equal(node.output, vocab["A"].v)
 
 
-@pytest.mark.parametrize('op', ['-', '~'])
+@pytest.mark.parametrize("op", ["-", "~"])
 def test_unary_operation_on_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A')
+    vocab.populate("A")
 
     with spa.Network():
         x = eval(op + "PointerSymbol('A', TVocabulary(vocab))")
         node = x.construct()
-    assert_equal(node.output, vocab.parse(op + 'A').v)
+    assert_equal(node.output, vocab.parse(op + "A").v)
 
 
-@pytest.mark.parametrize('op', ['+', '-', '*'])
+@pytest.mark.parametrize("op", ["+", "-", "*"])
 def test_binary_operation_on_pointer_symbols(op, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A; B')
+    vocab.populate("A; B")
 
     with spa.Network():
         v = TVocabulary(vocab)  # noqa: F841
         x = eval("PointerSymbol('A', v)" + op + "PointerSymbol('B', v)")
         node = x.construct()
-    assert_equal(node.output, vocab.parse('A' + op + 'B').v)
+    assert_equal(node.output, vocab.parse("A" + op + "B").v)
 
 
 def test_pointer_symbol_mul_with_array():
     with pytest.raises(TypeError):
-        PointerSymbol('X') * np.array([1, 2])
+        PointerSymbol("X") * np.array([1, 2])
 
 
-@pytest.mark.parametrize('op', ['+', '-'])
+@pytest.mark.parametrize("op", ["+", "-"])
 def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A')
+    vocab.populate("A")
 
     with spa.Network():
         with pytest.raises(TypeError):
@@ -81,64 +81,67 @@ def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
 
 def test_multiply_fixed_scalar_and_pointer_symbol(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A')
+    vocab.populate("A")
 
     with spa.Network():
-        x = 2 * PointerSymbol('A', TVocabulary(vocab))
+        x = 2 * PointerSymbol("A", TVocabulary(vocab))
         node = x.construct()
-    assert_equal(node.output, vocab.parse('2 * A').v)
+    assert_equal(node.output, vocab.parse("2 * A").v)
 
 
 def test_fixed_dot(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A; B')
+    vocab.populate("A; B")
 
     v = TVocabulary(vocab)
     assert_allclose(
-        spa.dot(PointerSymbol('A', v), PointerSymbol('A', v)).evaluate(), 1.)
-    assert spa.dot(
-        PointerSymbol('A', v), PointerSymbol('B', v)).evaluate() <= 0.1
+        spa.dot(PointerSymbol("A", v), PointerSymbol("A", v)).evaluate(), 1.0
+    )
+    assert spa.dot(PointerSymbol("A", v), PointerSymbol("B", v)).evaluate() <= 0.1
 
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_fixed_dot_matmul(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
-    vocab.populate('A; B')
+    vocab.populate("A; B")
 
     v = TVocabulary(vocab)  # noqa: F841
     assert_allclose(
-        eval("PointerSymbol('A', v) @ PointerSymbol('A', v)").evaluate(), 1.)
+        eval("PointerSymbol('A', v) @ PointerSymbol('A', v)").evaluate(), 1.0
+    )
 
 
 def test_translate(rng):
     v1 = spa.Vocabulary(16, pointer_gen=rng)
-    v1.populate('A; B')
+    v1.populate("A; B")
     v2 = spa.Vocabulary(16, pointer_gen=rng)
-    v2.populate('A; B')
+    v2.populate("A; B")
 
     assert_allclose(
-        spa.translate(PointerSymbol('A', TVocabulary(v1)), v2).evaluate().dot(
-            v2['A']), 1., atol=0.2)
+        spa.translate(PointerSymbol("A", TVocabulary(v1)), v2).evaluate().dot(v2["A"]),
+        1.0,
+        atol=0.2,
+    )
 
 
 def test_reinterpret(rng):
     v1 = spa.Vocabulary(16, pointer_gen=rng)
-    v1.populate('A; B')
+    v1.populate("A; B")
     v2 = spa.Vocabulary(16, pointer_gen=rng)
-    v2.populate('A; B')
+    v2.populate("A; B")
 
     assert_equal(
-        spa.reinterpret(PointerSymbol('A', TVocabulary(v1)), v2).evaluate().v,
-        v1['A'].v)
+        spa.reinterpret(PointerSymbol("A", TVocabulary(v1)), v2).evaluate().v, v1["A"].v
+    )
 
 
 def test_pointer_symbol_factory():
     ps = sym.A
     assert isinstance(ps, PointerSymbol)
-    assert ps.expr == 'A'
+    assert ps.expr == "A"
 
 
 def test_pointer_symbol_factory_expressions():
-    ps = sym('A + B * C')
+    ps = sym("A + B * C")
     assert isinstance(ps, PointerSymbol)
     assert ps.expr == (sym.A + sym.B * sym.C).expr

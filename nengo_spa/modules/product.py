@@ -24,7 +24,7 @@ class Product(Network):
         Output.
     """
 
-    n_neurons = IntParam('n_neurons', default=200, low=1, readonly=True)
+    n_neurons = IntParam("n_neurons", default=200, low=1, readonly=True)
 
     def __init__(self, n_neurons=Default, **kwargs):
         super(Product, self).__init__(**kwargs)

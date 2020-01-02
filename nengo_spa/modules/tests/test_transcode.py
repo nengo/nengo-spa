@@ -13,8 +13,8 @@ def test_fixed(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.buffer1 = spa.State(vocab=16)
         model.buffer2 = spa.State(vocab=8, subdimensions=8)
-        model.input1 = spa.Transcode('A', output_vocab=16)
-        model.input2 = spa.Transcode('B', output_vocab=8)
+        model.input1 = spa.Transcode("A", output_vocab=16)
+        model.input2 = spa.Transcode("B", output_vocab=8)
         model.input1 >> model.buffer1
         model.input2 >> model.buffer2
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
@@ -23,10 +23,12 @@ def test_fixed(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.1)
 
-    assert_sp_close(sim.trange(), sim.data[p1], model.buffer1.vocab.parse('A'),
-                    skip=0.08)
-    assert_sp_close(sim.trange(), sim.data[p2], model.buffer2.vocab.parse('B'),
-                    skip=0.08)
+    assert_sp_close(
+        sim.trange(), sim.data[p1], model.buffer1.vocab.parse("A"), skip=0.08
+    )
+    assert_sp_close(
+        sim.trange(), sim.data[p2], model.buffer2.vocab.parse("B"), skip=0.08
+    )
 
 
 def test_time_varying_encode(Simulator, seed):
@@ -35,13 +37,13 @@ def test_time_varying_encode(Simulator, seed):
 
         def stimulus(t):
             if t < 0.1:
-                return 'A'
+                return "A"
             elif t < 0.2:
-                return model.buffer.vocab.parse('B')
+                return model.buffer.vocab.parse("B")
             elif t < 0.3:
-                return model.buffer.vocab.parse('C').v
+                return model.buffer.vocab.parse("C").v
             else:
-                return '0'
+                return "0"
 
         model.encode = spa.Transcode(stimulus, output_vocab=16)
         model.encode >> model.buffer
@@ -54,13 +56,17 @@ def test_time_varying_encode(Simulator, seed):
     vocab = model.buffer.vocab
 
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A'), skip=0.08, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse("A"), skip=0.08, duration=0.02
+    )
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('B'), skip=0.18, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse("B"), skip=0.18, duration=0.02
+    )
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('C'), skip=0.28, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse("C"), skip=0.28, duration=0.02
+    )
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('0'), skip=0.38, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse("0"), skip=0.38, duration=0.02
+    )
 
 
 def test_encode_with_input(Simulator, seed):
@@ -68,7 +74,7 @@ def test_encode_with_input(Simulator, seed):
         buffer = spa.State(vocab=16)
 
         def stimulus(t, x):
-            return x[0] * buffer.vocab.parse('A')
+            return x[0] * buffer.vocab.parse("A")
 
         ctrl = nengo.Node(lambda t: t > 0.2)
 
@@ -82,27 +88,26 @@ def test_encode_with_input(Simulator, seed):
         sim.run(0.4)
 
     vocab = buffer.vocab
-    assert_sp_close(sim.trange(), sim.data[p], vocab.parse('0'), duration=0.2)
+    assert_sp_close(sim.trange(), sim.data[p], vocab.parse("0"), duration=0.2)
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse('A'), skip=.38, duration=0.02)
+        sim.trange(), sim.data[p], vocab.parse("A"), skip=0.38, duration=0.02
+    )
 
 
 def test_transcode(Simulator, seed):
     def transcode_fn(t, sp):
-        assert t < 0.15 or sp.vocab.parse('A').dot(sp) > 0.8
-        return 'B'
+        assert t < 0.15 or sp.vocab.parse("A").dot(sp) > 0.8
+        return "B"
 
     with spa.Network(seed=seed) as model:
-        transcode = Transcode(
-            transcode_fn, input_vocab=16, output_vocab=16)
+        transcode = Transcode(transcode_fn, input_vocab=16, output_vocab=16)
         spa.sym.A >> transcode
         p = nengo.Probe(transcode.output, synapse=None)
 
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert_sp_close(sim.trange(), sim.data[p],
-                    transcode.output_vocab.parse('B'))
+    assert_sp_close(sim.trange(), sim.data[p], transcode.output_vocab.parse("B"))
 
 
 def test_passthrough(Simulator, seed):
@@ -114,8 +119,9 @@ def test_passthrough(Simulator, seed):
     with Simulator(model) as sim:
         sim.run(0.2)
 
-    assert_sp_close(sim.trange(), sim.data[p],
-                    passthrough.output_vocab.parse('A'), skip=0.18)
+    assert_sp_close(
+        sim.trange(), sim.data[p], passthrough.output_vocab.parse("A"), skip=0.18
+    )
 
 
 def test_decode(Simulator, seed):
@@ -126,12 +132,12 @@ def test_decode(Simulator, seed):
         def __call__(self, t, v):
             if t > 0.001:
                 self.called = True
-                assert_almost_equal(v.vocab.parse('A').v, v.v)
+                assert_almost_equal(v.vocab.parse("A").v, v.v)
 
     output_fn = OutputFn()
 
     with spa.Network(seed=seed) as model:
-        model.config[nengo.Connection].synapse = nengo.Lowpass(0.)
+        model.config[nengo.Connection].synapse = nengo.Lowpass(0.0)
         model.output = Transcode(output_fn, input_vocab=16)
         spa.sym.A >> model.output
 
@@ -172,19 +178,22 @@ def test_decode_size_out(Simulator, seed):
 def test_exception_when_no_vocabularies_are_given():
     with spa.Network():
         with pytest.raises(ValidationError):
-            Transcode('A')
+            Transcode("A")
         with pytest.raises(ValidationError):
-            Transcode(lambda t: 'A')
+            Transcode(lambda t: "A")
 
 
-@pytest.mark.parametrize('value', [
-    'String',
-    spa.semantic_pointer.Zero(32),
-    spa.sym.Symbol,
-    lambda t: 'String',
-    lambda t: spa.semantic_pointer.Zero(32),
-    lambda t: spa.sym.Symbol,
-])
+@pytest.mark.parametrize(
+    "value",
+    [
+        "String",
+        spa.semantic_pointer.Zero(32),
+        spa.sym.Symbol,
+        lambda t: "String",
+        lambda t: spa.semantic_pointer.Zero(32),
+        lambda t: spa.sym.Symbol,
+    ],
+)
 def test_output_types(Simulator, value):
     with spa.Network() as model:
         stim = spa.Transcode(value, output_vocab=32)

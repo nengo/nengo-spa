@@ -28,7 +28,7 @@ class Type(object):
         self.name = name
 
     def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.name)
+        return "{}({!r})".format(self.__class__.__name__, self.name)
 
     def __str__(self):
         return self.name
@@ -59,7 +59,7 @@ class Type(object):
         return self > other or self == other
 
 
-TScalar = Type('TScalar')
+TScalar = Type("TScalar")
 
 
 class _TAnyVocab(Type):
@@ -71,28 +71,29 @@ class _TAnyVocab(Type):
         return other == TScalar
 
 
-TAnyVocab = _TAnyVocab('TAnyVocab')
+TAnyVocab = _TAnyVocab("TAnyVocab")
 
 
 class TAnyVocabOfDim(Type):
     """Type that allows for any vocab of a given dimensionality."""
 
     def __init__(self, dimensions):
-        super(TAnyVocabOfDim, self).__init__('TAnyVocabOfDim')
+        super(TAnyVocabOfDim, self).__init__("TAnyVocabOfDim")
         self.dimensions = dimensions
 
     def __repr__(self):
-        return '{}({!r})'.format(
-            self.__class__.__name__, self.dimensions)
+        return "{}({!r})".format(self.__class__.__name__, self.dimensions)
 
     def __str__(self):
-        return '{}<{}>'.format(self.name, self.dimensions)
+        return "{}<{}>".format(self.name, self.dimensions)
 
     def __eq__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return (super(TAnyVocabOfDim, self).__eq__(other)
-                and self.dimensions == other.dimensions)
+        return (
+            super(TAnyVocabOfDim, self).__eq__(other)
+            and self.dimensions == other.dimensions
+        )
 
     def __gt__(self, other):
         if not isinstance(other, Type):
@@ -107,7 +108,7 @@ class TVocabulary(Type):
     """
 
     def __init__(self, vocab):
-        super(TVocabulary, self).__init__('TVocabulary')
+        super(TVocabulary, self).__init__("TVocabulary")
         self.vocab = vocab
 
     @property
@@ -115,11 +116,10 @@ class TVocabulary(Type):
         return self.vocab.dimensions
 
     def __repr__(self):
-        return '{}({!r})'.format(
-            self.__class__.__name__, self.vocab)
+        return "{}({!r})".format(self.__class__.__name__, self.vocab)
 
     def __str__(self):
-        return '{}<{}>'.format(self.name, self.vocab)
+        return "{}<{}>".format(self.name, self.vocab)
 
     def __hash__(self):
         return super(TVocabulary, self).__hash__() ^ hash(self.vocab)
@@ -127,8 +127,7 @@ class TVocabulary(Type):
     def __eq__(self, other):
         if not isinstance(other, Type):
             return NotImplemented
-        return (super(TVocabulary, self).__eq__(other)
-                and self.vocab is other.vocab)
+        return super(TVocabulary, self).__eq__(other) and self.vocab is other.vocab
 
     def __gt__(self, other):
         if not isinstance(other, Type):
@@ -148,12 +147,17 @@ def coerce_types(*types):
     type_ = max(types)
     if not all(t <= type_ for t in types):
         offender = next(iter(t for t in types if not t <= type_))
-        if (hasattr(offender, 'vocab') and hasattr(type_, 'vocab')
-                and offender.vocab is not type_.vocab):
+        if (
+            hasattr(offender, "vocab")
+            and hasattr(type_, "vocab")
+            and offender.vocab is not type_.vocab
+        ):
             reason = "Different vocabularies"
-        elif (hasattr(offender, 'dimensions')
-                and hasattr(type_, 'dimensions')
-                and offender.dimensions != type_.dimensions):
+        elif (
+            hasattr(offender, "dimensions")
+            and hasattr(type_, "dimensions")
+            and offender.dimensions != type_.dimensions
+        ):
             reason = "Dimensionality mismatch"
         else:
             reason = "Incompatible types"

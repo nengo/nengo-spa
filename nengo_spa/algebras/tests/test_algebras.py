@@ -4,7 +4,7 @@ import pytest
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
-@pytest.mark.parametrize('d', [16, 25])
+@pytest.mark.parametrize("d", [16, 25])
 def test_make_unitary(algebra, d, rng):
     a = next(UnitLengthVectors(d, rng))
     b = algebra.make_unitary(a)
@@ -28,7 +28,7 @@ def test_superpose(algebra, rng):
         assert np.dot(v, r / np.linalg.norm(r)) > 0.6
 
 
-@pytest.mark.parametrize('d', [25, 36])
+@pytest.mark.parametrize("d", [25, 36])
 def test_binding_and_invert(algebra, d, rng):
     dissimilarity_passed = 0
     unbinding_passed = 0
@@ -88,5 +88,5 @@ def test_identity_element(algebra, rng):
 def test_zero_element(algebra, rng):
     a = next(UnitLengthVectors(16, rng))
     p = algebra.zero_element(16)
-    assert np.all(p == 0.)
-    assert np.allclose(algebra.bind(a, p), 0.)
+    assert np.all(p == 0.0)
+    assert np.allclose(algebra.bind(a, p), 0.0)

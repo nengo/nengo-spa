@@ -132,18 +132,25 @@ class BasalGanglia(Network):
        ganglia. Biological Cybernetics 84, 401-423.
     """
 
-    input_synapse = SynapseParam('input_synapse', default=Lowpass(0.002))
-    ampa_synapse = SynapseParam('ampa_synapse', default=Lowpass(0.002))
-    gaba_synapse = SynapseParam('gaba_synapse', default=Lowpass(0.008))
+    input_synapse = SynapseParam("input_synapse", default=Lowpass(0.002))
+    ampa_synapse = SynapseParam("ampa_synapse", default=Lowpass(0.002))
+    gaba_synapse = SynapseParam("gaba_synapse", default=Lowpass(0.008))
     n_neurons_per_ensemble = IntParam(
-        'n_neurons_per_ensemble', default=100, low=1, readonly=True)
-    output_weight = NumberParam('output_weight', default=-3., readonly=True)
-    input_bias = NumberParam('input_bias', default=0., readonly=True)
+        "n_neurons_per_ensemble", default=100, low=1, readonly=True
+    )
+    output_weight = NumberParam("output_weight", default=-3.0, readonly=True)
+    input_bias = NumberParam("input_bias", default=0.0, readonly=True)
 
     def __init__(
-            self, action_count, n_neurons_per_ensemble=Default,
-            output_weight=Default, input_bias=Default, ampa_synapse=Default,
-            gaba_synapse=Default, **kwargs):
+        self,
+        action_count,
+        n_neurons_per_ensemble=Default,
+        output_weight=Default,
+        input_bias=Default,
+        ampa_synapse=Default,
+        gaba_synapse=Default,
+        **kwargs
+    ):
         super(BasalGanglia, self).__init__(**kwargs)
 
         self.action_count = action_count
@@ -163,29 +170,43 @@ class BasalGanglia(Network):
             # Best, if we have SciPy
             config[nengo.Connection].solver = nengo.solvers.NnlsL2nz()
         except ImportError:
-            warnings.warn("SciPy is not installed, so BasalGanglia will "
-                          "use the default decoder solver. Installing "
-                          "SciPy may improve BasalGanglia performance.")
+            warnings.warn(
+                "SciPy is not installed, so BasalGanglia will "
+                "use the default decoder solver. Installing "
+                "SciPy may improve BasalGanglia performance."
+            )
 
-        ea_params = {'n_neurons': self.n_neurons_per_ensemble,
-                     'n_ensembles': self.action_count}
+        ea_params = {
+            "n_neurons": self.n_neurons_per_ensemble,
+            "n_ensembles": self.action_count,
+        }
 
         with self, config:
             self.strD1 = EnsembleArray(
                 label="Striatal D1 neurons",
-                intercepts=nengo.dists.Uniform(Weights.e, 1), **ea_params)
+                intercepts=nengo.dists.Uniform(Weights.e, 1),
+                **ea_params
+            )
             self.strD2 = EnsembleArray(
                 label="Striatal D2 neurons",
-                intercepts=nengo.dists.Uniform(Weights.e, 1), **ea_params)
+                intercepts=nengo.dists.Uniform(Weights.e, 1),
+                **ea_params
+            )
             self.stn = EnsembleArray(
                 label="Subthalamic nucleus",
-                intercepts=nengo.dists.Uniform(Weights.ep, 1), **ea_params)
+                intercepts=nengo.dists.Uniform(Weights.ep, 1),
+                **ea_params
+            )
             self.gpi = EnsembleArray(
                 label="Globus pallidus internus",
-                intercepts=nengo.dists.Uniform(Weights.eg, 1), **ea_params)
+                intercepts=nengo.dists.Uniform(Weights.eg, 1),
+                **ea_params
+            )
             self.gpe = EnsembleArray(
                 label="Globus pallidus externus",
-                intercepts=nengo.dists.Uniform(Weights.ee, 1), **ea_params)
+                intercepts=nengo.dists.Uniform(Weights.ee, 1),
+                **ea_params
+            )
 
             self.input = nengo.Node(label="input", size_in=self.action_count)
             self.output = nengo.Node(label="output", size_in=self.action_count)
@@ -194,31 +215,39 @@ class BasalGanglia(Network):
             if abs(self.input_bias) > 0.0:
                 self.bias_input = nengo.Node(
                     np.ones(self.action_count) * self.input_bias,
-                    label="basal ganglia bias")
+                    label="basal ganglia bias",
+                )
                 nengo.Connection(self.bias_input, self.input)
 
             # spread the input to StrD1, StrD2, and STN
-            nengo.Connection(self.input, self.strD1.input, synapse=None,
-                             transform=Weights.ws * (1 + Weights.lg))
-            nengo.Connection(self.input, self.strD2.input, synapse=None,
-                             transform=Weights.ws * (1 - Weights.le))
-            nengo.Connection(self.input, self.stn.input, synapse=None,
-                             transform=Weights.wt)
+            nengo.Connection(
+                self.input,
+                self.strD1.input,
+                synapse=None,
+                transform=Weights.ws * (1 + Weights.lg),
+            )
+            nengo.Connection(
+                self.input,
+                self.strD2.input,
+                synapse=None,
+                transform=Weights.ws * (1 - Weights.le),
+            )
+            nengo.Connection(
+                self.input, self.stn.input, synapse=None, transform=Weights.wt
+            )
 
             # connect the striatum to the GPi and GPe (inhibitory)
-            strD1_output = self.strD1.add_output('func_str', Weights.str_func)
-            strD2_output = self.strD2.add_output('func_str', Weights.str_func)
+            strD1_output = self.strD1.add_output("func_str", Weights.str_func)
+            strD2_output = self.strD2.add_output("func_str", Weights.str_func)
             self.gaba = nengo.Network("GABAergic connections")
             self.gaba.config[nengo.Connection].synapse = self.gaba_synapse
             with self.gaba:
-                nengo.Connection(strD1_output, self.gpi.input,
-                                 transform=-Weights.wm)
-                nengo.Connection(strD2_output, self.gpe.input,
-                                 transform=-Weights.wm)
+                nengo.Connection(strD1_output, self.gpi.input, transform=-Weights.wm)
+                nengo.Connection(strD2_output, self.gpe.input, transform=-Weights.wm)
 
             # connect the STN to GPi and GPe (broad and excitatory)
             tr = Weights.wp * np.ones((self.action_count, self.action_count))
-            stn_output = self.stn.add_output('func_stn', Weights.stn_func)
+            stn_output = self.stn.add_output("func_stn", Weights.stn_func)
             self.ampa = nengo.Network("AMPAergic connectiions")
             self.ampa.config[nengo.Connection].synapse = self.ampa_synapse
             with self.ampa:
@@ -226,19 +255,18 @@ class BasalGanglia(Network):
                 nengo.Connection(stn_output, self.gpe.input, transform=tr)
 
             # connect the GPe to GPi and STN (inhibitory)
-            gpe_output = self.gpe.add_output('func_gpe', Weights.gpe_func)
+            gpe_output = self.gpe.add_output("func_gpe", Weights.gpe_func)
             with self.gaba:
-                nengo.Connection(
-                    gpe_output, self.gpi.input, transform=-Weights.we)
-                nengo.Connection(
-                    gpe_output, self.stn.input, transform=-Weights.wg)
+                nengo.Connection(gpe_output, self.gpi.input, transform=-Weights.we)
+                nengo.Connection(gpe_output, self.stn.input, transform=-Weights.wg)
 
             # connect GPi to output (inhibitory)
-            gpi_output = self.gpi.add_output('func_gpi', Weights.gpi_func)
-            nengo.Connection(gpi_output, self.output, synapse=None,
-                             transform=self.output_weight)
+            gpi_output = self.gpi.add_output("func_gpi", Weights.gpi_func)
+            nengo.Connection(
+                gpi_output, self.output, synapse=None, transform=self.output_weight
+            )
 
     def connect_input(self, source, transform=Default, index=None):
         self.input_connections[index] = nengo.Connection(
-            source, self.input[index], transform=transform,
-            synapse=self.input_synapse)
+            source, self.input[index], transform=transform, synapse=self.input_synapse
+        )

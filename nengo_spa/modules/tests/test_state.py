@@ -7,15 +7,19 @@ import nengo_spa as spa
 def test_neurons():
     with spa.Network():
         state = spa.State(
-            vocab=16, neurons_per_dimension=2, represent_cc_identity=False)
+            vocab=16, neurons_per_dimension=2, represent_cc_identity=False
+        )
 
     assert len(state.state_ensembles.ensembles) == 1
     assert state.state_ensembles.ensembles[0].n_neurons == 16 * 2
 
     with spa.Network():
         state = spa.State(
-            vocab=16, subdimensions=1, neurons_per_dimension=2,
-            represent_cc_identity=False)
+            vocab=16,
+            subdimensions=1,
+            neurons_per_dimension=2,
+            represent_cc_identity=False,
+        )
 
     assert len(state.state_ensembles.ensembles) == 16
     assert state.state_ensembles.ensembles[0].n_neurons == 2
@@ -27,11 +31,12 @@ def test_no_feedback_run(Simulator, plt, seed):
 
         def state_input(t):
             if 0 <= t < 0.3:
-                return 'A'
+                return "A"
             elif 0.2 <= t < 0.6:
-                return 'B'
+                return "B"
             else:
-                return '0'
+                return "0"
+
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> state
 
@@ -57,9 +62,9 @@ def test_memory_run(Simulator, seed, plt):
 
         def state_input(t):
             if 0 <= t < 0.05:
-                return 'A'
+                return "A"
             else:
-                return '0'
+                return "0"
 
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> memory
@@ -84,14 +89,15 @@ def test_memory_run(Simulator, seed, plt):
 
 def test_memory_run_decay(Simulator, plt, seed):
     with spa.Network(seed=seed) as model:
-        memory = spa.State(vocab=32, feedback=(1.0 - 0.01/0.05),
-                           feedback_synapse=0.01)
+        memory = spa.State(
+            vocab=32, feedback=(1.0 - 0.01 / 0.05), feedback_synapse=0.01
+        )
 
         def state_input(t):
             if 0 <= t < 0.05:
-                return 'A'
+                return "A"
             else:
-                return '0'
+                return "0"
 
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> memory

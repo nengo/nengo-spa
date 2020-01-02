@@ -9,8 +9,8 @@ from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.networks.circularconvolution import transform_in, transform_out
 
 
-@pytest.mark.parametrize('invert_a', [True, False])
-@pytest.mark.parametrize('invert_b', [True, False])
+@pytest.mark.parametrize("invert_a", [True, False])
+@pytest.mark.parametrize("invert_b", [True, False])
 def test_circularconv_transforms(invert_a, invert_b, rng):
     """Test the circular convolution transforms"""
     dims = 100
@@ -23,8 +23,8 @@ def test_circularconv_transforms(invert_a, invert_b, rng):
         b = np.dot(inv, b)
     z0 = HrrAlgebra().bind(a, b)
 
-    tr_a = transform_in(dims, 'A', invert_a)
-    tr_b = transform_in(dims, 'B', invert_b)
+    tr_a = transform_in(dims, "A", invert_a)
+    tr_b = transform_in(dims, "B", invert_b)
     tr_out = transform_out(dims)
     XY = np.dot(tr_a, x) * np.dot(tr_b, y)
     z1 = np.dot(tr_out, XY)
@@ -40,8 +40,8 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     """
     neurons_per_product = 128
 
-    a = rng.normal(scale=np.sqrt(1./dims), size=dims) * magnitude
-    b = rng.normal(scale=np.sqrt(1./dims), size=dims) * magnitude
+    a = rng.normal(scale=np.sqrt(1.0 / dims), size=dims) * magnitude
+    b = rng.normal(scale=np.sqrt(1.0 / dims), size=dims) * magnitude
     result = HrrAlgebra().bind(a, b)
 
     model = nengo.Network(label="circular conv", seed=seed)
@@ -50,14 +50,14 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
         input_a = nengo.Node(a)
         input_b = nengo.Node(b)
         cconv = nengo_spa.networks.CircularConvolution(
-            neurons_per_product, dimensions=dims,
-            input_magnitude=magnitude)
+            neurons_per_product, dimensions=dims, input_magnitude=magnitude
+        )
         nengo.Connection(input_a, cconv.input_a, synapse=None)
         nengo.Connection(input_b, cconv.input_b, synapse=None)
         res_p = nengo.Probe(cconv.output)
         cconv_bad = nengo_spa.networks.CircularConvolution(
-            neurons_per_product, dimensions=dims,
-            input_magnitude=1)  # incorrect magnitude
+            neurons_per_product, dimensions=dims, input_magnitude=1
+        )  # incorrect magnitude
         nengo.Connection(input_a, cconv_bad.input_a, synapse=None)
         nengo.Connection(input_b, cconv_bad.input_b, synapse=None)
         res_p_bad = nengo.Probe(cconv_bad.output)
@@ -71,10 +71,10 @@ def test_input_magnitude(Simulator, seed, rng, dims=16, magnitude=10):
     assert error_bad > 0.1
 
 
-@pytest.mark.parametrize('dims', [8, 32])
+@pytest.mark.parametrize("dims", [8, 32])
 def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
-    a = rng.normal(scale=np.sqrt(1./dims), size=dims)
-    b = rng.normal(scale=np.sqrt(1./dims), size=dims)
+    a = rng.normal(scale=np.sqrt(1.0 / dims), size=dims)
+    b = rng.normal(scale=np.sqrt(1.0 / dims), size=dims)
     a /= np.linalg.norm(a)
     b /= np.linalg.norm(b)
     result = HrrAlgebra().bind(a, b)
@@ -85,7 +85,8 @@ def test_neural_accuracy(Simulator, seed, rng, dims, neurons_per_product=128):
         input_a = nengo.Node(a)
         input_b = nengo.Node(b)
         cconv = nengo_spa.networks.CircularConvolution(
-            neurons_per_product, dimensions=dims)
+            neurons_per_product, dimensions=dims
+        )
         nengo.Connection(input_a, cconv.input_a, synapse=None)
         nengo.Connection(input_b, cconv.input_b, synapse=None)
         res_p = nengo.Probe(cconv.output)

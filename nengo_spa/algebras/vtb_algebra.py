@@ -105,8 +105,7 @@ class VtbAlgebra(AbstractAlgebra):
 
     def get_binding_matrix(self, v, swap_inputs=False):
         sub_d = self._get_sub_d(len(v))
-        m = np.sqrt(sub_d) * np.kron(
-            np.eye(sub_d), v.reshape((sub_d, sub_d)))
+        m = np.sqrt(sub_d) * np.kron(np.eye(sub_d), v.reshape((sub_d, sub_d)))
         if swap_inputs:
             m = np.dot(self.get_swapping_matrix(len(v)), m)
         return m
@@ -141,12 +140,11 @@ class VtbAlgebra(AbstractAlgebra):
 
     def absorbing_element(self, d):
         """VTB has no absorbing element except the zero vector."""
-        raise NotImplementedError(
-            "VtbAlgebra does not have any absorbing elements.")
+        raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
     def identity_element(self, d):
         sub_d = self._get_sub_d(d)
-        return (np.eye(sub_d) / d**0.25).flatten()
+        return (np.eye(sub_d) / d ** 0.25).flatten()
 
     def zero_element(self, d):
         """Return the zero element of dimensionality *d*.

@@ -22,7 +22,7 @@ class Scalar(Network):
         Output.
     """
 
-    n_neurons = IntParam('n_neurons', default=50, low=1, readonly=True)
+    n_neurons = IntParam("n_neurons", default=50, low=1, readonly=True)
 
     def __init__(self, n_neurons=Default, **kwargs):
         super(Scalar, self).__init__(**kwargs)

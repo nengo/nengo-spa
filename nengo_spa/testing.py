@@ -4,8 +4,8 @@ import numpy as np
 
 
 def assert_sp_close(
-        t, data, target_sp, skip=0., duration=None, atol=0.2,
-        normalized=False):
+    t, data, target_sp, skip=0.0, duration=None, atol=0.2, normalized=False
+):
     """Test that the RMSE to a Semantic Pointer is below threshold.
 
     Parameters
@@ -35,6 +35,8 @@ def assert_sp_close(
         actual /= np.expand_dims(np.linalg.norm(actual, axis=1), 1)
         expected = expected.normalized()
     error = np.sqrt(np.mean(np.square(actual - expected.v), axis=1))
-    assert np.all(error < atol), \
-        "Absolute tolerance exceeded (mean={}, min={}, max={})".format(
-            np.mean(error), np.min(error), np.max(error))
+    assert np.all(
+        error < atol
+    ), "Absolute tolerance exceeded (mean={}, min={}, max={})".format(
+        np.mean(error), np.min(error), np.max(error)
+    )

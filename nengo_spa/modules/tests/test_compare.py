@@ -18,13 +18,13 @@ def test_basic():
 def test_run(Simulator, seed):
     with spa.Network(seed=seed) as model:
         model.compare = spa.Compare(vocab=16)
-        model.compare.vocab.populate('A; B')
+        model.compare.vocab.populate("A; B")
 
         def inputA(t):
             if 0 <= t < 0.1:
-                return 'A'
+                return "A"
             else:
-                return 'B'
+                return "B"
 
         model.input = spa.Transcode(inputA, output_vocab=16)
         model.input >> model.compare.input_a

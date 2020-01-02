@@ -10,5 +10,7 @@ name = "nengo_spa"
 version_info = (1, 0, 2)  # (major, minor, patch)
 dev = True
 
-version = "{v}{dev}".format(v=".".join(str(v) for v in version_info),
-                            dev="" if dev is None else ".dev{:d}".format(dev))
+version = "{v}{dev}".format(
+    v=".".join(str(v) for v in version_info),
+    dev="" if dev is None else ".dev{:d}".format(dev),
+)

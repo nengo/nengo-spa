@@ -49,20 +49,27 @@ class State(Network):
         Output.
     """
 
-    vocab = VocabularyOrDimParam('vocab', default=None, readonly=True)
-    subdimensions = IntParam('subdimensions', default=16, low=1, readonly=True)
+    vocab = VocabularyOrDimParam("vocab", default=None, readonly=True)
+    subdimensions = IntParam("subdimensions", default=16, low=1, readonly=True)
     neurons_per_dimension = IntParam(
-        'neurons_per_dimension', default=50, low=1, readonly=True)
-    feedback = NumberParam('feedback', default=.0, readonly=True)
-    feedback_synapse = NumberParam(
-        'feedback_synapse', default=.1, readonly=True)
+        "neurons_per_dimension", default=50, low=1, readonly=True
+    )
+    feedback = NumberParam("feedback", default=0.0, readonly=True)
+    feedback_synapse = NumberParam("feedback_synapse", default=0.1, readonly=True)
     represent_cc_identity = BoolParam(
-        'represent_cc_identity', default=True, readonly=True)
+        "represent_cc_identity", default=True, readonly=True
+    )
 
-    def __init__(self, vocab=Default, subdimensions=Default,
-                 neurons_per_dimension=Default, feedback=Default,
-                 represent_cc_identity=Default,
-                 feedback_synapse=Default, **kwargs):
+    def __init__(
+        self,
+        vocab=Default,
+        subdimensions=Default,
+        neurons_per_dimension=Default,
+        feedback=Default,
+        represent_cc_identity=Default,
+        feedback_synapse=Default,
+        **kwargs
+    ):
         super(State, self).__init__(**kwargs)
 
         self.vocab = vocab
@@ -76,15 +83,20 @@ class State(Network):
 
         if dimensions % self.subdimensions != 0:
             raise ValidationError(
-                "Dimensions (%d) must be divisible by subdimensions (%d)" % (
-                    dimensions, self.subdimensions),
-                attr='dimensions', obj=self)
+                "Dimensions (%d) must be divisible by subdimensions (%d)"
+                % (dimensions, self.subdimensions),
+                attr="dimensions",
+                obj=self,
+            )
 
         with self:
             if self.represent_cc_identity:
                 self.state_ensembles = IdentityEnsembleArray(
-                    self.neurons_per_dimension, dimensions, self.subdimensions,
-                    label='state')
+                    self.neurons_per_dimension,
+                    dimensions,
+                    self.subdimensions,
+                    label="state",
+                )
             else:
                 self.state_ensembles = EnsembleArray(
                     self.neurons_per_dimension * self.subdimensions,
@@ -92,12 +104,16 @@ class State(Network):
                     ens_dimensions=self.subdimensions,
                     eval_points=nengo.dists.CosineSimilarity(dimensions + 2),
                     intercepts=nengo.dists.CosineSimilarity(dimensions + 2),
-                    label='state')
+                    label="state",
+                )
 
             if self.feedback is not None and self.feedback != 0.0:
                 nengo.Connection(
-                    self.state_ensembles.output, self.state_ensembles.input,
-                    transform=self.feedback, synapse=self.feedback_synapse)
+                    self.state_ensembles.output,
+                    self.state_ensembles.input,
+                    transform=self.feedback,
+                    synapse=self.feedback_synapse,
+                )
 
         self.input = self.state_ensembles.input
         self.output = self.state_ensembles.output

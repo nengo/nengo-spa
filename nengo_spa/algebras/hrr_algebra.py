@@ -67,9 +67,9 @@ class HrrAlgebra(AbstractAlgebra):
         fft_imag = fft_val.imag
         fft_real = fft_val.real
         fft_norms = np.sqrt(fft_imag ** 2 + fft_real ** 2)
-        invalid = fft_norms <= 0.
-        fft_val[invalid] = 1.
-        fft_norms[invalid] = 1.
+        invalid = fft_norms <= 0.0
+        fft_val[invalid] = 1.0
+        fft_norms[invalid] = 1.0
         fft_unit = fft_val / fft_norms
         return np.array((np.fft.ifft(fft_unit, n=len(v))).real)
 
@@ -100,8 +100,7 @@ class HrrAlgebra(AbstractAlgebra):
         return node, n * (node,), node
 
     def implement_binding(self, n_neurons_per_d, d, unbind_left, unbind_right):
-        net = CircularConvolution(
-            n_neurons_per_d, d, unbind_left, unbind_right)
+        net = CircularConvolution(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_a, net.input_b), net.output
 
     def absorbing_element(self, d):
@@ -145,7 +144,7 @@ class HrrAlgebra(AbstractAlgebra):
             Identity element.
         """
         data = np.zeros(d)
-        data[0] = 1.
+        data[0] = 1.0
         return data
 
     def zero_element(self, d):
