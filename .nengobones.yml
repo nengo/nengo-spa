@@ -38,6 +38,8 @@ codecov_yml:
 
 ci_scripts:
   - template: static
+    codespell_ignore_words:
+      - ba
     pip_install:
       - flake8
     post_commands:
