@@ -9,6 +9,7 @@ import sys
 try:
     import nengo_spa
     import nengo_sphinx_theme
+    assert nengo_sphinx_theme
 except ImportError:
     print("To build the documentation, nengo_spa and nengo_sphinx_theme "
           "must be installed in the current environment. Please install these "
