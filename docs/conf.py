@@ -55,7 +55,7 @@ linkcheck_ignore = [
 
 # -- nbsphinx
 nbsphinx_allow_errors = False
-nbsphinx_timeout = 300
+nbsphinx_timeout = 600
 nbsphinx_execute = 'always'
 
 # -- sphinx
