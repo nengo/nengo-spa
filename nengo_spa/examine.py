@@ -69,7 +69,7 @@ def pairs(vocab):
 
     >>> vocab = nengo_spa.Vocabulary(32)
     >>> vocab.populate('A; B; C')
-    >>> sorted(pairs(vocab))
+    >>> sorted(nengo_spa.pairs(vocab))
     ['A*B', 'A*C', 'B*C']
     """
 

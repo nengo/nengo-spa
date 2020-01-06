@@ -18,8 +18,8 @@ def AxisAlignedVectors(d):
 
     Examples
     --------
-    >>> for p in nengo_spa.pointer_generation.AxisAlignedVectors(4):
-    >>>    print(p)
+    >>> for p in nengo_spa.vector_generation.AxisAlignedVectors(4):
+    ...    print(p)
     [1. 0. 0. 0.]
     [0. 1. 0. 0.]
     [0. 0. 1. 0.]

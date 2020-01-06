@@ -49,10 +49,13 @@ intersphinx_mapping = {
 # -- sphinx.ext.todo
 todo_include_todos = True
 
-# linkcheck
+# -- linkcheck
 linkcheck_ignore = [
     r'^https?://www\.amazon\..*$',
 ]
+
+# -- doctest
+doctest_global_setup = "import nengo_spa"
 
 # -- nbsphinx
 nbsphinx_allow_errors = False
