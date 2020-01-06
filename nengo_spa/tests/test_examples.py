@@ -20,13 +20,13 @@ example_dir = "docs/examples"
 
 too_slow = [
     "intro",
-    "intro_coming_from_legacy_spa",
+    "intro-coming-from-legacy-spa",
     "question",
-    "question_control",
-    "question_memory",
-    "spa_parser",
-    "spa_sequence",
-    "spa_sequence_routed",
+    "question-control",
+    "question-memory",
+    "spa-parser",
+    "spa-sequence",
+    "spa-sequence-routed",
 ]
 
 all_examples, slow_examples, fast_examples = [], [], []
