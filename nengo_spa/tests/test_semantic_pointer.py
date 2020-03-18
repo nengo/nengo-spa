@@ -12,7 +12,7 @@ from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, SemanticPointer, Zero
-from nengo_spa.vector_generation import UnitLengthVectors
+from nengo_spa.vector_generation import UnitaryVectors, UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
 from nengo_spa.vocabulary import Vocabulary
@@ -317,9 +317,97 @@ def test_name():
     assert (~a).name == "~(a)"
     assert a.normalized().name == "(a).normalized()"
     assert a.unitary().name == "(a).unitary()"
+    assert a.nondegenerate().name == "(a).nondegenerate()"
     assert (a + b).name == "(a)+(b)"
     assert (a * b).name == "(a)*(b)"
     assert (2.0 * a).name == "(2.0)*(a)"
+    assert (a ** 3).name == "(a)**(3)"
 
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None
+
+
+@pytest.mark.parametrize("d", [1, 4, 9, 16, 129, 512])
+def test_fractional_binding_properties(d, rng):
+    # tests a number of properties of fractional binding with nondegenerate
+    # vectors. these vectors don't strictly need to be unitary, but they
+    # should still be generated somewhat carefully. it is recommended to
+    # use both unitary + nondegenerate when possible.
+
+    gen = UnitaryVectors(d, algebra=HrrAlgebra(), rng=rng)
+    for _ in range(100):
+        x = SemanticPointer(next(gen)).nondegenerate()
+        x *= 1.1  # don't assume it's unitary
+
+        # check that it's not unitary
+        assert not np.allclose((x.unitary()).v, x.v)
+
+        # check that making it nondegenerate again
+        # does not change the vector
+        assert np.allclose((x.nondegenerate()).v, x.v)
+
+        # check that (sqrt(x))**2 == x
+        assert np.allclose(((x ** 0.5) ** 2).v, x.v)
+
+        # multiplication will add the exponents
+        assert np.allclose((x ** 2 * x).v, (x ** 3).v)
+        assert np.allclose((x ** 2.5 * x ** 1.5).v, (x * x * x * x).v)
+
+        # check this more generally
+        a, b, c = 10 * rng.rand(3) - 5  # [-5, 5]
+        assert np.allclose((x ** a * x ** b * x ** c).v, (x ** (a + b + c)).v)
+
+        # counter-intuitively, the property:
+        #     (x**a)**b == x**(a*b)
+        # does not hold in general -- e.g. (x**2)**(0.5) can be +/- x
+        # that is because sqrt is a multi-valued function
+        # assert np.allclose(((x**a)**b).v, (x**(a*b)).v)
+
+
+@pytest.mark.parametrize("d", [1, 4, 9, 16, 129, 512])
+def test_fractional_binding_unitary(d, rng):
+    # tests a number of properties of fractional binding with nondegenerate
+    # and unitary vectors
+
+    gen = UnitaryVectors(d, algebra=HrrAlgebra(), rng=rng)
+    for _ in range(100):
+        x = SemanticPointer(next(gen)).nondegenerate()
+
+        # check that making it nondegenerate or unitary again
+        # does not change the vector
+        assert np.allclose((x.nondegenerate()).v, x.v)
+        assert np.allclose((x.unitary()).v, x.v)
+
+        # 1/x is the inverse (since unitary)
+        assert np.allclose((x ** (-1)).v, (~x).v)
+
+        # x**0 gives the identity (since unitary)
+        assert np.allclose((x ** 0).v, Identity(d).v)
+
+        # check that it's still unitary after fractional binding
+        sqrt_x = x ** 0.5
+        x_check = sqrt_x * sqrt_x
+
+        assert np.allclose(np.linalg.norm(sqrt_x.v), 1)
+        assert np.allclose(np.linalg.norm(x_check.v), 1)
+        assert np.allclose(x_check.v, x.v)
+
+
+def test_degenerate():
+    # tests that an error occurs if throwing away imag components
+    # this error occurs regardless of whether it's unitary
+    x = SemanticPointer([1, 2, 3, 4, 5, 6]).unitary()
+    with pytest.raises(ValueError, match="nondegenerate"):
+        x ** 0.5
+
+
+def test_fractional_binding_natural():
+    # tests fractional binding with natural exponents
+    x = SemanticPointer([1, 2, 3, 4, 5, 6])
+
+    assert np.allclose((x ** 1).v, x.v)
+    assert np.allclose((x ** 2).v, (x * x).v)
+    assert np.allclose((x ** 4).v, (x * x * x * x).v)
+
+    # check that x is degenerate (i.e., not nondegenerate)
+    assert not np.allclose(x.nondegenerate().v, x.v)

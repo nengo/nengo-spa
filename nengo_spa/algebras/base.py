@@ -104,6 +104,38 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
+    def fractional_bind(self, v, exponent):
+        """Returns *v* bound with itself *exponent* times.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to exponentiate.
+        exponent : float
+            The exponent of the (potentially fractional) power.
+
+        Returns
+        -------
+        (d,) ndarray
+            *v* to the power of *exponent*.
+        """
+        raise NotImplementedError()
+
+    def make_nondegenerate(self, v):
+        """Returns a nondegenerate vector based on the vector *v*.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to base nondegenerate vector on.
+
+        Returns
+        -------
+        ndarray
+            Nondegenerate vector.
+        """
+        raise NotImplementedError()
+
     def invert(self, v):
         """Invert vector *v*.
 

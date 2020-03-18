@@ -31,9 +31,18 @@ class HrrAlgebra(AbstractAlgebra):
     More information on circular convolution as a binding operation can be
     found in [plate2003]_.
 
+    Fractional binding is an extension to auto-convolve the vector a
+    fractional (i.e., real-valued) number of times. More information can be
+    found in [komer2019]_.
+
     .. [plate2003] Plate, Tony A. Holographic Reduced Representation:
        Distributed Representation for Cognitive Structures. Stanford, CA: CSLI
        Publications, 2003.
+
+    .. [komer2019] Komer, B., Stewart, T.C., Voelker, A.R. and Eliasmith, C.
+       A neural representation of continuous space using fractional binding.
+       Proceedings of the 41st Annual Meeting of the Cognitive Science
+       Society. 2019.
     """
 
     _instance = None
@@ -81,6 +90,28 @@ class HrrAlgebra(AbstractAlgebra):
         if len(b) != n:
             raise ValueError("Inputs must have same length.")
         return np.fft.irfft(np.fft.rfft(a) * np.fft.rfft(b), n=n)
+
+    def fractional_bind(self, v, exponent):
+        r = np.fft.ifft(np.fft.fft(v) ** exponent)
+        if not np.allclose(r.imag, 0):
+            raise ValueError(
+                "None of the Fourier coefficients can have a "
+                "complex angle of +/- pi, otherwise it is "
+                "degenerate; self rotation is ambiguous. "
+                "Try generating the pointer using the "
+                "``nondegenerate()`` method."
+            )
+        return r.real
+
+    def make_nondegenerate(self, v):
+        v_fft = np.fft.fft(v)
+        v_fft[0] = np.abs(v_fft[0])  # zero frequency
+        d = len(v)
+        if d % 2 == 0:
+            v_fft[d // 2] = np.abs(v_fft[d // 2])  # +/- Nyquist frequency
+        r = np.fft.ifft(v_fft)
+        assert np.allclose(r.imag, 0)  # this should never happen
+        return r.real
 
     def invert(self, v):
         return v[-np.arange(len(v))]

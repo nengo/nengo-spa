@@ -132,6 +132,26 @@ class SemanticPointer(Fixed):
             name=self._get_method_name("unitary"),
         )
 
+    def nondegenerate(self):
+        """Make the Semantic Pointer nondegenerate and return as a new object.
+
+        The original object is not modified.
+
+        A degenerate Semantic Pointer is one that cannot be fractionally bound
+        using an arbitrary exponent in an unambiguous manner.
+        Otherwise the Semantic Pointer is said to be nondegenerate.
+
+        A unitary Semantic Pointer that is made nondegenerate will still be
+        unitary, and vice-versa. However, the Semantic Pointer can become
+        degenerate after certain operations (this depends on the algebra).
+        """
+        return SemanticPointer(
+            self.algebra.make_nondegenerate(self.v),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_method_name("nondegenerate"),
+        )
+
     def copy(self):
         """Return another semantic pointer with the same data."""
         return SemanticPointer(
@@ -233,6 +253,17 @@ class SemanticPointer(Fixed):
                 return self._bind(other, swap=swap)
         else:
             return NotImplemented
+
+    def __pow__(self, exponent):
+        """Bind the Semantic Pointer with itself *exponent* times."""
+        if not is_number(exponent):
+            return NotImplemented
+        return SemanticPointer(
+            data=self.algebra.fractional_bind(self.v, exponent),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_binary_name(exponent, "**"),
+        )
 
     def __invert__(self):
         """Return a reorganized vector that acts as an inverse for convolution.

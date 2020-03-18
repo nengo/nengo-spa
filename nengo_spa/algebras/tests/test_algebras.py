@@ -110,6 +110,12 @@ class DummyAlgebra:
     def bind(self, a, b):
         pass
 
+    def fractional_bind(self, v, exponent):
+        pass
+
+    def make_nondegenerate(self, v):
+        pass
+
     def invert(self, v):
         pass
 
