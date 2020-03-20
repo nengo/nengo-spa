@@ -59,7 +59,7 @@ class Vocabulary(Mapping):
         A name to display in the string representation of this vocabulary.
     algebra : AbstractAlgebra, optional
         Defines the vector symbolic operators used for Semantic Pointers in the
-        vocabulary. Defaults to `.CircularConvolutionAlgebra`.
+        vocabulary. Defaults to `.HrrAlgebra`.
 
     Attributes
     ----------

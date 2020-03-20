@@ -178,8 +178,7 @@ Release History
 **Removed**
 
 - Removed ``nengo_spa.networks.circularconvolution.circconv`` because
-  ``nengo_spa.algebras.CircularConvolutionAlgebra`` provides the same
-  functionality.
+  ``nengo_spa.algebras.HrrAlgebra`` provides the same functionality.
   (`#198 <https://github.com/nengo/nengo_spa/pull/198>`__)
 - The ``SemanticPointer`` class does no longer accept a single integer as
   dimensionality to create a random vector. Use the new generators in

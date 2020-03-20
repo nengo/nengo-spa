@@ -25,7 +25,7 @@ class SemanticPointer(Fixed):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     name : str, optional
         A name for the Semantic Pointer.
@@ -425,7 +425,7 @@ class Identity(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     """
 
@@ -452,7 +452,7 @@ class AbsorbingElement(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     """
 
@@ -475,7 +475,7 @@ class Zero(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     """
 
