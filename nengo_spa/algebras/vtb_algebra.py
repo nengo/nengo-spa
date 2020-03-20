@@ -99,6 +99,30 @@ class VtbAlgebra(AbstractAlgebra):
         m = self.get_binding_matrix(b)
         return np.dot(m, a)
 
+    def fractional_bind(self, v, exponent):
+        from scipy.linalg import fractional_matrix_power
+
+        sub_d = self._get_sub_d(len(v))
+        sub_m = fractional_matrix_power(
+            np.sqrt(sub_d) * v.reshape((sub_d, sub_d)), exponent
+        )
+        m = np.kron(np.eye(sub_d), sub_m)
+        # more efficient than the equivalent:
+        # m = fractional_matrix_power(self.get_binding_matrix(v), exponent)
+        return m.dot(self.identity_element(len(v)))
+
+    def make_nondegenerate(self, v):
+        # note: these "Householder vectors" are not only unitary, but symmetric
+        sub_d = self._get_sub_d(len(v))
+        # the choice of taking the mean across axis=1 is somewhat arbitrary
+        # the main consideration is to reduce d dimensions down to sub_d
+        u = v.reshape((sub_d, sub_d)).mean(axis=1)
+        # now use this vector generate a Householder matrix
+        # which are both symmetric and unitary
+        u /= np.linalg.norm(u)
+        h = np.eye(sub_d) - 2 * np.outer(u, u)
+        return h.flatten() / np.sqrt(sub_d)
+
     def invert(self, v):
         sub_d = self._get_sub_d(len(v))
         return v.reshape((sub_d, sub_d)).T.flatten()

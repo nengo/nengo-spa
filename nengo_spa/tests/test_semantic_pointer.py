@@ -9,6 +9,7 @@ import pytest
 import nengo_spa as spa
 from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, SemanticPointer, Zero
@@ -411,3 +412,49 @@ def test_fractional_binding_natural():
 
     # check that x is degenerate (i.e., not nondegenerate)
     assert not np.allclose(x.nondegenerate().v, x.v)
+
+
+@pytest.mark.parametrize("d", [1, 4, 9, 144])
+def test_fractional_binding_vtb(d, rng):
+    pytest.importorskip("scipy")
+
+    algebra = VtbAlgebra()
+    v = next(UnitLengthVectors(d, rng=rng))
+    x = SemanticPointer(v, algebra=algebra)
+
+    # note: doesn't quite behave with ideal properties
+    assert np.allclose((x ** 0).v, algebra.identity_element(d))
+    assert np.allclose((x ** 1).v, (~x).v)
+    assert np.allclose((x ** 2).v, (~x * x).v)
+    assert np.allclose((x ** 3).v, (((~x) * x) * x).v)
+
+
+@pytest.mark.parametrize("d", [1, 4, 9, 144])
+def test_nondegenerate_vtb(d, rng):
+    pytest.importorskip("scipy")
+
+    algebra = VtbAlgebra()
+    identity = Identity(d, algebra=algebra)
+    v = next(UnitLengthVectors(d, rng=rng))
+    x = SemanticPointer(v, algebra=algebra).nondegenerate()
+
+    # nondegenerate VTB vectors are unitary and their own inverse
+    assert np.allclose((~x).v, x.v)
+    assert np.allclose(algebra.make_unitary(x.v), x.v)
+
+    # nondegenerate properties are more consistent with HRRs, but they always
+    # oscillate with a period of 2 because V^2 = I
+    assert np.allclose((x ** 0).v, identity.v)
+    assert np.allclose((x ** 1).v, (x).v)
+    assert np.allclose((x ** 2).v, (x * x).v)
+    assert np.allclose((x ** 2).v, identity.v)
+    assert np.allclose((x ** 3).v, (x * x * x).v)
+    assert np.allclose((x ** 3).v, (identity * x).v)
+    assert np.allclose((x ** 3).v, (x * identity).v)
+
+    # satisfies translational properties as long as the intermediate results
+    # are allowed to be complex
+    x_complex = SemanticPointer(v, algebra=algebra, dtype=np.complex128).nondegenerate()
+
+    assert np.any(np.iscomplex((x_complex ** 0.5).v))
+    assert np.allclose((x_complex ** (-0.5) * x_complex ** 2.5).v, (x * x).v)
