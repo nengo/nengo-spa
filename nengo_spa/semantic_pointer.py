@@ -13,7 +13,8 @@ class SemanticPointer(Fixed):
     """A Semantic Pointer, based on Holographic Reduced Representations.
 
     Operators are overloaded so that ``+`` and ``-`` are addition,
-    ``*`` is circular convolution, and ``~`` is the inversion operator.
+    ``*`` is circular convolution, ``~`` is the inversion operator,
+    and ``**`` is fractional binding (see [komer2019]_).
 
     Parameters
     ----------
@@ -40,6 +41,11 @@ class SemanticPointer(Fixed):
         The vocabulary the this Semantic Pointer is considered to be part of.
     name : str or None
         Name of the Semantic Pointer.
+
+    .. [komer2019] Komer, B., Stewart, T.C., Voelker, A.R. and Eliasmith, C.
+       A neural representation of continuous space using fractional binding.
+       Proceedings of the 41st Annual Meeting of the Cognitive Science
+       Society. 2019.
     """
 
     def __init__(self, data, vocab=None, algebra=None, name=None):

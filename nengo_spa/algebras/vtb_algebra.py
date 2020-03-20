@@ -41,7 +41,15 @@ class VtbAlgebra(AbstractAlgebra):
 
     The VTB binding operation is neither associative nor commutative.
 
-    Publications with further information are forthcoming.
+    Fractional binding for this algebra is currently an experimental feature.
+
+    More information on VTB as a type of vector symbolic architecture can be
+    found in [gosmann2019]_.
+
+    .. [gosmann2019] Gosmann, J. and Eliasmith, C. Vector-derived
+       transformation binding: an improved binding operation for deep
+       symbol-like processing in neural networks. Neural Computation,
+       31(5):849-869, 2019.
     """
 
     _instance = None
