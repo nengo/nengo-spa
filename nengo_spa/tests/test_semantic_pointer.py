@@ -308,9 +308,8 @@ def test_name():
 
     assert str(a) == "SemanticPointer<a>"
     assert repr(a) == (
-        "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
-            a.v, a.vocab, a.algebra, a.name
-        )
+        "SemanticPointer({!r}, vocab={!r}, algebra={!r}, "
+        "name={!r}, dtype={!r})".format(a.v, a.vocab, a.algebra, a.name, a.dtype,)
     )
 
     assert (-a).name == "-(a)"

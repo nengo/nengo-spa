@@ -28,6 +28,10 @@ class SemanticPointer(Fixed):
         with the *vocab* argument.
     name : str, optional
         A name for the Semantic Pointer.
+    dtype : type, optional
+        A datatype for the coefficients of the Semantic Pointer.
+        Defaults to `np.float64`. Complex datatypes are currently an
+        experimental feature (i.e., not fully supported).
 
     Attributes
     ----------
@@ -36,25 +40,28 @@ class SemanticPointer(Fixed):
     algebra : AbstractAlgebra
         Algebra that defines the vector symbolic operations on this Semantic
         Pointer.
+    dtype : type
+        A datatype for the coefficients of the Semantic Pointer.
     vocab : Vocabulary or None
         The vocabulary the this Semantic Pointer is considered to be part of.
     name : str or None
         Name of the Semantic Pointer.
     """
 
-    def __init__(self, data, vocab=None, algebra=None, name=None):
+    def __init__(self, data, vocab=None, algebra=None, name=None, dtype=np.float64):
         super(SemanticPointer, self).__init__(
             TAnyVocab if vocab is None else TVocabulary(vocab)
         )
         self.algebra = self._get_algebra(vocab, algebra)
 
-        self.v = np.array(data, dtype=float)
+        self.v = np.array(data, dtype=dtype)
         if len(self.v.shape) != 1:
             raise ValidationError("'data' must be a vector", "data", self)
         self.v.setflags(write=False)
 
         self.vocab = vocab
         self.name = name
+        self.dtype = dtype
 
     def _get_algebra(cls, vocab, algebra):
         if algebra is None:
@@ -114,6 +121,7 @@ class SemanticPointer(Fixed):
             vocab=self.vocab,
             algebra=self.algebra,
             name=self._get_method_name("normalized"),
+            dtype=self.dtype,
         )
 
     def unitary(self):
@@ -130,12 +138,17 @@ class SemanticPointer(Fixed):
             vocab=self.vocab,
             algebra=self.algebra,
             name=self._get_method_name("unitary"),
+            dtype=self.dtype,
         )
 
     def copy(self):
         """Return another semantic pointer with the same data."""
         return SemanticPointer(
-            data=self.v, vocab=self.vocab, algebra=self.algebra, name=self.name
+            data=self.v,
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self.name,
+            dtype=self.dtype,
         )
 
     def length(self):
@@ -153,9 +166,9 @@ class SemanticPointer(Fixed):
             return repr(self)
 
     def __repr__(self):
-        return "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
-            self.v, self.vocab, self.algebra, self.name
-        )
+        return (
+            "SemanticPointer({!r}, vocab={!r}, algebra={!r}, " "name={!r}, dtype={!r})"
+        ).format(self.v, self.vocab, self.algebra, self.name, self.dtype,)
 
     @TypeCheckedBinaryOp(Fixed)
     def __add__(self, other):
@@ -179,6 +192,7 @@ class SemanticPointer(Fixed):
             vocab=vocab,
             algebra=self.algebra,
             name=self._get_binary_name(other_pointer, "+", swap),
+            dtype=self.dtype,
         )
 
     def __neg__(self):
@@ -187,6 +201,7 @@ class SemanticPointer(Fixed):
             vocab=self.vocab,
             algebra=self.algebra,
             name=self._get_unary_name("-"),
+            dtype=self.dtype,
         )
 
     def __sub__(self, other):
@@ -220,6 +235,7 @@ class SemanticPointer(Fixed):
                 vocab=self.vocab,
                 algebra=self.algebra,
                 name=self._get_binary_name(other, "*", swap),
+                dtype=self.dtype,
             )
         elif isinstance(other, Fixed):
             if other.type == TScalar:
@@ -228,6 +244,7 @@ class SemanticPointer(Fixed):
                     vocab=self.vocab,
                     algebra=self.algebra,
                     name=self._get_binary_name(other, "*", swap),
+                    dtype=self.dtype,
                 )
             else:
                 return self._bind(other, swap=swap)
@@ -247,6 +264,7 @@ class SemanticPointer(Fixed):
             vocab=self.vocab,
             algebra=self.algebra,
             name=self._get_unary_name("~"),
+            dtype=self.dtype,
         )
 
     def bind(self, other):
@@ -271,6 +289,7 @@ class SemanticPointer(Fixed):
             vocab=vocab,
             algebra=self.algebra,
             name=self._get_binary_name(other_pointer, "*", swap),
+            dtype=self.dtype,
         )
 
     def get_binding_matrix(self, swap_inputs=False):
@@ -315,7 +334,7 @@ class SemanticPointer(Fixed):
         vocabulary and allow the *source* to be interpreted as part of the
         vocabulary of any Semantic Pointer it is combined with.
         """
-        return SemanticPointer(self.v, vocab=vocab, name=self.name)
+        return SemanticPointer(self.v, vocab=vocab, name=self.name, dtype=self.dtype)
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
         """Translate the Semantic Pointer to vocabulary *vocab*.
@@ -344,7 +363,10 @@ class SemanticPointer(Fixed):
         """
         tr = self.vocab.transform_to(vocab, populate, solver)
         return SemanticPointer(
-            np.dot(tr, self.evaluate().v), vocab=vocab, name=self.name
+            np.dot(tr, self.evaluate().v),
+            vocab=vocab,
+            name=self.name,
+            dtype=self.dtype,
         )
 
     def distance(self, other):
@@ -373,6 +395,11 @@ class SemanticPointer(Fixed):
                 raise TypeError(
                     "Operation not supported for SemanticPointer with "
                     "different algebra."
+                )
+            if self.dtype is not other.dtype:
+                raise TypeError(
+                    "Operation not supported for SemanticPointer with "
+                    "different dtype."
                 )
 
 
