@@ -161,6 +161,7 @@ class Vocabulary(Mapping):
         best_p = None
         best_sim = np.inf
         for _ in range(attempts):
+            # note: p will get its algebra from vocab.algebra
             p = semantic_pointer.SemanticPointer(next(self.pointer_gen), vocab=self)
             if transform is not None:
                 p = eval("p." + transform, dict(self), {"p": p})
@@ -205,6 +206,7 @@ class Vocabulary(Mapping):
             return special_sps[key](self.dimensions, self)
         if not self.strict and key not in self:
             self.add(key, self.create_pointer())
+        # note: pointer will get its algebra from vocab.algebra
         return semantic_pointer.SemanticPointer(
             self._vectors[self._key2idx[key]], vocab=self, name=key
         )
@@ -230,16 +232,19 @@ class Vocabulary(Mapping):
                 "Python 2 identifiers beginning with a capital letter.".format(key)
             )
         if not isinstance(p, semantic_pointer.SemanticPointer):
+            # note: p will get its algebra from vocab.algebra
             p = semantic_pointer.SemanticPointer(p, vocab=self)
 
         if key in self._key2idx:
             raise ValidationError(
                 "The semantic pointer %r already exists" % key, attr="", obj=self
             )
-        if p.vocab is not None and p.vocab is not self:
+        isDifferentVocab = p.vocab is not None and p.vocab is not self
+        isDifferentAlgebra = p.algebra is not self.algebra  # algebra never None
+        if isDifferentVocab or isDifferentAlgebra:
             raise ValidationError(
                 "Cannot add a semantic pointer that belongs to a different "
-                "vocabulary.",
+                "vocabulary or algebra.",
                 attr="",
                 obj=self,
             )

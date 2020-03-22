@@ -23,6 +23,14 @@ Release History
 1.0.2 (unreleased)
 ==================
 
+**Changed**
+
+- Raise an exception when a Semantic Pointer is added to a vocabulary with a
+  differing algebra.
+  (`#239 <https://github.com/nengo/nengo_spa/issues/239>`__,
+  `#240 <https://github.com/nengo/nengo_spa/pull/240>`__)
+
+
 
 1.0.1 (December 14, 2019)
 =========================

@@ -6,7 +6,8 @@ import numpy as np
 from numpy.testing import assert_equal
 import pytest
 
-from nengo_spa import Vocabulary
+from nengo_spa import SemanticPointer, Vocabulary
+from nengo_spa.algebras import HrrAlgebra, VtbAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.vector_generation import AxisAlignedVectors
 from nengo_spa.vocabulary import (
@@ -23,6 +24,23 @@ def test_add(rng):
     v.add("B", [4, 5, 6])
     v.add("C", [7, 8, 9])
     assert np.allclose(v.vectors, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+
+def test_add_raises_exception_for_algebra_mismatch():
+    v = Vocabulary(4, algebra=HrrAlgebra())
+    with pytest.raises(ValidationError, match="different vocabulary or algebra"):
+        v.add("V", SemanticPointer(np.ones(4), algebra=VtbAlgebra()))
+    v.add("V", SemanticPointer(np.ones(4), algebra=VtbAlgebra()).reinterpret(v))
+
+
+def test_added_algebra_match(rng):
+    v = Vocabulary(4, algebra=VtbAlgebra())
+    sp = v.create_pointer()
+    assert sp.algebra is VtbAlgebra()
+    v.add("V", sp)
+    assert v["V"].vocab is v
+    assert v["V"].algebra is VtbAlgebra()
+    assert v["V"].name == "V"
 
 
 def test_populate(rng):
