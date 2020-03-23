@@ -2,6 +2,7 @@ import nengo
 from nengo.exceptions import ValidationError
 import numpy as np
 
+from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.typechecks import is_array, is_array_like, is_number
@@ -63,6 +64,10 @@ class SemanticPointer(Fixed):
                 algebra = vocab.algebra
         elif vocab is not None and vocab.algebra is not algebra:
             raise ValueError("vocab and algebra argument are mutually exclusive")
+        if not isinstance(algebra, AbstractAlgebra):
+            raise ValidationError(
+                "'algebra' must be an instance of AbstractAlgebra", "algebra", algebra
+            )
         return algebra
 
     def _get_unary_name(self, op):
