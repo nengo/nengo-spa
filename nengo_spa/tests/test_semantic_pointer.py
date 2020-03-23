@@ -8,6 +8,7 @@ import pytest
 
 import nengo_spa as spa
 from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, SemanticPointer, Zero
@@ -273,6 +274,13 @@ def test_incompatible_algebra(op):
     b = SemanticPointer(next(gen), algebra=AbstractAlgebra())  # noqa: F841
     with pytest.raises(TypeError):
         eval("a" + op + "b")
+
+
+def test_invalid_algebra():
+    gen = UnitLengthVectors(32)
+    with pytest.raises(ValidationError, match="AbstractAlgebra"):
+        SemanticPointer(next(gen), algebra=HrrAlgebra)
+    SemanticPointer(next(gen), algebra=HrrAlgebra())
 
 
 def test_identity(algebra):
