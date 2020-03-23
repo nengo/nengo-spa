@@ -31,6 +31,6 @@ from nengo_spa.vector_generation import (
 from nengo_spa.vocabulary import Vocabulary
 
 
-__copyright__ = "2013-2018, Applied Brain Research"
+__copyright__ = "2013-2020, Applied Brain Research"
 __license__ = "Free for non-commercial use; see LICENSE.rst"
 __version__ = version.version
