@@ -20,11 +20,15 @@ Release History
    - Fixed
 
 
-1.0.2 (unreleased)
+1.1.0 (unreleased)
 ==================
 
 **Changed**
 
+- Make ``AbstractAlgebra`` an actual abstract base class (using ``ABCMeta`` as
+  meta-class). While still supported, this deprecates pure duck-typing for
+  algebras.
+  (`#240 <https://github.com/nengo/nengo_spa/pull/240>`__)
 - Raise an exception when a Semantic Pointer is added to a vocabulary with a
   differing algebra.
   (`#239 <https://github.com/nengo/nengo_spa/issues/239>`__,

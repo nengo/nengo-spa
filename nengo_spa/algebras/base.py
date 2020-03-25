@@ -1,4 +1,32 @@
-class AbstractAlgebra(object):
+from abc import ABCMeta
+import warnings
+
+
+class _DuckTypedABCMeta(ABCMeta):
+    def __instancecheck__(cls, instance):
+        if super().__instancecheck__(instance):
+            return True
+
+        for member in dir(cls):
+            if member.startswith("_"):
+                continue
+            if not hasattr(instance, member) or not hasattr(
+                getattr(instance, member), "__self__"
+            ):
+                return False
+        warnings.warn(
+            DeprecationWarning(
+                "Please do not rely on pure duck-typing for {clsname}. "
+                "Explicitly register your class {userclass} as a virtual subclass "
+                "of {clsname} or derive from it.".format(
+                    clsname=cls.__name__, userclass=instance.__class__.__name__
+                )
+            )
+        )
+        return True
+
+
+class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
     """Abstract base class for algebras.
 
     Custom algebras can be defined by implementing the interface of this

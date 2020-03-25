@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from nengo_spa.algebras.base import AbstractAlgebra
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -90,3 +91,50 @@ def test_zero_element(algebra, rng):
     p = algebra.zero_element(16)
     assert np.all(p == 0.0)
     assert np.allclose(algebra.bind(a, p), 0.0)
+
+
+def test_isinstance_check(algebra):
+    assert isinstance(algebra, AbstractAlgebra)
+
+
+class DummyAlgebra:
+    def is_valid_dimensionality(self, d):
+        pass
+
+    def make_unitary(self, v):
+        pass
+
+    def superpose(self, a, b):
+        pass
+
+    def bind(self, a, b):
+        pass
+
+    def invert(self, v):
+        pass
+
+    def get_binding_matrix(self, v, swap_inputs=False):
+        pass
+
+    def get_inversion_matrix(self, d):
+        pass
+
+    def implement_superposition(self, n_neurons_per_d, d, n):
+        pass
+
+    def implement_binding(self, n_neurons_per_d, d, unbind_left, unbind_right):
+        pass
+
+    def absorbing_element(self, d):
+        pass
+
+    def identity_element(self, d):
+        pass
+
+    def zero_element(self, d):
+        pass
+
+
+@pytest.mark.filterwarnings("ignore:.*do not rely on pure duck-typing")
+def test_isinstance_ducktyping_check():
+    assert isinstance(DummyAlgebra(), AbstractAlgebra)
