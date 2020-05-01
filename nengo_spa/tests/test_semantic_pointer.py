@@ -324,6 +324,12 @@ def test_name():
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None
 
+    # check that names that blow up exponentially in length are truncated
+    for i in range(10):
+        a += a * b
+    assert len(a.name) == a.MAX_NAME
+    assert a.name.endswith("...")
+
 
 def test_translate(rng):
     v1 = spa.Vocabulary(16, pointer_gen=rng)
