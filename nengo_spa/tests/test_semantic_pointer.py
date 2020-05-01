@@ -451,10 +451,3 @@ def test_nondegenerate_vtb(d, rng):
     assert np.allclose((x ** 3).v, (x * x * x).v)
     assert np.allclose((x ** 3).v, (identity * x).v)
     assert np.allclose((x ** 3).v, (x * identity).v)
-
-    # satisfies translational properties as long as the intermediate results
-    # are allowed to be complex
-    x_complex = SemanticPointer(v, algebra=algebra, dtype=np.complex128).nondegenerate()
-
-    assert np.any(np.iscomplex((x_complex ** 0.5).v))
-    assert np.allclose((x_complex ** (-0.5) * x_complex ** 2.5).v, (x * x).v)
