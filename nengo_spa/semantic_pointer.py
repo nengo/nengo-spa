@@ -42,6 +42,8 @@ class SemanticPointer(Fixed):
         Name of the Semantic Pointer.
     """
 
+    MAX_NAME = 1024
+
     def __init__(self, data, vocab=None, algebra=None, name=None):
         super(SemanticPointer, self).__init__(
             TAnyVocab if vocab is None else TVocabulary(vocab)
@@ -54,6 +56,9 @@ class SemanticPointer(Fixed):
         self.v.setflags(write=False)
 
         self.vocab = vocab
+
+        if name is not None and len(name) > self.MAX_NAME:
+            name = "%s..." % (name[: self.MAX_NAME - 3])
         self.name = name
 
     def _get_algebra(cls, vocab, algebra):
