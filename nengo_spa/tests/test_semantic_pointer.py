@@ -438,16 +438,28 @@ def test_nondegenerate_vtb(d, rng):
     v = next(UnitLengthVectors(d, rng=rng))
     x = SemanticPointer(v, algebra=algebra).nondegenerate()
 
-    # nondegenerate VTB vectors are unitary and their own inverse
-    assert np.allclose((~x).v, x.v)
+    # nondegenerate VTB vectors are unitary
     assert np.allclose(algebra.make_unitary(x.v), x.v)
 
-    # nondegenerate properties are more consistent with HRRs, but they always
-    # oscillate with a period of 2 because V^2 = I
-    assert np.allclose((x ** 0).v, identity.v)
-    assert np.allclose((x ** 1).v, (x).v)
-    assert np.allclose((x ** 2).v, (x * x).v)
-    assert np.allclose((x ** 2).v, identity.v)
-    assert np.allclose((x ** 3).v, (x * x * x).v)
-    assert np.allclose((x ** 3).v, (identity * x).v)
-    assert np.allclose((x ** 3).v, (x * identity).v)
+    # binding on top of the identity produces consistent exponent properties
+    assert np.allclose((x ** 1).v, (identity * x).v)
+    assert np.allclose((x ** 2).v, ((identity * x) * x).v)
+    assert np.allclose((x ** 3).v, (((identity * x) * x) * x).v)
+
+    assert np.allclose((identity * (x ** 2.3)).v, ((identity * (x ** 1.1)) * (x ** 1.2)).v)
+    assert np.allclose((identity * ~(x ** 2.3)).v, ((identity * ~(x ** 1.1)) * ~(x ** 1.2)).v)
+    assert np.allclose((identity * (x ** -.1)).v, ((identity * (x ** 1.1)) * ~(x ** 1.2)).v)
+
+    # replacing 'bind' with 'inverse and bind' is required when not binding on top of the identity
+    assert np.allclose((x ** 2.3).v, ((x ** 1.1) * ~(x ** 1.2)).v)
+    assert np.allclose((x ** -2.3).v, ((x ** -1.1) * ~(x ** -1.2)).v)
+    assert np.allclose((x ** 0.7).v, ((x ** -1.5) * ~(x ** 2.2)).v)
+    assert np.allclose((x ** -1.3).v, ((x ** -1.5) * ~(x ** 0.2)).v)
+    assert np.allclose((x ** 2.8).v, (((x ** 1.7) * ~(x ** -0.4)) * ~(x ** 1.5)).v)
+
+    # repeated fractional binds do not decay the dot product
+    step = x ** 0.1
+    pt = step
+    for _ in range(1, 100):
+        pt = pt *~ step
+    assert(np.allclose(np.dot(pt.v, (x ** 10).v), 1))
