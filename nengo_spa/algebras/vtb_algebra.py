@@ -120,16 +120,18 @@ class VtbAlgebra(AbstractAlgebra):
         return m.dot(self.identity_element(len(v)))
 
     def make_nondegenerate(self, v):
-        # note: these "Householder vectors" are not only unitary, but symmetric
+        # nondegenerate vectors are unitary and
+        # form a matrix with a positive determinant
+        u = self.make_unitary(v)
         sub_d = self._get_sub_d(len(v))
-        # the choice of taking the mean across axis=1 is somewhat arbitrary
-        # the main consideration is to reduce d dimensions down to sub_d
-        u = v.reshape((sub_d, sub_d)).mean(axis=1)
-        # now use this vector generate a Householder matrix
-        # which are both symmetric and unitary
-        u /= np.linalg.norm(u)
-        h = np.eye(sub_d) - 2 * np.outer(u, u)
-        return h.flatten() / np.sqrt(sub_d)
+        m = u.reshape((sub_d, sub_d))
+        if np.linalg.det(m) < 0:
+            # force the determinant to be positive
+            w, v = np.linalg.eig(m)
+            m = m + (2 * np.dot(v, np.linalg.inv(v))).real
+            u = self.make_unitary(m.flatten())
+            assert np.linalg.det(u.reshape((sub_d, sub_d))) > 0
+        return u
 
     def invert(self, v):
         sub_d = self._get_sub_d(len(v))
