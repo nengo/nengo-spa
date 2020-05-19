@@ -46,7 +46,7 @@ def test_init():
 def test_length(rng):
     a = SemanticPointer([1, 1])
     assert np.allclose(a.length(), np.sqrt(2))
-    a = SemanticPointer(next(UnitLengthVectors(10, rng))) * 1.2
+    a = SemanticPointer(next(UnitLengthVectors(10, rng=rng))) * 1.2
     assert np.allclose(a.length(), 1.2)
 
 
@@ -67,7 +67,7 @@ def test_make_unitary(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
 
-    a = SemanticPointer(next(UnitLengthVectors(d, rng)), algebra=algebra)
+    a = SemanticPointer(next(UnitLengthVectors(d, rng=rng)), algebra=algebra)
     b = a.unitary()
     assert a is not b
     assert np.allclose(1, b.length())
@@ -76,7 +76,7 @@ def test_make_unitary(algebra, d, rng):
 
 
 def test_add_sub(algebra, rng):
-    gen = UnitLengthVectors(10, rng)
+    gen = UnitLengthVectors(10, rng=rng)
     a = SemanticPointer(next(gen), algebra=algebra)
     b = SemanticPointer(next(gen), algebra=algebra)
     c = a.copy()
@@ -96,7 +96,7 @@ def test_binding_and_inversion(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
 
-    gen = UnitLengthVectors(d, rng)
+    gen = UnitLengthVectors(d, rng=rng)
 
     a = SemanticPointer(next(gen), algebra=algebra)
     b = SemanticPointer(next(gen), algebra=algebra)
@@ -114,8 +114,8 @@ def test_binding_and_inversion(algebra, d, rng):
     assert (a * b * ~b).compare(a) > 0.6
 
 
-def test_multiply():
-    a = SemanticPointer(next(UnitLengthVectors(50)))
+def test_multiply(rng):
+    a = SemanticPointer(next(UnitLengthVectors(50, rng=rng)))
 
     assert np.allclose((a * 5).v, a.v * 5)
     assert np.allclose((5 * a).v, a.v * 5)
@@ -133,7 +133,7 @@ def test_multiply():
 
 
 def test_compare(rng):
-    gen = UnitLengthVectors(50, rng)
+    gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen)) * 10
     b = SemanticPointer(next(gen)) * 0.1
 
@@ -143,7 +143,7 @@ def test_compare(rng):
 
 
 def test_dot(rng):
-    gen = UnitLengthVectors(50, rng)
+    gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen)) * 1.1
     b = SemanticPointer(next(gen)) * (-1.5)
     assert np.allclose(a.dot(b), np.dot(a.v, b.v))
@@ -154,14 +154,14 @@ def test_dot(rng):
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_matmul(rng):
-    gen = UnitLengthVectors(50, rng)
+    gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen)) * 1.1
     b = SemanticPointer(next(gen)) * (-1.5)
     assert np.allclose(eval("a @ b"), np.dot(a.v, b.v))
 
 
 def test_distance(rng):
-    gen = UnitLengthVectors(50, rng)
+    gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen))
     b = SemanticPointer(next(gen))
     assert a.distance(a) < 1e-5
@@ -187,8 +187,8 @@ def test_copy():
     assert a.name is b.name
 
 
-def test_mse():
-    gen = UnitLengthVectors(50)
+def test_mse(rng):
+    gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen))
     b = SemanticPointer(next(gen))
 
@@ -196,7 +196,7 @@ def test_mse():
 
 
 def test_binding_matrix(algebra, rng):
-    gen = UnitLengthVectors(64, rng)
+    gen = UnitLengthVectors(64, rng=rng)
     a = SemanticPointer(next(gen), algebra=algebra)
     b = SemanticPointer(next(gen), algebra=algebra)
 
@@ -233,7 +233,7 @@ def test_none_vocab_is_always_compatible(op):
     eval(op)  # no assertion, just checking that no exception is raised
 
 
-def test_fixed_pointer_network_creation(rng):
+def test_fixed_pointer_network_creation():
     with spa.Network():
         A = SemanticPointer(next(UnitLengthVectors(16)))
         node = A.construct()
@@ -243,14 +243,14 @@ def test_fixed_pointer_network_creation(rng):
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 @pytest.mark.parametrize("order", ["AB", "BA"])
 def test_binary_operation_on_fixed_pointer_with_pointer_symbol(
-    Simulator, op, order, rng
+    Simulator, op, order, seed, rng
 ):
     vocab = spa.Vocabulary(64, pointer_gen=rng)
     vocab.populate("A; B")
     a = PointerSymbol("A", TVocabulary(vocab))  # noqa: F841
     b = SemanticPointer(vocab["B"].v)  # noqa: F841
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         if order == "AB":
             x = eval("a" + op + "b")
         elif order == "BA":

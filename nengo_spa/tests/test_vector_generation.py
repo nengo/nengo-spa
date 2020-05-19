@@ -18,14 +18,14 @@ def test_axis_aligned_pointers():
 
 
 def test_unit_length_pointers(rng):
-    g = UnitLengthVectors(64, rng)
+    g = UnitLengthVectors(64, rng=rng)
     for i in range(10):
         assert np.allclose(np.linalg.norm(next(g)), 1.0)
 
 
 def test_unitary_pointers(rng):
     algebra = HrrAlgebra()
-    g = UnitaryVectors(64, algebra, rng)
+    g = UnitaryVectors(64, algebra, rng=rng)
     a = SemanticPointer(next(g), algebra=algebra)
     b = SemanticPointer(next(g), algebra=algebra)
     c = SemanticPointer(next(g), algebra=algebra)
@@ -33,14 +33,14 @@ def test_unitary_pointers(rng):
 
 
 def test_orthonormal_pointers(rng):
-    g = OrthonormalVectors(32, rng)
+    g = OrthonormalVectors(32, rng=rng)
     vectors = np.array(list(g))
     assert len(vectors) == 32
     assert np.allclose(np.dot(vectors.T, vectors), np.eye(32))
 
 
 def test_expected_unit_length_vectors(rng):
-    g = ExpectedUnitLengthVectors(64, rng)
+    g = ExpectedUnitLengthVectors(64, rng=rng)
     assert np.abs(np.mean([np.linalg.norm(next(g)) for i in range(50)]) - 1.0) < 0.1
 
 

@@ -1,6 +1,5 @@
 import nengo
 from nengo.utils.numpy import rms
-import numpy as np
 import pytest
 
 import nengo_spa as spa
@@ -19,8 +18,7 @@ def test_basic():
     assert vocab_b.dimensions == 16
 
 
-def test_run(Simulator, algebra, seed):
-    rng = np.random.RandomState(seed)
+def test_run(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
@@ -37,7 +35,6 @@ def test_run(Simulator, algebra, seed):
         model.input >> model.bind.input_left
         spa.sym.A >> model.bind.input_right
 
-    with model:
         p = nengo.Probe(model.bind.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -51,8 +48,7 @@ def test_run(Simulator, algebra, seed):
 
 
 @pytest.mark.parametrize("side", ("left", "right"))
-def test_unbind(Simulator, algebra, side, seed):
-    rng = np.random.RandomState(seed)
+def test_unbind(Simulator, algebra, side, seed, rng):
     vocab = spa.Vocabulary(64, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
@@ -70,7 +66,6 @@ def test_unbind(Simulator, algebra, side, seed):
         else:
             raise ValueError("Invalid 'side' value.")
 
-    with model:
         p = nengo.Probe(model.bind.output, synapse=0.03)
 
     with Simulator(model) as sim:

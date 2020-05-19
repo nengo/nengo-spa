@@ -40,7 +40,6 @@ def test_no_feedback_run(Simulator, plt, seed):
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> state
 
-    with model:
         p = nengo.Probe(state.output, synapse=0.05)
 
     with Simulator(model) as sim:
@@ -69,7 +68,6 @@ def test_memory_run(Simulator, seed, plt):
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> memory
 
-    with model:
         p = nengo.Probe(memory.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -102,7 +100,6 @@ def test_memory_run_decay(Simulator, plt, seed):
         state_input = spa.Transcode(state_input, output_vocab=32)
         state_input >> memory
 
-    with model:
         p = nengo.Probe(memory.output, synapse=0.03)
 
     with Simulator(model) as sim:

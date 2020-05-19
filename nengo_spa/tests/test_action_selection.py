@@ -178,8 +178,8 @@ def test_access_thal_and_bg_objects():
     assert isinstance(actions.thalamus, spa.Thalamus)
 
 
-def test_eval(Simulator):
-    with spa.Network() as net:
+def test_eval(Simulator, seed):
+    with spa.Network(seed=seed) as net:
         a = spa.Transcode(input_vocab=16)
         0.5 * spa.sym.A >> a
         p = nengo.Probe(a.output)
@@ -190,8 +190,8 @@ def test_eval(Simulator):
     assert np.allclose(sim.data[p][-1], net.vocabs[16].parse("0.5*A").v)
 
 
-def test_assignment_of_fixed_scalar(Simulator, rng):
-    with spa.Network() as model:
+def test_assignment_of_fixed_scalar(Simulator, seed):
+    with spa.Network(seed=seed) as model:
         sink = spa.Scalar()
         0.5 >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
@@ -202,11 +202,11 @@ def test_assignment_of_fixed_scalar(Simulator, rng):
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
 
 
-def test_assignment_of_pointer_symbol(Simulator, rng):
+def test_assignment_of_pointer_symbol(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         sink = spa.State(vocab)
         PointerSymbol("A") >> sink
         p = nengo.Probe(sink.output, synapse=0.03)
@@ -217,8 +217,8 @@ def test_assignment_of_pointer_symbol(Simulator, rng):
     assert_sp_close(sim.trange(), sim.data[p], vocab["A"], skip=0.3)
 
 
-def test_assignment_of_dynamic_scalar(Simulator, rng):
-    with spa.Network() as model:
+def test_assignment_of_dynamic_scalar(Simulator, seed, rng):
+    with spa.Network(seed=seed) as model:
         source = spa.Scalar()
         sink = spa.Scalar()
         nengo.Connection(nengo.Node(0.5), source.input)
@@ -239,8 +239,8 @@ def test_assignment_of_dynamic_scalar(Simulator, rng):
         ("nengo.Node(0.5)", True),
     ],
 )
-def test_assignment_of_nengo_scalar(source, use_ens, Simulator, rng):
-    with spa.Network() as model:
+def test_assignment_of_nengo_scalar(source, use_ens, Simulator, seed):
+    with spa.Network(seed=seed) as model:
         source = eval(source)
         if use_ens:
             ens = nengo.Ensemble(50, 1)
@@ -256,11 +256,11 @@ def test_assignment_of_nengo_scalar(source, use_ens, Simulator, rng):
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.5, atol=0.2)
 
 
-def test_assignment_of_dynamic_pointer(Simulator, rng):
+def test_assignment_of_dynamic_pointer(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         source = spa.Transcode("A", output_vocab=vocab)
         sink = spa.State(vocab)
         source >> sink
@@ -272,11 +272,11 @@ def test_assignment_of_dynamic_pointer(Simulator, rng):
     assert_sp_close(sim.trange(), sim.data[p], vocab["A"], skip=0.3)
 
 
-def test_non_default_input_and_output(Simulator, rng):
+def test_non_default_input_and_output(Simulator, seed, rng):
     vocab = spa.Vocabulary(32, pointer_gen=rng)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         b = spa.Transcode("B", output_vocab=vocab)
         bind = spa.Bind(vocab)
@@ -291,11 +291,11 @@ def test_non_default_input_and_output(Simulator, rng):
 
 
 @pytest.mark.slow
-def test_action_selection(Simulator, rng):
-    vocab = spa.Vocabulary(64)
+def test_action_selection(Simulator, seed, rng):
+    vocab = spa.Vocabulary(64, pointer_gen=rng)
     vocab.populate("A; B; C; D; E; F")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         state = spa.Transcode(
             lambda t: "ABCDEF"[min(5, int(t / 0.5))], output_vocab=vocab
         )

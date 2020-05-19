@@ -34,7 +34,7 @@ def test_add_raises_exception_for_algebra_mismatch():
 
 
 def test_added_algebra_match(rng):
-    v = Vocabulary(4, algebra=VtbAlgebra())
+    v = Vocabulary(4, algebra=VtbAlgebra(), pointer_gen=rng)
     sp = v.create_pointer()
     assert sp.algebra is VtbAlgebra()
     v.add("V", sp)
@@ -115,8 +115,8 @@ def test_reserved_names(name):
 
 
 @pytest.mark.parametrize("name,sp", sorted(special_sps.items()))
-def test_special_sps(name, sp):
-    v = Vocabulary(16)
+def test_special_sps(name, sp, rng):
+    v = Vocabulary(16, pointer_gen=rng)
     assert name in v
     assert np.allclose(v[name].v, sp(16).v)
     assert np.allclose(v.parse(name).v, sp(16).v)

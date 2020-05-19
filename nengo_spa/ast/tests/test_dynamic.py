@@ -12,8 +12,8 @@ from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.testing import assert_sp_close
 
 
-def test_scalar_addition(Simulator):
-    with spa.Network() as model:
+def test_scalar_addition(Simulator, seed):
+    with spa.Network(seed=seed) as model:
         a = spa.Scalar()
         b = spa.Scalar()
 
@@ -52,11 +52,11 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
 
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 @pytest.mark.parametrize("suffix", ["", ".output"])
-def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
+def test_binary_operation_on_modules(Simulator, algebra, op, suffix, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
         b = spa.Transcode("B", output_vocab=vocab)  # noqa: F841
         x = eval("a" + suffix + op + "b" + suffix)
@@ -73,12 +73,12 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, rng):
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 @pytest.mark.parametrize("order", ["AB", "BA"])
 def test_binary_operation_on_modules_with_pointer_symbol(
-    Simulator, algebra, op, order, rng
+    Simulator, algebra, op, order, seed, rng
 ):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
         if order == "AB":
             x = eval("a" + op + 'PointerSymbol("B")')
@@ -99,13 +99,13 @@ def test_binary_operation_on_modules_with_pointer_symbol(
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 @pytest.mark.parametrize("order", ["AB", "BA"])
 def test_binary_operation_on_modules_with_fixed_pointer(
-    Simulator, algebra, op, order, rng
+    Simulator, algebra, op, order, seed, rng
 ):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
     b = SemanticPointer(vocab["B"].v)  # noqa: F841
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
         if order == "AB":
             x = eval("a" + op + "b")
@@ -152,11 +152,11 @@ def test_complex_rule(Simulator, algebra, rng):
     )
 
 
-def test_transformed(Simulator, algebra, rng):
+def test_transformed(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         x = PointerSymbol("B") * a
         p = nengo.Probe(x.construct(), synapse=0.3)
@@ -169,11 +169,11 @@ def test_transformed(Simulator, algebra, rng):
     )
 
 
-def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
+def test_transformed_and_pointer_symbol(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         x = (a * PointerSymbol("B")) * PointerSymbol("~B")
         p = nengo.Probe(x.construct(), synapse=0.3)
@@ -186,11 +186,11 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, rng):
     )
 
 
-def test_transformed_and_network(Simulator, algebra, rng):
+def test_transformed_and_network(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B.unitary()")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         b = spa.Transcode("B", output_vocab=vocab)
         x = (a * PointerSymbol("~B")) * b
@@ -204,11 +204,11 @@ def test_transformed_and_network(Simulator, algebra, rng):
     )
 
 
-def test_transformed_and_transformed(Simulator, algebra, rng):
+def test_transformed_and_transformed(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B.unitary(); C")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         c = spa.Transcode("C", output_vocab=vocab)
         x = (PointerSymbol("B") * a) * (PointerSymbol("~B") * c)
@@ -234,11 +234,11 @@ def test_pointer_symbol_with_dynamic_scalar(Simulator, rng):
             PointerSymbol("A") * scalar
 
 
-def test_dot(Simulator, rng):
+def test_dot(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         b = spa.Transcode(lambda t: "A" if t <= 0.5 else "B", output_vocab=vocab)
         x = spa.dot(a, b)
@@ -253,11 +253,11 @@ def test_dot(Simulator, rng):
 
 
 @pytest.mark.parametrize("a", ("PointerSymbol('A')", "vocab['A']"))
-def test_dot_with_fixed(Simulator, rng, a):
+def test_dot_with_fixed(Simulator, seed, rng, a):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = eval(a)
         b = spa.Transcode(lambda t: "A" if t <= 0.5 else "B", output_vocab=vocab)
         network_count = len(model.all_networks)
@@ -275,11 +275,11 @@ def test_dot_with_fixed(Simulator, rng, a):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
-def test_dot_matmul(Simulator, rng):
+def test_dot_matmul(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
         b = spa.Transcode(  # noqa: F841
             lambda t: "A" if t <= 0.5 else "B", output_vocab=vocab
@@ -296,11 +296,11 @@ def test_dot_matmul(Simulator, rng):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
-def test_dot_with_fixed_matmul(Simulator, rng):
+def test_dot_with_fixed_matmul(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = PointerSymbol("A")  # noqa: F841
         b = spa.Transcode(  # noqa: F841
             lambda t: "A" if t <= 0.5 else "B", output_vocab=vocab
@@ -316,13 +316,13 @@ def test_dot_with_fixed_matmul(Simulator, rng):
     assert np.all(sim.data[p][0.8 < t] < 0.2)
 
 
-def test_dynamic_translate(Simulator, rng):
+def test_dynamic_translate(Simulator, seed, rng):
     v1 = spa.Vocabulary(64, pointer_gen=rng)
     v1.populate("A; B")
     v2 = spa.Vocabulary(64, pointer_gen=rng)
     v2.populate("A; B")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         source = spa.Transcode("A", output_vocab=v1)
         x = spa.translate(source, v2)
         p = nengo.Probe(x.construct(), synapse=0.03)

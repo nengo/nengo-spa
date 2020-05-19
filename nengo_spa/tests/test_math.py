@@ -4,7 +4,7 @@ import pytest
 from nengo_spa.math import prob_cleanup
 
 
-def test_prob_cleanup(rng):
+def test_prob_cleanup():
     pytest.importorskip("scipy")
 
     assert 1.0 > prob_cleanup(0.7, 64, 10000) > 0.9999

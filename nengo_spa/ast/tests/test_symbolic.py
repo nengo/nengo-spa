@@ -11,8 +11,8 @@ from nengo_spa.ast.symbolic import FixedScalar, PointerSymbol
 from nengo_spa.types import TVocabulary
 
 
-def test_product_of_scalars(Simulator):
-    with spa.Network() as model:
+def test_product_of_scalars(Simulator, seed):
+    with spa.Network(seed=seed) as model:
         stimulus = nengo.Node(0.5)
         a = spa.Scalar()
         b = spa.Scalar()
@@ -27,7 +27,7 @@ def test_product_of_scalars(Simulator):
     assert_allclose(sim.data[p][sim.trange() > 0.3], 0.25, atol=0.2)
 
 
-def test_unary_minus_on_scalar(rng):
+def test_unary_minus_on_scalar():
     assert (-FixedScalar(1.0)).evaluate() == -1.0
 
 
