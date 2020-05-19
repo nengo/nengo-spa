@@ -140,7 +140,7 @@ def test_complex_rule(Simulator, algebra, rng):
         )
         p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
@@ -161,7 +161,7 @@ def test_transformed(Simulator, algebra, seed, rng):
         x = PointerSymbol("B") * a
         p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
@@ -178,7 +178,7 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, seed, rng):
         x = (a * PointerSymbol("B")) * PointerSymbol("~B")
         p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
@@ -196,7 +196,7 @@ def test_transformed_and_network(Simulator, algebra, seed, rng):
         x = (a * PointerSymbol("~B")) * b
         p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
@@ -214,7 +214,7 @@ def test_transformed_and_transformed(Simulator, algebra, seed, rng):
         x = (PointerSymbol("B") * a) * (PointerSymbol("~B") * c)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
@@ -227,7 +227,7 @@ def test_transformed_and_transformed(Simulator, algebra, seed, rng):
     )
 
 
-def test_pointer_symbol_with_dynamic_scalar(Simulator, rng):
+def test_pointer_symbol_with_dynamic_scalar():
     with spa.Network():
         scalar = spa.Scalar()
         with pytest.raises(SpaTypeError):
@@ -244,7 +244,7 @@ def test_dot(Simulator, seed, rng):
         x = spa.dot(a, b)
         p = nengo.Probe(x.construct(), synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(1.0)
 
     t = sim.trange()
@@ -266,7 +266,7 @@ def test_dot_with_fixed(Simulator, seed, rng, a):
         assert len(model.all_networks) == network_count
         p = nengo.Probe(x.construct(), synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(1.0)
 
     t = sim.trange()
@@ -287,7 +287,7 @@ def test_dot_matmul(Simulator, seed, rng):
         x = eval("a @ b")
         p = nengo.Probe(x.construct(), synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(1.0)
 
     t = sim.trange()
@@ -308,7 +308,7 @@ def test_dot_with_fixed_matmul(Simulator, seed, rng):
         x = eval("a @ b")
         p = nengo.Probe(x.construct(), synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(1.0)
 
     t = sim.trange()
@@ -327,7 +327,7 @@ def test_dynamic_translate(Simulator, seed, rng):
         x = spa.translate(source, v2)
         p = nengo.Probe(x.construct(), synapse=0.03)
 
-    with nengo.Simulator(model) as sim:
+    with Simulator(model) as sim:
         sim.run(0.5)
 
     assert_sp_close(sim.trange(), sim.data[p], v2["A"], skip=0.3, atol=0.2)

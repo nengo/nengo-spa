@@ -171,8 +171,9 @@ def test_am_ia(Simulator, plt, seed, rng):
         reset_p = nengo.Probe(m.reset)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
 
-    with nengo.Simulator(m) as sim:
+    with Simulator(m) as sim:
         sim.run(0.7)
+
     t = sim.trange()
     more_a = (t > 0.15) & (t < 0.2)
     more_b = t > 0.65
@@ -216,6 +217,7 @@ def test_am_default_output(Simulator, plt, seed, rng):
 
     with Simulator(m) as sim:
         sim.run(0.5)
+
     t = sim.trange()
     below_th = (t > 0.15) & (t < 0.25)
     above_th = t > 0.4
@@ -262,7 +264,7 @@ def test_am_spa_keys_as_expressions(Simulator, plt, seed, rng):
         in_p = nengo.Probe(m.am.input)
         out_p = nengo.Probe(m.am.output, synapse=0.03)
 
-    with nengo.Simulator(m) as sim:
+    with Simulator(m) as sim:
         sim.run(0.2)
 
     # Specify t ranges
