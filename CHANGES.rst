@@ -33,6 +33,9 @@ Release History
   differing algebra.
   (`#239 <https://github.com/nengo/nengo_spa/issues/239>`__,
   `#240 <https://github.com/nengo/nengo_spa/pull/240>`__)
+- All examples now have seeds to ensure that occasional "bad seeds" do not create
+  problems in the documentation.
+  (`#248 <https://github.com/nengo/nengo_spa/pull/248>`__)
 
 **Fixed**
 
