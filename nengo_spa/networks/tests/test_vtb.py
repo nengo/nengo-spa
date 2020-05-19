@@ -1,5 +1,4 @@
 import nengo
-import numpy as np
 import pytest
 
 import nengo_spa as spa
@@ -8,8 +7,7 @@ from nengo_spa.networks.vtb import VTB
 from nengo_spa.testing import assert_sp_close
 
 
-def test_bind(Simulator, seed):
-    rng = np.random.RandomState(seed)
+def test_bind(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=VtbAlgebra())
     vocab.populate("A; B")
 
@@ -26,8 +24,7 @@ def test_bind(Simulator, seed):
 
 
 @pytest.mark.parametrize("side", ("left", "right"))
-def test_unbind(Simulator, side, seed):
-    rng = np.random.RandomState(seed)
+def test_unbind(Simulator, side, seed, rng):
     vocab = spa.Vocabulary(36, pointer_gen=rng, algebra=VtbAlgebra())
     vocab.populate("A; B")
 

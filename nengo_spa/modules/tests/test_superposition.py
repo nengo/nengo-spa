@@ -1,5 +1,3 @@
-import numpy as np
-
 import nengo
 from nengo.utils.numpy import rms
 
@@ -19,8 +17,7 @@ def test_basic():
     assert vocab_b.dimensions == 16
 
 
-def test_run(Simulator, algebra, seed):
-    rng = np.random.RandomState(seed)
+def test_run(Simulator, algebra, seed, rng):
     vocab = spa.Vocabulary(32, pointer_gen=rng, algebra=algebra)
     vocab.populate("A; B")
 
@@ -37,7 +34,6 @@ def test_run(Simulator, algebra, seed):
         model.input >> model.superpos.inputs[0]
         spa.sym.A >> model.superpos.inputs[1]
 
-    with model:
         p = nengo.Probe(model.superpos.output, synapse=0.03)
 
     with Simulator(model) as sim:

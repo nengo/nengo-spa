@@ -15,7 +15,6 @@ def test_connect(Simulator, seed):
         model.buffer1 >> model.buffer2
         ~model.buffer1 >> model.buffer3
 
-    with model:
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
         p3 = nengo.Probe(model.buffer3.output, synapse=0.03)
 
@@ -36,7 +35,6 @@ def test_transform(Simulator, seed):
         spa.sym.A >> model.buffer1
         model.buffer1 * spa.sym.B >> model.buffer2
 
-    with model:
         p = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -57,7 +55,6 @@ def test_translate(Simulator, seed):
             model.buffer1, model.buffer2.vocab, populate=True
         ) >> model.buffer2
 
-    with model:
         p = nengo.Probe(model.buffer2.output, synapse=0.03)
 
     with Simulator(model) as sim:
@@ -87,7 +84,6 @@ def test_direct(Simulator, seed):
         spa.sym.C >> model.buffer1
         spa.sym.C >> model.buffer2
 
-    with model:
         p1 = nengo.Probe(model.buffer1.output, synapse=0.03)
         p2 = nengo.Probe(model.buffer2.output, synapse=0.03)
 

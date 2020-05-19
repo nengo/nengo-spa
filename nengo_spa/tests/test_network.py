@@ -132,13 +132,13 @@ def test_no_magic_vocab_transform():
         (16, 32, "translate(a, v2, solver=nengo.solvers.Lstsq())", "v2"),
     ],
 )
-def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, rng):
+def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, seed, rng):
     v1 = spa.Vocabulary(d1, pointer_gen=rng)
     v1.populate("A")
     v2 = spa.Vocabulary(d2, pointer_gen=rng)
     v2.populate("A")
 
-    with spa.Network() as model:
+    with spa.Network(seed=seed) as model:
         a = spa.State(vocab=v1)
         b = spa.State(vocab=v2)
         spa.sym.A >> a
@@ -170,8 +170,8 @@ def test_copy_spa(Simulator):
         pass
 
 
-def test_create_inhibit_node(Simulator, plt):
-    with nengo.Network() as model:
+def test_create_inhibit_node(Simulator, seed, plt):
+    with nengo.Network(seed=seed) as model:
         ea = nengo.networks.EnsembleArray(10, 10)
         bias = nengo.Node(1)
         inhibit_node = create_inhibit_node(ea)

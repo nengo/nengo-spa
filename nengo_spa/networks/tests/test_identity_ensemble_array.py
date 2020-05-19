@@ -15,7 +15,7 @@ def test_identity_ensemble_array(Simulator, seed, rng, pointer):
     if issubclass(pointer, SemanticPointer):
         v = pointer(d).v
     else:
-        v = next(pointer(d, rng))
+        v = next(pointer(d, rng=rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
@@ -33,7 +33,7 @@ def test_identity_ensemble_array(Simulator, seed, rng, pointer):
 
 def test_add_output(Simulator, seed, rng, plt):
     d = 8
-    pointer = next(UnitLengthVectors(d, rng))
+    pointer = next(UnitLengthVectors(d, rng=rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
@@ -54,7 +54,7 @@ def test_add_output(Simulator, seed, rng, plt):
 
 def test_add_output_multiple_fn(Simulator, seed, rng, plt):
     d = 8
-    pointer = next(UnitLengthVectors(d, rng))
+    pointer = next(UnitLengthVectors(d, rng=rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)
@@ -79,7 +79,7 @@ def test_add_output_multiple_fn(Simulator, seed, rng, plt):
 
 def test_neuron_connections(Simulator, seed, rng):
     d = 8
-    pointer = next(UnitLengthVectors(d, rng))
+    pointer = next(UnitLengthVectors(d, rng=rng))
 
     with nengo.Network(seed=seed) as model:
         ea = IdentityEnsembleArray(15, d, 4)

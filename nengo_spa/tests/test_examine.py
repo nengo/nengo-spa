@@ -8,7 +8,7 @@ from nengo_spa.vocabulary import Vocabulary
 
 
 def test_similarity(rng):
-    v = Vocabulary(64, max_similarity=0.1)
+    v = Vocabulary(64, max_similarity=0.1, pointer_gen=rng)
     v.populate(
         """
         A;

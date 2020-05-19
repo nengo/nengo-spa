@@ -20,7 +20,7 @@ def test_is_valid_dimensionality():
 
 
 def test_get_swapping_matrix(rng):
-    gen = UnitLengthVectors(64, rng)
+    gen = UnitLengthVectors(64, rng=rng)
     a = SemanticPointer(next(gen), algebra=VtbAlgebra()).v
     b = SemanticPointer(next(gen), algebra=VtbAlgebra()).v
 

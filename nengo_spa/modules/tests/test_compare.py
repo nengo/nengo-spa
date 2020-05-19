@@ -30,7 +30,6 @@ def test_run(Simulator, seed):
         model.input >> model.compare.input_a
         spa.sym.A >> model.compare.input_b
 
-    with model:
         p = nengo.Probe(model.compare.output, synapse=0.03)
 
     with Simulator(model) as sim:

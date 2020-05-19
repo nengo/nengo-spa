@@ -7,7 +7,7 @@ from nengo_spa.vector_generation import UnitLengthVectors
 
 @pytest.mark.parametrize("d", [16, 25])
 def test_make_unitary(algebra, d, rng):
-    a = next(UnitLengthVectors(d, rng))
+    a = next(UnitLengthVectors(d, rng=rng))
     b = algebra.make_unitary(a)
     for i in range(3):
         assert np.allclose(1, np.linalg.norm(a))
@@ -17,7 +17,7 @@ def test_make_unitary(algebra, d, rng):
 
 
 def test_superpose(algebra, rng):
-    gen = UnitLengthVectors(16, rng)
+    gen = UnitLengthVectors(16, rng=rng)
     a = next(gen)
     b = next(gen)
     # Orthogonalize
@@ -34,7 +34,7 @@ def test_binding_and_invert(algebra, d, rng):
     dissimilarity_passed = 0
     unbinding_passed = 0
     for i in range(10):
-        gen = UnitLengthVectors(d, rng)
+        gen = UnitLengthVectors(d, rng=rng)
         a = next(gen)
         b = next(gen)
         bound = algebra.bind(a, b)
@@ -54,7 +54,7 @@ def test_dimensionality_mismatch_exception(algebra):
 
 
 def test_get_binding_matrix(algebra, rng):
-    gen = UnitLengthVectors(16, rng)
+    gen = UnitLengthVectors(16, rng=rng)
     a = next(gen)
     b = next(gen)
 
@@ -64,13 +64,13 @@ def test_get_binding_matrix(algebra, rng):
 
 
 def test_get_inversion_matrix(algebra, rng):
-    a = next(UnitLengthVectors(16, rng))
+    a = next(UnitLengthVectors(16, rng=rng))
     m = algebra.get_inversion_matrix(16)
     assert np.allclose(algebra.invert(a), np.dot(m, a))
 
 
 def test_absorbing_element(algebra, rng):
-    a = next(UnitLengthVectors(16, rng))
+    a = next(UnitLengthVectors(16, rng=rng))
     try:
         p = algebra.absorbing_element(16)
         r = algebra.bind(a, p)
@@ -81,13 +81,13 @@ def test_absorbing_element(algebra, rng):
 
 
 def test_identity_element(algebra, rng):
-    a = next(UnitLengthVectors(16, rng))
+    a = next(UnitLengthVectors(16, rng=rng))
     p = algebra.identity_element(16)
     assert np.allclose(algebra.bind(a, p), a)
 
 
 def test_zero_element(algebra, rng):
-    a = next(UnitLengthVectors(16, rng))
+    a = next(UnitLengthVectors(16, rng=rng))
     p = algebra.zero_element(16)
     assert np.all(p == 0.0)
     assert np.allclose(algebra.bind(a, p), 0.0)
