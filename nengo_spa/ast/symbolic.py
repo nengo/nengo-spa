@@ -134,7 +134,9 @@ class PointerSymbol(Symbol):
         return self.evaluate().reinterpret(vocab)
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
-        tr = self.type.vocab.transform_to(vocab, populate, solver)
+        tr = self.type.vocab.transform_to(
+            vocab, populate=populate, keys=keys, solver=solver
+        )
         return SemanticPointer(np.dot(tr, self.evaluate().v), vocab=vocab)
 
     def __repr__(self):

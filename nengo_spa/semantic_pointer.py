@@ -342,7 +342,7 @@ class SemanticPointer(Fixed):
             If given, the solver will be used to solve the least squares
             problem to provide a better projection for the translation.
         """
-        tr = self.vocab.transform_to(vocab, populate, solver)
+        tr = self.vocab.transform_to(vocab, populate=populate, keys=keys, solver=solver)
         return SemanticPointer(
             np.dot(tr, self.evaluate().v), vocab=vocab, name=self.name
         )

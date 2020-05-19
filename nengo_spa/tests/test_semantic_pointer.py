@@ -1,7 +1,7 @@
 import sys
 
 import nengo
-from nengo.exceptions import ValidationError
+from nengo.exceptions import NengoWarning, ValidationError
 import numpy as np
 from numpy.testing import assert_equal
 import pytest
@@ -323,3 +323,23 @@ def test_name():
 
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None
+
+
+def test_translate(rng):
+    v1 = spa.Vocabulary(16, pointer_gen=rng)
+    v1.populate("A; B")
+    v2 = spa.Vocabulary(16, pointer_gen=rng)
+    v2.populate("A; B")
+    v3 = spa.Vocabulary(16, pointer_gen=rng)
+    v3.populate("B")
+
+    a1 = v1.parse("A")
+    assert isinstance(a1, SemanticPointer)
+
+    assert np.allclose(a1.translate(v2).dot(v2["A"]), 1.0, atol=0.2)
+    assert np.allclose(a1.translate(v2, keys=["A"]).dot(v2["A"]), 1.0, atol=0.2)
+    assert not np.allclose(a1.translate(v2, keys=["B"]).dot(v2["A"]), 1.0, atol=0.2)
+
+    with pytest.warns(NengoWarning, match="source vocabulary has keys not existent"):
+        a1.translate(v3)
+    assert np.allclose(a1.translate(v3, populate=True).dot(v3["A"]), 1.0, atol=0.2)

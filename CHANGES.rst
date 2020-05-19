@@ -34,6 +34,11 @@ Release History
   (`#239 <https://github.com/nengo/nengo_spa/issues/239>`__,
   `#240 <https://github.com/nengo/nengo_spa/pull/240>`__)
 
+**Fixed**
+
+- ``SemanticPointer.translate`` and ``PointerSymbol.translate`` now use the ``keys``
+  argument; previously, this argument was mistakenly ignored.
+  (`#248 <https://github.com/nengo/nengo_spa/pull/248>`__)
 
 
 1.0.1 (December 14, 2019)
