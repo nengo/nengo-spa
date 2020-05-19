@@ -10,7 +10,7 @@ from nengo_spa.exceptions import SpaActionSelectionError, SpaTypeError
 from nengo_spa.testing import assert_sp_close
 
 
-def test_new_action_syntax(Simulator, seed, plt, rng):
+def test_new_action_syntax(Simulator, seed, plt):
     model = spa.Network(seed=seed)
     model.config[spa.State].vocab = 3
     model.config[spa.State].subdimensions = 3
@@ -217,7 +217,7 @@ def test_assignment_of_pointer_symbol(Simulator, seed, rng):
     assert_sp_close(sim.trange(), sim.data[p], vocab["A"], skip=0.3)
 
 
-def test_assignment_of_dynamic_scalar(Simulator, seed, rng):
+def test_assignment_of_dynamic_scalar(Simulator, seed):
     with spa.Network(seed=seed) as model:
         source = spa.Scalar()
         sink = spa.Scalar()

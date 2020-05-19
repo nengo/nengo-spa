@@ -193,7 +193,7 @@ def test_capital(rng):
 
 
 @pytest.mark.parametrize("solver", [None, nengo.solvers.Lstsq()])
-def test_transform(recwarn, rng, solver):
+def test_transform(rng, solver):
     v1 = Vocabulary(32, strict=False, pointer_gen=rng)
     v2 = Vocabulary(64, strict=False, pointer_gen=rng)
     v1.populate("A; B; C")
