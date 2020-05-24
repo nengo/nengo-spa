@@ -441,25 +441,31 @@ def test_nondegenerate_vtb(d, rng):
     # nondegenerate VTB vectors are unitary
     assert np.allclose(algebra.make_unitary(x.v), x.v)
 
-    # binding on top of the identity produces consistent exponent properties
-    assert np.allclose((x ** 1).v, (identity * x).v)
-    assert np.allclose((x ** 2).v, ((identity * x) * x).v)
-    assert np.allclose((x ** 3).v, (((identity * x) * x) * x).v)
+    # power of 0 gives the identity
+    assert np.allclose((x ** 0).v, identity.v)
 
-    assert np.allclose((identity * (x ** 2.3)).v, ((identity * (x ** 1.1)) * (x ** 1.2)).v)
-    assert np.allclose((identity * ~(x ** 2.3)).v, ((identity * ~(x ** 1.1)) * ~(x ** 1.2)).v)
-    assert np.allclose((identity * (x ** -.1)).v, ((identity * (x ** 1.1)) * ~(x ** 1.2)).v)
+    # integer powers, positive and negative
+    assert np.allclose((x ** 1).v, x.v)
+    assert np.allclose((x ** 2).v, (x * x).v)
+    assert np.allclose((x ** 3).v, (((x) * x) * x).v)
+    assert np.allclose((x ** -1).v, (~x).v)
+    assert np.allclose((x ** -2).v, (~x * ~x).v)
+    assert np.allclose((x ** -3).v, (((~x) * ~x) * ~x).v)
 
-    # replacing 'bind' with 'inverse and bind' is required when not binding on top of the identity
-    assert np.allclose((x ** 2.3).v, ((x ** 1.1) * ~(x ** 1.2)).v)
-    assert np.allclose((x ** -2.3).v, ((x ** -1.1) * ~(x ** -1.2)).v)
-    assert np.allclose((x ** 0.7).v, ((x ** -1.5) * ~(x ** 2.2)).v)
-    assert np.allclose((x ** -1.3).v, ((x ** -1.5) * ~(x ** 0.2)).v)
-    assert np.allclose((x ** 2.8).v, (((x ** 1.7) * ~(x ** -0.4)) * ~(x ** 1.5)).v)
+    # fractional powers, positive and negative
+    assert np.allclose((x ** 2.3).v, ((x ** 1.1) * (x ** 1.2)).v)
+    assert np.allclose((x ** -2.3).v, ((x ** -1.1) * (x ** -1.2)).v)
+    assert np.allclose((x ** 0.7).v, ((x ** -1.5) * (x ** 2.2)).v)
+    assert np.allclose((x ** -1.3).v, ((x ** -1.5) * (x ** 0.2)).v)
+    assert np.allclose((x ** 2.8).v, (((x ** 1.7) * (x ** -0.4)) * (x ** 1.5)).v)
+
+    # adding of exponents in general
+    a, b, c = 10 * rng.rand(3) - 5  # [-5, 5]
+    assert np.allclose((x ** a * x ** b * x ** c).v, (x ** (a + b + c)).v)
 
     # repeated fractional binds do not decay the dot product
     step = x ** 0.1
     pt = step
     for _ in range(1, 100):
-        pt = pt *~ step
+        pt = pt * step
     assert(np.allclose(np.dot(pt.v, (x ** 10).v), 1))

@@ -112,7 +112,7 @@ class VtbAlgebra(AbstractAlgebra):
 
         sub_d = self._get_sub_d(len(v))
         sub_m = fractional_matrix_power(
-            np.sqrt(sub_d) * v.reshape((sub_d, sub_d)), exponent
+            np.sqrt(sub_d) * v.reshape((sub_d, sub_d)).T, exponent
         )
         m = np.kron(np.eye(sub_d), sub_m)
         # more efficient than the equivalent:
@@ -139,7 +139,7 @@ class VtbAlgebra(AbstractAlgebra):
 
     def get_binding_matrix(self, v, swap_inputs=False):
         sub_d = self._get_sub_d(len(v))
-        m = np.sqrt(sub_d) * np.kron(np.eye(sub_d), v.reshape((sub_d, sub_d)))
+        m = np.sqrt(sub_d) * np.kron(np.eye(sub_d), v.reshape((sub_d, sub_d)).T)
         if swap_inputs:
             m = np.dot(self.get_swapping_matrix(len(v)), m)
         return m
