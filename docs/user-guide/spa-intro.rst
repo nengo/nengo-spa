@@ -126,7 +126,7 @@ example of an SPA to date.
    nonlinear dynamical arm model). Central information manipulation depends on
    syntaictic structure for several tasks. Control is largely captured by the
    basal ganglia aciton selection elements. Memory and learning take place in
-   both basal ganglia and contex. The model itself consists of just under
+   both basal ganglia and cortex. The model itself consists of just under
    a million spiking neurons.
 
 Let us consider how the model would perform a single run of one of the cognitive
