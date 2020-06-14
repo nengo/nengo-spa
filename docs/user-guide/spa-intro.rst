@@ -118,7 +118,7 @@ cognition, and action across several different tasks. Spaun is the most complex
 example of an SPA to date.
 
 .. figure:: spa-1.png
-   :alt: High-level depicitoin of the Spaun model.
+   :alt: High-level depiction of the Spaun model.
 
    A high-level depiction of the Spaun model, with all of the central features
    of a general Semantic Pointer Architecture. Visual and motor hierarchies
