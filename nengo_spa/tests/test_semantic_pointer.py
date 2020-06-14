@@ -132,6 +132,25 @@ def test_multiply(rng):
         a * np.array([1, 2])
 
 
+def test_divide(rng):
+    a = SemanticPointer(next(UnitLengthVectors(50, rng=rng)))
+
+    assert np.allclose((a / 5).v, a.v / 5)
+    assert np.allclose((a / 5.7).v, a.v / 5.7)
+    assert np.allclose((a / 1.0).v, a.v)
+
+    with pytest.raises(ZeroDivisionError):
+        a / 0
+    with pytest.raises(TypeError):
+        5 / a
+    with pytest.raises(TypeError):
+        a / None
+    with pytest.raises(TypeError):
+        a / np.ones(50)
+    with pytest.raises(TypeError):
+        a / SemanticPointer(next(UnitLengthVectors(50, rng=rng)))
+
+
 def test_compare(rng):
     gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen)) * 10
@@ -320,6 +339,7 @@ def test_name():
     assert (a + b).name == "(a)+(b)"
     assert (a * b).name == "(a)*(b)"
     assert (2.0 * a).name == "(2.0)*(a)"
+    assert (a / 2.0).name == "(a)/(2.0)"
 
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None

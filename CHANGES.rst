@@ -23,6 +23,12 @@ Release History
 1.1.0 (unreleased)
 ==================
 
+**Added**
+
+- Support division of ``SemanticPointer`` with constant scalars.
+  (`#249 <https://github.com/nengo/nengo_spa/issues/249>`__,
+  `#253 <https://github.com/nengo/nengo_spa/pull/253>`__)
+
 **Changed**
 
 - Make ``AbstractAlgebra`` an actual abstract base class (using ``ABCMeta`` as

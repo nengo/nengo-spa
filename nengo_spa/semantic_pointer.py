@@ -217,7 +217,7 @@ class SemanticPointer(Fixed):
     def _mul(self, other, swap=False):
         if is_array(other):
             raise TypeError(
-                "Multiplication of Semantic Pointers with arrays in not " "allowed."
+                "Multiplication of Semantic Pointers with arrays in not allowed."
             )
         elif is_number(other):
             return SemanticPointer(
@@ -236,6 +236,21 @@ class SemanticPointer(Fixed):
                 )
             else:
                 return self._bind(other, swap=swap)
+        else:
+            return NotImplemented
+
+    def __truediv__(self, other):
+        if is_array(other):
+            raise TypeError("Division of Semantic Pointers with arrays is not allowed.")
+        elif is_number(other):
+            if other == 0:
+                raise ZeroDivisionError("Semantic Pointer division by zero")
+            return SemanticPointer(
+                data=self.v / other,
+                vocab=self.vocab,
+                algebra=self.algebra,
+                name=self._get_binary_name(other, "/"),
+            )
         else:
             return NotImplemented
 
