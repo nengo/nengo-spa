@@ -125,7 +125,7 @@ def test_passthrough(Simulator, seed):
 
 
 def test_decode(Simulator, seed):
-    class OutputFn(object):
+    class OutputFn:
         def __init__(self):
             self.called = False
 

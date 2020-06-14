@@ -16,7 +16,7 @@ from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 
 
-class TestConfig(object):
+class TestConfig:
     """Parameters affecting all Nengo SPA testes.
 
     These are essentially global variables used by py.test to modify aspects

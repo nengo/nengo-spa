@@ -143,7 +143,7 @@ class PointerSymbol(Symbol):
         return "PointerSymbol({!r}, {!r})".format(self.expr, self.type)
 
 
-class PointerSymbolFactory(object):
+class PointerSymbolFactory:
     """Provides syntactic sugar to create *PointerSymbol* instances.
 
     Use the `.sym` instance of this class to create *PointerSymbols* like so::

@@ -29,7 +29,7 @@ def AxisAlignedVectors(d):
         yield v
 
 
-class UnitLengthVectors(object):
+class UnitLengthVectors:
     """Generator for uniformly distributed unit-length vectors.
 
     Parameters
@@ -59,7 +59,7 @@ class UnitLengthVectors(object):
         return self.__next__()
 
 
-class UnitaryVectors(object):
+class UnitaryVectors:
     """Generator for unitary vectors (given some binding method).
 
     Parameters
@@ -90,7 +90,7 @@ class UnitaryVectors(object):
         return self.__next__()
 
 
-class OrthonormalVectors(object):
+class OrthonormalVectors:
     """Generator for random orthonormal vectors.
 
     Parameters
@@ -130,7 +130,7 @@ class OrthonormalVectors(object):
         return self.__next__()
 
 
-class ExpectedUnitLengthVectors(object):
+class ExpectedUnitLengthVectors:
     r"""Generator for vectors with expected unit-length.
 
     The vectors will be uniformly distributed with an expected norm

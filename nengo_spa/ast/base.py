@@ -20,7 +20,7 @@ def infer_types(*nodes):
     return type_
 
 
-class Node(object):
+class Node:
     """Base class for nodes in the AST for Nengo SPA operations.
 
     Parameters
@@ -74,7 +74,7 @@ class Fixed(Node):
         raise NotImplementedError()
 
 
-class TypeCheckedBinaryOp(object):
+class TypeCheckedBinaryOp:
     """Decorator to check the type of the *other* parameter of an operator.
 
     If the *other* parameter is not an instance of *expected_type*,
