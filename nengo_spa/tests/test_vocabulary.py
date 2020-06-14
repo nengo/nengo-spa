@@ -318,7 +318,7 @@ def test_vocabulary_set(rng):
 
 
 def test_vocabulary_map_param():
-    class Test(object):
+    class Test:
         vocab_map = VocabularyMapParam("vocab_map", readonly=False)
 
     obj = Test()
@@ -341,7 +341,7 @@ def test_vocabulary_or_dim_param():
     v16 = Vocabulary(16)
     v32 = Vocabulary(32)
 
-    class Test(object):
+    class Test:
         vocabs = VocabularyMap([v16])
         vocab = VocabularyOrDimParam("vocab", readonly=False)
 

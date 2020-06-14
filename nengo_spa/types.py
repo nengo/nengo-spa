@@ -3,7 +3,7 @@
 from nengo_spa.exceptions import SpaTypeError
 
 
-class Type(object):
+class Type:
     """Describes a type.
 
     Types can be compared and by default two types are considered to be equal

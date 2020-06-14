@@ -11,7 +11,7 @@ from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
-class SpArrayExtractor(object):
+class SpArrayExtractor:
     def __init__(self, vocab):
         self.vocab = vocab
 

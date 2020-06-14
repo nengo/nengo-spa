@@ -17,7 +17,7 @@ from nengo_spa.types import TScalar
 from nengo_spa.vocabulary import VocabularyMap, VocabularyMapParam
 
 
-class _AutoConfig(object):
+class _AutoConfig:
     def __init__(self, cfg):
         self._cfg = cfg
 

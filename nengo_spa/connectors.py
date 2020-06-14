@@ -61,7 +61,7 @@ def as_sink(obj):
         return ModuleInput(input_, TVocabulary(vocab))
 
 
-class ModuleInput(object):
+class ModuleInput:
     """Represents the input to a module with type information.
 
     Supports the ``>>`` operator to provide input from an AST node. It will
@@ -92,7 +92,7 @@ class ModuleInput(object):
             other.connect_to(self.input)
 
 
-class RoutedConnection(object):
+class RoutedConnection:
     """Represents a routed connection from an AST node to a `.ModuleInput`.
 
     A routed connection is passed through an inhibitable channel to allow the
@@ -135,7 +135,7 @@ class RoutedConnection(object):
             return np.atleast_2d(self.source.evaluate().v).T
 
 
-class SpaOperatorMixin(object):
+class SpaOperatorMixin:
     """Mixin class that implements the SPA operators.
 
     All operands will be converted to AST node and the implementation of the
@@ -184,7 +184,7 @@ class SpaOperatorMixin(object):
         return as_ast_node(self).translate(vocab, populate, keys, solver)
 
 
-class ConnectorRegistry(object):
+class ConnectorRegistry:
     """Registry associating connectors with vocabularies and enable SPA syntax.
 
     A connector is either an input or output to a SPA module.
