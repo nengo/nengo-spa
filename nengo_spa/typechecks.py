@@ -1,4 +1,4 @@
-import collections
+from collections.abc import Iterable
 
 import numpy as np
 
@@ -27,7 +27,7 @@ def is_iterable(obj):
     if isinstance(obj, np.ndarray):
         return obj.ndim > 0
     else:
-        return isinstance(obj, collections.Iterable)
+        return isinstance(obj, Iterable)
 
 
 def is_number(obj):
