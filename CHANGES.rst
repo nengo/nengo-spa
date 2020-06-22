@@ -25,9 +25,10 @@ Release History
 
 **Added**
 
-- Support division of ``SemanticPointer`` with constant scalars.
+- Support division with constant scalars.
   (`#249 <https://github.com/nengo/nengo_spa/issues/249>`__,
-  `#253 <https://github.com/nengo/nengo_spa/pull/253>`__)
+  `#253 <https://github.com/nengo/nengo_spa/pull/253>`__,
+  `#257 <https://github.com/nengo/nengo_spa/pull/257>`__)
 
 **Changed**
 
@@ -52,6 +53,10 @@ Release History
   could grow exponentially in length, by truncating them at 1 KB.
   (`#244 <https://github.com/nengo/nengo_spa/issues/244>`__,
   `#246 <https://github.com/nengo/nengo_spa/pull/246>`__)
+- Allow NumPy scalars in place of Python scalars for binary operations on
+  `SemanticPointer` instances.
+  (`#250 <https://github.com/nengo/nengo_spa/issues/250>`__,
+  `#257 <https://github.com/nengo/nengo_spa/pull/257>`__)
 
 
 1.0.1 (December 14, 2019)
