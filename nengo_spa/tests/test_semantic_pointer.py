@@ -124,6 +124,10 @@ def test_multiply(rng):
     assert np.allclose((0 * a).v, np.zeros(50))
     assert np.allclose((1 * a).v, a.v)
 
+    numpy_scalar = np.float64(5.7)
+    assert np.allclose((numpy_scalar * a).v, a.v * numpy_scalar)
+    assert np.allclose((a * numpy_scalar).v, a.v * numpy_scalar)
+
     with pytest.raises(Exception):
         a * None
     with pytest.raises(Exception):
@@ -137,6 +141,7 @@ def test_divide(rng):
 
     assert np.allclose((a / 5).v, a.v / 5)
     assert np.allclose((a / 5.7).v, a.v / 5.7)
+    assert np.allclose((a / np.float64(5.7)).v, a.v / 5.7)
     assert np.allclose((a / 1.0).v, a.v)
 
     with pytest.raises(ZeroDivisionError):
