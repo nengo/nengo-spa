@@ -57,6 +57,10 @@ Release History
   `SemanticPointer` instances.
   (`#250 <https://github.com/nengo/nengo_spa/issues/250>`__,
   `#257 <https://github.com/nengo/nengo_spa/pull/257>`__)
+- The SPA sequence example was not working properly due to a missing connection.
+  (`#258 <https://github.com/nengo/nengo_spa/issues/258>`__,
+  `#259 <https://github.com/nengo/nengo_spa/pull/259>`__)
+
 
 
 1.0.1 (December 14, 2019)
