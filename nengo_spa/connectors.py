@@ -165,6 +165,7 @@ class SpaOperatorMixin:
     __rsub__ = __define_binary_op.__func__("__rsub__")
     __mul__ = __define_binary_op.__func__("__mul__")
     __rmul__ = __define_binary_op.__func__("__rmul__")
+    __truediv__ = __define_binary_op.__func__("__truediv__")
     __matmul__ = __define_binary_op.__func__("__matmul__")
     __rmatmul__ = __define_binary_op.__func__("__rmatmul__")
 

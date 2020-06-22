@@ -90,6 +90,17 @@ def test_multiply_fixed_scalar_and_pointer_symbol(scalar, rng):
     assert_equal(node.output, vocab.parse("2 * A").v)
 
 
+@pytest.mark.parametrize("scalar", [2, np.float64(2)])
+def test_divide_pointer_symbol_by_fixed_scalar(scalar, rng):
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
+    vocab.populate("A")
+
+    with spa.Network():
+        x = PointerSymbol("A", TVocabulary(vocab)) / scalar
+        node = x.construct()
+    assert_equal(node.output, vocab.parse("0.5 * A").v)
+
+
 def test_fixed_dot(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
