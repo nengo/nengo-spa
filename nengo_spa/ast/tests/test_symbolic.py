@@ -79,12 +79,13 @@ def test_additive_op_fixed_scalar_and_pointer_symbol(op, rng):
             eval("2" + op + "PointerSymbol('A')")
 
 
-def test_multiply_fixed_scalar_and_pointer_symbol(rng):
+@pytest.mark.parametrize("scalar", [2, np.float64(2)])
+def test_multiply_fixed_scalar_and_pointer_symbol(scalar, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A")
 
     with spa.Network():
-        x = 2 * PointerSymbol("A", TVocabulary(vocab))
+        x = scalar * PointerSymbol("A", TVocabulary(vocab))
         node = x.construct()
     assert_equal(node.output, vocab.parse("2 * A").v)
 
