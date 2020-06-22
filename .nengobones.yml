@@ -27,7 +27,7 @@ travis_yml:
       dist: $DIST
     - script: test-no-scipy
       dist: $DIST
-  pypi_user: jgosmann
+  pypi_user: __token__
   deploy_dists:
     - sdist
     - bdist_wheel
@@ -62,3 +62,4 @@ ci_scripts:
     pip_install:
       - matplotlib
       - $SCIPY
+  - template: deploy
