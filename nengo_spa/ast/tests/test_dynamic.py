@@ -70,6 +70,24 @@ def test_binary_operation_on_modules(Simulator, algebra, op, suffix, seed, rng):
     )
 
 
+@pytest.mark.parametrize("suffix", ["", ".output"])
+def test_division_with_fixed(Simulator, suffix, seed, rng):
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
+    vocab.populate("A")
+
+    with spa.Network(seed=seed) as model:
+        a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
+        x = eval("a" + suffix + "/ 2")
+        p = nengo.Probe(x.construct(), synapse=0.03)
+
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert_sp_close(
+        sim.trange(), sim.data[p], vocab.parse("0.5 * A"), skip=0.2, atol=0.3
+    )
+
+
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 @pytest.mark.parametrize("order", ["AB", "BA"])
 def test_binary_operation_on_modules_with_pointer_symbol(

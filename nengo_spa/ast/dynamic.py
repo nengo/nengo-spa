@@ -115,6 +115,13 @@ class DynamicNode(Node):
             return self._mul_with_dynamic(other, swap_inputs=True)
 
     @binary_node_op
+    def __truediv__(self, other):
+        if isinstance(other, FixedScalar):
+            return self._mul_with_fixed(FixedScalar(1.0 / other.value))
+        else:
+            return NotImplemented
+
+    @binary_node_op
     def dot(self, other):
         type_ = infer_types(self, other)
 

@@ -114,6 +114,11 @@ class PointerSymbol(Symbol):
         type_ = infer_types(self, other)
         return PointerSymbol(other.expr + "*" + self.expr, type_)
 
+    @symbolic_op
+    def __truediv__(self, other):
+        type_ = infer_types(self, other)
+        return PointerSymbol(self.expr + "/" + other.expr, type_)
+
     def dot(self, other):
         other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
