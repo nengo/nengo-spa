@@ -30,8 +30,8 @@ Nengo SPA imports several open source libraries.
 
 * `NumPy <http://www.numpy.org/>`_ - Used under
   `BSD license <http://www.numpy.org/doc/stable/license.html>`__
-* `Sphinx <http://www.sphinx-doc.org/en/master>`_ - Used under
-  `BSD license <https://bitbucket.org/birkenfeld/sphinx/src/be5bd373a1a47fb68d70523b6e980e654e070e9f/LICENSE?at=default>`__
+* `Sphinx <https://www.sphinx-doc.org/>`_ - Used under
+  `BSD license <https://github.com/sphinx-doc/sphinx/blob/master/LICENSE>`__
 * `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_ - Used under
   `MIT license <https://github.com/spatialaudio/nbsphinx/blob/master/LICENSE>`__
 * `matplotlib <https://matplotlib.org/>`_ - Used under
