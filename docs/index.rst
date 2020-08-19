@@ -1,8 +1,8 @@
-*********
-Nengo SPA
-*********
+********
+NengoSPA
+********
 
-Nengo SPA is an implementation of the Semantic Pointer Architecture for Nengo.
+NengoSPA is an implementation of the Semantic Pointer Architecture for Nengo.
 The :doc:`Semantic Pointer Architecture <user-guide/spa-intro>` provides an
 approach to building cognitive models implemented with large-scale spiking
 neural networks.

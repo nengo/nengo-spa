@@ -10,7 +10,7 @@ possible to set module parameters with `nengo.Config` objects to allow to
 easily change parameters of networks created in this way.
 
 Note that SPA modules can be used as standalone networks without using
-any other Nengo SPA features.
+any other NengoSPA features.
 """
 
 from nengo_spa.ast import dynamic as _dynamic

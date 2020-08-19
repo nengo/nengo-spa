@@ -1,4 +1,4 @@
-"""Basic classes for abstract syntax trees (ASTs) in Nengo SPA."""
+"""Basic classes for abstract syntax trees (ASTs) in NengoSPA."""
 
 from nengo_spa.typechecks import is_array
 from nengo_spa.types import coerce_types, TAnyVocab, TVocabulary
@@ -21,7 +21,7 @@ def infer_types(*nodes):
 
 
 class Node:
-    """Base class for nodes in the AST for Nengo SPA operations.
+    """Base class for nodes in the AST for NengoSPA operations.
 
     Parameters
     ----------

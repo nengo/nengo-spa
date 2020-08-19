@@ -1,4 +1,4 @@
-"""Types used in the Nengo SPA type system to verify operations."""
+"""Types used in the NengoSPA type system to verify operations."""
 
 from nengo_spa.exceptions import SpaTypeError
 

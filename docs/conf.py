@@ -72,7 +72,7 @@ master_doc = 'index'
 mathjax_path = ("https://cdn.mathjax.org/mathjax/latest/MathJax.js"
                 "?config=TeX-AMS-MML_HTMLorMML")
 
-project = u'Nengo SPA'
+project = u'NengoSPA'
 authors = u'Applied Brain Research'
 copyright = nengo_spa.__copyright__
 version = '.'.join(nengo_spa.__version__.split('.')[:2])  # Short X.Y version
@@ -82,7 +82,7 @@ pygments_style = 'friendly'
 # -- Options for HTML output --------------------------------------------------
 
 html_theme = 'nengo_sphinx_theme'
-html_title = "Nengo SPA {0} docs".format(release)
+html_title = "NengoSPA {0} docs".format(release)
 html_static_path = ['_static']
 html_favicon = os.path.join('_static', 'favicon.ico')
 html_use_smartypants = True
