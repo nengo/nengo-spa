@@ -1,6 +1,18 @@
-project_name: Nengo SPA
+project_name: NengoSPA
 pkg_name: nengo_spa
 repo_name: nengo/nengo-spa
+
+copyright_start: 2013
+
+contributing_rst: {}
+
+contributors_rst: {}
+
+license_rst: {}
+
+manifest_in:
+  global-exclude:
+    - "*.swp"  # exclude VIM swp files
 
 travis_yml:
   python: 3.7

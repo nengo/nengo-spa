@@ -1,10 +1,10 @@
 Algebras
 --------
 
-Nengo SPA uses elementwise addition for superposition and circular convolution
+NengoSPA uses elementwise addition for superposition and circular convolution
 for binding (`.CircularConvolutionAlgebra`) by default. However, other choices are
-viable. In Nengo SPA we call such a specific choice of such operators an
-*algebra*. It is easy to change the algebra that is used by Nengo SPA as it is
+viable. In NengoSPA we call such a specific choice of such operators an
+*algebra*. It is easy to change the algebra that is used by NengoSPA as it is
 tied to the vocabulary. To use a different algebra, it suffices to manually
 create a vocabulary with the desired algebra and use this in your model::
 
@@ -36,5 +36,5 @@ and binding operator, functions for obtaining specific matrices (such as
 inverting a vector), functions for obtaining special elements like the identity
 vector, and functions to provide neural implementations of the superposition and
 binding. A partial implementation is possible, but will prevent the usage of
-certain parts of Nengo SPA. For example, when not providing neural
+certain parts of NengoSPA. For example, when not providing neural
 implementations, only non-neural math can be performed.

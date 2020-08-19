@@ -1,4 +1,4 @@
-"""Nengo SPA version information.
+"""NengoSPA version information.
 
 We use semantic versioning (see https://semver.org/).
 and conform to PEP440 (see https://www.python.org/dev/peps/pep-0440/).

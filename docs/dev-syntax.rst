@@ -24,7 +24,7 @@ There is a hierarchy of certain sets to consider in this.
    `.Transformed` is used for a dynamic output to which a constant transformation
    matrix is applied, and `.ModuleOutput` is the bare output of a SPA module.
 
-Nengo SPA used to construct a complete abstract syntax tree (AST) before
+NengoSPA used to construct a complete abstract syntax tree (AST) before
 constructing any network, but this has since been changed to greedily construct
 networks as soon as all the required information has been obtained. For this
 historical reason, most of the classes mentioned still live in `nengo_spa.ast`.
@@ -48,7 +48,7 @@ the result.
 Types
 ^^^^^
 
-Types in Nengo SPA are defined by deriving from `nengo_spa.types.Type`. Two
+Types in NengoSPA are defined by deriving from `nengo_spa.types.Type`. Two
 types will be considered equal if their *name* attributes match (as long as
 *__eq__* is not overwritten). For more complex relationships, the *__gt__*
 method may be overwritten to specify a partial ordering. A call to
