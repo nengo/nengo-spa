@@ -41,7 +41,7 @@ tests_require = [
     "jupyter",
     "matplotlib>=2.0",
     "nbformat",
-    "pytest>=4.0,<5",
+    "pytest>=3.6",
     "pytest-plt",
     "pytest-rng",
 ]
