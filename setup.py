@@ -30,20 +30,21 @@ version_module = imp.load_source(
 )
 testing = "test" in sys.argv or "pytest" in sys.argv
 
+numpy = "numpy>=1.8"
 docs_require = [
-    "jupyter_client",
-    "sphinx",
-    "nbsphinx",
-    "nengo_sphinx_theme",
+    "jupyter_client>=5.3.4",
+    "sphinx>=2.2.1",
+    "nbsphinx>=0.5.0",
+    "nengo_sphinx_theme>=1.2.0",
 ]
-optional_requires = ["scipy"]
+optional_requires = ["scipy>=1.4.1"]
 tests_require = [
-    "jupyter",
+    "jupyter>=1.0.0",
     "matplotlib>=2.0",
-    "nbformat",
+    "nbformat>=5.0.7",
     "pytest>=3.6",
-    "pytest-plt",
-    "pytest-rng",
+    "pytest-plt>=1.0.1",
+    "pytest-rng>=1.0.0",
 ]
 
 setup(
@@ -59,8 +60,8 @@ setup(
     long_description=read("README.rst", "CHANGES.rst"),
     zip_safe=True,
     include_package_data=True,
-    setup_requires=["pytest-runner"] if testing else [] + ["numpy>=1.8",],
-    install_requires=["nengo>=2.7,<4", "numpy>=1.8",],
+    setup_requires=["pytest-runner>=5.2"] if testing else [] + [numpy,],
+    install_requires=["nengo>=2.7", numpy,],
     extras_require={
         "all": docs_require + optional_requires + tests_require,
         "docs": docs_require,
