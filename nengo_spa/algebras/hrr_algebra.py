@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
@@ -103,7 +103,7 @@ class HrrAlgebra(AbstractAlgebra):
         net = CircularConvolution(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_a, net.input_b), net.output
 
-    def absorbing_element(self, d):
+    def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the standard absorbing element of dimensionality *d*.
 
         An absorbing element will produce a scaled version of itself when bound
@@ -117,6 +117,9 @@ class HrrAlgebra(AbstractAlgebra):
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the standard absorbing element is two-sided.
 
         Returns
         -------
@@ -125,7 +128,7 @@ class HrrAlgebra(AbstractAlgebra):
         """
         return np.ones(d) / np.sqrt(d)
 
-    def identity_element(self, d):
+    def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the identity element of dimensionality *d*.
 
         The identity does not change the vector it is bound to.
@@ -137,6 +140,9 @@ class HrrAlgebra(AbstractAlgebra):
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the identity is two-sided.
 
         Returns
         -------
@@ -147,7 +153,7 @@ class HrrAlgebra(AbstractAlgebra):
         data[0] = 1.0
         return data
 
-    def zero_element(self, d):
+    def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
@@ -157,6 +163,9 @@ class HrrAlgebra(AbstractAlgebra):
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the zero element is two-sided.
 
         Returns
         -------

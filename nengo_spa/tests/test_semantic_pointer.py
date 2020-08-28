@@ -7,7 +7,7 @@ from numpy.testing import assert_equal
 import pytest
 
 import nengo_spa as spa
-from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
@@ -100,7 +100,7 @@ def test_binding_and_inversion(algebra, d, rng):
 
     a = SemanticPointer(next(gen), algebra=algebra)
     b = SemanticPointer(next(gen), algebra=algebra)
-    identity = Identity(d, algebra=algebra)
+    identity = Identity(d, algebra=algebra, sidedness=ElementSidedness.RIGHT)
 
     c = a.copy()
     c *= b
@@ -307,22 +307,41 @@ def test_invalid_algebra():
     SemanticPointer(next(gen), algebra=HrrAlgebra())
 
 
-def test_identity(algebra):
-    assert np.allclose(Identity(64, algebra=algebra).v, algebra.identity_element(64))
-
-
-def test_absorbing_element(algebra, plt):
-    plt.plot([0, 1], [0, 1])
+@pytest.mark.filterwarnings("ignore:.*:DeprecationWarning")
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_identity(algebra, sidedness):
     try:
         assert np.allclose(
-            AbsorbingElement(64, algebra=algebra).v, algebra.absorbing_element(64)
+            Identity(64, algebra=algebra, sidedness=sidedness).v,
+            algebra.identity_element(64, sidedness=sidedness),
         )
     except NotImplementedError:
         pass
 
 
-def test_zero(algebra):
-    assert np.allclose(Zero(64, algebra=algebra).v, algebra.zero_element(64))
+@pytest.mark.filterwarnings("ignore:.*:DeprecationWarning")
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_absorbing_element(algebra, sidedness, plt):
+    plt.plot([0, 1], [0, 1])
+    try:
+        assert np.allclose(
+            AbsorbingElement(64, algebra=algebra, sidedness=sidedness).v,
+            algebra.absorbing_element(64, sidedness=sidedness),
+        )
+    except NotImplementedError:
+        pass
+
+
+@pytest.mark.filterwarnings("ignore:.*:DeprecationWarning")
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_zero(algebra, sidedness):
+    try:
+        assert np.allclose(
+            Zero(64, algebra=algebra, sidedness=sidedness).v,
+            algebra.zero_element(64, sidedness=sidedness),
+        )
+    except NotImplementedError:
+        pass
 
 
 def test_name():

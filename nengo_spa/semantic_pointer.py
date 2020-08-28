@@ -2,7 +2,7 @@ import nengo
 from nengo.exceptions import ValidationError
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.typechecks import is_array, is_array_like, is_number
@@ -410,10 +410,21 @@ class Identity(SemanticPointer):
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
+    sidedness : ElementSidedness, optional
+        Side in the binding operation on which the element acts as identity.
     """
 
-    def __init__(self, n_dimensions, vocab=None, algebra=None):
-        data = self._get_algebra(vocab, algebra).identity_element(n_dimensions)
+    def __init__(
+        self,
+        n_dimensions,
+        vocab=None,
+        algebra=None,
+        *,
+        sidedness=ElementSidedness.TWO_SIDED
+    ):
+        data = self._get_algebra(vocab, algebra).identity_element(
+            n_dimensions, sidedness=sidedness
+        )
         super(Identity, self).__init__(
             data, vocab=vocab, algebra=algebra, name="Identity"
         )
@@ -437,10 +448,21 @@ class AbsorbingElement(SemanticPointer):
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
+    sidedness : ElementSidedness, optional
+        Side in the binding operation on which the element acts as absorbing element.
     """
 
-    def __init__(self, n_dimensions, vocab=None, algebra=None):
-        data = self._get_algebra(vocab, algebra).absorbing_element(n_dimensions)
+    def __init__(
+        self,
+        n_dimensions,
+        vocab=None,
+        algebra=None,
+        *,
+        sidedness=ElementSidedness.TWO_SIDED
+    ):
+        data = self._get_algebra(vocab, algebra).absorbing_element(
+            n_dimensions, sidedness=sidedness
+        )
         super(AbsorbingElement, self).__init__(
             data, vocab=vocab, algebra=algebra, name="AbsorbingElement"
         )
@@ -460,8 +482,18 @@ class Zero(SemanticPointer):
         Algebra used to perform vector symbolic operations on the Semantic
         Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
         with the *vocab* argument.
+    sidedness : ElementSidedness, optional
+        Side in the binding operation on which the element acts as zero element.
     """
 
-    def __init__(self, n_dimensions, vocab=None, algebra=None):
-        data = self._get_algebra(vocab, algebra).zero_element(n_dimensions)
+    def __init__(
+        self,
+        n_dimensions,
+        vocab=None,
+        algebra=None,
+        sidedness=ElementSidedness.TWO_SIDED,
+    ):
+        data = self._get_algebra(vocab, algebra).zero_element(
+            n_dimensions, sidedness=sidedness
+        )
         super(Zero, self).__init__(data, vocab=vocab, algebra=algebra, name="Zero")

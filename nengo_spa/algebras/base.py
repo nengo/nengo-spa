@@ -1,5 +1,14 @@
 from abc import ABCMeta
+from enum import Enum
 import warnings
+
+
+class ElementSidedness(Enum):
+    """The side in a binary operation for which a special element's properties hold."""
+
+    LEFT = "left"
+    RIGHT = "right"
+    TWO_SIDED = "two-sided"
 
 
 class _DuckTypedABCMeta(ABCMeta):
@@ -201,7 +210,7 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
-    def absorbing_element(self, d):
+    def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the standard absorbing element of dimensionality *d*.
 
         An absorbing element will produce a scaled version of itself when bound
@@ -215,6 +224,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which the element absorbs.
 
         Returns
         -------
@@ -223,15 +234,20 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
-    def identity_element(self, d):
+    def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the identity element of dimensionality *d*.
 
         The identity does not change the vector it is bound to.
+
+        Some algebras might not have an identity element. In that case a
+        *NotImplementedError* may be raised.
 
         Parameters
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which the element acts as identity.
 
         Returns
         -------
@@ -240,16 +256,21 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
-    def zero_element(self, d):
+    def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
         Usually this will be the zero vector.
 
+        Some algebras might not have a zero element. In that case a
+        *NotImplementedError* may be raised.
+
         Parameters
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which the element acts as zero.
 
         Returns
         -------

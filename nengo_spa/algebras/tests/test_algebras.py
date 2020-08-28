@@ -1,7 +1,9 @@
+import warnings
+
 import numpy as np
 import pytest
 
-from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -69,28 +71,75 @@ def test_get_inversion_matrix(algebra, rng):
     assert np.allclose(algebra.invert(a), np.dot(m, a))
 
 
-def test_absorbing_element(algebra, rng):
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_absorbing_element(algebra, sidedness, rng):
     a = next(UnitLengthVectors(16, rng=rng))
     try:
-        p = algebra.absorbing_element(16)
-        r = algebra.bind(a, p)
-        r /= np.linalg.norm(r)
-        assert np.allclose(p, r) or np.allclose(p, -r)
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always", DeprecationWarning)
+            p = algebra.absorbing_element(16)
     except NotImplementedError:
         pass
+    else:
+        is_deprecated = len(caught_warnings) > 0 and any(
+            issubclass(w.category, DeprecationWarning) for w in caught_warnings
+        )
+        if (
+            sidedness in (ElementSidedness.LEFT, ElementSidedness.TWO_SIDED)
+            and not is_deprecated
+        ):
+            r = algebra.bind(p, a)
+            r /= np.linalg.norm(r)
+            assert np.allclose(p, r) or np.allclose(p, -r)
+        if sidedness in (ElementSidedness.RIGHT, ElementSidedness.TWO_SIDED):
+            r = algebra.bind(a, p)
+            r /= np.linalg.norm(r)
+            assert np.allclose(p, r) or np.allclose(p, -r)
 
 
-def test_identity_element(algebra, rng):
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_identity_element(algebra, sidedness, rng):
     a = next(UnitLengthVectors(16, rng=rng))
-    p = algebra.identity_element(16)
-    assert np.allclose(algebra.bind(a, p), a)
+    try:
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always", DeprecationWarning)
+            p = algebra.identity_element(16)
+    except NotImplementedError:
+        pass
+    else:
+        is_deprecated = len(caught_warnings) > 0 and any(
+            issubclass(w.category, DeprecationWarning) for w in caught_warnings
+        )
+        if (
+            sidedness in (ElementSidedness.LEFT, ElementSidedness.TWO_SIDED)
+            and not is_deprecated
+        ):
+            assert np.allclose(algebra.bind(p, a), a)
+        if sidedness in (ElementSidedness.RIGHT, ElementSidedness.TWO_SIDED):
+            assert np.allclose(algebra.bind(a, p), a)
 
 
-def test_zero_element(algebra, rng):
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_zero_element(algebra, sidedness, rng):
     a = next(UnitLengthVectors(16, rng=rng))
-    p = algebra.zero_element(16)
-    assert np.all(p == 0.0)
-    assert np.allclose(algebra.bind(a, p), 0.0)
+    try:
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always", DeprecationWarning)
+            p = algebra.zero_element(16)
+    except NotImplementedError:
+        pass
+    else:
+        assert np.all(p == 0.0)
+        is_deprecated = len(caught_warnings) > 0 and any(
+            issubclass(w.category, DeprecationWarning) for w in caught_warnings
+        )
+        if (
+            sidedness in (ElementSidedness.LEFT, ElementSidedness.TWO_SIDED)
+            and not is_deprecated
+        ):
+            assert np.allclose(algebra.bind(a, p), 0.0)
+        if sidedness in (ElementSidedness.RIGHT, ElementSidedness.TWO_SIDED):
+            assert np.allclose(algebra.bind(p, a), 0.0)
 
 
 def test_isinstance_check(algebra):
