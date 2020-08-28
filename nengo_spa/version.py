@@ -7,7 +7,7 @@ a release version. Release versions are git tagged with the version.
 """
 
 name = "nengo_spa"
-version_info = (1, 1, 2)  # (major, minor, patch)
+version_info = (1, 2, 0)  # (major, minor, patch)
 dev = True
 
 version = "{v}{dev}".format(

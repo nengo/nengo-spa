@@ -1,7 +1,9 @@
+import warnings
+
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.networks.vtb import VTB
 
 
@@ -138,15 +140,27 @@ class VtbAlgebra(AbstractAlgebra):
         net = VTB(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_left, net.input_right), net.output
 
-    def absorbing_element(self, d):
+    def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """VTB has no absorbing element except the zero vector."""
         raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
-    def identity_element(self, d):
+    def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        if sidedness is ElementSidedness.LEFT:
+            raise NotImplementedError("VtbAlgebra does not have a left identity.")
+        if sidedness is ElementSidedness.TWO_SIDED:
+            warnings.warn(
+                DeprecationWarning(
+                    "VtbAlgebra does not have a two-sided identity, returning "
+                    "the right identity instead. Please change your code to "
+                    "request the right identity explicitly with "
+                    "`sidedness=ElementSidedness.RIGHT`."
+                )
+            )
+
         sub_d = self._get_sub_d(d)
         return (np.eye(sub_d) / d ** 0.25).flatten()
 
-    def zero_element(self, d):
+    def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
@@ -156,6 +170,9 @@ class VtbAlgebra(AbstractAlgebra):
         ----------
         d : int
             Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the zero element of the VTB
+            algebra is two-sided.
 
         Returns
         -------

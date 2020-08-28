@@ -20,8 +20,25 @@ Release History
    - Fixed
 
 
-1.1.2 (unreleased)
+1.2.0 (unreleased)
 ==================
+
+**Added**
+
+- Differentiation between left, right, and two-sided special elements (identity,
+  zero, absorbing element) of an algebra.
+  (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
+
+**Changed**
+
+- Creating special elements (identity, zero, absorbing element) of the
+  ``VtbAlgebra`` without ``sidedness`` argument has been deprecated because
+  these are only right-sided special element. Add the
+  ``sidedness=ElementSidedness.RIGHT`` argument to update your code.
+  (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
+- The ``~`` operator has been deprecated for the ``VtbAlgebra``. Use the
+  ``rinv()`` method instead.
+  (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
 
 
 1.1.1 (November 3, 2020)
@@ -33,7 +50,6 @@ Release History
   ``(sym.A + sym.B) * sym.C`` will be evaluated correctly now.
   (`#267 <https://github.com/nengo/nengo_spa/issues/267>`__,
   `#268 <https://github.com/nengo/nengo_spa/pull/268>`__)
-
 
 
 1.1.0 (June 23, 2020)
