@@ -156,6 +156,8 @@ class SpaOperatorMixin:
         return op_impl
 
     __invert__ = __define_unary_op.__func__("__invert__")
+    linv = __define_unary_op.__func__("linv")
+    rinv = __define_unary_op.__func__("rinv")
     __neg__ = __define_unary_op.__func__("__neg__")
 
     __add__ = __define_binary_op.__func__("__add__")

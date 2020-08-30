@@ -3,6 +3,7 @@
 import nengo
 import numpy as np
 
+from nengo_spa.algebras.base import ElementSidedness
 from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
 from nengo_spa.ast.symbolic import Fixed, FixedScalar, Symbol
 from nengo_spa.exceptions import SpaTypeError
@@ -33,12 +34,23 @@ class DynamicNode(Node):
     """Base class for AST node with an output that changes over time."""
 
     def __invert__(self):
+        return self.__invert_impl(sidedness=ElementSidedness.TWO_SIDED)
+
+    def linv(self):
+        return self.__invert_impl(sidedness=ElementSidedness.LEFT)
+
+    def rinv(self):
+        return self.__invert_impl(sidedness=ElementSidedness.RIGHT)
+
+    def __invert_impl(self, sidedness):
         if not hasattr(self.type, "vocab"):
             raise SpaTypeError(
                 "Cannot invert semantic pointer with unknown vocabulary."
             )
         dimensions = self.type.vocab.dimensions
-        transform = self.type.vocab.algebra.get_inversion_matrix(dimensions)
+        transform = self.type.vocab.algebra.get_inversion_matrix(
+            dimensions, sidedness=sidedness
+        )
         return Transformed(self, transform, self.type)
 
     def __neg__(self):
