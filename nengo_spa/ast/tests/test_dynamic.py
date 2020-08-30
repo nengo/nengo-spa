@@ -33,6 +33,7 @@ def test_scalar_addition(Simulator, seed):
     assert np.all(np.abs(sim.data[p2][sim.trange() > 0.2] - 0.5) < 0.1)
 
 
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
 @pytest.mark.parametrize("op", ["-", "~"])
 @pytest.mark.parametrize("suffix", ["", ".output"])
 def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
@@ -48,6 +49,28 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
         sim.run(0.3)
 
     assert_sp_close(sim.trange(), sim.data[p], vocab.parse(op + "A"), skip=0.2)
+
+
+@pytest.mark.parametrize("sidedness", ["l", "r"])
+@pytest.mark.parametrize("suffix", ["", ".output"])
+def test_inv_operation_on_module(Simulator, algebra, sidedness, suffix, rng):
+    try:
+        vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
+        vocab.populate("A")
+
+        with spa.Network() as model:
+            stimulus = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
+            x = eval("stimulus" + suffix + "." + sidedness + "inv()")
+            p = nengo.Probe(x.construct(), synapse=0.03)
+
+        with Simulator(model) as sim:
+            sim.run(0.3)
+
+        assert_sp_close(
+            sim.trange(), sim.data[p], vocab.parse("A." + sidedness + "inv()"), skip=0.2
+        )
+    except NotImplementedError:
+        pass
 
 
 @pytest.mark.parametrize("op", ["+", "-", "*"])
@@ -193,33 +216,44 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, seed, rng):
 
     with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
-        x = (a * PointerSymbol("B")) * PointerSymbol("~B")
+        x = (a * PointerSymbol("B")) * PointerSymbol("B.rinv()")
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with Simulator(model) as sim:
         sim.run(0.3)
 
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse("A * B * ~B"), skip=0.2, normalized=True
+        sim.trange(),
+        sim.data[p],
+        vocab.parse("A * B * B.rinv()"),
+        skip=0.2,
+        normalized=True,
     )
 
 
 def test_transformed_and_network(Simulator, algebra, seed, rng):
-    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
-    vocab.populate("A; B.unitary()")
+    try:
+        vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
+        vocab.populate("A; B.unitary()")
 
-    with spa.Network(seed=seed) as model:
-        a = spa.Transcode("A", output_vocab=vocab)
-        b = spa.Transcode("B", output_vocab=vocab)
-        x = (a * PointerSymbol("~B")) * b
-        p = nengo.Probe(x.construct(), synapse=0.3)
+        with spa.Network(seed=seed) as model:
+            a = spa.Transcode("A", output_vocab=vocab)
+            b = spa.Transcode("B", output_vocab=vocab)
+            x = (a * PointerSymbol("B.linv()")) * b
+            p = nengo.Probe(x.construct(), synapse=0.3)
 
-    with Simulator(model) as sim:
-        sim.run(0.3)
+        with Simulator(model) as sim:
+            sim.run(0.3)
 
-    assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse("A * ~B * B"), skip=0.2, normalized=True
-    )
+        assert_sp_close(
+            sim.trange(),
+            sim.data[p],
+            vocab.parse("A * B.linv() * B"),
+            skip=0.2,
+            normalized=True,
+        )
+    except NotImplementedError:
+        pass
 
 
 def test_transformed_and_transformed(Simulator, algebra, seed, rng):
@@ -229,7 +263,7 @@ def test_transformed_and_transformed(Simulator, algebra, seed, rng):
     with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)
         c = spa.Transcode("C", output_vocab=vocab)
-        x = (PointerSymbol("B") * a) * (PointerSymbol("~B") * c)
+        x = (PointerSymbol("B") * a) * (PointerSymbol("B.rinv()") * c)
         p = nengo.Probe(x.construct(), synapse=0.3)
 
     with Simulator(model) as sim:
@@ -238,7 +272,7 @@ def test_transformed_and_transformed(Simulator, algebra, seed, rng):
     assert_sp_close(
         sim.trange(),
         sim.data[p],
-        vocab.parse("(B * A) * (~B * C)"),
+        vocab.parse("(B * A) * (B.rinv() * C)"),
         skip=0.2,
         normalized=True,
         atol=0.3,
