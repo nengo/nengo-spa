@@ -255,18 +255,43 @@ class SemanticPointer(Fixed):
             return NotImplemented
 
     def __invert__(self):
-        """Return a reorganized vector that acts as an inverse for convolution.
+        """Return a reorganized vector that acts as a two-sided inverse for
+        binding.
+
+        When using the (default) ``HrrAlgebra``:
 
         This reorganization turns circular convolution into circular
         correlation, meaning that ``A*B*~B`` is approximately ``A``.
 
         For the vector ``[1, 2, 3, 4, 5]``, the inverse is ``[1, 5, 4, 3, 2]``.
+
+        See also
+        --------
+        linv, rinv
         """
         return SemanticPointer(
-            data=self.algebra.invert(self.v),
+            data=self.algebra.invert(self.v, sidedness=ElementSidedness.TWO_SIDED),
             vocab=self.vocab,
             algebra=self.algebra,
             name=self._get_unary_name("~"),
+        )
+
+    def linv(self):
+        """Return a reorganized vector that acts as the left inverse for binding."""
+        return SemanticPointer(
+            data=self.algebra.invert(self.v, sidedness=ElementSidedness.LEFT),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_method_name("rinv"),
+        )
+
+    def rinv(self):
+        """Return a reorganized vector that acts as the right inverse for binding."""
+        return SemanticPointer(
+            data=self.algebra.invert(self.v, sidedness=ElementSidedness.RIGHT),
+            vocab=self.vocab,
+            algebra=self.algebra,
+            name=self._get_method_name("rinv"),
         )
 
     def bind(self, other):

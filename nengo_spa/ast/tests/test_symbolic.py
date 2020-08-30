@@ -52,6 +52,17 @@ def test_unary_operation_on_pointer_symbol(op, rng):
     assert_equal(node.output, vocab.parse(op + "A").v)
 
 
+@pytest.mark.parametrize("sidedness", ["l", "r"])
+def test_sided_inverse_on_pointer_symbol(sidedness, rng):
+    vocab = spa.Vocabulary(16, pointer_gen=rng)
+    vocab.populate("A")
+
+    with spa.Network():
+        x = eval("PointerSymbol('A', TVocabulary(vocab))." + sidedness + "inv()")
+        node = x.construct()
+    assert_equal(node.output, vocab.parse("A." + sidedness + "inv()").v)
+
+
 @pytest.mark.parametrize("op", ["+", "-", "*"])
 def test_binary_operation_on_pointer_symbols(op, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)

@@ -101,7 +101,19 @@ class VtbAlgebra(AbstractAlgebra):
         m = self.get_binding_matrix(b)
         return np.dot(m, a)
 
-    def invert(self, v):
+    def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
+        if sidedness is ElementSidedness.LEFT:
+            raise NotImplementedError("VtbAlgebra does not have a left inverse.")
+        if sidedness is ElementSidedness.TWO_SIDED:
+            warnings.warn(
+                DeprecationWarning(
+                    "VtbAlgebra does not have a two-sided inverse, returning "
+                    "the right inverse instead. Please change your code to "
+                    "request the right inverse explicitly with "
+                    "`sidedness=ElementSidedness.RIGHT`."
+                )
+            )
+
         sub_d = self._get_sub_d(len(v))
         return v.reshape((sub_d, sub_d)).T.flatten()
 
@@ -126,9 +138,21 @@ class VtbAlgebra(AbstractAlgebra):
             Matrix to multiply with a vector to switch left and right operand
             in bound state.
         """
-        return self.get_inversion_matrix(d)
+        return self.get_inversion_matrix(d, sidedness=ElementSidedness.RIGHT)
 
-    def get_inversion_matrix(self, d):
+    def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        if sidedness is ElementSidedness.LEFT:
+            raise NotImplementedError("VtbAlgebra does not have a left inverse.")
+        if sidedness is ElementSidedness.TWO_SIDED:
+            warnings.warn(
+                DeprecationWarning(
+                    "VtbAlgebra does not have a two-sided inverse, returning "
+                    "the right inverse instead. Please change your code to "
+                    "request the right inverse explicitly with "
+                    "`sidedness=ElementSidedness.RIGHT`."
+                )
+            )
+
         sub_d = self._get_sub_d(d)
         return np.eye(d).reshape(d, sub_d, sub_d).T.reshape(d, d)
 

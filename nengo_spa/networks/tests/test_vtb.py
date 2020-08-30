@@ -49,5 +49,5 @@ def test_unbind(Simulator, side, seed, rng):
         sim.run(0.2)
 
     assert_sp_close(
-        sim.trange(), sim.data[p], vocab.parse("A * B * ~B"), skip=0.15, atol=0.3
+        sim.trange(), sim.data[p], vocab.parse("A * B * B.rinv()"), skip=0.15, atol=0.3
     )

@@ -26,12 +26,18 @@ Release History
 **Added**
 
 - Differentiation between left, right, and two-sided special elements (identity,
-  zero, absorbing element) of an algebra.
+  zero, absorbing element, inverse) of an algebra.
+  (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
+- Added ``linv`` and ``rinv`` methods to ``SemanticPointer`` for the left and
+  right inverse, respectively.
+  (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
+- Add support for the ``normalized`` and ``unitary`` methods on Semantic Pointer
+  symbols.
   (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
 
 **Changed**
 
-- Creating special elements (identity, zero, absorbing element) of the
+- Creating special elements (identity, zero, absorbing element, inverse) of the
   ``VtbAlgebra`` without ``sidedness`` argument has been deprecated because
   these are only right-sided special element. Add the
   ``sidedness=ElementSidedness.RIGHT`` argument to update your code.

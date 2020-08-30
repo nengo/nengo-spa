@@ -88,6 +88,12 @@ class PointerSymbol(Symbol):
     def __invert__(self):
         return PointerSymbol(~self._expr_tree, self.type)
 
+    def linv(self):
+        return PointerSymbol(self.expr + ".linv()", self.type)
+
+    def rinv(self):
+        return PointerSymbol(self.expr + ".rinv()", self.type)
+
     def __neg__(self):
         return PointerSymbol(-self._expr_tree, self.type)
 

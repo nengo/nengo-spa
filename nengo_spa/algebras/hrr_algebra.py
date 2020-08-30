@@ -82,7 +82,7 @@ class HrrAlgebra(AbstractAlgebra):
             raise ValueError("Inputs must have same length.")
         return np.fft.irfft(np.fft.rfft(a) * np.fft.rfft(b), n=n)
 
-    def invert(self, v):
+    def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         return v[-np.arange(len(v))]
 
     def get_binding_matrix(self, v, swap_inputs=False):
@@ -92,7 +92,7 @@ class HrrAlgebra(AbstractAlgebra):
             T.append([v[(i - j) % D] for j in range(D)])
         return np.array(T)
 
-    def get_inversion_matrix(self, d):
+    def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
         return np.eye(d)[-np.arange(d)]
 
     def implement_superposition(self, n_neurons_per_d, d, n):

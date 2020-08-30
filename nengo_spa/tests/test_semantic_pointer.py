@@ -92,7 +92,7 @@ def test_add_sub(algebra, rng):
 
 
 @pytest.mark.parametrize("d", [64, 65])
-def test_binding_and_inversion(algebra, d, rng):
+def test_binding(algebra, d, rng):
     if not algebra.is_valid_dimensionality(d):
         return
 
@@ -100,7 +100,6 @@ def test_binding_and_inversion(algebra, d, rng):
 
     a = SemanticPointer(next(gen), algebra=algebra)
     b = SemanticPointer(next(gen), algebra=algebra)
-    identity = Identity(d, algebra=algebra, sidedness=ElementSidedness.RIGHT)
 
     c = a.copy()
     c *= b
@@ -110,8 +109,43 @@ def test_binding_and_inversion(algebra, d, rng):
     assert np.allclose((a * b).v, conv_ans)
     assert np.allclose(a.bind(b).v, conv_ans)
     assert np.allclose(c.v, conv_ans)
-    assert np.allclose((a * identity).v, a.v)
-    assert (a * b * ~b).compare(a) > 0.6
+    try:
+        identity = Identity(d, algebra=algebra, sidedness=ElementSidedness.RIGHT)
+        assert np.allclose((a * identity).v, a.v)
+    except NotImplementedError:
+        pass
+    try:
+        identity = Identity(d, algebra=algebra, sidedness=ElementSidedness.LEFT)
+        assert np.allclose((identity * a).v, a.v)
+    except NotImplementedError:
+        pass
+
+
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
+def test_inverse(algebra, rng):
+    gen = UnitLengthVectors(64, rng=rng)
+    a = SemanticPointer(next(gen), algebra=algebra)
+
+    try:
+        assert np.allclose(
+            (~a).v, algebra.invert(a.v, sidedness=ElementSidedness.TWO_SIDED)
+        )
+    except NotImplementedError:
+        pass
+
+    try:
+        assert np.allclose(
+            a.linv().v, algebra.invert(a.v, sidedness=ElementSidedness.LEFT)
+        )
+    except NotImplementedError:
+        pass
+
+    try:
+        assert np.allclose(
+            a.rinv().v, algebra.invert(a.v, sidedness=ElementSidedness.RIGHT)
+        )
+    except NotImplementedError:
+        pass
 
 
 def test_multiply(rng):
