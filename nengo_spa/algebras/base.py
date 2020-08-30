@@ -113,15 +113,21 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
-    def invert(self, v):
+    def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         """Invert vector *v*.
 
         A vector bound to its inverse will result in the identity vector.
+
+        Some algebras might not have an inverse only on specific sides. In that
+        case a *NotImplementedError* may be raised for non-existing inverses.
 
         Parameters
         ----------
         v : (d,) ndarray
             Vector to invert.
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which the returned value acts as
+            inverse.
 
         Returns
         -------
@@ -151,13 +157,19 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
-    def get_inversion_matrix(self, d):
+    def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Returns the transformation matrix for inverting a vector.
+
+        Some algebras might not have an inverse only on specific sides. In that
+        case a *NotImplementedError* may be raised for non-existing inverses.
 
         Parameters
         ----------
         d : int
             Vector dimensionality (determines the matrix size).
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which a transformed vectors acts as
+            inverse.
 
         Returns
         -------

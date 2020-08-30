@@ -32,20 +32,41 @@ def test_superpose(algebra, rng):
 
 
 @pytest.mark.parametrize("d", [25, 36])
-def test_binding_and_invert(algebra, d, rng):
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_binding_and_invert(algebra, d, sidedness, rng):
     dissimilarity_passed = 0
     unbinding_passed = 0
-    for i in range(10):
-        gen = UnitLengthVectors(d, rng=rng)
-        a = next(gen)
-        b = next(gen)
-        bound = algebra.bind(a, b)
-        r = algebra.bind(bound, algebra.invert(b))
-        for v in (a, b):
-            dissimilarity_passed += np.dot(v, bound / np.linalg.norm(b)) < 0.7
-        unbinding_passed += np.dot(a, r / np.linalg.norm(r)) > 0.6
-    assert dissimilarity_passed >= 2 * 8
-    assert unbinding_passed >= 8
+    try:
+        for i in range(10):
+            gen = UnitLengthVectors(d, rng=rng)
+            a = next(gen)
+            b = next(gen)
+
+            binding_side = sidedness
+            if sidedness is ElementSidedness.TWO_SIDED:
+                binding_side = (
+                    ElementSidedness.LEFT if i % 1 == 0 else ElementSidedness.RIGHT
+                )
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", DeprecationWarning)
+                if binding_side is ElementSidedness.LEFT:
+                    bound = algebra.bind(b, a)
+                    r = algebra.bind(bound, algebra.invert(b, sidedness=sidedness))
+                elif binding_side is ElementSidedness.RIGHT:
+                    bound = algebra.bind(a, b)
+                    r = algebra.bind(bound, algebra.invert(b, sidedness=sidedness))
+                else:
+                    raise AssertionError("Invalid binding_side value.")
+
+            for v in (a, b):
+                dissimilarity_passed += np.dot(v, bound / np.linalg.norm(b)) < 0.7
+            unbinding_passed += np.dot(a, r / np.linalg.norm(r)) > 0.6
+
+        assert dissimilarity_passed >= 2 * 8
+        assert unbinding_passed >= 8
+    except (NotImplementedError, DeprecationWarning):
+        pass
 
 
 def test_dimensionality_mismatch_exception(algebra):
@@ -65,10 +86,15 @@ def test_get_binding_matrix(algebra, rng):
     assert np.allclose(algebra.bind(a, b), np.dot(m, a))
 
 
-def test_get_inversion_matrix(algebra, rng):
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_get_inversion_matrix(algebra, sidedness, rng):
     a = next(UnitLengthVectors(16, rng=rng))
-    m = algebra.get_inversion_matrix(16)
-    assert np.allclose(algebra.invert(a), np.dot(m, a))
+    try:
+        m = algebra.get_inversion_matrix(16, sidedness=sidedness)
+        assert np.allclose(algebra.invert(a, sidedness=sidedness), np.dot(m, a))
+    except NotImplementedError:
+        pass
 
 
 @pytest.mark.parametrize("sidedness", ElementSidedness)
