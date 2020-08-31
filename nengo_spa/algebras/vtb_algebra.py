@@ -42,8 +42,16 @@ class VtbAlgebra(AbstractAlgebra):
     Note that VTB requires the vector dimensionality to be square.
 
     The VTB binding operation is neither associative nor commutative.
+    Furthermore, there are right inverses and identities only.
 
-    Publications with further information are forthcoming.
+    Additional information about VTB can be found in
+
+    * `Gosmann, Jan, and Chris Eliasmith (2019). Vector-derived transformation binding:
+      an improved binding operation for deep symbol-like processing in
+      neural networks. Neural computation 31.5, 849-869.
+      <https://www.mitpressjournals.org/action/showCitFormats?doi=10.1162/neco_a_01179>`_
+    * `Jan Gosmann (2018). An Integrated Model of Context, Short-Term, and
+      Long-Term Memory. UWSpace. <https://uwspace.uwaterloo.ca/handle/10012/13498>`_
     """
 
     _instance = None
@@ -102,6 +110,30 @@ class VtbAlgebra(AbstractAlgebra):
         return np.dot(m, a)
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
+        """Invert vector *v*.
+
+        A vector bound to its inverse will result in the identity vector.
+
+        VTB has a right inverse only.
+
+        .. deprecated:: 1.2.0
+           Calling this method with the default
+           ``sidedness=ElementSidedness.TWO_SIDED`` returns the right inverse
+           for backwards compatibility, but has been deprecated and will be
+           removed in the next major release.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to invert.
+        sidedness : ElementSidedness
+            Must be set to `ElementSidedness.RIGHT`.
+
+        Returns
+        -------
+        (d,) ndarray
+            Right inverse of vector.
+        """
         if sidedness is ElementSidedness.LEFT:
             raise NotImplementedError("VtbAlgebra does not have a left inverse.")
         if sidedness is ElementSidedness.TWO_SIDED:
@@ -141,6 +173,29 @@ class VtbAlgebra(AbstractAlgebra):
         return self.get_inversion_matrix(d, sidedness=ElementSidedness.RIGHT)
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        """Returns the transformation matrix for inverting a vector.
+
+        VTB has a right inverse only.
+
+        .. deprecated:: 1.2.0
+           Calling this method with the default
+           ``sidedness=ElementSidedness.TWO_SIDED`` returns the right
+           transformation matrix for the right inverse for backwards
+           compatibility, but has been deprecated and will be removed in the
+           next major release.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness
+            Must be set to `ElementSidedness.RIGHT`.
+
+        Returns
+        -------
+        (d, d) ndarray
+            Transformation matrix to invert a vector.
+        """
         if sidedness is ElementSidedness.LEFT:
             raise NotImplementedError("VtbAlgebra does not have a left inverse.")
         if sidedness is ElementSidedness.TWO_SIDED:
@@ -165,10 +220,35 @@ class VtbAlgebra(AbstractAlgebra):
         return net, (net.input_left, net.input_right), net.output
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """VTB has no absorbing element except the zero vector."""
+        """VTB has no absorbing element except the zero vector.
+
+        Always raises a `NotImplementedError`.
+        """
         raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        """Return the identity element of dimensionality *d*.
+
+        VTB has a right identity only.
+
+        .. deprecated:: 1.2.0
+           Calling this method with the default
+           ``sidedness=ElementSidedness.TWO_SIDED`` returns the right identity
+           for backwards compatibility, but has been deprecated and will be
+           removed in the next major release.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness
+            Must be set to `ElementSidedness.RIGHT`.
+
+        Returns
+        -------
+        (d,) ndarray
+            Right identity element.
+        """
         if sidedness is ElementSidedness.LEFT:
             raise NotImplementedError("VtbAlgebra does not have a left identity.")
         if sidedness is ElementSidedness.TWO_SIDED:
