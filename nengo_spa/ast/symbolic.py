@@ -85,6 +85,12 @@ class PointerSymbol(Symbol):
     def expr(self):
         return str(self._expr_tree)
 
+    def normalized(self):
+        return PointerSymbol(self.expr + ".normalized()", self.type)
+
+    def unitary(self):
+        return PointerSymbol(self.expr + ".unitary()", self.type)
+
     def __invert__(self):
         return PointerSymbol(~self._expr_tree, self.type)
 
