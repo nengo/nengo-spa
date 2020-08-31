@@ -13,7 +13,9 @@ class SemanticPointer(Fixed):
     """A Semantic Pointer, based on Holographic Reduced Representations.
 
     Operators are overloaded so that ``+`` and ``-`` are addition,
-    ``*`` is circular convolution, and ``~`` is the inversion operator.
+    ``*`` is circular convolution, and ``~`` is the two-sided inversion operator.
+    The left and right inverese can be obtained with the `linv` and `rinv`
+    methods.
 
     Parameters
     ----------
@@ -24,7 +26,7 @@ class SemanticPointer(Fixed):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     name : str, optional
         A name for the Semantic Pointer.
@@ -255,19 +257,10 @@ class SemanticPointer(Fixed):
             return NotImplemented
 
     def __invert__(self):
-        """Return a reorganized vector that acts as a two-sided inverse for
-        binding.
+        """Return a reorganized `SemanticPointer` that acts as a two-sided
+        inverse for binding.
 
-        When using the (default) ``HrrAlgebra``:
-
-        This reorganization turns circular convolution into circular
-        correlation, meaning that ``A*B*~B`` is approximately ``A``.
-
-        For the vector ``[1, 2, 3, 4, 5]``, the inverse is ``[1, 5, 4, 3, 2]``.
-
-        See also
-        --------
-        linv, rinv
+        .. seealso:: linv, rinv
         """
         return SemanticPointer(
             data=self.algebra.invert(self.v, sidedness=ElementSidedness.TWO_SIDED),
@@ -277,7 +270,11 @@ class SemanticPointer(Fixed):
         )
 
     def linv(self):
-        """Return a reorganized vector that acts as the left inverse for binding."""
+        """Return a reorganized `SemanticPointer` that acts as a left inverse
+        for binding.
+
+        .. seealso:: `__invert__`, `rinv`
+        """
         return SemanticPointer(
             data=self.algebra.invert(self.v, sidedness=ElementSidedness.LEFT),
             vocab=self.vocab,
@@ -286,7 +283,11 @@ class SemanticPointer(Fixed):
         )
 
     def rinv(self):
-        """Return a reorganized vector that acts as the right inverse for binding."""
+        """Return a reorganized `SemanticPointer` that acts as a right inverse
+        for binding.
+
+        .. seealso:: `__invert__`, `linv`
+        """
         return SemanticPointer(
             data=self.algebra.invert(self.v, sidedness=ElementSidedness.RIGHT),
             vocab=self.vocab,
@@ -433,7 +434,7 @@ class Identity(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive
         with the *vocab* argument.
     sidedness : ElementSidedness, optional
         Side in the binding operation on which the element acts as identity.
@@ -471,8 +472,8 @@ class AbsorbingElement(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
-        with the *vocab* argument.
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive with the *vocab*
+        argument.
     sidedness : ElementSidedness, optional
         Side in the binding operation on which the element acts as absorbing element.
     """
@@ -505,8 +506,8 @@ class Zero(SemanticPointer):
         Mutually exclusive with the *algebra* argument.
     algebra : AbstractAlgebra, optional
         Algebra used to perform vector symbolic operations on the Semantic
-        Pointer. Defaults to `.CircularConvolutionAlgebra`. Mutually exclusive
-        with the *vocab* argument.
+        Pointer. Defaults to `.HrrAlgebra`. Mutually exclusive with the *vocab*
+        argument.
     sidedness : ElementSidedness, optional
         Side in the binding operation on which the element acts as zero element.
     """

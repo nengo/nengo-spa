@@ -9,6 +9,8 @@ nengo\_spa\.networks
 
       CircularConvolution
       IdentityEnsembleArray
+      MatrixMult
+      VTB
 
    .. rubric:: Selection networks
 

@@ -83,6 +83,28 @@ class HrrAlgebra(AbstractAlgebra):
         return np.fft.irfft(np.fft.rfft(a) * np.fft.rfft(b), n=n)
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
+        """Invert vector *v*.
+
+        This turns circular convolution into circular correlation, meaning that
+        ``A*B*~B`` is approximately ``A``.
+
+        Examples
+        --------
+        For the vector ``[1, 2, 3, 4, 5]``, the inverse is ``[1, 5, 4, 3, 2]``.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to invert.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the inverse is two-sided.
+
+        Returns
+        -------
+        (d,) ndarray
+            Inverted vector.
+        """
         return v[-np.arange(len(v))]
 
     def get_binding_matrix(self, v, swap_inputs=False):
@@ -93,6 +115,21 @@ class HrrAlgebra(AbstractAlgebra):
         return np.array(T)
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        """Returns the transformation matrix for inverting a vector.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality (determines the matrix size).
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the inverse is two-sided.
+
+        Returns
+        -------
+        (d, d) ndarray
+            Transformation matrix to invert a vector.
+        """
         return np.eye(d)[-np.arange(d)]
 
     def implement_superposition(self, n_neurons_per_d, d, n):

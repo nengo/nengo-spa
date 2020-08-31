@@ -67,7 +67,14 @@ class VTB(nengo.Network):
 
     The VTB binding operation is neither associative nor commutative.
 
-    Publications with further information are forthcoming.
+    Additional information about VTB can be found in
+
+    * `Gosmann, Jan, and Chris Eliasmith (2019). Vector-derived transformation binding:
+      an improved binding operation for deep symbol-like processing in
+      neural networks. Neural computation 31.5, 849-869.
+      <https://www.mitpressjournals.org/action/showCitFormats?doi=10.1162/neco_a_01179>`_
+    * `Jan Gosmann (2018). An Integrated Model of Context, Short-Term, and
+      Long-Term Memory. UWSpace. <https://uwspace.uwaterloo.ca/handle/10012/13498>`_
 
     Parameters
     ----------

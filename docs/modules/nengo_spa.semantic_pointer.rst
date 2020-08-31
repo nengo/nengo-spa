@@ -15,4 +15,5 @@ nengo\_spa\.semantic_pointer
       Zero
 
    .. autoclass:: SemanticPointer
+      :special-members: __invert__
       :exclude-members: connect_to, construct, evaluate
