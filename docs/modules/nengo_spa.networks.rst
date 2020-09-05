@@ -11,6 +11,7 @@ nengo\_spa\.networks
       IdentityEnsembleArray
       MatrixMult
       VTB
+      TVTB
 
    .. rubric:: Selection networks
 

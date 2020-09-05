@@ -25,6 +25,12 @@ Release History
 
 **Added**
 
+- Transposed Vector-derived Transformation Binding (TVTB) algebra which has
+  essentially the same properties as the existing VTB algebra, but has two-sided
+  identities and inverses (opposed to VTB where these are right-sided only).
+  The only difference in the math is that TVTB transposes the matrix used in the
+  binding operation.
+  (`#266 <https://github.com/nengo/nengo_spa/issues/266>`__)
 - Differentiation between left, right, and two-sided special elements (identity,
   zero, absorbing element, inverse) of an algebra.
   (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)

@@ -14,6 +14,7 @@ except ImportError:
 
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.algebras.vtb_algebra import VtbAlgebra
+from nengo_spa.algebras.tvtb_algebra import TvtbAlgebra
 
 
 class TestConfig:
@@ -27,7 +28,7 @@ class TestConfig:
     module modify these values accordingly.
     """
 
-    algebras = [HrrAlgebra(), VtbAlgebra()]
+    algebras = [HrrAlgebra(), VtbAlgebra(), TvtbAlgebra()]
 
 
 def pytest_generate_tests(metafunc):
