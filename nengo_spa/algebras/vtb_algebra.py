@@ -37,12 +37,15 @@ class VtbAlgebra(AbstractAlgebra):
     .. math:: d'^2 = d.
 
     The approximate inverse :math:`y^+` for :math:`y` is permuting the elements
-    such that :math:`V_{y^+} = V_y`.
+    such that :math:`V_{y^+} = V_y^T`.
 
     Note that VTB requires the vector dimensionality to be square.
 
     The VTB binding operation is neither associative nor commutative.
     Furthermore, there are right inverses and identities only.
+    By transposing the :math:`V_y` matrix, the closely related `.TvtbAlgebra`
+    (Transposed VTB) algebra is obtained which does have two-sided identities
+    and inverses.
 
     Additional information about VTB can be found in
 
@@ -52,6 +55,9 @@ class VtbAlgebra(AbstractAlgebra):
       <https://www.mitpressjournals.org/action/showCitFormats?doi=10.1162/neco_a_01179>`_
     * `Jan Gosmann (2018). An Integrated Model of Context, Short-Term, and
       Long-Term Memory. UWSpace. <https://uwspace.uwaterloo.ca/handle/10012/13498>`_
+
+    .. seealso::
+        `.TvtbAlgebra`
     """
 
     _instance = None

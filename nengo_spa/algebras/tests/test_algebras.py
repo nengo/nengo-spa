@@ -52,7 +52,7 @@ def test_binding_and_invert(algebra, d, sidedness, rng):
                 warnings.simplefilter("error", DeprecationWarning)
                 if binding_side is ElementSidedness.LEFT:
                     bound = algebra.bind(b, a)
-                    r = algebra.bind(bound, algebra.invert(b, sidedness=sidedness))
+                    r = algebra.bind(algebra.invert(b, sidedness=sidedness), bound)
                 elif binding_side is ElementSidedness.RIGHT:
                     bound = algebra.bind(a, b)
                     r = algebra.bind(bound, algebra.invert(b, sidedness=sidedness))
@@ -82,8 +82,10 @@ def test_get_binding_matrix(algebra, rng):
     b = next(gen)
 
     m = algebra.get_binding_matrix(b)
-
     assert np.allclose(algebra.bind(a, b), np.dot(m, a))
+
+    m = algebra.get_binding_matrix(b, swap_inputs=True)
+    assert np.allclose(algebra.bind(b, a), np.dot(m, a))
 
 
 @pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")

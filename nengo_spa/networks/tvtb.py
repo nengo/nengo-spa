@@ -22,27 +22,18 @@ def inversion_matrix(dimensions):
     return m
 
 
-def swapping_matrix(dimensions):
-    sub_d = calc_sub_d(dimensions)
-    m = np.zeros((dimensions, dimensions))
-    for i in range(dimensions):
-        j = i // sub_d + sub_d * (i % sub_d)
-        m[i, j] = 1.0
-    return m
-
-
-class VTB(nengo.Network):
-    r"""Compute vector-derived transformation binding (VTB).
+class TVTB(nengo.Network):
+    r"""Compute transposed vector-derived transformation binding (TVTB).
 
     VTB uses elementwise addition for superposition. The binding operation
     :math:`\mathcal{B}(x, y)` is defined as
 
     .. math::
 
-       \mathcal{B}(x, y) := V_y x = \left[\begin{array}{ccc}
-           V_y' &    0 &    0 \\
-              0 & V_y' &    0 \\
-              0 &    0 & V_y'
+       \mathcal{B}(x, y) := V_y^T x = \left[\begin{array}{ccc}
+           V_y'^T &      0 &      0 \\
+              0   & V_y'^T &      0 \\
+              0   &      0 & V_y'^T
            \end{array}\right] x
 
     with
@@ -63,25 +54,14 @@ class VTB(nengo.Network):
     The approximate inverse :math:`y^+` for :math:`y` is permuting the elements
     such that :math:`V_{y^+} = V_y^T`.
 
-    Note that VTB requires the vector dimensionality to be square.
+    Note that TVTB requires the vector dimensionality to be square.
 
-    The VTB binding operation is neither associative nor commutative.
-    Furthermore, there are right inverses and identities only.
-    By transposing the :math:`V_y` matrix, the closely related `.TvtbAlgebra`
-    (Transposed VTB) algebra is obtained which does have two-sided identities
-    and inverses.
-
-    Additional information about VTB can be found in
-
-    * `Gosmann, Jan, and Chris Eliasmith (2019). Vector-derived transformation binding:
-      an improved binding operation for deep symbol-like processing in
-      neural networks. Neural computation 31.5, 849-869.
-      <https://www.mitpressjournals.org/action/showCitFormats?doi=10.1162/neco_a_01179>`_
-    * `Jan Gosmann (2018). An Integrated Model of Context, Short-Term, and
-      Long-Term Memory. UWSpace. <https://uwspace.uwaterloo.ca/handle/10012/13498>`_
+    The TVTB binding operation is neither associative nor commutative.
+    In contrast to VTB, however, TVTB has two-sided identities and inverses.
+    Other properties are equivalent to VTB.
 
     .. seealso::
-        `.TvtbAlgebra`, `.TVTB`
+        `.VtbAlgebra`, `.VTB`
 
     Parameters
     ----------
@@ -143,7 +123,6 @@ class VTB(nengo.Network):
                 nengo.Connection(
                     self.input_right,
                     self.vec,
-                    transform=swapping_matrix(dimensions),
                     synapse=None,
                 )
             else:
@@ -164,7 +143,12 @@ class VTB(nengo.Network):
             for i in range(sub_d):
                 mm = self.matmuls[i]
                 sl = slice(i * sub_d, (i + 1) * sub_d)
-                nengo.Connection(self.mat, mm.input_left, synapse=None)
+                nengo.Connection(
+                    self.mat,
+                    mm.input_left,
+                    transform=inversion_matrix(dimensions),
+                    synapse=None,
+                )
                 nengo.Connection(self.vec[sl], mm.input_right, synapse=None)
                 nengo.Connection(
                     mm.output, self.output[sl], transform=np.sqrt(sub_d), synapse=None

@@ -12,3 +12,4 @@ nengo\_spa\.algebras
       ElementSidedness
       HrrAlgebra
       VtbAlgebra
+      TvtbAlgebra
