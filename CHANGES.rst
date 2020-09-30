@@ -23,6 +23,12 @@ Release History
 1.1.1 (unreleased)
 ==================
 
+**Fixed**
+
+- ``PointerSymbol`` precedence handling has been fixed. For example,
+  ``(sym.A + sym.B) * sym.C`` will be evaluated correctly now.
+  (`#267 <https://github.com/nengo/nengo_spa/issues/267>`__,
+  `#268 <https://github.com/nengo/nengo_spa/pull/268>`__)
 
 
 
