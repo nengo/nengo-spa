@@ -38,5 +38,6 @@ def test_unary_operator(op):
 @pytest.mark.parametrize("op", ["<<", ">>", "+", "-", "*", "@", "/", "//", "%", "**"])
 def test_binary_operator(op):
     lhs, rhs = Leaf("lhs"), Leaf("rhs")
+    assert lhs
+    assert rhs
     assert str(eval("lhs" + op + "rhs")) == "lhs {} rhs".format(op)
-

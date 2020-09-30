@@ -153,7 +153,15 @@ def test_pointer_symbol_factory():
     assert ps.expr == "A"
 
 
-def test_pointer_symbol_factory_expressions():
-    ps = sym("A + B * C")
+@pytest.mark.parametrize(
+    "ps,expected",
+    [
+        (sym("A + B * C"), "(A+B*C)"),
+        (sym.A + sym.B * sym.C, "A + B * C"),
+        (sym("(A + B) * C"), "((A+B)*C)"),
+        ((sym.A + sym.B) * sym.C, "(A + B) * C"),
+    ],
+)
+def test_pointer_symbol_factory_expressions(ps, expected):
     assert isinstance(ps, PointerSymbol)
-    assert ps.expr == (sym.A + sym.B * sym.C).expr
+    assert ps.expr == expected

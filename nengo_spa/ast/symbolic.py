@@ -5,6 +5,7 @@ import re
 import nengo
 import numpy as np
 
+from nengo_spa.ast import expr_tree
 from nengo_spa.ast.base import infer_types, Fixed, TypeCheckedBinaryOp
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import SemanticPointer
@@ -51,6 +52,10 @@ class FixedScalar(Symbol):
     def expr(self):
         return repr(self.value)
 
+    @property
+    def _expr_tree(self):
+        return expr_tree.Leaf(self.expr)
+
     def __neg__(self):
         return FixedScalar(-self.value)
 
@@ -58,7 +63,9 @@ class FixedScalar(Symbol):
 class PointerSymbol(Symbol):
     def __init__(self, expr, type_=TAnyVocab):
         super(PointerSymbol, self).__init__(type_=type_)
-        self._expr = expr
+        self._expr_tree = (
+            expr if isinstance(expr, expr_tree.Node) else expr_tree.Leaf(expr)
+        )
 
     def connect_to(self, sink, **kwargs):
         return nengo.Connection(self.construct(), sink, **kwargs)
@@ -76,20 +83,20 @@ class PointerSymbol(Symbol):
 
     @property
     def expr(self):
-        return self._expr
+        return str(self._expr_tree)
 
     def __invert__(self):
-        return PointerSymbol("~" + self.expr, self.type)
+        return PointerSymbol(~self._expr_tree, self.type)
 
     def __neg__(self):
-        return PointerSymbol("-" + self.expr, self.type)
+        return PointerSymbol(-self._expr_tree, self.type)
 
     def __add__(self, other):
         other = as_symbolic_node(other)
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + "+" + other.expr, type_)
+        return PointerSymbol(self._expr_tree + other._expr_tree, type_)
 
     def __radd__(self, other):
         return self + other
@@ -99,7 +106,7 @@ class PointerSymbol(Symbol):
         if not isinstance(other, PointerSymbol):
             return NotImplemented
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + "-" + other.expr, type_)
+        return PointerSymbol(self._expr_tree - other._expr_tree, type_)
 
     def __rsub__(self, other):
         return (-self) + other
@@ -107,17 +114,17 @@ class PointerSymbol(Symbol):
     @symbolic_op
     def __mul__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + "*" + other.expr, type_)
+        return PointerSymbol(self._expr_tree * other._expr_tree, type_)
 
     @symbolic_op
     def __rmul__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(other.expr + "*" + self.expr, type_)
+        return PointerSymbol(other._expr_tree * self._expr_tree, type_)
 
     @symbolic_op
     def __truediv__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(self.expr + "/" + other.expr, type_)
+        return PointerSymbol(self._expr_tree / other._expr_tree, type_)
 
     def dot(self, other):
         other = as_symbolic_node(other)
@@ -145,7 +152,7 @@ class PointerSymbol(Symbol):
         return SemanticPointer(np.dot(tr, self.evaluate().v), vocab=vocab)
 
     def __repr__(self):
-        return "PointerSymbol({!r}, {!r})".format(self.expr, self.type)
+        return "PointerSymbol({!r}, {!r})".format(self._expr_tree, self.type)
 
 
 class PointerSymbolFactory:
@@ -165,7 +172,7 @@ class PointerSymbolFactory:
         return PointerSymbol(key)
 
     def __call__(self, expr):
-        return PointerSymbol(re.sub(r"\s+", "", expr))
+        return PointerSymbol("({})".format(re.sub(r"\s+", "", expr)))
 
 
 sym = PointerSymbolFactory()
