@@ -157,7 +157,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         return input_vocab_registry.declare_connector(obj, vocab)
 
     def declare_output(self, obj, vocab):
-        """ Declares a network output.
+        """Declares a network output.
 
         Parameters
         ----------
