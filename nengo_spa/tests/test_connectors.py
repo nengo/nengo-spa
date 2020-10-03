@@ -7,7 +7,11 @@ from nengo_spa.exceptions import SpaTypeError
 
 
 @pytest.mark.parametrize(
-    "construct_obj", (lambda: nengo.Node([1.0, 2.0]), lambda: [None],)
+    "construct_obj",
+    (
+        lambda: nengo.Node([1.0, 2.0]),
+        lambda: [None],
+    ),
 )
 def test_as_ast_node_error(construct_obj):
     with spa.Network():

@@ -126,8 +126,7 @@ class RoutedConnection:
         return isinstance(self.source, Fixed)
 
     def transform(self):
-        """For a fixed source, returns the transform to implement the output.
-        """
+        """For a fixed source, returns the transform to implement the output."""
         assert self.fixed
         if self.type == TScalar:
             return self.source.evaluate()
