@@ -5,6 +5,15 @@ import numpy as np
 from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
+from nengo_spa.ast.expr_tree import (
+    AttributeAccess,
+    BinaryOperator,
+    FunctionCall,
+    Leaf,
+    limit_str_length,
+    Node,
+    UnaryOperator,
+)
 from nengo_spa.typechecks import is_array, is_array_like, is_number
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
@@ -59,9 +68,15 @@ class SemanticPointer(Fixed):
 
         self.vocab = vocab
 
-        if name is not None and len(name) > self.MAX_NAME:
-            name = "%s..." % (name[: self.MAX_NAME - 3])
-        self.name = name
+        if name is not None:
+            if not isinstance(name, Node):
+                name = Leaf(name)
+            name = limit_str_length(name, self.MAX_NAME)
+        self._expr_tree = name
+
+    @property
+    def name(self):
+        return None if self._expr_tree is None else str(self._expr_tree)
 
     def _get_algebra(cls, vocab, algebra):
         if algebra is None:
@@ -78,21 +93,25 @@ class SemanticPointer(Fixed):
         return algebra
 
     def _get_unary_name(self, op):
-        return "{}({})".format(op, self.name) if self.name else None
+        return UnaryOperator(op, self._expr_tree) if self._expr_tree else None
 
     def _get_method_name(self, method):
-        return "({}).{}()".format(self.name, method) if self.name else None
+        return (
+            FunctionCall(tuple(), AttributeAccess(method, self._expr_tree))
+            if self._expr_tree
+            else None
+        )
 
     def _get_binary_name(self, other, op, swap=False):
         if isinstance(other, SemanticPointer):
-            other_name = other.name
+            other_expr_tree = other._expr_tree
         else:
-            other_name = str(other)
-        self_name = self.name
-        if self_name and other_name:
+            other_expr_tree = Leaf(str(other))  # FIXME what is this for?
+        self_expr_tree = self._expr_tree
+        if self_expr_tree and other_expr_tree:
             if swap:
-                self_name, other_name = other_name, self.name
-            return "({}){}({})".format(self_name, op, other_name)
+                self_expr_tree, other_expr_tree = other_expr_tree, self._expr_tree
+            return BinaryOperator(op, self_expr_tree, other_expr_tree)
         else:
             return None
 

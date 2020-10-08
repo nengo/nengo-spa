@@ -390,14 +390,14 @@ def test_name():
         )
     )
 
-    assert (-a).name == "-(a)"
-    assert (~a).name == "~(a)"
-    assert a.normalized().name == "(a).normalized()"
-    assert a.unitary().name == "(a).unitary()"
-    assert (a + b).name == "(a)+(b)"
-    assert (a * b).name == "(a)*(b)"
-    assert (2.0 * a).name == "(2.0)*(a)"
-    assert (a / 2.0).name == "(a)/(2.0)"
+    assert (-a).name == "-a"
+    assert (~a).name == "~a"
+    assert a.normalized().name == "a.normalized()"
+    assert a.unitary().name == "a.unitary()"
+    assert (a + b).name == "a + b"
+    assert (a * b).name == "a * b"
+    assert (2.0 * a).name == "2.0 * a"
+    assert (a / 2.0).name == "a / 2.0"
 
     assert (a + unnamed).name is None
     assert (a * unnamed).name is None
@@ -405,7 +405,8 @@ def test_name():
     # check that names that blow up exponentially in length are truncated
     for i in range(10):
         a += a * b
-    assert len(a.name) == a.MAX_NAME
+    assert len(a.name) <= a.MAX_NAME
+    assert a.name.startswith("a + a * b + (a + a * b) * b")
     assert a.name.endswith("...")
 
 

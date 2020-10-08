@@ -365,4 +365,4 @@ def test_pointer_names():
     v.populate("A; B")
 
     assert v["A"].name == "A"
-    assert v.parse("A*B").name == "(A)*(B)"
+    assert v.parse("A*B").name == "A * B"
