@@ -1,0 +1,1153 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>nengo_spa.algebras &#8212; NengoSPA 1.1.1 docs</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,600|Rajdhani:700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+<link rel="stylesheet" href="https://www.nengo.ai/css/bootstrap.css" type="text/css">
+<style>
+  body .title-bar,
+  body .documentation-source h1:after {
+    background-color: #d40000;
+  }
+</style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-41658423-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-41658423-2');
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stickyfill/2.1.0/stickyfill.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<!-- From basic/layout.html -->
+<script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+  
+  
+<script src="../_static/underscore.js"></script>
+  
+  
+<script src="../_static/doctools.js"></script>
+  
+  
+<script src="../_static/language_data.js"></script>
+  
+  
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+  
+<script async="async" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+<script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nengo_spa.examine" href="nengo_spa.examine.html" />
+    <link rel="prev" title="nengo_spa" href="nengo_spa.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  </head><body class="bg-dark">
+
+<header class="fixed-top header-top shadow-sm">
+  <nav class="navbar navbar-expand-md navbar-light bg-white">
+    <a class="navbar-brand" href="https://www.nengo.ai/">
+      <img
+        src="https://www.nengo.ai/design/_images/general-full-light.svg"
+        alt="Nengo"
+        class="logo"
+      />
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbar-collapse"
+      aria-controls="navbar-collapse"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.nengo.ai/">What is Nengo?</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.nengo.ai/examples/">Examples</a>
+        </li>
+        <li class="nav-item dropdown active">
+          <a
+            class="nav-link dropdown-toggle"
+            id="navbar-dropdown-docs"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            href="#"
+            >Documentation</a
+          >
+          <div
+            class="dropdown-menu shadow-lg border-0"
+            aria-labelledby="navbar-dropdown-docs"
+          >
+            
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo/">Nengo core</a>
+            <a class="dropdown-item" href="https://github.com/nengo/nengo-gui/">NengoGUI</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-dl/">NengoDL</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-spa/">NengoSPA</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-extras/">NengoExtras</a>
+            <a class="dropdown-item" href="https://arvoelke.github.io/nengolib-docs/">Nengolib</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/keras-spiking">KerasSpiking</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/pytorch-spiking">PyTorchSpiking</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-fpga/">NengoFPGA</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-loihi/">NengoLoihi</a>
+            <a class="dropdown-item" href="https://labs.nengo.ai/nengo-ocl/">NengoOCL</a>
+            <a class="dropdown-item" href="https://github.com/project-rig/nengo_spinnaker">NengoSpiNNaker</a>
+            <a class="dropdown-item" href="https://github.com/nengo-labs/nengo-mpi">NengoMPI</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/documentation/"
+              >All documentation</a
+            >
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            id="navbar-dropdown-community"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            href="#"
+            >Community</a
+          >
+          <div
+            class="dropdown-menu shadow-lg border-0"
+            aria-labelledby="navbar-dropdown-community"
+          >
+            <a class="dropdown-item" href="https://forum.nengo.ai">Forum</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/people/"
+              >People</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/summer-school/"
+              >Summer school</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/contributing/"
+              >Contributing</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/publications/"
+              >Publications</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/videos/"
+              >Videos</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/conduct/"
+              >Code of conduct</a
+            >
+            <a class="dropdown-item" href="https://www.nengo.ai/caa/">CAA</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link btn btn-success btn-sm text-white"
+            href="https://www.nengo.ai/getting-started/"
+            >Getting started</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<div class="main-content gradient-top">
+  <div class="container-fluid">
+    <div class="row"><a class="toggle-sidenav d-block d-md-none" href="#"
+  ><i class="icon-close fa fa-fw fa-arrow-left"></i
+  ><i class="icon-open fa fa-fw fa-arrow-right"></i
+></a>
+<div role="complementary" class="sidenav col-4 col-xl-3 p-0 border-right">
+  <h3 class="pt-5 px-5">
+    <a href="../index.html">
+      <img
+        class="img-fluid documentation-image"
+        src="https://www.nengo.ai/design/_images/nengo-spa-full-light.svg"
+        alt="NengoSPA"
+      />
+    </a>
+  </h3>
+<form class="px-5 py-3 my-0 border-bottom" action="../search.html" method="get">
+  <div class="form-group form-group-single">
+    <input type="text" name="q" class="form-control" placeholder="Search" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+    <button type="submit" class="btn btn-link">
+      <img src="https://www.nengo.ai/img/icon-search.svg" alt="Go" />
+    </button>
+  </div>
+</form><div class="p-5 toctree">
+  
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user-guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.html">nengo_spa</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">nengo_spa.algebras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.examine.html">nengo_spa.examine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.exceptions.html">nengo_spa.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.math.html">nengo_spa.math</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.modules.html">nengo_spa.modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.networks.html">nengo_spa.networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.operators.html">nengo_spa.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.semantic_pointer.html">nengo_spa.semantic_pointer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.testing.html">nengo_spa.testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.vector_generation.html">nengo_spa.vector_generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.version.html">nengo_spa.version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.vocabulary.html">nengo_spa.vocabulary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer Guide</a></li>
+</ul>
+
+  
+  </div>
+  
+  <form class="p-5 my-0 border-top">
+    <div class="form-group">
+      <label class="text-gray">Version:</label>
+      <select class="custom-select" onchange="switchVersion(this);">
+        
+        
+        <option value="../../modules/nengo_spa.algebras.html">latest</option>
+        
+        
+          
+        <option selected>v1.1.1</option>
+          
+        
+          
+        <option value="../../v1.1.0/modules/nengo_spa.algebras.html">
+          v1.1.0
+        </option>
+          
+        
+      </select>
+    </div>
+  </form>
+  
+</div>
+      
+
+      <div class="col-12 col-md-8 col-xl-9">
+        <div class="container">
+          <div class="row">
+            <div class="col-10 offset-1 pb-5 documentation-source" role="main">
+              
+              
+  <div class="section" id="module-nengo_spa.algebras">
+<span id="nengo-spa-algebras"></span><h1>nengo_spa.algebras<a class="headerlink" href="#module-nengo_spa.algebras" title="Permalink to this headline">¶</a></h1>
+<p>Algebras define the specific superposition and (un)binding operations.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#nengo_spa.algebras.AbstractAlgebra" title="nengo_spa.algebras.AbstractAlgebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractAlgebra</span></code></a></p></td>
+<td><p>Abstract base class for algebras.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#nengo_spa.algebras.HrrAlgebra" title="nengo_spa.algebras.HrrAlgebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HrrAlgebra</span></code></a></p></td>
+<td><p>Holographic Reduced Representations (HRRs) algebra.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#nengo_spa.algebras.VtbAlgebra" title="nengo_spa.algebras.VtbAlgebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VtbAlgebra</span></code></a></p></td>
+<td><p>Vector-derived Transformation Binding (VTB) algebra.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt id="nengo_spa.algebras.AbstractAlgebra">
+<em class="property">class </em><code class="sig-prename descclassname">nengo_spa.algebras.</code><code class="sig-name descname">AbstractAlgebra</code><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for algebras.</p>
+<p>Custom algebras can be defined by implementing the interface of this
+abstract base class.</p>
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.is_valid_dimensionality">
+<code class="sig-name descname">is_valid_dimensionality</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.is_valid_dimensionality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.is_valid_dimensionality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether <em>d</em> is a valid vector dimensionality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Dimensionality</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>True</em>, if <em>d</em> is a valid vector dimensionality for the use with
+the algebra.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.make_unitary">
+<code class="sig-name descname">make_unitary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.make_unitary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.make_unitary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unitary vector based on the vector <em>v</em>.</p>
+<p>A unitary vector does not change the length of a vector it is bound to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to base unitary vector on.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unitary vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.superpose">
+<code class="sig-name descname">superpose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.superpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.superpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the superposition of <em>a</em> and <em>b</em>.</p>
+<p>This is commonly elementwise addition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in superposition.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in superposition.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Superposed vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the binding of <em>a</em> and <em>b</em>.</p>
+<p>The resulting vector should in most cases be dissimilar to both inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in binding.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in binding.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bound vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.invert">
+<code class="sig-name descname">invert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.invert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert vector <em>v</em>.</p>
+<p>A vector bound to its inverse will result in the identity vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to invert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Inverted vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.get_binding_matrix">
+<code class="sig-name descname">get_binding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">swap_inputs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.get_binding_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.get_binding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for binding with a fixed vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Fixed vector to derive binding matrix for.</p></li>
+<li><p><strong>swap_inputs</strong> (<em>bool</em><em>, </em><em>optional</em>) – By default the matrix will be such that <em>v</em> becomes the <em>right</em>
+operand in the binding. By setting <em>swap_inputs</em>, the matrix will
+be such that <em>v</em> becomes the <em>left</em> operand. For binding operations
+that are commutative (such as circular convolution), this has no
+effect.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to perform binding with <em>v</em>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.get_inversion_matrix">
+<code class="sig-name descname">get_inversion_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.get_inversion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.get_inversion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for inverting a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality (determines the matrix size).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to invert a vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.implement_superposition">
+<code class="sig-name descname">implement_superposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.implement_superposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.implement_superposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for superposing vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of vectors to superpose in the network.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of length <em>n</em> of inputs to the
+network, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.implement_binding">
+<code class="sig-name descname">implement_binding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">unbind_left</span></em>, <em class="sig-param"><span class="n">unbind_right</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.implement_binding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.implement_binding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for binding vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>unbind_left</strong> (<em>bool</em>) – Whether the left input should be unbound from the right input.</p></li>
+<li><p><strong>unbind_right</strong> (<em>bool</em>) – Whether the right input should be unbound from the left input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of the left and the right
+input in that order, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.absorbing_element">
+<code class="sig-name descname">absorbing_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.absorbing_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.absorbing_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the standard absorbing element of dimensionality <em>d</em>.</p>
+<p>An absorbing element will produce a scaled version of itself when bound
+to another vector. The standard absorbing element is the absorbing
+element with norm 1.</p>
+<p>Some algebras might not have an absorbing element other than the zero
+vector. In that case a <em>NotImplementedError</em> may be raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Standard absorbing element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.identity_element">
+<code class="sig-name descname">identity_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.identity_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.identity_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the identity element of dimensionality <em>d</em>.</p>
+<p>The identity does not change the vector it is bound to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Identity element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.AbstractAlgebra.zero_element">
+<code class="sig-name descname">zero_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/base.html#AbstractAlgebra.zero_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.AbstractAlgebra.zero_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the zero element of dimensionality <em>d</em>.</p>
+<p>The zero element produces itself when bound to a different vector.
+Usually this will be the zero vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Zero element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.algebras.HrrAlgebra">
+<em class="property">class </em><code class="sig-prename descclassname">nengo_spa.algebras.</code><code class="sig-name descname">HrrAlgebra</code><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holographic Reduced Representations (HRRs) algebra.</p>
+<p>Uses element-wise addition for superposition, circular convolution for
+binding with an approximate inverse.</p>
+<p>The circular convolution <span class="math notranslate nohighlight">\(c\)</span> of vectors <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>
+is given by</p>
+<div class="math notranslate nohighlight">
+\[c[i] = \sum_j a[j] b[i - j]\]</div>
+<p>where negative indices on <span class="math notranslate nohighlight">\(b\)</span> wrap around to the end of the vector.</p>
+<p>This computation can also be done in the Fourier domain,</p>
+<div class="math notranslate nohighlight">
+\[c = DFT^{-1} ( DFT(a) \odot DFT(b) )\]</div>
+<p>where <span class="math notranslate nohighlight">\(DFT\)</span> is the Discrete Fourier Transform operator, and
+<span class="math notranslate nohighlight">\(DFT^{-1}\)</span> is its inverse.</p>
+<p>Circular convolution as a binding operation is associative, commutative,
+distributive.</p>
+<p>More information on circular convolution as a binding operation can be
+found in <a class="reference internal" href="#plate2003" id="id1"><span>[plate2003]</span></a>.</p>
+<dl class="citation">
+<dt class="label" id="plate2003"><span class="brackets"><a class="fn-backref" href="#id1">plate2003</a></span></dt>
+<dd><p>Plate, Tony A. Holographic Reduced Representation:
+Distributed Representation for Cognitive Structures. Stanford, CA: CSLI
+Publications, 2003.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.is_valid_dimensionality">
+<code class="sig-name descname">is_valid_dimensionality</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.is_valid_dimensionality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.is_valid_dimensionality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether <em>d</em> is a valid vector dimensionality.</p>
+<p>For circular convolution all positive numbers are valid
+dimensionalities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Dimensionality</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>True</em>, if <em>d</em> is a valid vector dimensionality for the use with
+the algebra.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.make_unitary">
+<code class="sig-name descname">make_unitary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.make_unitary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.make_unitary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unitary vector based on the vector <em>v</em>.</p>
+<p>A unitary vector does not change the length of a vector it is bound to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to base unitary vector on.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unitary vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.superpose">
+<code class="sig-name descname">superpose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.superpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.superpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the superposition of <em>a</em> and <em>b</em>.</p>
+<p>This is commonly elementwise addition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in superposition.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in superposition.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Superposed vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the binding of <em>a</em> and <em>b</em>.</p>
+<p>The resulting vector should in most cases be dissimilar to both inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in binding.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in binding.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bound vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.invert">
+<code class="sig-name descname">invert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.invert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert vector <em>v</em>.</p>
+<p>A vector bound to its inverse will result in the identity vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to invert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Inverted vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.get_binding_matrix">
+<code class="sig-name descname">get_binding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">swap_inputs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.get_binding_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.get_binding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for binding with a fixed vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Fixed vector to derive binding matrix for.</p></li>
+<li><p><strong>swap_inputs</strong> (<em>bool</em><em>, </em><em>optional</em>) – By default the matrix will be such that <em>v</em> becomes the <em>right</em>
+operand in the binding. By setting <em>swap_inputs</em>, the matrix will
+be such that <em>v</em> becomes the <em>left</em> operand. For binding operations
+that are commutative (such as circular convolution), this has no
+effect.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to perform binding with <em>v</em>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.get_inversion_matrix">
+<code class="sig-name descname">get_inversion_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.get_inversion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.get_inversion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for inverting a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality (determines the matrix size).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to invert a vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.implement_superposition">
+<code class="sig-name descname">implement_superposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.implement_superposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.implement_superposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for superposing vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of vectors to superpose in the network.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of length <em>n</em> of inputs to the
+network, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.implement_binding">
+<code class="sig-name descname">implement_binding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">unbind_left</span></em>, <em class="sig-param"><span class="n">unbind_right</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.implement_binding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.implement_binding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for binding vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>unbind_left</strong> (<em>bool</em>) – Whether the left input should be unbound from the right input.</p></li>
+<li><p><strong>unbind_right</strong> (<em>bool</em>) – Whether the right input should be unbound from the left input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of the left and the right
+input in that order, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.absorbing_element">
+<code class="sig-name descname">absorbing_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.absorbing_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.absorbing_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the standard absorbing element of dimensionality <em>d</em>.</p>
+<p>An absorbing element will produce a scaled version of itself when bound
+to another vector. The standard absorbing element is the absorbing
+element with norm 1.</p>
+<p>The absorbing element for circular convolution is the vector
+<span class="math notranslate nohighlight">\((1, 1, \dots, 1)^{\top} / \sqrt{d}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Standard absorbing element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.identity_element">
+<code class="sig-name descname">identity_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.identity_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.identity_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the identity element of dimensionality <em>d</em>.</p>
+<p>The identity does not change the vector it is bound to.</p>
+<p>The identity element for circular convolution is the vector
+<span class="math notranslate nohighlight">\((1, 0, \dots, 0)^{\top}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Identity element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.HrrAlgebra.zero_element">
+<code class="sig-name descname">zero_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/hrr_algebra.html#HrrAlgebra.zero_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.HrrAlgebra.zero_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the zero element of dimensionality <em>d</em>.</p>
+<p>The zero element produces itself when bound to a different vector.
+For circular convolution this is the zero vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Zero element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.algebras.VtbAlgebra">
+<em class="property">class </em><code class="sig-prename descclassname">nengo_spa.algebras.</code><code class="sig-name descname">VtbAlgebra</code><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector-derived Transformation Binding (VTB) algebra.</p>
+<p>VTB uses elementwise addition for superposition. The binding operation
+<span class="math notranslate nohighlight">\(\mathcal{B}(x, y)\)</span> is defined as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathcal{B}(x, y) := V_y x = \left[\begin{array}{ccc}
+    V_y' &amp;    0 &amp;    0 \\
+       0 &amp; V_y' &amp;    0 \\
+       0 &amp;    0 &amp; V_y'
+    \end{array}\right] x\end{split}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V_y' = d^{\frac{1}{4}} \left[\begin{array}{cccc}
+    y_1            &amp; y_2            &amp; \dots  &amp; y_{d'}  \\
+    y_{d' + 1}     &amp; y_{d' + 2}     &amp; \dots  &amp; y_{2d'} \\
+    \vdots         &amp; \vdots         &amp; \ddots &amp; \vdots  \\
+    y_{d - d' + 1} &amp; y_{d - d' + 2} &amp; \dots  &amp; y_d
+\end{array}\right]\end{split}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[d'^2 = d.\]</div>
+<p>The approximate inverse <span class="math notranslate nohighlight">\(y^+\)</span> for <span class="math notranslate nohighlight">\(y\)</span> is permuting the elements
+such that <span class="math notranslate nohighlight">\(V_{y^+} = V_y\)</span>.</p>
+<p>Note that VTB requires the vector dimensionality to be square.</p>
+<p>The VTB binding operation is neither associative nor commutative.</p>
+<p>Publications with further information are forthcoming.</p>
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.is_valid_dimensionality">
+<code class="sig-name descname">is_valid_dimensionality</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.is_valid_dimensionality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.is_valid_dimensionality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether <em>d</em> is a valid vector dimensionality.</p>
+<p>For VTB all square numbers are valid dimensionalities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Dimensionality</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>True</em>, if <em>d</em> is a valid vector dimensionality for the use with
+the algebra.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.make_unitary">
+<code class="sig-name descname">make_unitary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.make_unitary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.make_unitary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unitary vector based on the vector <em>v</em>.</p>
+<p>A unitary vector does not change the length of a vector it is bound to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to base unitary vector on.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unitary vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.superpose">
+<code class="sig-name descname">superpose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.superpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.superpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the superposition of <em>a</em> and <em>b</em>.</p>
+<p>This is commonly elementwise addition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in superposition.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in superposition.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Superposed vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the binding of <em>a</em> and <em>b</em>.</p>
+<p>The resulting vector should in most cases be dissimilar to both inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Left operand in binding.</p></li>
+<li><p><strong>b</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Right operand in binding.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bound vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.invert">
+<code class="sig-name descname">invert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.invert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert vector <em>v</em>.</p>
+<p>A vector bound to its inverse will result in the identity vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Vector to invert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Inverted vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.get_binding_matrix">
+<code class="sig-name descname">get_binding_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">swap_inputs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.get_binding_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.get_binding_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for binding with a fixed vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>(</em><em>d</em><em>,</em><em>) </em><em>ndarray</em>) – Fixed vector to derive binding matrix for.</p></li>
+<li><p><strong>swap_inputs</strong> (<em>bool</em><em>, </em><em>optional</em>) – By default the matrix will be such that <em>v</em> becomes the <em>right</em>
+operand in the binding. By setting <em>swap_inputs</em>, the matrix will
+be such that <em>v</em> becomes the <em>left</em> operand. For binding operations
+that are commutative (such as circular convolution), this has no
+effect.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to perform binding with <em>v</em>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.get_swapping_matrix">
+<code class="sig-name descname">get_swapping_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.get_swapping_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.get_swapping_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get matrix to swap operands in bound state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Dimensionality of vector.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Matrix to multiply with a vector to switch left and right operand
+in bound state.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.get_inversion_matrix">
+<code class="sig-name descname">get_inversion_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.get_inversion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.get_inversion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the transformation matrix for inverting a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality (determines the matrix size).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformation matrix to invert a vector.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d, d) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.implement_superposition">
+<code class="sig-name descname">implement_superposition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.implement_superposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.implement_superposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for superposing vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of vectors to superpose in the network.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of length <em>n</em> of inputs to the
+network, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.implement_binding">
+<code class="sig-name descname">implement_binding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_neurons_per_d</span></em>, <em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">unbind_left</span></em>, <em class="sig-param"><span class="n">unbind_right</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.implement_binding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.implement_binding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement neural network for binding vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons_per_d</strong> (<em>int</em>) – Neurons to use per dimension.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Dimensionality of the vectors.</p></li>
+<li><p><strong>unbind_left</strong> (<em>bool</em>) – Whether the left input should be unbound from the right input.</p></li>
+<li><p><strong>unbind_right</strong> (<em>bool</em>) – Whether the right input should be unbound from the left input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple <em>(net, inputs, output)</em> where <em>net</em> is the implemented
+<a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Network" title="(in Nengo v3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Network</span></code></a>, <em>inputs</em> a sequence of the left and the right
+input in that order, and <em>output</em> the network output.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.absorbing_element">
+<code class="sig-name descname">absorbing_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.absorbing_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.absorbing_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>VTB has no absorbing element except the zero vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.identity_element">
+<code class="sig-name descname">identity_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.identity_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.identity_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the identity element of dimensionality <em>d</em>.</p>
+<p>The identity does not change the vector it is bound to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Identity element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.algebras.VtbAlgebra.zero_element">
+<code class="sig-name descname">zero_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nengo_spa/algebras/vtb_algebra.html#VtbAlgebra.zero_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nengo_spa.algebras.VtbAlgebra.zero_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the zero element of dimensionality <em>d</em>.</p>
+<p>The zero element produces itself when bound to a different vector.
+For VTB this is the zero vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>int</em>) – Vector dimensionality.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Zero element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(d,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><footer class="text-light footer-main gradient-bottom">
+  <p class="small text-center mb-0">
+    <a class="no-hover-line" href="https://appliedbrainresearch.com">
+      <img
+        src="https://appliedbrainresearch.com/img/logo-blue-notext.svg"
+        height="48"
+      />
+    </a>
+    <a href="https://www.nengo.ai/">What is Nengo?</a>
+    <a href="https://www.nengo.ai/examples/">Examples</a>
+    <a href="https://www.nengo.ai/documentation/">Documentation</a>
+    <a href="https://www.nengo.ai/getting-started/">Getting started</a>
+    <a href="https://www.nengo.ai/privacy/">Privacy</a>
+  </p>
+  <p class="small text-center mb-0">&copy; Applied Brain Research</p>
+</footer>
+<script>
+  function switchVersion(select) {
+    var option = select.selectedOptions[0];
+    if (option.hasAttribute("value")) {
+      window.location = option.value;
+    }
+  }
+</script>
+
+<script>
+  var elements = document.querySelectorAll('.sidenav');
+  Stickyfill.add(elements);
+</script>
+<script>
+  ScrollReveal().reveal(".fade-in", {
+      scale: 0.85,
+      duration: 1000,
+      delay: 250,
+      interval: 50
+  });
+</script>
+<script>
+  $('a.toggle-sidenav').on('click', function(e) {
+    e.preventDefault();
+    if ( $(this).hasClass('active') ) {
+      $(this).removeClass('active');
+      $('.sidenav').removeClass('open');
+    } else {
+      $(this).addClass('active');
+      $('.sidenav').addClass('open');
+    }
+  });
+</script>
+<script>
+  var lists = document.querySelectorAll('.toctree ul');
+  lists.forEach((ul) => {
+      ul.classList.add("nav");
+  });
+  var links = document.querySelectorAll('.toctree a');
+  links.forEach((link) => {
+      link.classList.add("nav-link");
+  });
+  $("body").scrollspy({target: ".sidenav"});
+</script>
+  </body>
+</html>
