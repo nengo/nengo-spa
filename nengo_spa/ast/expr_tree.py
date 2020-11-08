@@ -181,106 +181,104 @@ class KeywordArgument(Node):
         return "{}={}".format(self.value, str(self.children[0]))
 
 
-def limit_str_length(expr_tree, max_len):
-    """Returns a modified expression tree with a string length limited to
-    approximately *max_len*."""
-
+class _LimitStrLengthVisitor:
     # General idea of the algorithm: Do an in-order traversal and keep track
     # how much characters we may still use (max_len). When the limit is
     # exceeded, start replacing nodes with ellipsis and re-adjust max_len to
     # account for the characters saved through the replacement.
 
-    def visit_Leaf(node):
-        nonlocal max_len
-        if len(node.value) <= 3 or len(node.value) <= max_len:
-            max_len -= len(node.value)
+    def __init__(self, max_len):
+        self.max_len = max_len
+
+    def visit_Leaf(self, node):
+        if len(node.value) <= 3 or len(node.value) <= self.max_len:
+            self.max_len -= len(node.value)
             return node
         else:
-            max_len -= 3
+            self.max_len -= 3
             return Leaf("...")
 
-    def visit_UnaryOperator(node):
-        nonlocal max_len
-        max_len -= len(node.value)
+    def visit_UnaryOperator(self, node):
+        self.max_len -= len(node.value)
         if node.precedence >= node.children[0].precedence:
-            max_len -= 2
-        return UnaryOperator(node.value, visit_node(node.children[0]))
+            self.max_len -= 2
+        return UnaryOperator(node.value, self.visit_node(node.children[0]))
 
-    def visit_BinaryOperator(node):
-        nonlocal max_len
-        initial_max_len = max_len
+    def visit_BinaryOperator(self, node):
+        initial_max_len = self.max_len
 
         # Operator + 2 spaces + reserve 3 characters for the second operand, so
         # that it can be at least turned into an ellipsis
-        max_len -= len(node.value) + 2 + 3
-        lhs = visit_node(node.lhs)
-        max_len += 3  # return reserved characters for the second operand
+        self.max_len -= len(node.value) + 2 + 3
+        lhs = self.visit_node(node.lhs)
+        self.max_len += 3  # return reserved characters for the second operand
         # Adjust for parenthesis due to operator precedence
         if node.precedence > lhs.precedence:
-            max_len -= 2
+            self.max_len -= 2
         if node.precedence >= node.rhs.precedence:
-            max_len -= 2
+            self.max_len -= 2
 
-        rhs = visit_node(node.rhs)
-        if max_len < 0:
+        rhs = self.visit_node(node.rhs)
+        if self.max_len < 0:
             if node.precedence >= node.rhs.precedence:
-                max_len += 2
-            max_len += len(str(rhs)) - 3
+                self.max_len += 2
+            self.max_len += len(str(rhs)) - 3
             rhs = Leaf("...")
-        if max_len >= 0:
+        if self.max_len >= 0:
             return BinaryOperator(node.value, lhs, rhs)
         else:
-            max_len = initial_max_len - 3
+            self.max_len = initial_max_len - 3
             return Leaf("...")
 
-    def visit_AttributeAccess(node):
-        nonlocal max_len
-        initial_max_len = max_len
-        max_len -= len(node.value) + 1
-        child = visit_node(node.children[0])
+    def visit_AttributeAccess(self, node):
+        initial_max_len = self.max_len
+        self.max_len -= len(node.value) + 1
+        child = self.visit_node(node.children[0])
         if node.precedence > child.precedence:
-            max_len -= 2
-        if max_len < 0:
-            max_len += len(str(child)) - 5
+            self.max_len -= 2
+        if self.max_len < 0:
+            self.max_len += len(str(child)) - 5
             child = Leaf("(...)")
-        if max_len >= 0:
+        if self.max_len >= 0:
             return AttributeAccess(node.value, child)
         else:
-            max_len = initial_max_len - 3
+            self.max_len = initial_max_len - 3
             return Leaf("...")
 
-    def visit_FunctionCall(node):
-        nonlocal max_len
-        initial_max_len = max_len
-        child = visit_node(node.children[0])
-        max_len -= 2  # parenthesis invoking call
+    def visit_FunctionCall(self, node):
+        initial_max_len = self.max_len
+        child = self.visit_node(node.children[0])
+        self.max_len -= 2  # parenthesis invoking call
         if node.precedence > child.precedence:
-            max_len -= 2  # parenthesis around function
+            self.max_len -= 2  # parenthesis around function
 
         args = []
         for i, arg in enumerate(node.value):
             if i > 0:
-                max_len -= 2  # comma + space argument separator
-            arg = visit_node(arg)
-            if i > 0 and max_len < 0:
-                max_len += (
+                self.max_len -= 2  # comma + space argument separator
+            arg = self.visit_node(arg)
+            if i > 0 and self.max_len < 0:
+                self.max_len += (
                     len(str(args[-1])) - 3
                 )  # replacement of previous arg with ellipsis
-                max_len += (
+                self.max_len += (
                     len(str(arg)) + 2
                 )  # adjust for dropped, but processed arg and separator
                 args[-1] = Leaf("...")
             else:
                 args.append(arg)
 
-        if max_len >= 0:
+        if self.max_len >= 0:
             return FunctionCall(args, child)
         else:
-            max_len = initial_max_len - 3
+            self.max_len = initial_max_len - 3
             return Leaf("...")
 
-    def visit_node(node):
-        nonlocal max_len, visit_Leaf, visit_UnaryOperator, visit_BinaryOperator, visit_AttributeAccess, visit_FunctionCall
-        return locals()["visit_" + type(node).__name__](node)
+    def visit_node(self, node):
+        return getattr(self, "visit_" + type(node).__name__)(node)
 
-    return visit_node(expr_tree)
+
+def limit_str_length(expr_tree, max_len):
+    """Returns a modified expression tree with a string length limited to
+    approximately *max_len*."""
+    return _LimitStrLengthVisitor(max_len).visit_node(expr_tree)
