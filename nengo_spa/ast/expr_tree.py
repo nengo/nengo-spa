@@ -101,6 +101,13 @@ class Leaf(Node):
         return str(self.value)
 
 
+class EllipsisLeaf(Leaf):
+    __slots__ = ()
+
+    def __new__(cls, value="..."):
+        return super().__new__(cls, value)
+
+
 class UnaryOperator(Node):
     __slots__ = ()
 
@@ -196,7 +203,11 @@ class _LimitStrLengthVisitor:
             return node
         else:
             self.max_len -= 3
-            return Leaf("...")
+            return EllipsisLeaf()
+
+    def visit_EllipsisLeaf(self, node):
+        self.max_len -= len(str(node))
+        return node
 
     def visit_UnaryOperator(self, node):
         self.max_len -= len(node.value)
@@ -223,12 +234,12 @@ class _LimitStrLengthVisitor:
             if node.precedence >= node.rhs.precedence:
                 self.max_len += 2
             self.max_len += len(str(rhs)) - 3
-            rhs = Leaf("...")
+            rhs = EllipsisLeaf()
         if self.max_len >= 0:
             return BinaryOperator(node.value, lhs, rhs)
         else:
             self.max_len = initial_max_len - 3
-            return Leaf("...")
+            return EllipsisLeaf()
 
     def visit_AttributeAccess(self, node):
         initial_max_len = self.max_len
@@ -238,12 +249,12 @@ class _LimitStrLengthVisitor:
             self.max_len -= 2
         if self.max_len < 0:
             self.max_len += len(str(child)) - 5
-            child = Leaf("(...)")
+            child = EllipsisLeaf("(...)")
         if self.max_len >= 0:
             return AttributeAccess(node.value, child)
         else:
             self.max_len = initial_max_len - 3
-            return Leaf("...")
+            return EllipsisLeaf()
 
     def visit_FunctionCall(self, node):
         initial_max_len = self.max_len
@@ -264,7 +275,7 @@ class _LimitStrLengthVisitor:
                 self.max_len += (
                     len(str(arg)) + 2
                 )  # adjust for dropped, but processed arg and separator
-                args[-1] = Leaf("...")
+                args[-1] = EllipsisLeaf()
             else:
                 args.append(arg)
 
@@ -272,7 +283,7 @@ class _LimitStrLengthVisitor:
             return FunctionCall(args, child)
         else:
             self.max_len = initial_max_len - 3
-            return Leaf("...")
+            return EllipsisLeaf()
 
     def visit_KeywordArgument(self, node):
         initial_max_len = self.max_len
@@ -282,7 +293,7 @@ class _LimitStrLengthVisitor:
             return KeywordArgument(node.value, child)
         else:
             self.max_len = initial_max_len - 3
-            return Leaf("...")
+            return EllipsisLeaf()
 
     def visit_node(self, node):
         return getattr(self, "visit_" + type(node).__name__)(node)

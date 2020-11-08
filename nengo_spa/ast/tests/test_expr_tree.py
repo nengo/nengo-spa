@@ -3,6 +3,7 @@ import pytest
 from nengo_spa.ast.expr_tree import (
     AttributeAccess,
     BinaryOperator,
+    EllipsisLeaf,
     FunctionCall,
     KeywordArgument,
     Leaf,
@@ -85,84 +86,88 @@ def test_binary_operator(op):
     ]
     + [
         (Leaf("foo"), 0, Leaf("foo")),
-        (Leaf("too_long"), len("too_long") - 1, Leaf("...")),
-        (Leaf("too_long"), 3, Leaf("...")),
-        (Leaf("too_long"), 0, Leaf("...")),
+        (Leaf("too_long"), len("too_long") - 1, EllipsisLeaf()),
+        (Leaf("too_long"), 3, EllipsisLeaf()),
+        (Leaf("too_long"), 0, EllipsisLeaf()),
         (
             Leaf("varA") + Leaf("varB"),
             len("varA + varB") - 1,
-            Leaf("varA") + Leaf("..."),
+            Leaf("varA") + EllipsisLeaf(),
         ),
-        (Leaf("varA") + Leaf("varB"), len("varA + ..."), Leaf("varA") + Leaf("...")),
-        (Leaf("varA") + Leaf("varB"), len("varA + ...") - 1, Leaf("...") + Leaf("...")),
-        (Leaf("varA") + Leaf("varB"), 3, Leaf("...")),
-        (Leaf("a") + Leaf("b"), len("a + b") - 1, Leaf("...")),
+        (Leaf("varA") + Leaf("varB"), len("varA + ..."), Leaf("varA") + EllipsisLeaf()),
+        (
+            Leaf("varA") + Leaf("varB"),
+            len("varA + ...") - 1,
+            EllipsisLeaf() + EllipsisLeaf(),
+        ),
+        (Leaf("varA") + Leaf("varB"), 3, EllipsisLeaf()),
+        (Leaf("a") + Leaf("b"), len("a + b") - 1, EllipsisLeaf()),
         (
             (Leaf("a") + Leaf("b")) * Leaf("c"),
             len("(a + b) * c") - 1,
-            Leaf("...") * Leaf("c"),
+            EllipsisLeaf() * Leaf("c"),
         ),
-        ((Leaf("a") + Leaf("b")) * Leaf("c"), len("(a + b) * c") - 5, Leaf("...")),
+        ((Leaf("a") + Leaf("b")) * Leaf("c"), len("(a + b) * c") - 5, EllipsisLeaf()),
         (
             (Leaf("a") + Leaf("b")) * Leaf("varC"),
             len("(a + b) * varC") - 1,
-            (Leaf("a") + Leaf("b")) * Leaf("..."),
+            (Leaf("a") + Leaf("b")) * EllipsisLeaf(),
         ),
         (
             Leaf("a") * (Leaf("b") + Leaf("c")),
             len("a * (b + c)") - 1,
-            Leaf("a") * Leaf("..."),
+            Leaf("a") * EllipsisLeaf(),
         ),
         (
             Leaf("a") * (Leaf("b") + Leaf("varC")),
             len("a * (b + varC)") - 1,
-            Leaf("a") * (Leaf("b") + Leaf("...")),
+            Leaf("a") * (Leaf("b") + EllipsisLeaf()),
         ),
         (
             Leaf("a") + Leaf("a") * Leaf("b") + Leaf("a") * Leaf("b"),
             len("a + a * b + a * b") - 2,
-            Leaf("a") + Leaf("a") * Leaf("b") + Leaf("..."),
+            Leaf("a") + Leaf("a") * Leaf("b") + EllipsisLeaf(),
         ),
         (
             Leaf("a") / (Leaf("a") * Leaf("b")) / (Leaf("a") * Leaf("b")),
             len("a / (a * b) / (a * b)") - 3,
-            Leaf("a") / (Leaf("a") * Leaf("b")) / Leaf("..."),
+            Leaf("a") / (Leaf("a") * Leaf("b")) / EllipsisLeaf(),
         ),
         (
             AttributeAccess("attribute", Leaf("varA") + Leaf("varB")),
             len("(varA + varB).attribute") - 3,
-            AttributeAccess("attribute", Leaf("(...)")),
+            AttributeAccess("attribute", EllipsisLeaf("(...)")),
         ),
         (
             AttributeAccess("attribute", Leaf("a")),
             len("a.attribute") - 1,
-            Leaf("..."),
+            EllipsisLeaf(),
         ),
-        (FunctionCall([], Leaf("fn_name")), len("...()") - 1, Leaf("...")),
+        (FunctionCall([], Leaf("fn_name")), len("...()") - 1, EllipsisLeaf()),
         (
             FunctionCall([], Leaf("fn_name")),
             len("fn_name()") - 1,
-            Leaf("..."),
+            EllipsisLeaf(),
         ),
         (
             FunctionCall([], Leaf("a") + Leaf("b")),
             len("(a + b)()") - 1,
-            Leaf("..."),
+            EllipsisLeaf(),
         ),
         (
             FunctionCall(["arg1", "arg2"], Leaf("fn_name")),
             len("fn_name(arg1, arg2)") - 1,
-            FunctionCall(["arg1", "..."], Leaf("fn_name")),
+            FunctionCall(["arg1", EllipsisLeaf()], Leaf("fn_name")),
         ),
         (
             FunctionCall(["arg1", "arg2"], Leaf("fn_name")),
             len("fn_name(arg1, arg2)") - 2,
-            FunctionCall(["..."], Leaf("fn_name")),
+            FunctionCall([EllipsisLeaf()], Leaf("fn_name")),
         ),
         (
             FunctionCall(["arg1", "arg2"], Leaf("fn_name")),
             len("fn_name(arg1, arg2)") - 8,
-            Leaf("..."),
+            EllipsisLeaf(),
         ),
         (
             FunctionCall(["arg1", "arg2"], Leaf("a") + Leaf("b")),
@@ -172,7 +177,7 @@ def test_binary_operator(op):
         (
             FunctionCall([Leaf("arg1") + Leaf("arg2")], Leaf("fn_name")),
             len("fn_name(arg1 + arg2)") - 1,
-            FunctionCall([Leaf("arg1") + Leaf("...")], Leaf("fn_name")),
+            FunctionCall([Leaf("arg1") + EllipsisLeaf()], Leaf("fn_name")),
         ),
         (
             Leaf("var") + FunctionCall([], Leaf("fn_name")),
@@ -182,12 +187,12 @@ def test_binary_operator(op):
         (
             FunctionCall([KeywordArgument("key", Leaf("value"))], Leaf("fn_name")),
             len("fn_name(key=value)") - 1,
-            FunctionCall([KeywordArgument("key", Leaf("..."))], Leaf("fn_name")),
+            FunctionCall([KeywordArgument("key", EllipsisLeaf())], Leaf("fn_name")),
         ),
         (
             FunctionCall([KeywordArgument("key", Leaf("value"))], Leaf("fn_name")),
             len("fn_name(key=...)") - 1,
-            FunctionCall([Leaf("...")], Leaf("fn_name")),
+            FunctionCall([EllipsisLeaf()], Leaf("fn_name")),
         ),
     ],
 )
@@ -199,4 +204,3 @@ def test_limit_str_length(expr_tree, max_len, expected):
     ).format(
         expr=str(expr_tree), max_len=max_len, expected=str(expected), actual=str(actual)
     )
-
