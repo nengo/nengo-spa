@@ -45,6 +45,11 @@ Release History
 - The ``~`` operator has been deprecated for the ``VtbAlgebra``. Use the
   ``rinv()`` method instead.
   (`#265 <https://github.com/nengo/nengo_spa/pull/265>`__)
+- Improved automatic names for ``SemanticPointer`` that only contain parenthesis
+  where actually needed. In addition, syntax is considered when shortening a
+  name exceeding the maximum length.
+  (`#255 <https://github.com/nengo/nengo_spa/issues/255>`__,
+  `#270 <https://github.com/nengo/nengo_spa/pull/270>`__)
 
 
 1.1.1 (November 3, 2020)
