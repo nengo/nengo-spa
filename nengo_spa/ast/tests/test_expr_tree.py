@@ -144,7 +144,11 @@ def test_binary_operator(op):
             EllipsisLeaf(),
         ),
         (FunctionCall([], Leaf("fn_name")), len("...()") - 1, EllipsisLeaf()),
-        (FunctionCall([], Leaf("fn_name")), len("fn_name()") - 1, EllipsisLeaf(),),
+        (
+            FunctionCall([], Leaf("fn_name")),
+            len("fn_name()") - 1,
+            EllipsisLeaf(),
+        ),
         (
             FunctionCall([], Leaf("a") + Leaf("b")),
             len("(a + b)()") - 1,
