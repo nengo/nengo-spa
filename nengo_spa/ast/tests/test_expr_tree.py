@@ -194,8 +194,9 @@ def test_binary_operator(op):
 )
 def test_limit_str_length(expr_tree, max_len, expected):
     actual = limit_str_length(expr_tree, max_len)
-    assert (
-        actual == expected
-    ), 'When limiting the expression "{expr}" to length {max_len}, "{expected}" is expected, but got "{actual}"'.format(
+    assert actual == expected, (
+        'When limiting the expression "{expr}" to length {max_len}, '
+        '"{expected}" is expected, but got "{actual}"'
+    ).format(
         expr=str(expr_tree), max_len=max_len, expected=str(expected), actual=str(actual)
     )
