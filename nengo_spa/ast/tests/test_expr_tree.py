@@ -179,6 +179,16 @@ def test_binary_operator(op):
             len("var + fn_name()") - 1,
             Leaf("var") + Leaf("..."),
         ),
+        (
+            FunctionCall([KeywordArgument("key", Leaf("value"))], Leaf("fn_name")),
+            len("fn_name(key=value)") - 1,
+            FunctionCall([KeywordArgument("key", Leaf("..."))], Leaf("fn_name")),
+        ),
+        (
+            FunctionCall([KeywordArgument("key", Leaf("value"))], Leaf("fn_name")),
+            len("fn_name(key=...)") - 1,
+            FunctionCall([Leaf("...")], Leaf("fn_name")),
+        ),
     ],
 )
 def test_limit_str_length(expr_tree, max_len, expected):

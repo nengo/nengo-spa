@@ -274,6 +274,16 @@ class _LimitStrLengthVisitor:
             self.max_len = initial_max_len - 3
             return Leaf("...")
 
+    def visit_KeywordArgument(self, node):
+        initial_max_len = self.max_len
+        self.max_len -= len(str(node.value)) + 1  # 1 for assignment (=)
+        child = self.visit_node(node.children[0])
+        if self.max_len >= 0:
+            return KeywordArgument(node.value, child)
+        else:
+            self.max_len = initial_max_len - 3
+            return Leaf("...")
+
     def visit_node(self, node):
         return getattr(self, "visit_" + type(node).__name__)(node)
 
