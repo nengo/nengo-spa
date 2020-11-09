@@ -106,7 +106,7 @@ class SemanticPointer(Fixed):
         if isinstance(other, SemanticPointer):
             other_expr_tree = other._expr_tree
         else:
-            other_expr_tree = Leaf(str(other))  # FIXME what is this for?
+            other_expr_tree = Leaf(str(other))
         self_expr_tree = self._expr_tree
         if self_expr_tree and other_expr_tree:
             if swap:
