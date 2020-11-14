@@ -1,5 +1,5 @@
 import warnings
-from abc import ABCMeta
+from abc import ABC, ABCMeta
 from enum import Enum
 
 
@@ -220,6 +220,66 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
+    def sign(self, v):
+        """Returns the sign of *v* defined by the algebra.
+
+        The exact definition of the sign depends on the concrete algebra, but
+        should be analogous to the sign of a number in so far that
+
+        * binding of two "positive" vectors produces another "positive" vector,
+        * binding of a "negative" vector with itself produces a "positive"
+          vector,
+        * binding of a "negative" and "positive" vectors produces a "negative"
+          vector.
+
+        Furthermore, if the algebra supports fractional binding powers, it
+        should do so for all "non-negative" vectors, but not "negative" vectors.
+
+        If an algebra does not have the notion of a sign, it may raise a
+        *NotImplementedError*.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to determine sign of.
+
+        Returns
+        -------
+        AbstractSign
+            The sign of the input vector.
+
+        See Also
+        --------
+        AbstractAlgebra.abs
+        """
+        raise NotImplementedError()
+
+    def abs(self, v):
+        """Returns the absolute vector of *v* defined by the algebra.
+
+        The exact definition of "absolute vector" may depend on the concrete
+        algebra. It should be a "positive" vector (see `.sign`) that relates
+        to the input vector.
+
+        The default implementation requires that the possible signs of the
+        algebra correspond to actual vectors within the algebra. It will bind
+        the sign vector (from the left side) to the vector *v*.
+
+        If an algebra does not have the notion of a sign or absolute vector,
+        it may raise a *NotImplementedError*.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to obtain the absolute vector of.
+
+        Returns
+        -------
+        (d,) ndarray
+            The absolute vector relating to the input vector.
+        """
+        return self.bind(self.sign(v).to_vector(len(v)), v)
+
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the standard absorbing element of dimensionality *d*.
 
@@ -266,6 +326,29 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
+    def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        """Returns the negative identity element of dimensionality *d*.
+
+        The negative identity only changes the sign of the vector it is bound to.
+
+        Some algebras might not have a negative identity element (or even the
+        notion of a sign). In that case a *NotImplementedError* may be raised.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            Side in the binding operation on which the element acts as negative
+            identity.
+
+        Returns
+        -------
+        (d,) ndarray
+            Negative identity element.
+        """
+        raise NotImplementedError()
+
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
@@ -286,5 +369,36 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         -------
         (d,) ndarray
             Zero element.
+        """
+        raise NotImplementedError()
+
+
+class AbstractSign(ABC):
+    """Abstract base class for implementing signs for an algebra."""
+
+    def is_positive(self):
+        """Return whether the sign is positive."""
+        raise NotImplementedError()
+
+    def is_negative(self):
+        """Return whether the sign is negative."""
+        raise NotImplementedError()
+
+    def is_zero(self):
+        """Return whether the sign neither positive nor negative (i.e. zero)."""
+        return not (self.is_positive() or self.is_negative())
+
+    def to_vector(self, d):
+        """Return the vector in the algebra corresponding to the sign.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+
+        Returns
+        -------
+        (d,) ndarray
+            Vector corresponding to the sign.
         """
         raise NotImplementedError()

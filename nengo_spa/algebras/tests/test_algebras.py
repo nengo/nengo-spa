@@ -148,6 +148,33 @@ def test_identity_element(algebra, sidedness, rng):
 
 
 @pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_negative_identity_element(algebra, sidedness, rng):
+    try:
+        x = next(UnitLengthVectors(16, rng=rng))
+        a = algebra.abs(x)
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always", DeprecationWarning)
+            p = algebra.negative_identity_element(16)
+    except NotImplementedError:
+        pass
+    else:
+        is_deprecated = len(caught_warnings) > 0 and any(
+            issubclass(w.category, DeprecationWarning) for w in caught_warnings
+        )
+        if (
+            sidedness in (ElementSidedness.LEFT, ElementSidedness.TWO_SIDED)
+            and not is_deprecated
+        ):
+            b = algebra.bind(p, a)
+            assert np.allclose(algebra.abs(b), a)
+            assert algebra.sign(b).is_negative()
+        if sidedness in (ElementSidedness.RIGHT, ElementSidedness.TWO_SIDED):
+            b = algebra.bind(a, p)
+            assert np.allclose(algebra.abs(b), a)
+            assert algebra.sign(b).is_negative()
+
+
+@pytest.mark.parametrize("sidedness", ElementSidedness)
 def test_zero_element(algebra, sidedness, rng):
     a = next(UnitLengthVectors(16, rng=rng))
     try:
@@ -202,10 +229,19 @@ class DummyAlgebra:
     def implement_binding(self, n_neurons_per_d, d, unbind_left, unbind_right):
         pass
 
+    def sign(self, v):
+        pass
+
+    def abs(self, v):
+        pass
+
     def absorbing_element(self, d):
         pass
 
     def identity_element(self, d):
+        pass
+
+    def negative_identity_element(self, d):
         pass
 
     def zero_element(self, d):
@@ -215,3 +251,31 @@ class DummyAlgebra:
 @pytest.mark.filterwarnings("ignore:.*do not rely on pure duck-typing")
 def test_isinstance_ducktyping_check():
     assert isinstance(DummyAlgebra(), AbstractAlgebra)
+
+
+@pytest.mark.parametrize(
+    "element,check_property",
+    [
+        ("identity", "is_positive"),
+        ("zero", "is_zero"),
+        ("negative_identity", "is_negative"),
+    ],
+)
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
+def test_sign(algebra, element, check_property, sidedness):
+    try:
+        v = getattr(algebra, element + "_element")(16, sidedness)
+        assert getattr(algebra.sign(v), check_property)()
+    except NotImplementedError:
+        pass
+
+
+@pytest.mark.parametrize("sidedness", ElementSidedness)
+def test_abs(algebra, sidedness):
+    try:
+        v = algebra.abs(algebra.negative_identity_element(16, sidedness))
+        assert algebra.sign(v).is_positive()
+        assert np.allclose(v, algebra.identity_element(16, sidedness))
+    except NotImplementedError:
+        pass

@@ -9,7 +9,9 @@ nengo\_spa\.algebras
    .. autosummary::
 
       AbstractAlgebra
+      AbstractSign
       ElementSidedness
       HrrAlgebra
+      HrrSign
       VtbAlgebra
       TvtbAlgebra
