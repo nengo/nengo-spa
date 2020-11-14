@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
+from nengo_spa.algebras.base import AbstractAlgebra, AbstractSign, ElementSidedness
 from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
@@ -140,6 +140,28 @@ class HrrAlgebra(AbstractAlgebra):
         net = CircularConvolution(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_a, net.input_b), net.output
 
+    def sign(self, v):
+        """Returns the HRR sign of *v*.
+
+        See `AbstractAlgebra.sign` for general information on the notion of a
+        sign for algbras, and `.HrrSign` for details specific to HRRs.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to determine sign of.
+
+        Returns
+        -------
+        HrrSign
+            The sign of the input vector.
+        """
+        dc, nyquist = np.fft.rfft(v)[[0, -1]]
+        if len(v) % 2 == 1:
+            nyquist = 0
+        assert np.isclose(dc.imag, 0) and np.isclose(nyquist.imag, 0)
+        return HrrSign(int(np.sign(dc.real)), int(np.sign(nyquist.real)))
+
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the standard absorbing element of dimensionality *d*.
 
@@ -190,6 +212,27 @@ class HrrAlgebra(AbstractAlgebra):
         data[0] = 1.0
         return data
 
+    def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        r"""Return the negative identity element of dimensionality *d*.
+
+        The identity element for circular convolution is the vector
+        :math:`(-1, 0, \dots, 0)^{\top}`.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the HRR algebra is commutative
+            and the identity is two-sided.
+
+        Returns
+        -------
+        (d,) ndarray
+            Negative identity element.
+        """
+        return -self.identity_element(d, sidedness)
+
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
@@ -210,3 +253,99 @@ class HrrAlgebra(AbstractAlgebra):
             Zero element.
         """
         return np.zeros(d)
+
+
+class HrrSign(AbstractSign):
+    """Represents a sign in the `.HrrAlgebra`.
+
+    For odd dimensionalities, the sign is equal to the sign of the DC component
+    of the Fourier representation of the vector. For even dimensionalities the
+    sign is constituted out of the signs of the DC component and Nyquist
+    frequency. Thus, for even dimensionalities, there is a total of four
+    sub-signs excluding zero. The overall sign is considered positive if both
+    the components are positive, negative if either one is negative, and zero if
+    both are zero.
+
+    Parameters
+    ----------
+    dc_sign : int
+        Sign of the DC component.
+    nyquist_sign : int
+        Sign of the Nyquist frequency component. Set to zero for odd
+        dimensionalities by definition.
+    """
+
+    __slots__ = ["dc_sign", "nyquist_sign"]
+
+    def __init__(self, dc_sign, nyquist_sign):
+        if dc_sign == 0 and nyquist_sign != 0:
+            raise ValueError(
+                "nyquist_sign must be 0 if dc_sign is 0 to constitute a valid "
+                "sign in the HrrAlgebra."
+            )
+        if dc_sign not in (-1, 0, 1):
+            raise ValueError("dc_sign must be one of -1, 0, 1")
+        if nyquist_sign not in (-1, 0, 1):
+            raise ValueError("nyquist_sign must be one of -1, 0, 1")
+
+        self.dc_sign = dc_sign
+        self.nyquist_sign = nyquist_sign
+
+    def is_positive(self):
+        return self.dc_sign > 0 and self.nyquist_sign >= 0
+
+    def is_negative(self):
+        return self.dc_sign < 0 or self.nyquist_sign < 0
+
+    def to_vector(self, d):
+        """Return the vector in the algebra corresponding to the sign.
+
+        ============  =================  ====================================
+        DC component  Nyquist component  Vector
+        ============  =================  ====================================
+         1            >=0                [ 1,  0, 0, ...] (identity)
+         1             <0                [ 0,  1, 0, 0, ...]
+        -1            >=0                [ 0, -1, 0, ...] (negative identity)
+        -1             <0                [-1,  0, 0, 0, ...]
+         0              0                [ 0,  0, 0, ...] (zero)
+        ============  =================  ====================================
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+
+        Returns
+        -------
+        (d,) ndarray
+            Vector corresponding to the sign.
+        """
+        if self.dc_sign == 0 and self.nyquist_sign == 0:
+            return np.zeros(d)
+
+        is_even_dim = d % 2 == 0
+        if is_even_dim and self.nyquist_sign == 0:
+            raise ValueError(
+                "A sign with a zero nyquist_sign is only valid for odd "
+                "dimensionalities."
+            )
+        elif not is_even_dim and self.nyquist_sign != 0:
+            raise ValueError(
+                "A sign with a non-zero nyquist_sign is only valid for even "
+                "dimensionalities."
+            )
+
+        v = HrrAlgebra().identity_element(d)
+        if self.dc_sign * self.nyquist_sign < 0:
+            v = np.roll(v, 1)
+        return self.dc_sign * v
+
+    def __repr__(self):
+        return "{}(dc_sign={}, nyquist_sign={})".format(
+            self.__class__.__name__, self.dc_sign, self.nyquist_sign
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, HrrSign):
+            return False
+        return self.dc_sign == other.dc_sign and self.nyquist_sign == other.nyquist_sign
