@@ -279,7 +279,7 @@ class SemanticPointer(Fixed):
         """Return a reorganized `SemanticPointer` that acts as a two-sided
         inverse for binding.
 
-        .. seealso:: linv, rinv
+        .. seealso:: `linv`, `rinv`
         """
         return SemanticPointer(
             data=self.algebra.invert(self.v, sidedness=ElementSidedness.TWO_SIDED),
