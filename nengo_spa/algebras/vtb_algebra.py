@@ -3,7 +3,7 @@ import warnings
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness, GenericSign
 from nengo_spa.networks.vtb import VTB
 
 
@@ -225,6 +225,23 @@ class VtbAlgebra(AbstractAlgebra):
         net = VTB(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_left, net.input_right), net.output
 
+    def sign(self, v):
+        m = self.get_binding_matrix(v)
+        if not np.allclose(m, m.T):
+            return VtbSign(None)
+        eigenvalues = np.linalg.eigvalsh(m)
+        if np.all(eigenvalues > 0):
+            return VtbSign(1)
+        elif np.all(eigenvalues < 0):
+            return VtbSign(-1)
+        elif np.allclose(eigenvalues, 0):
+            return VtbSign(0)
+        else:
+            return VtbSign(None)
+
+    def abs(self, v):
+        return self.bind(v, self.sign(v).to_vector(len(v)))
+
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """VTB has no absorbing element except the zero vector.
 
@@ -270,6 +287,27 @@ class VtbAlgebra(AbstractAlgebra):
         sub_d = self._get_sub_d(d)
         return (np.eye(sub_d) / d ** 0.25).flatten()
 
+    def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        r"""Return the negative identity element of dimensionality *d*.
+
+        VTB has a right negative identity only.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            Must be set to `ElementSidedness.RIGHT`.
+
+        Returns
+        -------
+        (d,) ndarray
+            Negative identity element.
+        """
+        if sidedness is not ElementSidedness.RIGHT:
+            raise NotImplementedError("VTB only has a right negative identity.")
+        return -self.identity_element(d, sidedness)
+
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
@@ -290,3 +328,24 @@ class VtbAlgebra(AbstractAlgebra):
             Zero element.
         """
         return np.zeros(d)
+
+
+class VtbSign(GenericSign):
+    def to_vector(self, d):
+        if self.sign is None:
+            raise NotImplementedError(
+                "There is no vector corresponding to an indefinite sign."
+            )
+        elif self.sign > 0:
+            return VtbAlgebra().identity_element(d, sidedness=ElementSidedness.RIGHT)
+        elif self.sign < 0:
+            return VtbAlgebra().negative_identity_element(
+                d, sidedness=ElementSidedness.RIGHT
+            )
+        elif self.sign == 0:
+            return VtbAlgebra().zero_element(d)
+        else:
+            raise AssertionError(
+                "Invalid value for sign, this code should be unreachable."
+            )
+
