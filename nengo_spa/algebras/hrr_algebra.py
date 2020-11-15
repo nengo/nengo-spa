@@ -297,6 +297,9 @@ class HrrSign(AbstractSign):
     def is_negative(self):
         return self.dc_sign < 0 or self.nyquist_sign < 0
 
+    def is_indefinite(self):
+        return False
+
     def to_vector(self, d):
         """Return the vector in the algebra corresponding to the sign.
 

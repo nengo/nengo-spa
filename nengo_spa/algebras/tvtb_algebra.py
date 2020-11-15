@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
+from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness, GenericSign
 from nengo_spa.networks.tvtb import TVTB
 
 
@@ -158,6 +158,20 @@ class TvtbAlgebra(AbstractAlgebra):
         net = TVTB(n_neurons_per_d, d, unbind_left, unbind_right)
         return net, (net.input_left, net.input_right), net.output
 
+    def sign(self, v):
+        m = self.get_binding_matrix(v)
+        if not np.allclose(m, m.T):
+            return TvtbSign(None)
+        eigenvalues = np.linalg.eigvalsh(m)
+        if np.all(eigenvalues > 0):
+            return TvtbSign(1)
+        elif np.all(eigenvalues < 0):
+            return TvtbSign(-1)
+        elif np.allclose(eigenvalues, 0):
+            return TvtbSign(0)
+        else:
+            return TvtbSign(None)
+
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """TVTB has no absorbing element except the zero vector.
 
@@ -184,6 +198,24 @@ class TvtbAlgebra(AbstractAlgebra):
         sub_d = self._get_sub_d(d)
         return (np.eye(sub_d) / d ** 0.25).flatten()
 
+    def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
+        r"""Return the negative identity element of dimensionality *d*.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality.
+        sidedness : ElementSidedness, optional
+            This argument has no effect because the negative identity of the
+            TVTB algebra is two-sided.
+
+        Returns
+        -------
+        (d,) ndarray
+            Negative identity element.
+        """
+        return -self.identity_element(d, sidedness)
+
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the zero element of dimensionality *d*.
 
@@ -204,3 +236,22 @@ class TvtbAlgebra(AbstractAlgebra):
             Zero element.
         """
         return np.zeros(d)
+
+
+class TvtbSign(GenericSign):
+    def to_vector(self, d):
+        if self.sign is None:
+            raise NotImplementedError(
+                "There is no vector corresponding to an indefinite sign."
+            )
+        elif self.sign > 0:
+            return TvtbAlgebra().identity_element(d)
+        elif self.sign < 0:
+            return TvtbAlgebra().negative_identity_element(d)
+        elif self.sign == 0:
+            return TvtbAlgebra().zero_element(d)
+        else:
+            raise AssertionError(
+                "Invalid value for sign, this code should be unreachable."
+            )
+
