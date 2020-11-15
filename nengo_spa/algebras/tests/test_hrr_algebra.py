@@ -34,6 +34,7 @@ class TestHrrSign:
         assert sign.is_positive()
         assert not sign.is_negative()
         assert not sign.is_zero()
+        assert not sign.is_indefinite()
 
     @pytest.mark.parametrize(
         "sign", [HrrSign(1, -1), HrrSign(-1, 1), HrrSign(-1, -1), HrrSign(-1, 0)]
@@ -42,11 +43,14 @@ class TestHrrSign:
         assert not sign.is_positive()
         assert sign.is_negative()
         assert not sign.is_zero()
+        assert not sign.is_indefinite()
 
     def test_zero(self):
-        assert not HrrSign(0, 0).is_positive()
-        assert not HrrSign(0, 0).is_negative()
-        assert HrrSign(0, 0).is_zero()
+        sign = HrrSign(0, 0)
+        assert not sign.is_positive()
+        assert not sign.is_negative()
+        assert sign.is_zero()
+        assert not sign.is_indefinite()
 
     @pytest.mark.parametrize(
         "dc_sign, nyquist_sign", [(0, 1), (0, -1), (0.5, 0), (1, 2)]

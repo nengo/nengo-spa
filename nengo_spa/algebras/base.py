@@ -385,8 +385,13 @@ class AbstractSign(ABC):
         raise NotImplementedError()
 
     def is_zero(self):
-        """Return whether the sign neither positive nor negative (i.e. zero)."""
-        return not (self.is_positive() or self.is_negative())
+        """Return whether the sign neither positive nor negative (i.e. zero),
+        but definite."""
+        return not (self.is_positive() or self.is_negative() or self.is_indefinite())
+
+    def is_indefinite(self):
+        """Return whether the sign is neither positive nor negative nor zero."""
+        raise NotImplementedError()
 
     def to_vector(self, d):
         """Return the vector in the algebra corresponding to the sign.
@@ -402,3 +407,36 @@ class AbstractSign(ABC):
             Vector corresponding to the sign.
         """
         raise NotImplementedError()
+
+
+class GenericSign(AbstractSign):
+    """A generic sign implementation.
+
+    Parameters
+    ----------
+    sign : -1, 0, 1, None
+        The represented sign. *None* is used for and indefinite sign.
+    """
+
+    def __init__(self, sign):
+        if sign not in (-1, 0, 1, None):
+            raise ValueError("sign must be one of -1, 0, 1, None")
+        self.sign = sign
+
+    def is_positive(self):
+        return not self.is_indefinite() and self.sign > 0
+
+    def is_negative(self):
+        return not self.is_indefinite() and self.sign < 0
+
+    def is_zero(self):
+        return not self.is_indefinite() and self.sign == 0
+
+    def is_indefinite(self):
+        return self.sign is None
+
+    def __repr__(self):
+        return "{}(sign={})".format(self.__class__.__name__, self.sign)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.sign == other.sign
