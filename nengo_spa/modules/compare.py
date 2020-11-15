@@ -1,6 +1,6 @@
 import nengo
-from nengo.params import Default, IntParam
 import numpy as np
+from nengo.params import Default, IntParam
 
 from nengo_spa.network import Network
 from nengo_spa.vocabulary import VocabularyOrDimParam

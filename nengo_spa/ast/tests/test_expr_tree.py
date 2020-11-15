@@ -7,8 +7,8 @@ from nengo_spa.ast.expr_tree import (
     FunctionCall,
     KeywordArgument,
     Leaf,
-    limit_str_length,
     UnaryOperator,
+    limit_str_length,
 )
 
 

@@ -1,7 +1,6 @@
-import pytest
-
 import nengo
 import numpy as np
+import pytest
 
 import nengo_spa as spa
 

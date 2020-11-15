@@ -3,12 +3,12 @@
 See :doc:`examples/associative_memory` for an introduction and examples.
 """
 import nengo
+import numpy as np
 from nengo.exceptions import ValidationError
 from nengo.utils.network import with_self
-import numpy as np
 
 from nengo_spa.network import Network
-from nengo_spa.networks.selection import IA, Thresholding, WTA
+from nengo_spa.networks.selection import IA, WTA, Thresholding
 from nengo_spa.vocabulary import VocabularyOrDimParam
 
 

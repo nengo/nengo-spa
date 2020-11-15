@@ -4,12 +4,11 @@ import nengo
 import numpy as np
 
 from nengo_spa.algebras.base import ElementSidedness
-from nengo_spa.ast.base import infer_types, Node, TypeCheckedBinaryOp
+from nengo_spa.ast.base import Node, TypeCheckedBinaryOp, infer_types
 from nengo_spa.ast.symbolic import Fixed, FixedScalar, Symbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.typechecks import is_number
-from nengo_spa.types import TAnyVocab, TScalar, TAnyVocabOfDim, TVocabulary
-
+from nengo_spa.types import TAnyVocab, TAnyVocabOfDim, TScalar, TVocabulary
 
 BasalGangliaRealization = None
 BindRealization = None

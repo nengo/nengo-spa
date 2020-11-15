@@ -7,8 +7,9 @@ import os
 import sys
 
 try:
-    import nengo_spa
     import nengo_sphinx_theme
+
+    import nengo_spa
 
     assert nengo_sphinx_theme
 except ImportError:

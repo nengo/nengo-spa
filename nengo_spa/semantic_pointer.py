@@ -1,18 +1,18 @@
 import nengo
-from nengo.exceptions import ValidationError
 import numpy as np
+from nengo.exceptions import ValidationError
 
 from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
-from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
+from nengo_spa.ast.base import Fixed, TypeCheckedBinaryOp, infer_types
 from nengo_spa.ast.expr_tree import (
     AttributeAccess,
     BinaryOperator,
     FunctionCall,
     Leaf,
-    limit_str_length,
     Node,
     UnaryOperator,
+    limit_str_length,
 )
 from nengo_spa.typechecks import is_array, is_array_like, is_number
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary

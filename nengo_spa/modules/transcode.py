@@ -1,9 +1,9 @@
 import nengo
+import numpy as np
 from nengo.config import Default
 from nengo.exceptions import ValidationError
 from nengo.params import IntParam, Parameter
 from nengo.utils.stdlib import checked_call
-import numpy as np
 
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.network import Network

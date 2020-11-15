@@ -1,10 +1,10 @@
 import warnings
 
 import nengo
+import numpy as np
 from nengo.networks.ensemblearray import EnsembleArray
 from nengo.params import Default, IntParam, NumberParam
 from nengo.synapses import Lowpass, SynapseParam
-import numpy as np
 
 from nengo_spa.network import Network
 

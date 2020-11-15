@@ -1,6 +1,5 @@
-import numpy as np
-
 import nengo
+import numpy as np
 from nengo.dists import Uniform
 from nengo.params import Default, IntParam, NumberParam
 from nengo.synapses import Lowpass, SynapseParam

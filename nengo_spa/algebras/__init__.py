@@ -2,5 +2,5 @@
 
 from .base import AbstractAlgebra, ElementSidedness
 from .hrr_algebra import HrrAlgebra
-from .vtb_algebra import VtbAlgebra
 from .tvtb_algebra import TvtbAlgebra
+from .vtb_algebra import VtbAlgebra

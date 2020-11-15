@@ -1,6 +1,5 @@
-import numpy as np
-
 import nengo
+import numpy as np
 from nengo.exceptions import ValidationError
 from nengo.networks.product import Product
 

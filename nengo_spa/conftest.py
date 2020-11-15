@@ -13,8 +13,8 @@ except ImportError:
 
 
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
-from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 from nengo_spa.algebras.tvtb_algebra import TvtbAlgebra
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 
 
 class TestConfig:

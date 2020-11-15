@@ -6,7 +6,7 @@ import nengo
 import numpy as np
 
 from nengo_spa.ast import expr_tree
-from nengo_spa.ast.base import infer_types, Fixed, TypeCheckedBinaryOp
+from nengo_spa.ast.base import Fixed, TypeCheckedBinaryOp, infer_types
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.typechecks import is_number

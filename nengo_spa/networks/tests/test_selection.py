@@ -1,8 +1,8 @@
+import nengo
 import numpy as np
 from numpy.testing import assert_allclose
 
-import nengo
-from nengo_spa.networks.selection import IA, Thresholding, WTA
+from nengo_spa.networks.selection import IA, WTA, Thresholding
 
 
 def test_ia(Simulator, plt, seed):

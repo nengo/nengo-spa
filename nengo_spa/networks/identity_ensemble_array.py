@@ -1,9 +1,9 @@
 import warnings
 
 import nengo
+import numpy as np
 from nengo.exceptions import ValidationError
 from nengo.utils.network import with_self
-import numpy as np
 
 from nengo_spa.typechecks import is_iterable
 

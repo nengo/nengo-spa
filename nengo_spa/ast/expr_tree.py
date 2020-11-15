@@ -2,7 +2,6 @@
 
 from collections import namedtuple
 
-
 # Reference precedence table:
 # https://docs.python.org/3/reference/expressions.html
 precedence = {

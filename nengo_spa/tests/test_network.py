@@ -1,11 +1,11 @@
-import numpy as np
-from numpy.testing import assert_allclose
-import pytest
-
 import nengo
+import numpy as np
+import pytest
+from numpy.testing import assert_allclose
+
 import nengo_spa as spa
-from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.examine import similarity
+from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.network import create_inhibit_node
 from nengo_spa.vocabulary import VocabularyMap
 
