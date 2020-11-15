@@ -7,8 +7,8 @@ from nengo_spa.vector_generation import (
     AxisAlignedVectors,
     ExpectedUnitLengthVectors,
     OrthonormalVectors,
-    UnitLengthVectors,
     UnitaryVectors,
+    UnitLengthVectors,
 )
 
 

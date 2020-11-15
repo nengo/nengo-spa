@@ -1,6 +1,6 @@
+import warnings
 from abc import ABCMeta
 from enum import Enum
-import warnings
 
 
 class ElementSidedness(Enum):

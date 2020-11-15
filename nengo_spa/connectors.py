@@ -3,7 +3,7 @@ import weakref
 import nengo
 import numpy as np
 
-from nengo_spa.ast.base import Node, infer_types, Fixed
+from nengo_spa.ast.base import Fixed, Node, infer_types
 from nengo_spa.ast.dynamic import ModuleOutput
 from nengo_spa.ast.symbolic import FixedScalar
 from nengo_spa.exceptions import SpaTypeError

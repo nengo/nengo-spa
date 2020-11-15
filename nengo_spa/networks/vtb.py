@@ -1,7 +1,7 @@
 import nengo
+import numpy as np
 from nengo.dists import CosineSimilarity
 from nengo.exceptions import ValidationError
-import numpy as np
 
 from nengo_spa.networks.matrix_multiplication import MatrixMult
 

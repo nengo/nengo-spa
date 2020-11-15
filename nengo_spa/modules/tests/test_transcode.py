@@ -1,8 +1,8 @@
 import nengo
-from nengo.exceptions import ValidationError
 import numpy as np
-from numpy.testing import assert_almost_equal
 import pytest
+from nengo.exceptions import ValidationError
+from numpy.testing import assert_almost_equal
 
 import nengo_spa as spa
 from nengo_spa.modules.transcode import Transcode

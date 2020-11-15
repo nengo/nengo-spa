@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from nengo.exceptions import NengoWarning, ValidationError
 import nengo.solvers
 import numpy as np
-from numpy.testing import assert_equal
 import pytest
+from nengo.exceptions import NengoWarning, ValidationError
+from numpy.testing import assert_equal
 
 from nengo_spa import SemanticPointer, Vocabulary
 from nengo_spa.algebras import HrrAlgebra, VtbAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.vector_generation import AxisAlignedVectors
 from nengo_spa.vocabulary import (
-    special_sps,
     VocabularyMap,
     VocabularyMapParam,
     VocabularyOrDimParam,
+    special_sps,
 )
 
 

@@ -1,18 +1,17 @@
 import nengo
-from nengo.exceptions import ValidationError
 import numpy as np
 import pytest
+from nengo.exceptions import ValidationError
 
 import nengo_spa as spa
 from nengo_spa import Vocabulary
+from nengo_spa.examine import similarity
 from nengo_spa.modules.associative_memory import (
+    IAAssocMem,
     ThresholdingAssocMem,
     WTAAssocMem,
-    IAAssocMem,
 )
-from nengo_spa.examine import similarity
 from nengo_spa.testing import assert_sp_close
-
 
 filtered_step_fn = lambda x: np.maximum(1.0 - np.exp(-15.0 * x), 0.0)
 

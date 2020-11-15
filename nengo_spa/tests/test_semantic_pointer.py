@@ -1,10 +1,10 @@
 import sys
 
 import nengo
-from nengo.exceptions import NengoWarning, ValidationError
 import numpy as np
-from numpy.testing import assert_equal
 import pytest
+from nengo.exceptions import NengoWarning, ValidationError
+from numpy.testing import assert_equal
 
 import nengo_spa as spa
 from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
@@ -12,9 +12,9 @@ from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.symbolic import PointerSymbol
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, SemanticPointer, Zero
-from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.testing import assert_sp_close
 from nengo_spa.types import TVocabulary
+from nengo_spa.vector_generation import UnitLengthVectors
 from nengo_spa.vocabulary import Vocabulary
 
 

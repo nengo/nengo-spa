@@ -1,6 +1,6 @@
+import nengo
 import numpy as np
 
-import nengo
 import nengo_spa as spa
 
 

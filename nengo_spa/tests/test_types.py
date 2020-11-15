@@ -2,12 +2,12 @@ import pytest
 
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.types import (
-    coerce_types,
     TAnyVocab,
-    TScalar,
     TAnyVocabOfDim,
+    TScalar,
     TVocabulary,
     Type,
+    coerce_types,
 )
 from nengo_spa.vocabulary import Vocabulary
 

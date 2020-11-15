@@ -1,8 +1,7 @@
 import os
 
-import pytest
 import _pytest.capture
-
+import pytest
 from nbformat import read as read_nb
 from nengo.utils.stdlib import execfile
 

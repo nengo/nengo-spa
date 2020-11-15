@@ -1,19 +1,18 @@
-from collections.abc import Mapping
-from keyword import iskeyword
 import re
 import warnings
+from collections.abc import Mapping
+from keyword import iskeyword
 
 import nengo
-from nengo.exceptions import NengoWarning, ValidationError
 import numpy as np
+from nengo.exceptions import NengoWarning, ValidationError
 
 from nengo_spa import semantic_pointer
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
 from nengo_spa.exceptions import SpaParseError
 from nengo_spa.semantic_pointer import AbsorbingElement, Identity, Zero
-from nengo_spa.typechecks import is_number, is_integer, is_iterable
+from nengo_spa.typechecks import is_integer, is_iterable, is_number
 from nengo_spa.vector_generation import UnitLengthVectors
-
 
 valid_sp_regex = re.compile("^[A-Z][_a-zA-Z0-9]*$")
 special_sps = {

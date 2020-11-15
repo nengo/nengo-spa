@@ -1,7 +1,6 @@
+import nengo
 import numpy as np
 import pytest
-
-import nengo
 from nengo.utils.numpy import rms
 
 import nengo_spa

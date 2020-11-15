@@ -1,6 +1,6 @@
 import nengo
-from nengo.utils.numpy import rms
 import pytest
+from nengo.utils.numpy import rms
 
 import nengo_spa as spa
 from nengo_spa.testing import assert_sp_close

@@ -2,9 +2,8 @@
 
 from itertools import combinations
 
-import numpy as np
-
 import nengo.utils.numpy as npext
+import numpy as np
 from nengo.exceptions import ValidationError
 
 from nengo_spa.semantic_pointer import SemanticPointer

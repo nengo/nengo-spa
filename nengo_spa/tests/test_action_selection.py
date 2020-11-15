@@ -1,7 +1,7 @@
 import nengo
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
 import nengo_spa as spa
 from nengo_spa.action_selection import ActionSelection
