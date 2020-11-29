@@ -1,7 +1,12 @@
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra, AbstractSign, ElementSidedness
+from nengo_spa.algebras.base import (
+    AbstractAlgebra,
+    AbstractSign,
+    CommonProperties,
+    ElementSidedness,
+)
 from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
@@ -61,6 +66,45 @@ class HrrAlgebra(AbstractAlgebra):
             the algebra.
         """
         return d > 0
+
+    def create_vector(self, d, properties, *, rng=None):
+        """Create a vector fulfilling given properties in the algebra.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality
+        properties : set of str
+            Definition of properties for the vector to fulfill. Valid set
+            elements are constants defined in `.HrrProperties`.
+        rng : numpy.random.RandomState, optional
+            The random number generator to use to create the vector.
+
+        Returns
+        -------
+        ndarray
+            Random vector with desired properties.
+        """
+        properties = set(properties)
+
+        if rng is None:
+            rng = np.random.RandomState()
+
+        v = rng.randn(d)
+        v /= np.linalg.norm(v)
+
+        if HrrProperties.POSITIVE in properties:
+            properties.remove(HrrProperties.POSITIVE)
+            v = self.abs(v)
+
+        if HrrProperties.UNITARY in properties:
+            properties.remove(HrrProperties.UNITARY)
+            v = self.make_unitary(v)
+
+        if len(properties) > 0:
+            raise ValueError("Invalid properties: " + ", ".join(properties))
+
+        return v
 
     def make_unitary(self, v):
         fft_val = np.fft.fft(v)
@@ -352,3 +396,10 @@ class HrrSign(AbstractSign):
         if not isinstance(other, HrrSign):
             return False
         return self.dc_sign == other.dc_sign and self.nyquist_sign == other.nyquist_sign
+
+
+class HrrProperties:
+    """Vector properties supported by the `.HrrAlgebra`."""
+
+    UNITARY = CommonProperties.UNITARY
+    POSITIVE = CommonProperties.POSITIVE

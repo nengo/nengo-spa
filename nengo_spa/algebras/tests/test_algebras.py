@@ -205,6 +205,9 @@ class DummyAlgebra:
     def is_valid_dimensionality(self, d):
         pass
 
+    def create_vector(self, d, properties, *, rng=None):
+        pass
+
     def make_unitary(self, v):
         pass
 
