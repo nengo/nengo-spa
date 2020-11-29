@@ -70,3 +70,14 @@ def test_create_positive_unitary_vector(rng):
 def test_create_vector_with_invalid_property():
     with pytest.raises(ValueError):
         VtbAlgebra().create_vector(16, "foo")
+
+
+def test_fractional_binding_power_of_non_positive_vector_raises(rng):
+    algebra = VtbAlgebra()
+    v = algebra.bind(
+        algebra.create_vector(16, {VtbProperties.POSITIVE}, rng=rng),
+        VtbSign(-1).to_vector(16),
+    )
+    assert algebra.sign(v).is_negative()
+    with pytest.raises(ValueError):
+        algebra.binding_power(v, 0.5)
