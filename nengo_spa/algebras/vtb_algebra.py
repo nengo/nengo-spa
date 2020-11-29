@@ -222,6 +222,62 @@ class VtbAlgebra(AbstractAlgebra):
         sub_d = self._get_sub_d(len(v))
         return v.reshape((sub_d, sub_d)).T.flatten()
 
+    def binding_power(self, v, exponent):
+        """Returns the binding power of *v* using the *exponent*.
+
+        The binding power is defined as binding (*exponent*-1) times bindings
+        of *v* to itself. Depending on the algebra, fractional exponents might
+        be valid or return a *ValueError*, if not. Usually, a fractional binding
+        power will require that *v* has a positive sign.
+
+        Note the following special exponents:
+
+        * an exponent of -1 will return the inverse,
+        * an exponent of 0 will return the identity vector,
+        * and an *exponent* of 1 will return *v* itself.
+
+        The default implementation supports integer exponents and will apply
+        the `.bind` method multiple times. It requires the algebra to have a
+        left identity.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to bind repeatedly to itself.
+        exponent : int or float
+            Exponent of the binding power.
+
+        Returns
+        -------
+        (d,) ndarray
+            Binding power of *v*.
+
+        See also
+        --------
+        AbstractAlgebra.sign
+        """
+
+        if not int(exponent) == exponent:
+            # FIXME
+            raise ValueError(
+                "{} only supports integer binding powers.".format(
+                    self.__class__.__name__
+                )
+            )
+        exponent = int(exponent)
+
+        if exponent == 0:
+            return self.identity_element(len(v), sidedness=ElementSidedness.RIGHT)
+
+        if exponent < 0:
+            v = self.invert(v)
+        power = v
+
+        for _ in range(abs(exponent) - 1):
+            power = self.bind(power, v)
+
+        return power
+
     def get_binding_matrix(self, v, swap_inputs=False):
         sub_d = self._get_sub_d(len(v))
         m = np.sqrt(sub_d) * np.kron(np.eye(sub_d), v.reshape((sub_d, sub_d)))
