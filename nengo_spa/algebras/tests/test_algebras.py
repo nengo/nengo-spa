@@ -3,7 +3,7 @@ import warnings
 import numpy as np
 import pytest
 
-from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness
+from nengo_spa.algebras.base import AbstractAlgebra, CommonProperties, ElementSidedness
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -80,6 +80,21 @@ def test_integer_binding_power(algebra, rng):
     assert np.allclose(algebra.binding_power(v, 1), v)
     assert np.allclose(algebra.binding_power(v, 2), algebra.bind(v, v))
     assert np.allclose(algebra.binding_power(v, 3), algebra.bind(algebra.bind(v, v), v))
+
+
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
+def test_fractional_binding_power(algebra, rng):
+    pytest.importorskip("scipy")
+    v = algebra.create_vector(16, {CommonProperties.POSITIVE}, rng=rng)
+
+    try:
+        sqrt_v = algebra.binding_power(v, 0.5)
+        assert np.allclose(algebra.bind(sqrt_v, sqrt_v), v)
+
+        inv_sqrt_v = algebra.binding_power(v, -0.5)
+        assert np.allclose(algebra.bind(inv_sqrt_v, inv_sqrt_v), algebra.invert(v))
+    except ValueError as err:
+        assert "only supports integer binding powers" in str(err)
 
 
 def test_dimensionality_mismatch_exception(algebra):

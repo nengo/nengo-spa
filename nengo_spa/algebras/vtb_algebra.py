@@ -223,12 +223,13 @@ class VtbAlgebra(AbstractAlgebra):
         return v.reshape((sub_d, sub_d)).T.flatten()
 
     def binding_power(self, v, exponent):
-        """Returns the binding power of *v* using the *exponent*.
+        r"""Returns the binding power of *v* using the *exponent*.
 
         The binding power is defined as binding (*exponent*-1) times bindings
-        of *v* to itself. Depending on the algebra, fractional exponents might
-        be valid or return a *ValueError*, if not. Usually, a fractional binding
-        power will require that *v* has a positive sign.
+        of *v* to itself.
+
+        Fractional binding powers are supported for "positive" vectors if SciPy
+        is available.
 
         Note the following special exponents:
 
@@ -236,9 +237,11 @@ class VtbAlgebra(AbstractAlgebra):
         * an exponent of 0 will return the identity vector,
         * and an *exponent* of 1 will return *v* itself.
 
-        The default implementation supports integer exponents and will apply
-        the `.bind` method multiple times. It requires the algebra to have a
-        left identity.
+        Be aware that the binding power for the VTB algebra does *not* satisfy
+        the usual properties of exponentiation:
+
+        * :math:`\mathcal{B}(v^a, v^b) = v^{a+b}` does *not* hold,
+        * :math:`(v^a)^b = v^{ab}` does *not* hold.
 
         Parameters
         ----------
@@ -254,29 +257,49 @@ class VtbAlgebra(AbstractAlgebra):
 
         See also
         --------
-        AbstractAlgebra.sign
+        .sign
         """
 
-        if not int(exponent) == exponent:
-            # FIXME
-            raise ValueError(
-                "{} only supports integer binding powers.".format(
-                    self.__class__.__name__
+        try:
+            from scipy.linalg import fractional_matrix_power
+        except ImportError as err:
+            if int(exponent) == exponent:
+                exponent = int(exponent)
+                # Provide fallback for integer-only powers
+
+                def fractional_matrix_power(m, exp):
+                    power = np.eye(len(m))
+                    for _ in range(exp):
+                        power = np.dot(power, m)
+                    return power
+
+            else:
+                # From Python 3.6 onward we get a ModuleNotFoundError. We want
+                # to re-raise the same type to be as specific as possible.
+                raise type(err)(
+                    "Fractional VTB binding powers require SciPy to be available.",
+                    name=err.name,
+                    path=err.path,
                 )
-            )
-        exponent = int(exponent)
 
         if exponent == 0:
             return self.identity_element(len(v), sidedness=ElementSidedness.RIGHT)
 
+        if int(exponent) != exponent and not self.sign(v).is_positive():
+            raise ValueError(
+                "Fractional binding powers are only supported for 'positive' vectors."
+            )
+
         if exponent < 0:
-            v = self.invert(v)
-        power = v
+            v = self.invert(v, sidedness=ElementSidedness.RIGHT)
 
-        for _ in range(abs(exponent) - 1):
-            power = self.bind(power, v)
+        sub_d = self._get_sub_d(len(v))
+        power = fractional_matrix_power(
+            v.reshape((sub_d, sub_d)) * np.sqrt(sub_d), abs(exponent) - 1
+        ).flatten() / np.sqrt(sub_d)
+        assert np.allclose(power.imag, 0)
 
-        return power
+        return self.bind(v, power.real)
 
     def get_binding_matrix(self, v, swap_inputs=False):
         sub_d = self._get_sub_d(len(v))
