@@ -140,6 +140,58 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
+    def binding_power(self, v, exponent):
+        """Returns the binding power of *v* using the *exponent*.
+
+        The binding power is defined as binding (*exponent*-1) times bindings
+        of *v* to itself. Depending on the algebra, fractional exponents might
+        be valid or return a *ValueError*, if not. Usually, a fractional binding
+        power will require that *v* has a positive sign.
+
+        Note the following special exponents:
+
+        * an exponent of -1 will return the inverse,
+        * an exponent of 0 will return the identity vector,
+        * and an *exponent* of 1 will return *v* itself.
+
+        The default implementation supports integer exponents and will apply
+        the `.bind` method multiple times. It requires the algebra to have a
+        left identity.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to bind repeatedly to itself.
+        exponent : int or float
+            Exponent of the binding power.
+
+        Returns
+        -------
+        (d,) ndarray
+            Binding power of *v*.
+
+        See also
+        --------
+        AbstractAlgebra.sign
+        """
+
+        if not int(exponent) == exponent:
+            raise ValueError(
+                "{} only supports integer binding powers.".format(
+                    self.__class__.__name__
+                )
+            )
+        exponent = int(exponent)
+
+        power = self.identity_element(len(v), sidedness=ElementSidedness.LEFT)
+        for _ in range(abs(exponent)):
+            power = self.bind(power, v)
+
+        if exponent < 0:
+            power = self.invert(power)
+
+        return power
+
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         """Invert vector *v*.
 
