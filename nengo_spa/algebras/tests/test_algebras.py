@@ -69,6 +69,19 @@ def test_binding_and_invert(algebra, d, sidedness, rng):
         pass
 
 
+@pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
+def test_integer_binding_power(algebra, rng):
+    v = algebra.create_vector(16, set(), rng=rng)
+    assert np.allclose(
+        algebra.binding_power(v, -2), algebra.bind(algebra.invert(v), algebra.invert(v))
+    )
+    assert np.allclose(algebra.binding_power(v, -1), algebra.invert(v))
+    assert np.allclose(algebra.binding_power(v, 0), algebra.identity_element(16))
+    assert np.allclose(algebra.binding_power(v, 1), v)
+    assert np.allclose(algebra.binding_power(v, 2), algebra.bind(v, v))
+    assert np.allclose(algebra.binding_power(v, 3), algebra.bind(algebra.bind(v, v), v))
+
+
 def test_dimensionality_mismatch_exception(algebra):
     with pytest.raises(ValueError):
         algebra.bind(np.ones(16), np.ones(25))
@@ -215,6 +228,9 @@ class DummyAlgebra:
         pass
 
     def bind(self, a, b):
+        pass
+
+    def binding_power(self, v, exponent):
         pass
 
     def invert(self, v):
