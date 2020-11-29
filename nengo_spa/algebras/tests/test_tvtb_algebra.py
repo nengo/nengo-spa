@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from nengo_spa.algebras.tvtb_algebra import TvtbAlgebra, TvtbSign
-from nengo_spa.vector_generation import UnitLengthVectors
+from nengo_spa.algebras.tvtb_algebra import TvtbAlgebra, TvtbProperties, TvtbSign
 
 
 def test_is_singleton():
@@ -27,10 +26,36 @@ def test_sign_and_abs(sign):
     pytest.importorskip("scipy")
     d = 16
     algebra = TvtbAlgebra()
-    base = next(UnitLengthVectors(d))
-    # TODO replace the following line with the canonical methods of generating
-    # positive definite vectors for the algebra
-    abs_v = np.dot(algebra.get_binding_matrix(base).T, base)
+    abs_v = algebra.create_vector(d, {TvtbProperties.POSITIVE})
     v = algebra.bind(sign.to_vector(d), abs_v)
     assert algebra.sign(v) == sign
     assert np.allclose(algebra.abs(v), abs_v)
+
+
+def test_create_positive_vector(rng):
+    pytest.importorskip("scipy")
+    algebra = TvtbAlgebra()
+    v = algebra.create_vector(16, {TvtbProperties.POSITIVE}, rng=rng)
+    assert len(v) == 16
+    assert algebra.sign(v).is_positive()
+
+
+def test_create_unitary_vector(rng):
+    algebra = TvtbAlgebra()
+    v = algebra.create_vector(16, {TvtbProperties.UNITARY}, rng=rng)
+    assert len(v) == 16
+    assert np.allclose(algebra.make_unitary(v), v)
+
+
+@pytest.mark.filterwarnings("ignore:.*only positive unitary vector")
+def test_create_positive_unitary_vector(rng):
+    algebra = TvtbAlgebra()
+    v = algebra.create_vector(16, {TvtbProperties.UNITARY, TvtbProperties.POSITIVE})
+    assert len(v) == 16
+    assert algebra.sign(v).is_positive()
+    assert np.allclose(algebra.make_unitary(v), v)
+
+
+def test_create_vector_with_invalid_property():
+    with pytest.raises(ValueError):
+        TvtbAlgebra().create_vector(16, "foo")

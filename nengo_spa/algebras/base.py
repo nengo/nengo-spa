@@ -56,6 +56,35 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """
         raise NotImplementedError()
 
+    def create_vector(self, d, properties, *, rng=None):
+        """Create a vector fulfilling given properties in the algebra.
+
+        Valid properties and combinations thereof depend on the concrete
+        algebra. It is suggested that the *properties* is either a *set* of
+        *str* (if order does not matter) or a *list* of *str* (if order does
+        matter). Use the constants defined in `.CommonProperties` where
+        appropriate.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality
+        properties
+            Definition of properties for the vector to fulfill. Type and
+            specification format depend on the concrete algbra, but it is
+            suggested to use either a *set* or *list* of *str* (depending on
+            whether order of properties matters) utilizing the constants defined
+            in `.CommonProperties` where applicable.
+        rng : numpy.random.RandomState, optional
+            The random number generator to use to create the vector.
+
+        Returns
+        -------
+        ndarray
+            Random vector with desired properties.
+        """
+        raise NotImplementedError()
+
     def make_unitary(self, v):
         """Returns a unitary vector based on the vector *v*.
 
@@ -440,3 +469,13 @@ class GenericSign(AbstractSign):
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.sign == other.sign
+
+
+class CommonProperties:
+    """Definition of constants for common properties of vectors in an algebra.
+
+    Use these for best interoperability between algebras.
+    """
+
+    UNITARY = "unitary"
+    POSITIVE = "positive"

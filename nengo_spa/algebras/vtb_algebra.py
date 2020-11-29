@@ -3,7 +3,12 @@ import warnings
 import nengo
 import numpy as np
 
-from nengo_spa.algebras.base import AbstractAlgebra, ElementSidedness, GenericSign
+from nengo_spa.algebras.base import (
+    AbstractAlgebra,
+    CommonProperties,
+    ElementSidedness,
+    GenericSign,
+)
 from nengo_spa.networks.vtb import VTB
 
 
@@ -93,6 +98,68 @@ class VtbAlgebra(AbstractAlgebra):
         if sub_d * sub_d != d:
             raise ValueError("Vector dimensionality must be a square number.")
         return sub_d
+
+    def create_vector(self, d, properties, *, rng=None):
+        """Create a vector fulfilling given properties in the algebra.
+
+        Creating positive vectors requires SciPy.
+
+        Parameters
+        ----------
+        d : int
+            Vector dimensionality
+        properties : set of str
+            Definition of properties for the vector to fulfill. Valid set
+            elements are constants defined in `.VtbProperties`.
+        rng : numpy.random.RandomState, optional
+            The random number generator to use to create the vector.
+
+        Returns
+        -------
+        ndarray
+            Random vector with desired properties.
+        """
+        properties = set(properties)
+
+        if rng is None:
+            rng = np.random.RandomState()
+
+        if {VtbProperties.UNITARY, VtbProperties.POSITIVE} <= properties:
+            properties -= {VtbProperties.UNITARY, VtbProperties.POSITIVE}
+            v = self.identity_element(d, sidedness=ElementSidedness.RIGHT)
+            warnings.warn(
+                "The only positive unitary vector in VTB is the identity. "
+                "Use the identity directly to avoid this warning."
+            )
+        elif VtbProperties.UNITARY in properties:
+            properties.remove(VtbProperties.UNITARY)
+            v = self.make_unitary(rng.randn(d))
+        elif VtbProperties.POSITIVE in properties:
+            try:
+                from scipy.linalg import sqrtm
+            except ImportError as err:
+                # From Python 3.6 onward we get a ModuleNotFoundError. We want
+                # to re-raise the same type to be as specific as possible.
+                raise type(err)(
+                    "Creating positive VTB vectors requires SciPy to be available.",
+                    name=err.name,
+                    path=err.path,
+                )
+
+            properties.remove(VtbProperties.POSITIVE)
+            sub_d = self._get_sub_d(d)
+            v = rng.randn(d)
+            v /= np.linalg.norm(v)
+            mat = v.reshape((sub_d, sub_d))
+            v = sqrtm(np.dot(mat, mat.T)).flatten()
+        else:
+            v = rng.randn(d)
+            v /= np.linalg.norm(v)
+
+        if len(properties) > 0:
+            raise ValueError("Invalid properties: " + ", ".join(properties))
+
+        return v
 
     def make_unitary(self, v):
         sub_d = self._get_sub_d(len(v))
@@ -349,3 +416,9 @@ class VtbSign(GenericSign):
                 "Invalid value for sign, this code should be unreachable."
             )
 
+
+class VtbProperties:
+    """Vector properties supported by the `.VtbAlgebra`."""
+
+    UNITARY = CommonProperties.UNITARY
+    POSITIVE = CommonProperties.POSITIVE
