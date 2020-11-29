@@ -10,8 +10,11 @@ nengo\_spa\.algebras
 
       AbstractAlgebra
       AbstractSign
+      CommonProperties
       ElementSidedness
       HrrAlgebra
       HrrSign
       VtbAlgebra
+      VtbProperties
       TvtbAlgebra
+      TvtbProperties

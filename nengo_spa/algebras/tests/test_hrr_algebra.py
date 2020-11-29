@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from nengo_spa.algebras.hrr_algebra import HrrAlgebra, HrrSign
+from nengo_spa.algebras.hrr_algebra import HrrAlgebra, HrrProperties, HrrSign
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -26,6 +26,33 @@ def test_sign_and_abs(sign, d, roll):
     v = algebra.bind(sign.to_vector(d), abs_v)
     assert algebra.sign(v) == sign
     assert np.allclose(algebra.abs(v), np.roll(abs_v, 2 * roll))
+
+
+def test_create_positive_vector(rng):
+    algebra = HrrAlgebra()
+    v = algebra.create_vector(16, {HrrProperties.POSITIVE}, rng=rng)
+    assert len(v) == 16
+    assert algebra.sign(v).is_positive()
+
+
+def test_create_unitary_vector(rng):
+    algebra = HrrAlgebra()
+    v = algebra.create_vector(16, {HrrProperties.UNITARY}, rng=rng)
+    assert len(v) == 16
+    assert np.allclose(algebra.make_unitary(v), v)
+
+
+def test_create_positive_unitary_vector(rng):
+    algebra = HrrAlgebra()
+    v = algebra.create_vector(16, {HrrProperties.UNITARY, HrrProperties.POSITIVE})
+    assert len(v) == 16
+    assert algebra.sign(v).is_positive()
+    assert np.allclose(algebra.make_unitary(v), v)
+
+
+def test_create_vector_with_invalid_property():
+    with pytest.raises(ValueError):
+        HrrAlgebra().create_vector(16, "foo")
 
 
 class TestHrrSign:
