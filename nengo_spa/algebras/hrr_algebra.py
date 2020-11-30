@@ -126,6 +126,48 @@ class HrrAlgebra(AbstractAlgebra):
             raise ValueError("Inputs must have same length.")
         return np.fft.irfft(np.fft.rfft(a) * np.fft.rfft(b), n=n)
 
+    def binding_power(self, v, exponent):
+        r"""Returns the binding power of *v* using the *exponent*.
+
+        The binding power is defined as binding (*exponent*-1) times bindings
+        of *v* to itself. Fractional binding powers are supported.
+
+        Note the following special exponents:
+
+        * an exponent of -1 will return the inverse,
+        * an exponent of 0 will return the identity vector,
+        * and an *exponent* of w1cne will return *v* itself.
+
+        The following relations hold for integer exponents, and for unitary
+        vectors:
+
+        * :math:`\mathcal{B}(v^a, v^b) = v^{a+b}`,
+        * :math:`(v^a)^b = v^{ab}`.
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to bind repeatedly to itself.
+        exponent : int or float
+            Exponent of the binding power.
+
+        Returns
+        -------
+        (d,) ndarray
+            Binding power of *v*.
+
+        See also
+        --------
+        .sign
+        """
+        if int(exponent) != exponent and not self.sign(v).is_positive():
+            raise ValueError(
+                "Fractional binding powers are only supported for 'positive' vectors."
+            )
+        if exponent < 0:
+            v = self.invert(v)
+        return np.fft.irfft(np.fft.rfft(v) ** abs(exponent), n=len(v))
+
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         """Invert vector *v*.
 
