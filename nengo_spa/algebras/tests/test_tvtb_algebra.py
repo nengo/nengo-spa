@@ -59,3 +59,54 @@ def test_create_positive_unitary_vector(rng):
 def test_create_vector_with_invalid_property():
     with pytest.raises(ValueError):
         TvtbAlgebra().create_vector(16, "foo")
+
+
+def test_additional_integer_binding_power_properties(rng):
+    algebra = TvtbAlgebra()
+    v = algebra.create_vector(16, {TvtbProperties.UNITARY}, rng=rng)
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2), algebra.binding_power(v, 3)),
+        algebra.binding_power(v, 5),
+    )
+    assert np.allclose(
+        algebra.binding_power(algebra.binding_power(v, 2), 3),
+        algebra.binding_power(v, 6),
+    )
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2), algebra.binding_power(v, -4)),
+        algebra.binding_power(v, -2),
+    )
+    assert np.allclose(
+        algebra.binding_power(algebra.binding_power(v, -2), 3),
+        algebra.binding_power(v, -6),
+    )
+
+
+@pytest.mark.filterwarnings("ignore:.*only positive unitary vector")
+def test_additional_fractional_binding_power_properties(rng):
+    algebra = TvtbAlgebra()
+    v = algebra.create_vector(
+        16, {TvtbProperties.POSITIVE, TvtbProperties.UNITARY}, rng=rng
+    )
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2.2), algebra.binding_power(v, 3.3)),
+        algebra.binding_power(v, 5.5),
+    )
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2.2), algebra.binding_power(v, -4.4)),
+        algebra.binding_power(v, -2.2),
+    )
+
+
+def test_fractional_binding_power_of_non_positive_vector_raises(rng):
+    algebra = TvtbAlgebra()
+    v = algebra.bind(
+        algebra.create_vector(16, {TvtbProperties.POSITIVE}, rng=rng),
+        TvtbSign(-1).to_vector(16),
+    )
+    assert algebra.sign(v).is_negative()
+    with pytest.raises(ValueError):
+        algebra.binding_power(v, 0.5)

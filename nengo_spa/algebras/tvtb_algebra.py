@@ -171,6 +171,83 @@ class TvtbAlgebra(AbstractAlgebra):
         m = self.get_binding_matrix(b)
         return np.dot(m, a)
 
+    def binding_power(self, v, exponent):
+        r"""Returns the binding power of *v* using the *exponent*.
+
+        The binding power is defined as binding (*exponent*-1) times bindings
+        of *v* to itself.
+
+        Fractional binding powers are supported for "positive" vectors if SciPy
+        is available.
+
+        Note the following special exponents:
+
+        * an exponent of -1 will return the inverse,
+        * an exponent of 0 will return the identity vector,
+        * and an *exponent* of w1cne will return *v* itself.
+
+        The following relations hold for integer exponents:
+
+        * :math:`\mathcal{B}(v^a, v^b) = v^{a+b}`,
+        * :math:`(v^a)^b = v^{ab}`.
+
+        (Technically, these relations also hold for positive unitary vectors,
+        but the only such vector is the identity vector.)
+
+        Parameters
+        ----------
+        v : (d,) ndarray
+            Vector to bind repeatedly to itself.
+        exponent : int or float
+            Exponent of the binding power.
+
+        Returns
+        -------
+        (d,) ndarray
+            Binding power of *v*.
+
+        See also
+        --------
+        .sign
+        """
+
+        try:
+            from scipy.linalg import fractional_matrix_power
+        except ImportError as err:
+            if int(exponent) == exponent:
+                exponent = int(exponent)
+                # Provide fallback for integer-only powers
+                def fractional_matrix_power(m, exp):
+                    power = np.eye(len(m))
+                    for _ in range(exp):
+                        power = np.dot(power, m)
+                    return power
+
+            else:
+                # From Python 3.6 onward we get a ModuleNotFoundError. We want
+                # to re-raise the same type to be as specific as possible.
+                raise type(err)(
+                    "Fractional TVTB binding powers require SciPy to be available.",
+                    name=err.name,
+                    path=err.path,
+                )
+
+        if int(exponent) != exponent and not self.sign(v).is_positive():
+            raise ValueError(
+                "Fractional binding powers are only supported for 'positive' vectors."
+            )
+
+        if exponent < 0:
+            exponent = abs(exponent)
+            v = self.invert(v)
+
+        sub_d = self._get_sub_d(len(v))
+        power = fractional_matrix_power(
+            v.reshape((sub_d, sub_d)) * np.sqrt(sub_d), exponent
+        ).flatten() / np.sqrt(sub_d)
+        assert np.allclose(power.imag, 0)
+        return power.real
+
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         """Invert vector *v*.
 
