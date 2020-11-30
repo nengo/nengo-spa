@@ -55,6 +55,57 @@ def test_create_vector_with_invalid_property():
         HrrAlgebra().create_vector(16, "foo")
 
 
+def test_additional_integer_binding_power_properties(rng):
+    algebra = HrrAlgebra()
+    v = algebra.create_vector(16, {HrrProperties.UNITARY}, rng=rng)
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2), algebra.binding_power(v, 3)),
+        algebra.binding_power(v, 5),
+    )
+    assert np.allclose(
+        algebra.binding_power(algebra.binding_power(v, 2), 3),
+        algebra.binding_power(v, 6),
+    )
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2), algebra.binding_power(v, -4)),
+        algebra.binding_power(v, -2),
+    )
+    assert np.allclose(
+        algebra.binding_power(algebra.binding_power(v, -2), 3),
+        algebra.binding_power(v, -6),
+    )
+
+
+@pytest.mark.filterwarnings("ignore:.*only positive unitary vector")
+def test_additional_fractional_binding_power_properties(rng):
+    algebra = HrrAlgebra()
+    v = algebra.create_vector(
+        16, {HrrProperties.POSITIVE, HrrProperties.UNITARY}, rng=rng
+    )
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2.2), algebra.binding_power(v, 3.3)),
+        algebra.binding_power(v, 5.5),
+    )
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2.2), algebra.binding_power(v, -4.4)),
+        algebra.binding_power(v, -2.2),
+    )
+
+
+def test_fractional_binding_power_of_non_positive_vector_raises(rng):
+    algebra = HrrAlgebra()
+    v = algebra.bind(
+        algebra.create_vector(16, {HrrProperties.POSITIVE}, rng=rng),
+        HrrSign(-1, 1).to_vector(16),
+    )
+    assert algebra.sign(v).is_negative()
+    with pytest.raises(ValueError):
+        algebra.binding_power(v, 0.5)
+
+
 class TestHrrSign:
     @pytest.mark.parametrize("sign", [HrrSign(1, 1), HrrSign(1, 0)])
     def test_positive(self, sign):

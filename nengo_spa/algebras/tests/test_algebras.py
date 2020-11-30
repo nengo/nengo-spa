@@ -69,23 +69,25 @@ def test_binding_and_invert(algebra, d, sidedness, rng):
         pass
 
 
+@pytest.mark.parametrize("d", [25, 36])
 @pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
-def test_integer_binding_power(algebra, rng):
-    v = algebra.create_vector(16, set(), rng=rng)
+def test_integer_binding_power(algebra, d, rng):
+    v = algebra.create_vector(d, set(), rng=rng)
     assert np.allclose(
         algebra.binding_power(v, -2), algebra.bind(algebra.invert(v), algebra.invert(v))
     )
     assert np.allclose(algebra.binding_power(v, -1), algebra.invert(v))
-    assert np.allclose(algebra.binding_power(v, 0), algebra.identity_element(16))
+    assert np.allclose(algebra.binding_power(v, 0), algebra.identity_element(d))
     assert np.allclose(algebra.binding_power(v, 1), v)
     assert np.allclose(algebra.binding_power(v, 2), algebra.bind(v, v))
     assert np.allclose(algebra.binding_power(v, 3), algebra.bind(algebra.bind(v, v), v))
 
 
+@pytest.mark.parametrize("d", [16, 25])
 @pytest.mark.filterwarnings("ignore:.*sidedness:DeprecationWarning")
-def test_fractional_binding_power(algebra, rng):
+def test_fractional_binding_power(algebra, d, rng):
     pytest.importorskip("scipy")
-    v = algebra.create_vector(16, {CommonProperties.POSITIVE}, rng=rng)
+    v = algebra.create_vector(d, {CommonProperties.POSITIVE}, rng=rng)
 
     try:
         sqrt_v = algebra.binding_power(v, 0.5)
