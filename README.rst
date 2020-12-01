@@ -58,7 +58,7 @@ To install NengoSPA::
 
     pip install nengo-spa
 
-NengoSPA is tested to work on Python 3.5+.
+NengoSPA is tested to work on Python 3.6+.
 
 If you need support for Python 2.7 or 3.4, NengoSPA 0.6.2 is the last version
 with support for these earlier Python versions.

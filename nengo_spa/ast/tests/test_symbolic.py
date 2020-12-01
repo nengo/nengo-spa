@@ -1,5 +1,3 @@
-import sys
-
 import nengo
 import numpy as np
 import pytest
@@ -123,7 +121,6 @@ def test_fixed_dot(rng):
     assert spa.dot(PointerSymbol("A", v), PointerSymbol("B", v)).evaluate() <= 0.1
 
 
-@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_fixed_dot_matmul(rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")

@@ -1,5 +1,3 @@
-import sys
-
 import nengo
 import numpy as np
 import pytest
@@ -326,7 +324,6 @@ def test_dot_with_fixed(Simulator, seed, rng, a):
     assert np.all(sim.data[p][0.8 < t] < 0.2)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_matmul(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
@@ -347,7 +344,6 @@ def test_dot_matmul(Simulator, seed, rng):
     assert np.all(sim.data[p][0.8 < t] < 0.2)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_with_fixed_matmul(Simulator, seed, rng):
     vocab = spa.Vocabulary(16, pointer_gen=rng)
     vocab.populate("A; B")
