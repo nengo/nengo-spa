@@ -25,11 +25,9 @@ class _DuckTypedABCMeta(ABCMeta):
                 return False
         warnings.warn(
             DeprecationWarning(
-                "Please do not rely on pure duck-typing for {clsname}. "
-                "Explicitly register your class {userclass} as a virtual subclass "
-                "of {clsname} or derive from it.".format(
-                    clsname=cls.__name__, userclass=instance.__class__.__name__
-                )
+                f"Please do not rely on pure duck-typing for {cls.__name__}. "
+                f"Explicitly register your class {instance.__class__.__name__} "
+                f"as a virtual subclass of {cls.__name__} or derive from it."
             )
         )
         return True

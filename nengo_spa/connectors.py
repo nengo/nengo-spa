@@ -27,7 +27,7 @@ def as_ast_node(obj):
     except (KeyError, TypeError):
         if getattr(output, "size_out", 0) == 1:
             return ModuleOutput(output, TScalar)
-        err = SpaTypeError("{} was not registered as a SPA output.".format(output))
+        err = SpaTypeError(f"{output} was not registered as a SPA output.")
         err.__suppress_context__ = True
         raise err
     finally:
@@ -49,7 +49,7 @@ def as_sink(obj):
         # Trying to create weakref on access of weak dict can raise TypeError
         vocab = input_vocab_registry[input_]
     except (KeyError, TypeError):
-        err = SpaTypeError("{} was not registered as a SPA input.".format(input_))
+        err = SpaTypeError(f"{input_} was not registered as a SPA input.")
         err.__suppress_context__ = True
         raise err
     finally:
@@ -224,7 +224,7 @@ class ConnectorRegistry:
             extended_type = self._type_cache[obj.__class__]
         except KeyError:
             extended_type = type(
-                "Connector<%s>" % (obj.__class__.__name__),
+                f"Connector<{obj.__class__.__name__}>",
                 (obj.__class__, SpaOperatorMixin),
                 {},
             )

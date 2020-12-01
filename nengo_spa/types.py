@@ -28,7 +28,7 @@ class Type:
         self.name = name
 
     def __repr__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.name)
+        return f"{self.__class__.__name__}({self.name!r})"
 
     def __str__(self):
         return self.name
@@ -82,10 +82,10 @@ class TAnyVocabOfDim(Type):
         self.dimensions = dimensions
 
     def __repr__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.dimensions)
+        return f"{self.__class__.__name__}({self.dimensions!r})"
 
     def __str__(self):
-        return "{}<{}>".format(self.name, self.dimensions)
+        return f"{self.name}<{self.dimensions}>"
 
     def __eq__(self, other):
         if not isinstance(other, Type):
@@ -116,10 +116,10 @@ class TVocabulary(Type):
         return self.vocab.dimensions
 
     def __repr__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.vocab)
+        return f"{self.__class__.__name__}({self.vocab!r})"
 
     def __str__(self):
-        return "{}<{}>".format(self.name, self.vocab)
+        return f"{self.name}<{self.vocab}>"
 
     def __hash__(self):
         return super(TVocabulary, self).__hash__() ^ hash(self.vocab)

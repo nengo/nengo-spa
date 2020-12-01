@@ -40,7 +40,7 @@ def similarity(data, vocab, normalize=False):
         vectors = np.array(vocab, copy=False, ndmin=2)
     else:
         raise ValidationError(
-            "%r object is not a valid vocabulary" % (type(vocab).__name__), attr="vocab"
+            f"{type(vocab).__name__:r} object is not a valid vocabulary", attr="vocab"
         )
 
     dots = np.dot(vectors, data.T)
@@ -139,4 +139,4 @@ def text(
         else:
             break
 
-    return join.join(["%0.2f%s" % (sim, key) for (sim, key) in r])
+    return join.join([f"{sim:0.2f}{key}" for (sim, key) in r])

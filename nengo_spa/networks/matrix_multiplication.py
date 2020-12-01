@@ -39,14 +39,12 @@ class MatrixMult(nengo.Network):
 
     def __init__(self, n_neurons, shape_left, shape_right, **kwargs):
         if len(shape_left) != 2:
-            raise ValueError("Shape {} is not two dimensional.".format(shape_left))
+            raise ValueError(f"Shape {shape_left} is not two dimensional.")
         if len(shape_right) != 2:
-            raise ValueError("Shape {} is not two dimensional.".format(shape_right))
+            raise ValueError(f"Shape {shape_right} is not two dimensional.")
         if shape_left[1] != shape_right[0]:
             raise ValueError(
-                "Matrix dimensions {} and  {} are incompatible".format(
-                    shape_left, shape_right
-                )
+                f"Matrix dimensions {shape_left} and  {shape_right} are incompatible"
             )
 
         super().__init__(**kwargs)

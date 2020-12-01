@@ -60,7 +60,7 @@ def test_function_call_str():
 def test_unary_operator(op):
     leaf = Leaf("leaf")
     assert leaf
-    assert str(eval(op + "leaf")) == op + "leaf"
+    assert str(eval(f"{op}leaf")) == op + "leaf"
 
 
 @pytest.mark.parametrize("op", ["<<", ">>", "+", "-", "*", "@", "/", "//", "%", "**"])
@@ -68,7 +68,7 @@ def test_binary_operator(op):
     lhs, rhs = Leaf("lhs"), Leaf("rhs")
     assert lhs
     assert rhs
-    assert str(eval("lhs" + op + "rhs")) == "lhs {} rhs".format(op)
+    assert str(eval(f"lhs {op} rhs")) == f"lhs {op} rhs"
 
 
 @pytest.mark.parametrize(
@@ -199,8 +199,6 @@ def test_binary_operator(op):
 def test_limit_str_length(expr_tree, max_len, expected):
     actual = limit_str_length(expr_tree, max_len)
     assert actual == expected, (
-        'When limiting the expression "{expr}" to length {max_len}, '
-        '"{expected}" is expected, but got "{actual}"'
-    ).format(
-        expr=str(expr_tree), max_len=max_len, expected=str(expected), actual=str(actual)
+        f'When limiting the expression "{str(expr_tree)}" to length {max_len}, '
+        f'"{str(expected)}" is expected, but got "{str(actual)}"'
     )

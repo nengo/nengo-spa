@@ -174,13 +174,14 @@ class SemanticPointer(Fixed):
 
     def __str__(self):
         if self.name:
-            return "SemanticPointer<{}>".format(self.name)
+            return f"SemanticPointer<{self.name}>"
         else:
             return repr(self)
 
     def __repr__(self):
-        return "SemanticPointer({!r}, vocab={!r}, algebra={!r}, name={!r}".format(
-            self.v, self.vocab, self.algebra, self.name
+        return (
+            f"SemanticPointer({self.v!r}, vocab={self.vocab!r}, "
+            f"algebra={self.algebra!r}, name={self.name!r}"
         )
 
     @TypeCheckedBinaryOp(Fixed)
@@ -465,7 +466,7 @@ class Identity(SemanticPointer):
         vocab=None,
         algebra=None,
         *,
-        sidedness=ElementSidedness.TWO_SIDED
+        sidedness=ElementSidedness.TWO_SIDED,
     ):
         data = self._get_algebra(vocab, algebra).identity_element(
             n_dimensions, sidedness=sidedness
@@ -503,7 +504,7 @@ class AbsorbingElement(SemanticPointer):
         vocab=None,
         algebra=None,
         *,
-        sidedness=ElementSidedness.TWO_SIDED
+        sidedness=ElementSidedness.TWO_SIDED,
     ):
         data = self._get_algebra(vocab, algebra).absorbing_element(
             n_dimensions, sidedness=sidedness

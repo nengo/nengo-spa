@@ -129,10 +129,8 @@ class Vocabulary(Mapping):
         return v
 
     def __str__(self):
-        name = "" if self.name is None else '"{}" '.format(self.name)
-        return "{}-dimensional vocab {}at 0x{:x}".format(
-            self.dimensions, name, id(self)
-        )
+        name = "" if self.name is None else f'"{self.name}" '
+        return f"{self.dimensions}-dimensional vocab {name} at 0x{id(self):x}"
 
     def create_pointer(self, attempts=100, transform=None):
         """Create a new semantic pointer and add it to the vocabulary.
@@ -177,8 +175,9 @@ class Vocabulary(Mapping):
         else:
             warnings.warn(
                 "Could not create a semantic pointer with "
-                "max_similarity=%1.2f (D=%d, M=%d, similarity=%1.2f)"
-                % (self.max_similarity, self.dimensions, len(self._key2idx), best_sim)
+                f"max_similarity={self.max_similarity:1.2f} "
+                f"(D={self.dimensions}, M={len(self._key2idx)}, "
+                f"similarity={best_sim:1.2f})"
             )
         return best_p
 
@@ -227,8 +226,8 @@ class Vocabulary(Mapping):
         """
         if not valid_sp_regex.match(key) or iskeyword(key) or key in reserved_sp_names:
             raise SpaParseError(
-                "Invalid Semantic Pointer name {!r}. Valid names are valid "
-                "Python 2 identifiers beginning with a capital letter.".format(key)
+                f"Invalid Semantic Pointer name {key!r}. Valid names are valid "
+                "Python 2 identifiers beginning with a capital letter."
             )
         if not isinstance(p, semantic_pointer.SemanticPointer):
             # note: p will get its algebra from vocab.algebra
@@ -236,7 +235,7 @@ class Vocabulary(Mapping):
 
         if key in self._key2idx:
             raise ValidationError(
-                "The semantic pointer %r already exists" % key, attr="", obj=self
+                f"The semantic pointer {key!r} already exists", attr="", obj=self
             )
         isDifferentVocab = p.vocab is not None and p.vocab is not self
         isDifferentAlgebra = p.algebra is not self.algebra  # algebra never None
@@ -314,16 +313,14 @@ class Vocabulary(Mapping):
             value = eval(text, {}, self)
         except NameError as err:
             raise SpaParseError(
-                "Error parsing expression {expr!r} with {vocab}: {msg}".format(
-                    expr=text, vocab=self, msg=str(err)
-                )
+                f"Error parsing expression {text!r} with {self}: {str(err)}"
             )
 
         if is_number(value):
             value *= Identity(self.dimensions)
         elif not isinstance(value, semantic_pointer.SemanticPointer):
             raise SpaParseError(
-                "The result of parsing '%s' is not a SemanticPointer." % text
+                f"The result of parsing '{text}' is not a SemanticPointer."
             )
         return value
 
@@ -462,9 +459,9 @@ class VocabularyMap(Mapping):
         """
         if vocab.dimensions in self._vocabs:
             warnings.warn(
-                "Duplicate vocabularies with dimension %d. "
+                f"Duplicate vocabularies with dimension {vocab.dimensions}. "
                 "Using the last entry in the vocab list with "
-                "that dimensionality." % vocab.dimensions
+                "that dimensionality."
             )
         self._vocabs[vocab.dimensions] = vocab
 
@@ -545,7 +542,7 @@ class VocabularyMapParam(nengo.params.Parameter):
             except ValueError:
                 raise ValidationError(
                     "Must be of type 'VocabularyMap' or compatible "
-                    "(got type %r)." % type(vocab_set).__name__,
+                    f"(got type {type(vocab_set).__name__}).",
                     attr=self.name,
                     obj=instance,
                 )
@@ -578,8 +575,8 @@ class VocabularyOrDimParam(nengo.params.Parameter):
                 value = instance.vocabs.get_or_create(value)
             elif not isinstance(value, Vocabulary):
                 raise ValidationError(
-                    "Must be of type 'Vocabulary' or an integer (got type %r)."
-                    % type(value).__name__,
+                    "Must be of type 'Vocabulary' or an integer (got type "
+                    f"{type(value).__name__}).",
                     attr=self.name,
                     obj=instance,
                 )

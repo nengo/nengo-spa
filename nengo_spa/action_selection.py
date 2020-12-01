@@ -188,9 +188,7 @@ def ifmax(name, condition, *actions):
         )
     if condition.type != TScalar:
         raise SpaTypeError(
-            "ifmax condition must evaluate to a scalar, but got {}.".format(
-                condition.type
-            )
+            f"ifmax condition must evaluate to a scalar, but got {condition.type}."
         )
     if any(not isinstance(a, RoutedConnection) for a in actions):
         raise SpaActionSelectionError(
