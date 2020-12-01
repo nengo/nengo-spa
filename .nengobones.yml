@@ -15,23 +15,25 @@ manifest_in:
     - "*.swp" # exclude VIM swp files
 
 travis_yml:
-  python: 3.7
+  python: 3.8
   global_vars:
     NUMPY: numpy
     SCIPY: scipy
-  dist: focal
   jobs:
     - script: static
     - script: docs
-    - script: test # min supported Python + Numpy versions
-      python: 3.5
+      dist: focal
+    - script: test
+      python: 3.6
       env:
         NUMPY: numpy>=1.10,<1.11
         SCIPY: scipy>=1.0,<1.1
+      dist: $DIST
     - script: test
-      python: 3.6
+      python: 3.7
+      dist: $DIST
     - script: test
-      python: 3.8
+      python: 3.9
     - script: test-coverage
     - script: test-no-scipy
   pypi_user: __token__

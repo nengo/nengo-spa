@@ -1,5 +1,3 @@
-import sys
-
 import nengo
 import numpy as np
 import pytest
@@ -210,7 +208,6 @@ def test_dot(rng):
     assert np.allclose(a.dot(tuple(b.v)), np.dot(a.v, b.v))
 
 
-@pytest.mark.skipif(sys.version_info < (3, 5), reason="requires Python 3.5")
 def test_dot_matmul(rng):
     gen = UnitLengthVectors(50, rng=rng)
     a = SemanticPointer(next(gen)) * 1.1

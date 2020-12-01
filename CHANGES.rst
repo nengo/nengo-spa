@@ -20,6 +20,16 @@ Release History
    - Fixed
 
 
+1.3.0 (unreleased)
+==================
+
+**Removed**
+
+- Python 3.5 support was removed.
+  (`#273 <https://github.com/nengo/nengo_spa/issues/273>`__,
+  `#274 <https://github.com/nengo/nengo_spa/pull/274>`__)
+
+
 1.2.0 (November 15, 2020)
 =========================
 
