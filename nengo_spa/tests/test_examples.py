@@ -63,7 +63,7 @@ def assert_noexceptions(nb_file, tmpdir):
     from nengo.utils.ipython import export_py
 
     nb = load_example(nb_file)
-    pyfile = "%s.py" % tmpdir.join(os.path.basename(nb_file))
+    pyfile = f"{tmpdir.join(os.path.basename(nb_file))}.py"
     export_py(nb, pyfile)
     execfile(pyfile, {})
     plt.close("all")

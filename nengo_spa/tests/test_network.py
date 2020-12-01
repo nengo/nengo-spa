@@ -142,7 +142,7 @@ def test_casting_vocabs(d1, d2, method, lookup, Simulator, plt, seed, rng):
         a = spa.State(vocab=v1)
         b = spa.State(vocab=v2)
         spa.sym.A >> a
-        eval("spa.%s" % method) >> b
+        eval(f"spa.{method}") >> b
         p = nengo.Probe(b.output, synapse=0.03)
 
     with Simulator(model) as sim:

@@ -117,7 +117,7 @@ class UnaryOperator(Node):
         child = self.children[0]
         operand = str(child)
         if self.precedence >= child.precedence:
-            operand = "({})".format(operand)
+            operand = f"({operand})"
         return self.value + operand
 
 
@@ -130,10 +130,10 @@ class BinaryOperator(Node):
     def __str__(self):
         lhs, rhs = self.children
         if self.precedence > lhs.precedence:
-            lhs = "({})".format(lhs)
+            lhs = f"({lhs})"
         if self.precedence >= rhs.precedence:
-            rhs = "({})".format(rhs)
-        return "{} {} {}".format(lhs, self.value, rhs)
+            rhs = f"({rhs})"
+        return f"{lhs} {self.value} {rhs}"
 
     @property
     def lhs(self):
@@ -154,7 +154,7 @@ class AttributeAccess(Node):
         child = self.children[0]
         operand = str(child)
         if self.precedence > child.precedence:
-            operand = "({})".format(operand)
+            operand = f"({operand})"
         return operand + "." + self.value
 
 
@@ -173,8 +173,8 @@ class FunctionCall(Node):
         child = self.children[0]
         operand = str(child)
         if self.precedence > child.precedence:
-            operand = "({})".format(operand)
-        return "{}({})".format(operand, ", ".join(str(arg) for arg in self.value))
+            operand = f"({operand})"
+        return f"{operand}({', '.join(str(arg) for arg in self.value)})"
 
 
 class KeywordArgument(Node):
@@ -184,7 +184,7 @@ class KeywordArgument(Node):
         return super().__new__(cls, value, 0, (child,))
 
     def __str__(self):
-        return "{}={}".format(self.value, str(self.children[0]))
+        return f"{self.value}={str(self.children[0])}"
 
 
 class _LimitStrLengthVisitor:

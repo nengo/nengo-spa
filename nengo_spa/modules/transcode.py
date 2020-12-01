@@ -57,7 +57,7 @@ class TranscodeFunctionParam(Parameter):
             return fn
         else:
             raise ValidationError(
-                "Invalid output type {!r}".format(type(fn)), attr=self.name, obj=obj
+                f"Invalid output type {type(fn)!r}", attr=self.name, obj=obj
             )
 
     def coerce_callable(self, obj, fn):
@@ -75,20 +75,19 @@ class TranscodeFunctionParam(Parameter):
             args = (t,)
 
         _, invoked = checked_call(fn, *args)
-        fn(*args)
         if not invoked:
             if obj.input_vocab is not None:
                 raise ValidationError(
-                    "Transcode function %r is expected to accept exactly 2 "
+                    f"Transcode function {fn} is expected to accept exactly 2 "
                     "arguments: time as a float, and a SemanticPointer",
                     attr=self.name,
                     obj=obj,
                 )
             else:
                 raise ValidationError(
-                    "Transcode function %r is expected to accept exactly 1 or "
-                    "2 arguments: time as a float, and optionally the input "
-                    "data as NumPy array.",
+                    f"Transcode function {fn} is expected to accept exactly 1 "
+                    "or 2 arguments: time as a float, and optionally "
+                    "the input data as NumPy array.",
                     attr=self.name,
                     obj=obj,
                 )
@@ -107,7 +106,7 @@ class TranscodeFunctionParam(Parameter):
         elif isinstance(fn, (str, SemanticPointer, PointerSymbol)):
             return SpArrayExtractor(output_vocab)(fn)
         else:
-            raise ValueError("Invalid output type {!r}".format(type(fn)))
+            raise ValueError(f"Invalid output type {type(fn)!r}")
 
 
 class Transcode(Network):
@@ -183,7 +182,7 @@ class Transcode(Network):
         output_vocab=Default,
         size_in=Default,
         size_out=Default,
-        **kwargs
+        **kwargs,
     ):
         super(Transcode, self).__init__(**kwargs)
 

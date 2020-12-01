@@ -21,9 +21,7 @@ def dot(a, b):
         result = b.rdot(a)
     if result is NotImplemented:
         raise TypeError(
-            "'dot' not supported between instances of '{}' and '{}'".format(
-                type(a), type(b)
-            )
+            f"'dot' not supported between instances of '{type(a)}' and '{type(b)}'"
         )
     return result
 

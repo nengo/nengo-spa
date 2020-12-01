@@ -164,7 +164,7 @@ class PointerSymbol(Symbol):
         return SemanticPointer(np.dot(tr, self.evaluate().v), vocab=vocab)
 
     def __repr__(self):
-        return "PointerSymbol({!r}, {!r})".format(self._expr_tree, self.type)
+        return f"PointerSymbol({self._expr_tree!r}, {self.type!r})"
 
 
 class PointerSymbolFactory:

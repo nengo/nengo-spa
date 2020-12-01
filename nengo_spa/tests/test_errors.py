@@ -20,7 +20,7 @@ def test_missing_sink(sink):
         a = spa.State(d)
         assert a
         with pytest.raises(NameError):
-            eval("a >> %s" % sink)
+            eval(f"a >> {sink}")
 
 
 @pytest.mark.parametrize("sink", ("0.5", "0.6 * a", "a * 0.6"))
@@ -30,7 +30,7 @@ def test_invalid_sink(sink):
         a = spa.State(d)
         assert a
         with pytest.raises((SyntaxError, SpaTypeError)):
-            eval("a >> {}".format(sink))
+            eval(f"a >> {sink}")
 
 
 def test_missing_pointer():

@@ -68,7 +68,7 @@ class State(Network):
         feedback=Default,
         represent_cc_identity=Default,
         feedback_synapse=Default,
-        **kwargs
+        **kwargs,
     ):
         super(State, self).__init__(**kwargs)
 
@@ -83,8 +83,8 @@ class State(Network):
 
         if dimensions % self.subdimensions != 0:
             raise ValidationError(
-                "Dimensions (%d) must be divisible by subdimensions (%d)"
-                % (dimensions, self.subdimensions),
+                f"Dimensions ({dimensions}) must be divisible by "
+                f"subdimensions ({self.subdimensions})",
                 attr="dimensions",
                 obj=self,
             )
