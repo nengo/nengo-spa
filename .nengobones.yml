@@ -12,33 +12,28 @@ license_rst: {}
 
 manifest_in:
   global-exclude:
-    - "*.swp"  # exclude VIM swp files
+    - "*.swp" # exclude VIM swp files
 
 travis_yml:
   python: 3.7
   global_vars:
-      NUMPY: numpy
-      SCIPY: scipy
-      DIST: bionic
+    NUMPY: numpy
+    SCIPY: scipy
+  dist: focal
   jobs:
     - script: static
-      dist: $DIST
     - script: docs
-      dist: xenial
-    - script: test  # min supported Python + Numpy versions
+    - script: test # min supported Python + Numpy versions
       python: 3.5
       env:
-          NUMPY: numpy>=1.10,<1.11
-          SCIPY: scipy>=1.0,<1.1
+        NUMPY: numpy>=1.10,<1.11
+        SCIPY: scipy>=1.0,<1.1
     - script: test
       python: 3.6
     - script: test
       python: 3.8
-      dist: $DIST
     - script: test-coverage
-      dist: $DIST
     - script: test-no-scipy
-      dist: $DIST
   pypi_user: __token__
   deploy_dists:
     - sdist

@@ -18,14 +18,12 @@ env:
     - PIP_USE_FEATURE="2020-resolver"
     - NUMPY="numpy"
     - SCIPY="scipy"
-    - DIST="bionic"
 
 jobs:
   include:
   -
     env:
       SCRIPT="static"
-    dist: $DIST
   -
     env:
       SCRIPT="docs"
@@ -33,7 +31,6 @@ jobs:
       apt:
         packages:
           - pandoc
-    dist: xenial
   -
     env:
       NUMPY="numpy>=1.10,<1.11"
@@ -48,15 +45,12 @@ jobs:
     env:
       SCRIPT="test"
     python: 3.8
-    dist: $DIST
   -
     env:
       SCRIPT="test-coverage"
-    dist: $DIST
   -
     env:
       SCRIPT="test-no-scipy"
-    dist: $DIST
   - stage: deploy
     if: branch =~ ^release-candidate-* OR tag =~ ^v[0-9]*
     env: SCRIPT="deploy"
@@ -95,11 +89,7 @@ before_install:
   # install/run nengo-bones
   - pip install git+https://github.com/nengo/nengo-bones#egg=nengo-bones
   - bones-generate --output-dir .ci ci-scripts
-  - if [[ "$TRAVIS_PYTHON_VERSION" < "3.6" ]]; then
-        echo "Skipping bones-check because Python $TRAVIS_PYTHON_VERSION < 3.6";
-    else
-        bones-check --verbose;
-    fi
+  - bones-check --verbose
   # display environment info
   - pip freeze
 
