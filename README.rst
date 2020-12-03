@@ -1,6 +1,10 @@
-.. image:: https://img.shields.io/travis/nengo/nengo-spa/master.svg
-  :target: https://travis-ci.org/nengo/nengo-spa
-  :alt: Travis-CI build status
+.. image:: https://img.shields.io/pypi/v/nengo-spa.svg
+  :target: https://pypi.org/project/nengo-spa
+  :alt: Latest PyPI version
+
+.. image:: https://img.shields.io/pypi/pyversions/nengo-spa.svg
+  :target: https://pypi.org/project/nengo-spa
+  :alt: Python versions
 
 .. image:: https://img.shields.io/codecov/c/github/nengo/nengo-spa/master.svg
   :target: https://codecov.io/gh/nengo/nengo-spa/branch/master
