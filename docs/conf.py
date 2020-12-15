@@ -56,7 +56,8 @@ todo_include_todos = True
 # -- linkcheck
 linkcheck_ignore = [
     r"^https?://www\.amazon\..*$",
-    r"^https://uwspace\.uwaterloo\.ca.*$",
+    r"^https://uwspace\.uwaterloo\.ca/.*$",
+    r"^https?://journals\.plos\.org/.*$",
 ]
 
 # -- doctest
