@@ -7,8 +7,9 @@ class MatrixMult(nengo.Network):
 
     Both matrices need to be two dimensional.
 
-    See the `Matrix Multiplication example <:doc:networks>`_
-    for a description of the network internals.
+    See the Nengo :doc:`Matrix Multiplication example
+    <nengo:examples/advanced/matrix-multiplication>` for a description of the
+    network internals.
 
     Parameters
     ----------
