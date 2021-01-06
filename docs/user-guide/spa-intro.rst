@@ -125,7 +125,7 @@ example of an SPA to date.
    provide semantics via connections to natural input (images) and output (a
    nonlinear dynamical arm model). Central information manipulation depends on
    syntaictic structure for several tasks. Control is largely captured by the
-   basal ganglia aciton selection elements. Memory and learning take place in
+   basal ganglia action selection elements. Memory and learning take place in
    both basal ganglia and cortex. The model itself consists of just under
    a million spiking neurons.
 
@@ -135,7 +135,7 @@ tasks (`see a video of Spaun running this task
 Matrix <https://en.wikipedia.org/wiki/Raven's_Progressive_Matrices>`_ task,
 which requires people to figure out a pattern in the input, and apply that
 pattern to new input to produce novel output. For instance given the following
-input ``[1] [11] [111] [2n [22] [222] [3] [33] ?`` the expected answer is
+input ``[1] [11] [111] [2] [22] [222] [3] [33] ?`` the expected answer is
 ``333``. The input to the model first indicates which task it will
 perform by presenting it with an ``A`` followed by the task number (e.g. ``A 7``
 for this task). Then it is shown a series of letters and brackets and it has to
