@@ -110,7 +110,7 @@ def test_division_with_fixed(Simulator, suffix, seed, rng):
 
 
 @pytest.mark.parametrize("op", ["+", "-", "*"])
-@pytest.mark.parametrize("order", ["AB", "BA"])
+@pytest.mark.parametrize("order", [("A", "B"), ("B", "A")])
 def test_binary_operation_on_modules_with_pointer_symbol(
     Simulator, algebra, op, order, seed, rng
 ):
@@ -119,9 +119,9 @@ def test_binary_operation_on_modules_with_pointer_symbol(
 
     with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
-        if order == "AB":
+        if order == ("A", "B"):
             x = eval("a" + op + 'PointerSymbol("B")')
-        elif order == "BA":
+        elif order == ("B", "A"):
             x = eval('PointerSymbol("B")' + op + "a")
         else:
             raise ValueError("Invalid order argument.")
@@ -136,7 +136,7 @@ def test_binary_operation_on_modules_with_pointer_symbol(
 
 
 @pytest.mark.parametrize("op", ["+", "-", "*"])
-@pytest.mark.parametrize("order", ["AB", "BA"])
+@pytest.mark.parametrize("order", [("A", "B"), ("B", "A")])
 def test_binary_operation_on_modules_with_fixed_pointer(
     Simulator, algebra, op, order, seed, rng
 ):
@@ -146,9 +146,9 @@ def test_binary_operation_on_modules_with_fixed_pointer(
 
     with spa.Network(seed=seed) as model:
         a = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
-        if order == "AB":
+        if order == ("A", "B"):
             x = eval("a" + op + "b")
-        elif order == "BA":
+        elif order == ("B", "A"):
             x = eval("b" + op + "a")
         else:
             raise ValueError("Invalid order argument.")
