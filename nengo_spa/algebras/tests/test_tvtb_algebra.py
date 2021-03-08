@@ -86,6 +86,7 @@ def test_additional_integer_binding_power_properties(rng):
 
 @pytest.mark.filterwarnings("ignore:.*only positive unitary vector")
 def test_additional_fractional_binding_power_properties(rng):
+    pytest.importorskip("scipy")
     algebra = TvtbAlgebra()
     v = algebra.create_vector(
         16, {TvtbProperties.POSITIVE, TvtbProperties.UNITARY}, rng=rng
@@ -102,6 +103,7 @@ def test_additional_fractional_binding_power_properties(rng):
 
 
 def test_fractional_binding_power_of_non_positive_vector_raises(rng):
+    pytest.importorskip("scipy")
     algebra = TvtbAlgebra()
     v = algebra.bind(
         algebra.create_vector(16, {TvtbProperties.POSITIVE}, rng=rng),
