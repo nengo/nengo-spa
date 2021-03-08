@@ -217,6 +217,7 @@ class TvtbAlgebra(AbstractAlgebra):
             if int(exponent) == exponent:
                 exponent = int(exponent)
                 # Provide fallback for integer-only powers
+
                 def fractional_matrix_power(m, exp):
                     power = np.eye(len(m))
                     for _ in range(exp):
