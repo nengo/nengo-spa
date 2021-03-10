@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from nengo_spa.algebras.base import AbstractAlgebra, CommonProperties, ElementSidedness
+from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 from nengo_spa.vector_generation import UnitLengthVectors
 
 
@@ -81,6 +82,23 @@ def test_integer_binding_power(algebra, d, rng):
     assert np.allclose(algebra.binding_power(v, 1), v)
     assert np.allclose(algebra.binding_power(v, 2), algebra.bind(v, v))
     assert np.allclose(algebra.binding_power(v, 3), algebra.bind(algebra.bind(v, v), v))
+
+
+@pytest.mark.parametrize("d", [25, 36])
+def test_integer_binding_is_consistent_with_base_implementation(algebra, d, rng):
+    v = algebra.create_vector(d, set(), rng=rng)
+
+    try:
+        for exponent in range(-2, 4):
+            assert np.allclose(
+                algebra.binding_power(v, exponent),
+                AbstractAlgebra.binding_power(algebra, v, exponent),
+            )
+
+        with pytest.raises(ValueError, match="only supports integer binding powers"):
+            AbstractAlgebra.binding_power(algebra, v, 0.5)
+    except NotImplementedError:
+        pytest.skip()
 
 
 @pytest.mark.parametrize("d", [16, 25])
