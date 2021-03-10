@@ -325,11 +325,14 @@ def test_sign(algebra, element, check_property, sidedness):
         pass
 
 
+@pytest.mark.parametrize("d", [16, 25])
 @pytest.mark.parametrize("sidedness", ElementSidedness)
-def test_abs(algebra, sidedness):
+def test_abs(algebra, d, sidedness):
     try:
-        v = algebra.abs(algebra.negative_identity_element(16, sidedness))
+        neg_v = algebra.negative_identity_element(d, sidedness)
+        assert algebra.sign(neg_v).is_negative()
+        v = algebra.abs(neg_v)
         assert algebra.sign(v).is_positive()
-        assert np.allclose(v, algebra.identity_element(16, sidedness))
+        assert np.allclose(v, algebra.identity_element(d, sidedness))
     except NotImplementedError:
         pass
