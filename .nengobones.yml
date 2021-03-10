@@ -35,7 +35,7 @@ travis_yml:
     - script: test
       python: 3.9
     - script: test-coverage
-    - script: test-no-scipy
+    - script: test-coverage-no-scipy
   pypi_user: __token__
   deploy_dists:
     - sdist
@@ -63,10 +63,11 @@ ci_scripts:
       - $NUMPY
       - $SCIPY
     coverage: true
-  - output_name: test-no-scipy
+  - output_name: test-coverage-no-scipy
     template: test
     pip_install:
       - $NUMPY
+    coverage: true
   - template: docs
     pip_install:
       - matplotlib
