@@ -94,6 +94,13 @@ def test_additional_fractional_binding_power_properties(rng):
         algebra.binding_power(v, -2.2),
     )
 
+    v = algebra.create_vector(16, {HrrProperties.POSITIVE}, rng=rng)
+
+    assert np.allclose(
+        algebra.bind(algebra.binding_power(v, 2.2), algebra.binding_power(v, 3.3)),
+        algebra.binding_power(v, 5.5),
+    )
+
 
 def test_fractional_binding_power_of_non_positive_vector_raises(rng):
     algebra = HrrAlgebra()

@@ -144,6 +144,9 @@ class HrrAlgebra(AbstractAlgebra):
         * :math:`\mathcal{B}(v^a, v^b) = v^{a+b}`,
         * :math:`(v^a)^b = v^{ab}`.
 
+        If :math:`a >= 0` and :math:`b >= 0`, then the first relation holds also
+        for non-unitary vectors with real exponents.
+
         Parameters
         ----------
         v : (d,) ndarray
