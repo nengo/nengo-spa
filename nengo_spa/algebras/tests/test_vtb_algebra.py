@@ -82,3 +82,11 @@ def test_fractional_binding_power_of_non_positive_vector_raises(rng):
     assert algebra.sign(v).is_negative()
     with pytest.raises(ValueError):
         algebra.binding_power(v, 0.5)
+
+
+def test_fractional_binding_power_with_positive_exponent_lower_1(rng):
+    pytest.importorskip("scipy")
+
+    algebra = VtbAlgebra()
+    v = algebra.create_vector(16, {VtbProperties.POSITIVE}, rng=rng)
+    assert np.allclose(v, algebra.binding_power(algebra.binding_power(v, 2.5), 1 / 2.5))
