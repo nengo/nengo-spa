@@ -305,13 +305,11 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """Returns the sign of *v* defined by the algebra.
 
         The exact definition of the sign depends on the concrete algebra, but
-        should be analogous to the sign of a number in so far that
-
-        * binding of two "positive" vectors produces another "positive" vector,
-        * binding of a "negative" vector with itself produces a "positive"
-          vector,
-        * binding of a "negative" and "positive" vectors produces a "negative"
-          vector.
+        should be analogous to the sign of a number in so far that binding two
+        vectors with the same sign produces a "positive" vector. There might
+        however be multiple types of negative signs, where binding vectors with
+        different types of negative signs will produce another "negative"
+        vector.
 
         Furthermore, if the algebra supports fractional binding powers, it
         should do so for all "non-negative" vectors, but not "negative" vectors.
