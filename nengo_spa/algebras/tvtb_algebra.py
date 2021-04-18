@@ -386,6 +386,8 @@ class TvtbAlgebra(AbstractAlgebra):
 
 
 class TvtbSign(GenericSign):
+    """Represents a sign in the `.TvtbAlgebra`."""
+
     def to_vector(self, d):
         if self.sign is None:
             raise NotImplementedError(

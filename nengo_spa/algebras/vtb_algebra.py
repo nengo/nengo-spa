@@ -477,6 +477,8 @@ class VtbAlgebra(AbstractAlgebra):
 
 
 class VtbSign(GenericSign):
+    """Represents a sign in the `.VtbAlgebra`."""
+
     def to_vector(self, d):
         if self.sign is None:
             raise NotImplementedError(
