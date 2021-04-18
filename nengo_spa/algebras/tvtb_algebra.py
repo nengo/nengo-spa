@@ -184,7 +184,7 @@ class TvtbAlgebra(AbstractAlgebra):
 
         * an exponent of -1 will return the inverse,
         * an exponent of 0 will return the identity vector,
-        * and an *exponent* of w1cne will return *v* itself.
+        * and an *exponent* of 1 will return *v* itself.
 
         The following relations hold for integer exponents:
 
@@ -407,4 +407,10 @@ class TvtbProperties:
     """Vector properties supported by the `.TvtbAlgebra`."""
 
     UNITARY = CommonProperties.UNITARY
+    """A unitary vector does not change the length of a vector it is bound to."""
+
     POSITIVE = CommonProperties.POSITIVE
+    """A positive vector does not change the sign of a vector it is bound to.
+
+    A positive vector allows for fractional binding powers.
+    """
