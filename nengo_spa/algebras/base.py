@@ -143,20 +143,22 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
     def binding_power(self, v, exponent):
         """Returns the binding power of *v* using the *exponent*.
 
-        The binding power is defined as binding (*exponent*-1) times bindings
-        of *v* to itself. Depending on the algebra, fractional exponents might
-        be valid or return a *ValueError*, if not. Usually, a fractional binding
-        power will require that *v* has a positive sign.
+        For a positive *exponent*, the binding power is defined as binding
+        (*exponent*-1) times bindings of *v* to itself. For a negative
+        *exponent*, the binding power is the approximate inverse bound to itself
+        according to the prior definition. Depending on the algebra, fractional
+        exponents might be valid or return a *ValueError*, if not. Usually, a
+        fractional binding power will require that *v* has a positive sign.
 
         Note the following special exponents:
 
-        * an exponent of -1 will return the inverse,
+        * an exponent of -1 will return the approximate inverse,
         * an exponent of 0 will return the identity vector,
         * and an *exponent* of 1 will return *v* itself.
 
-        The default implementation supports integer exponents and will apply
-        the `.bind` method multiple times. It requires the algebra to have a
-        left identity.
+        The default implementation supports integer exponents only and will
+        apply the `.bind` method multiple times. It requires the algebra to have
+        a left identity.
 
         Parameters
         ----------
@@ -305,17 +307,17 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         """Returns the sign of *v* defined by the algebra.
 
         The exact definition of the sign depends on the concrete algebra, but
-        should be analogous to the sign of a number in so far that binding two
-        vectors with the same sign produces a "positive" vector. There might
-        however be multiple types of negative signs, where binding vectors with
-        different types of negative signs will produce another "negative"
-        vector.
+        should be analogous to the sign of a (complex) number in so far that
+        binding two vectors with the same sign produces a "positive" vector.
+        There might, however, be multiple types of negative signs, where binding
+        vectors with different types of negative signs will produce another
+        "negative" vector.
 
         Furthermore, if the algebra supports fractional binding powers, it
         should do so for all "non-negative" vectors, but not "negative" vectors.
 
         If an algebra does not have the notion of a sign, it may raise a
-        *NotImplementedError*.
+        :py:class:`NotImplementedError`.
 
         Parameters
         ----------
@@ -345,7 +347,7 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         the sign vector (from the left side) to the vector *v*.
 
         If an algebra does not have the notion of a sign or absolute vector,
-        it may raise a *NotImplementedError*.
+        it may raise a :py:class:`NotImplementedError`.
 
         Parameters
         ----------
@@ -411,7 +413,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         The negative identity only changes the sign of the vector it is bound to.
 
         Some algebras might not have a negative identity element (or even the
-        notion of a sign). In that case a *NotImplementedError* may be raised.
+        notion of a sign). In that case a :py:class`NotImplementedError` may be
+        raised.
 
         Parameters
         ----------
@@ -494,7 +497,7 @@ class GenericSign(AbstractSign):
     Parameters
     ----------
     sign : -1, 0, 1, None
-        The represented sign. *None* is used for and indefinite sign.
+        The represented sign. *None* is used for an indefinite sign.
     """
 
     def __init__(self, sign):
@@ -528,4 +531,10 @@ class CommonProperties:
     """
 
     UNITARY = "unitary"
+    """A unitary vector does not change the length of a vector it is bound to."""
+
     POSITIVE = "positive"
+    """A positive vector does not change the sign of a vector it is bound to.
+
+    A positive vector allows for fractional binding powers.
+    """

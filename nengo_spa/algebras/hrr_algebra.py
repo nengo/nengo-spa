@@ -134,17 +134,17 @@ class HrrAlgebra(AbstractAlgebra):
 
         Note the following special exponents:
 
-        * an exponent of -1 will return the inverse,
+        * an exponent of -1 will return the approximate inverse,
         * an exponent of 0 will return the identity vector,
         * and an *exponent* of w1cne will return *v* itself.
 
         The following relations hold for integer exponents, and for unitary
         vectors:
 
-        * :math:`\mathcal{B}(v^a, v^b) = v^{a+b}`,
+        * :math:`v^a \circledast v^b = v^{a+b}`,
         * :math:`(v^a)^b = v^{ab}`.
 
-        If :math:`a >= 0` and :math:`b >= 0`, then the first relation holds also
+        If :math:`a \geq 0` and :math:`b \geq 0`, then the first relation holds also
         for non-unitary vectors with real exponents.
 
         Parameters
@@ -304,7 +304,7 @@ class HrrAlgebra(AbstractAlgebra):
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the negative identity element of dimensionality *d*.
 
-        The identity element for circular convolution is the vector
+        The negative identity element for circular convolution is the vector
         :math:`(-1, 0, \dots, 0)^{\top}`.
 
         Parameters
@@ -351,10 +351,12 @@ class HrrSign(AbstractSign):
     of the Fourier representation of the vector. For even dimensionalities the
     sign is constituted out of the signs of the DC component and Nyquist
     frequency. Thus, for even dimensionalities, there is a total of four
-    sub-signs excluding zero. The overall sign is considered positive if both
-    the components are positive, negative if either one is negative, and zero if
-    both are zero. Binding two Semantic Pointers with the same sub-sign will
-    yield a positive Semantic Pointer. See the table below for details.
+    sub-signs excluding zero. The overall sign is considered positive if the
+    DC component is positive and the Nyquist component is non-negative;
+    the sign is considered negative if either component is negative; and
+    the sign is considered zero if both are zero. Binding two Semantic Pointers
+    with the same sub-sign will yield a positive Semantic Pointer. See the table
+    below for details.
 
     .. table:: Resulting Semantic Pointer signs from HRR binding two Semantic
          Pointers. (Only the upper triangle is given as the matrix is
@@ -407,15 +409,15 @@ class HrrSign(AbstractSign):
     def to_vector(self, d):
         """Return the vector in the algebra corresponding to the sign.
 
-        ============  =================  ====================================
-        DC component  Nyquist component  Vector
-        ============  =================  ====================================
-         1            >=0                [ 1,  0, 0, ...] (identity)
-         1             <0                [ 0,  1, 0, 0, ...]
-        -1            >=0                [ 0, -1, 0, ...] (negative identity)
-        -1             <0                [-1,  0, 0, 0, ...]
-         0              0                [ 0,  0, 0, ...] (zero)
-        ============  =================  ====================================
+        =======  ============  =======================================
+        DC sign  Nyquist sign  Vector
+        =======  ============  =======================================
+         1       >=0           [ 1,  0, 0, ...] (identity)
+         1        <0           [ 0,  1, 0, 0, ...]
+        -1       >=0           [ 0, -1, 0, ...]
+        -1        <0           [-1,  0, 0, 0, ...] (negative identity)
+         0         0           [ 0,  0, 0, ...] (zero)
+        =======  ============  =======================================
 
         Parameters
         ----------
@@ -462,4 +464,10 @@ class HrrProperties:
     """Vector properties supported by the `.HrrAlgebra`."""
 
     UNITARY = CommonProperties.UNITARY
+    """A unitary vector does not change the length of a vector it is bound to."""
+
     POSITIVE = CommonProperties.POSITIVE
+    """A positive vector does not change the sign of a vector it is bound to.
+
+    A positive vector allows for fractional binding powers.
+    """

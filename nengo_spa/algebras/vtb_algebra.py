@@ -500,4 +500,10 @@ class VtbProperties:
     """Vector properties supported by the `.VtbAlgebra`."""
 
     UNITARY = CommonProperties.UNITARY
+    """A unitary vector does not change the length of a vector it is bound to."""
+
     POSITIVE = CommonProperties.POSITIVE
+    """A positive vector does not change the sign of a vector it is bound to.
+
+    A positive vector allows for fractional binding powers.
+    """

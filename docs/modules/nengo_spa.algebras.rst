@@ -12,6 +12,7 @@ nengo\_spa\.algebras
       AbstractSign
       CommonProperties
       ElementSidedness
+      GenericSign
       HrrAlgebra
       HrrProperties
       HrrSign

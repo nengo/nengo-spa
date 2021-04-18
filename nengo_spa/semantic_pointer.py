@@ -148,8 +148,7 @@ class SemanticPointer(Fixed):
         The original object is not modified.
 
         A unitary Semantic Pointer has the property that it does not change
-        the length of Semantic Pointers it is bound with using circular
-        convolution.
+        the length of Semantic Pointers it is bound with.
         """
         return SemanticPointer(
             self.algebra.make_unitary(self.v),
