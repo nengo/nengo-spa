@@ -43,6 +43,11 @@ def test_sign_and_abs(sign):
     assert np.allclose(algebra.abs(v), abs_v)
 
 
+def test_sign_repr():
+    sign = VtbSign(-1)
+    assert eval(repr(sign)) == sign
+
+
 def test_create_positive_vector(rng):
     pytest.importorskip("scipy")
     algebra = VtbAlgebra()

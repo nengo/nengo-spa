@@ -176,3 +176,7 @@ class TestHrrSign:
         assert HrrSign(1, 1) != HrrSign(0, 0)
 
         assert HrrSign(1, 1) != (1, 1)
+
+    def test_repr(self):
+        sign = HrrSign(-1, 1)
+        assert eval(repr(sign)) == sign
