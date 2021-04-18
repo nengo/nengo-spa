@@ -345,7 +345,7 @@ class HrrAlgebra(AbstractAlgebra):
 
 
 class HrrSign(AbstractSign):
-    """Represents a sign in the `.HrrAlgebra`.
+    r"""Represents a sign in the `.HrrAlgebra`.
 
     For odd dimensionalities, the sign is equal to the sign of the DC component
     of the Fourier representation of the vector. For even dimensionalities the
@@ -353,7 +353,22 @@ class HrrSign(AbstractSign):
     frequency. Thus, for even dimensionalities, there is a total of four
     sub-signs excluding zero. The overall sign is considered positive if both
     the components are positive, negative if either one is negative, and zero if
-    both are zero.
+    both are zero. Binding two Semantic Pointers with the same sub-sign will
+    yield a positive Semantic Pointer. See the table below for details.
+
+    .. table:: Resulting Semantic Pointer signs from HRR binding two Semantic
+         Pointers. (Only the upper triangle is given as the matrix is
+         symmetric.)
+
+        ================== =========== ========== ========== ========== ======
+        Sign (DC, Nyquist) \+ (+1, ≥0) − (+1, <0) − (-1, ≥0) − (−1, <0) (0, 0)
+        ================== =========== ========== ========== ========== ======
+        \+ (+1, ≥0)        \+ (+1, ≥0) − (+1, <0) − (−1, ≥0) − (−1, <0) (0, 0)
+        − (+1, <0)                     \+ (1, ≥0) − (−1, <0) − (−1, ≥0) (0, 0)
+        − (−1, ≥0)                                \+ (1, ≥0) − (+1, <0) (0, 0)
+        − (−1, <0)                                           \+ (1, ≥0) (0, 0)
+        (0, 0)                                                          (0, 0)
+        ================== =========== ========== ========== ========== ======
 
     Parameters
     ----------
