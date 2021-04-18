@@ -76,7 +76,7 @@ class VTB(nengo.Network):
     * `Gosmann, Jan, and Chris Eliasmith (2019). Vector-derived transformation binding:
       an improved binding operation for deep symbol-like processing in
       neural networks. Neural computation 31.5, 849-869.
-      <https://www.mitpressjournals.org/action/showCitFormats?doi=10.1162/neco_a_01179>`_
+      <https://direct.mit.edu/neco/article/31/5/849/8469/Vector-Derived-Transformation-Binding-An-Improved>`_
     * `Jan Gosmann (2018). An Integrated Model of Context, Short-Term, and
       Long-Term Memory. UWSpace. <https://uwspace.uwaterloo.ca/handle/10012/13498>`_
 

@@ -15,7 +15,7 @@ nengo-spa`` again.
 
 NengoSPA only depends on `core Nengo
 <https://www.nengo.ai/nengo/index.html>`_ (which depends on `NumPy
-<http://www.numpy.org/>`_). Please check the `Nengo documentation
+<https://numpy.org/>`_). Please check the `Nengo documentation
 <https://www.nengo.ai/nengo/getting-started.html#installation>`__ for
 instructions on how to install Nengo or NumPy.
 
