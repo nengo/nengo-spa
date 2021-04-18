@@ -23,6 +23,11 @@ Release History
 1.3.0 (unreleased)
 ==================
 
+**Added**
+
+- Support for (fractional) binding powers and the notion of signs in algebras.
+  (`#271 <https://github.com/nengo/nengo_spa/pull/271>`__)
+
 **Removed**
 
 - Python 3.5 support was removed.
