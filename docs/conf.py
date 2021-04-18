@@ -58,6 +58,7 @@ linkcheck_ignore = [
     r"^https?://www\.amazon\..*$",
     r"^https://uwspace\.uwaterloo\.ca/.*$",
     r"^https?://journals\.plos\.org/.*$",
+    r"^https?://direct.mit.edu/neco/article/.*$",
 ]
 
 # -- doctest
