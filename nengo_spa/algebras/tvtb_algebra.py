@@ -23,10 +23,12 @@ class TvtbAlgebra(AbstractAlgebra):
        \mathcal{B}(x, y) := V_y^T x = \left[\begin{array}{ccc}
            V_y'^T &      0 &      0 \\
               0   & V_y'^T &      0 \\
-              0   &      0 & V_y'^T
+              0   &      0 & \ddots
            \end{array}\right] x
 
-    with
+    with :math:`d'` blocks
+
+    where
 
     .. math::
 
