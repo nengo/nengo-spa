@@ -18,6 +18,7 @@ of how ``nengo_spa`` works.
 
    examples/convolution
    examples/associative-memory
+   examples/learning
    examples/question
    examples/question-control
    examples/question-memory
