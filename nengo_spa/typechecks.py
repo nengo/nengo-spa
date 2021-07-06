@@ -1,3 +1,4 @@
+import numbers
 from collections.abc import Iterable
 
 import numpy as np
@@ -15,12 +16,15 @@ def is_array_like(obj):
     return is_array(obj) or is_number(obj) or isinstance(obj, (list, tuple))
 
 
-def is_float(obj):
-    return isinstance(obj, (float, np.float))
+def is_scalar_of_type(obj, number_type):
+    if is_array(obj) and obj.ndim == 0:
+        return issubclass(obj.dtype.type, number_type)
+    else:
+        return isinstance(obj, number_type)
 
 
 def is_integer(obj):
-    return isinstance(obj, (int, np.integer))
+    return is_scalar_of_type(obj, numbers.Integral)
 
 
 def is_iterable(obj):
@@ -31,4 +35,4 @@ def is_iterable(obj):
 
 
 def is_number(obj):
-    return is_integer(obj) or is_float(obj)
+    return is_scalar_of_type(obj, numbers.Number)
