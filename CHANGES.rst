@@ -33,6 +33,9 @@ Release History
   vector generators.
   (`#284 <https://github.com/nengo/nengo_spa/issues/284>`__,
   `#285 <https://github.com/nengo/nengo_spa/pull/285>`__)
+- Example of how to use learning connections between ``State`` modules.
+  (`#16 <https://github.com/nengo/nengo_spa/issues/16>`__,
+  `#288 <https://github.com/nengo/nengo_spa/pull/288>`__)
 
 **Removed**
 
