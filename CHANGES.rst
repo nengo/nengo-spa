@@ -38,6 +38,11 @@ Release History
   (`#273 <https://github.com/nengo/nengo_spa/issues/273>`__,
   `#274 <https://github.com/nengo/nengo_spa/pull/274>`__)
 
+**Fixed**
+
+- Scalar arrays like `np.array(1)` will now be treated as scalars as intended.
+  (`#289 <https://github.com/nengo/nengo_spa/pull/289>`__)
+
 
 1.2.0 (November 15, 2020)
 =========================
