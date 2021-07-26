@@ -10,3 +10,6 @@ line-length=72
 
 [title-match-regex]
 regex=^[A-Z]
+
+[ignore-body-lines]
+regex=^\s*\[\S+\]:\s+https?://.*
