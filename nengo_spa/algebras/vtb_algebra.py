@@ -388,6 +388,8 @@ class VtbAlgebra(AbstractAlgebra):
             return VtbSign(None)
 
     def abs(self, v):
+        # No inverse of sign required because in VTB sign vectors are their
+        # own inverse.
         return self.bind(v, self.sign(v).to_vector(len(v)))
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):

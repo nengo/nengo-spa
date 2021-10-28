@@ -25,14 +25,25 @@ Release History
 
 **Added**
 
-- Support for (fractional) binding powers and the notion of signs in algebras.
-  (`#271 <https://github.com/nengo/nengo_spa/pull/271>`__)
+- Support for (fractional) binding powers and the notion of signs in algebras
+  and for `SemanticPointer` instances.
+  (`#271 <https://github.com/nengo/nengo_spa/pull/271>`__,
+  `#286 <https://github.com/nengo/nengo_spa/pull/286>`__)
+- ``EquallySpacedPositiveUnitaryHrrVectors`` and ``VectorsWithProperties``
+  vector generators.
+  (`#284 <https://github.com/nengo/nengo_spa/issues/284>`__,
+  `#285 <https://github.com/nengo/nengo_spa/pull/285>`__)
 
 **Removed**
 
 - Python 3.5 support was removed.
   (`#273 <https://github.com/nengo/nengo_spa/issues/273>`__,
   `#274 <https://github.com/nengo/nengo_spa/pull/274>`__)
+
+**Fixed**
+
+- Scalar arrays like `np.array(1)` will now be treated as scalars as intended.
+  (`#289 <https://github.com/nengo/nengo_spa/pull/289>`__)
 
 
 1.2.0 (November 15, 2020)
