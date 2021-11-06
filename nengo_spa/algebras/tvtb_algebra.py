@@ -8,6 +8,7 @@ from nengo_spa.algebras.base import (
     CommonProperties,
     ElementSidedness,
     GenericSign,
+    supports_sidedness,
 )
 from nengo_spa.networks.tvtb import TVTB
 
@@ -321,6 +322,7 @@ class TvtbAlgebra(AbstractAlgebra):
         else:
             return TvtbSign(None)
 
+    @supports_sidedness({})
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """TVTB has no absorbing element except the zero vector.
 

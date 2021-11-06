@@ -10,6 +10,7 @@ The following items are re-exported by :mod:`nengo_spa.algebras`:
    base.AbstractAlgebra
    base.CommonProperties
    base.ElementSidedness
+   base.supports_sidedness
    hrr_algebra.HrrAlgebra
    hrr_algebra.HrrProperties
    vtb_algebra.VtbAlgebra

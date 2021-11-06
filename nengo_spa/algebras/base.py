@@ -11,6 +11,54 @@ class ElementSidedness(Enum):
     TWO_SIDED = "two-sided"
 
 
+def supports_sidedness(sidedness):
+    """Declare supported sidedness values on an operation.
+
+    This decorator can be used with methods in an algebra that take a
+    *sidedness* parameter. It declares which values of *sidedness* are
+    supported by the algebra. The valid values are added as a *frozenset* as
+    a *supported_sidedness* attribute on the method.
+
+    When checking for supported sidedness, it must first be checked whether
+    the *supported_sidedness* attribute exists (for backwards compatibility).
+    If it does not exist, it should be assumed that all values for *sidedness*
+    are supported.
+
+    Parameters
+    ----------
+    sidedness: Iterable[ElementSidedness]
+        The sidedness values that are supported by the annotated method.
+
+    Returns
+    -------
+    function
+        The method itself with the *supported_sidedness* attribute added.
+
+    Examples
+    -------
+
+    >>> from nengo_spa.algebras import (
+    ...     AbstractAlgebra, ElementSidedness, supports_sidedness
+    ... )
+    >>> class MyAlgebra(AbstractAlgebra):
+    ...     @supports_sidedness({ElementSidedness.LEFT})
+    ...     def invert(self, v, sidedness):
+    ...         # ...
+    ...         pass
+    ...
+    ...     # ...
+    ...
+    >>> print(MyAlgebra.invert.supported_sidedness)
+    frozenset({<ElementSidedness.LEFT: 'left'>})
+    """
+
+    def decorator(fn):
+        setattr(fn, "supported_sidedness", frozenset(sidedness))
+        return fn
+
+    return decorator
+
+
 class _DuckTypedABCMeta(ABCMeta):
     def __instancecheck__(cls, instance):
         if super().__instancecheck__(instance):
