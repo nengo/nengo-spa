@@ -41,6 +41,7 @@ Feature highlights
   structures. Different binding operations/algebras can be mixed in a single
   model.
 - Seamless integration with non-SPA Nengo models.
+- Binding powers and fractional bindings.
 
 
 Project status
