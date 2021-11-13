@@ -4,7 +4,9 @@ import pytest
 from numpy.testing import assert_allclose
 
 import nengo_spa as spa
+from nengo_spa.algebras.base import ElementSidedness
 from nengo_spa.ast.symbolic import PointerSymbol
+from nengo_spa.conftest import check_sidedness
 from nengo_spa.exceptions import SpaTypeError
 from nengo_spa.semantic_pointer import SemanticPointer
 from nengo_spa.testing import assert_sp_close
@@ -49,26 +51,31 @@ def test_unary_operation_on_module(Simulator, algebra, op, suffix, rng):
     assert_sp_close(sim.trange(), sim.data[p], vocab.parse(op + "A"), skip=0.2)
 
 
-@pytest.mark.parametrize("sidedness", ["l", "r"])
+@pytest.mark.parametrize("sidedness", [ElementSidedness.LEFT, ElementSidedness.RIGHT])
 @pytest.mark.parametrize("suffix", ["", ".output"])
 def test_inv_operation_on_module(Simulator, algebra, sidedness, suffix, rng):
-    try:
-        vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
-        vocab.populate("A")
+    check_sidedness(algebra, "invert", sidedness)
+    sidedness_prefix = {ElementSidedness.LEFT: "l", ElementSidedness.RIGHT: "r"}[
+        sidedness
+    ]
 
-        with spa.Network() as model:
-            stimulus = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
-            x = eval("stimulus" + suffix + "." + sidedness + "inv()")
-            p = nengo.Probe(x.construct(), synapse=0.03)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
+    vocab.populate("A")
 
-        with Simulator(model) as sim:
-            sim.run(0.3)
+    with spa.Network() as model:
+        stimulus = spa.Transcode("A", output_vocab=vocab)  # noqa: F841
+        x = eval("stimulus" + suffix + "." + sidedness_prefix + "inv()")
+        p = nengo.Probe(x.construct(), synapse=0.03)
 
-        assert_sp_close(
-            sim.trange(), sim.data[p], vocab.parse("A." + sidedness + "inv()"), skip=0.2
-        )
-    except NotImplementedError:
-        pass
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert_sp_close(
+        sim.trange(),
+        sim.data[p],
+        vocab.parse("A." + sidedness_prefix + "inv()"),
+        skip=0.2,
+    )
 
 
 @pytest.mark.parametrize("op", ["+", "-", "*"])
@@ -230,28 +237,27 @@ def test_transformed_and_pointer_symbol(Simulator, algebra, seed, rng):
 
 
 def test_transformed_and_network(Simulator, algebra, seed, rng):
-    try:
-        vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
-        vocab.populate("A; B.unitary()")
+    check_sidedness(algebra, "invert", ElementSidedness.LEFT)
 
-        with spa.Network(seed=seed) as model:
-            a = spa.Transcode("A", output_vocab=vocab)
-            b = spa.Transcode("B", output_vocab=vocab)
-            x = (a * PointerSymbol("B.linv()")) * b
-            p = nengo.Probe(x.construct(), synapse=0.3)
+    vocab = spa.Vocabulary(16, pointer_gen=rng, algebra=algebra)
+    vocab.populate("A; B.unitary()")
 
-        with Simulator(model) as sim:
-            sim.run(0.3)
+    with spa.Network(seed=seed) as model:
+        a = spa.Transcode("A", output_vocab=vocab)
+        b = spa.Transcode("B", output_vocab=vocab)
+        x = (a * PointerSymbol("B.linv()")) * b
+        p = nengo.Probe(x.construct(), synapse=0.3)
 
-        assert_sp_close(
-            sim.trange(),
-            sim.data[p],
-            vocab.parse("A * B.linv() * B"),
-            skip=0.2,
-            normalized=True,
-        )
-    except NotImplementedError:
-        pass
+    with Simulator(model) as sim:
+        sim.run(0.3)
+
+    assert_sp_close(
+        sim.trange(),
+        sim.data[p],
+        vocab.parse("A * B.linv() * B"),
+        skip=0.2,
+        normalized=True,
+    )
 
 
 def test_transformed_and_transformed(Simulator, algebra, seed, rng):

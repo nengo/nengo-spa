@@ -33,6 +33,11 @@ Release History
   vector generators.
   (`#284 <https://github.com/nengo/nengo_spa/issues/284>`__,
   `#285 <https://github.com/nengo/nengo_spa/pull/285>`__)
+- ``supports_sidedness`` decorator that can be used in algebras to define what
+  ``ElementSidedness`` values are allowed for an operation. This information can
+  then be retrieved from the respective methods.
+  (`#281 <https://github.com/nengo/nengo_spa/issues/281>`__,
+  `#291 <https://github.com/nengo/nengo_spa/pull/291>`__)
 
 **Removed**
 

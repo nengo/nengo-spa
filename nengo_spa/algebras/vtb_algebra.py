@@ -8,6 +8,7 @@ from nengo_spa.algebras.base import (
     CommonProperties,
     ElementSidedness,
     GenericSign,
+    supports_sidedness,
 )
 from nengo_spa.networks.vtb import VTB
 
@@ -184,6 +185,7 @@ class VtbAlgebra(AbstractAlgebra):
         m = self.get_binding_matrix(b)
         return np.dot(m, a)
 
+    @supports_sidedness({ElementSidedness.RIGHT})
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
         """Invert vector *v*.
 
@@ -392,6 +394,7 @@ class VtbAlgebra(AbstractAlgebra):
         # own inverse.
         return self.bind(v, self.sign(v).to_vector(len(v)))
 
+    @supports_sidedness({})
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """VTB has no absorbing element except the zero vector.
 
@@ -399,6 +402,7 @@ class VtbAlgebra(AbstractAlgebra):
         """
         raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
+    @supports_sidedness({ElementSidedness.RIGHT})
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         """Return the identity element of dimensionality *d*.
 
@@ -437,6 +441,7 @@ class VtbAlgebra(AbstractAlgebra):
         sub_d = self._get_sub_d(d)
         return (np.eye(sub_d) / d ** 0.25).flatten()
 
+    @supports_sidedness({ElementSidedness.RIGHT})
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the negative identity element of dimensionality *d*.
 

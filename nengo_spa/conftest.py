@@ -38,3 +38,15 @@ def pytest_generate_tests(metafunc):
             "algebra",
             [pytest.param(a, id=a.__class__.__name__) for a in TestConfig.algebras],
         )
+
+
+def check_sidedness(algebra, method_name, sidedness):
+    method = getattr(algebra, method_name)
+    if (
+        hasattr(method, "supported_sidedness")
+        and sidedness not in method.supported_sidedness
+    ):
+        pytest.xfail(
+            f"Algebra {algebra.__class__.__name__} does not have a "
+            f"{sidedness} {method_name}."
+        )
