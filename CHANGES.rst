@@ -20,8 +20,8 @@ Release History
    - Fixed
 
 
-1.3.0 (unreleased)
-==================
+1.3.0 (November 30, 2021)
+=========================
 
 **Added**
 
