@@ -49,7 +49,7 @@ Release History
 
 **Fixed**
 
-- Scalar arrays like `np.array(1)` will now be treated as scalars as intended.
+- Scalar arrays like ``np.array(1)`` will now be treated as scalars as intended.
   (`#289 <https://github.com/nengo/nengo_spa/pull/289>`__)
 
 
