@@ -160,7 +160,7 @@ def test_integer_binding_power(algebra, d, rng):
     gen = UnitaryVectors(d, algebra, rng=rng)
     a = SemanticPointer(next(gen), algebra=algebra)
 
-    assert np.allclose((a * a * a).v, (a ** 3).v)
+    assert np.allclose((a * a * a).v, (a**3).v)
     assert np.allclose((a * a * a).v, pow(a, 3).v)
 
 
@@ -176,7 +176,7 @@ def test_fractional_binding_power(algebra, d, rng):
     )
     a = SemanticPointer(next(gen), algebra=algebra)
 
-    assert np.allclose(a.v, (((a ** 0.5) ** 2).v))
+    assert np.allclose(a.v, (((a**0.5) ** 2).v))
     assert np.allclose(a.v, (pow(a, 0.5) ** 2).v)
 
 
@@ -455,7 +455,7 @@ def test_name():
     assert a.abs().name == "a.abs()"
     assert (a + b).name == "a + b"
     assert (a * b).name == "a * b"
-    assert (a ** 2).name == "a ** 2"
+    assert (a**2).name == "a ** 2"
     assert (2.0 * a).name == "2.0 * a"
     assert (a / 2.0).name == "a / 2.0"
 

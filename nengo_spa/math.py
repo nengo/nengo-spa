@@ -18,4 +18,4 @@ def prob_cleanup(similarity, dimensions, vocab_size):
     p = CosineSimilarity(dimensions).cdf(similarity)
     if similarity < 1.0 and p == 1.0:
         raise ArithmeticError("Insufficient floating point precision to compute value.")
-    return p ** vocab_size
+    return p**vocab_size

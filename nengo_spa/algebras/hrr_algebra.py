@@ -110,7 +110,7 @@ class HrrAlgebra(AbstractAlgebra):
         fft_val = np.fft.fft(v)
         fft_imag = fft_val.imag
         fft_real = fft_val.real
-        fft_norms = np.sqrt(fft_imag ** 2 + fft_real ** 2)
+        fft_norms = np.sqrt(fft_imag**2 + fft_real**2)
         invalid = fft_norms <= 0.0
         fft_val[invalid] = 1.0
         fft_norms[invalid] = 1.0

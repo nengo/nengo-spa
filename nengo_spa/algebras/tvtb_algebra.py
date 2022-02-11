@@ -345,7 +345,7 @@ class TvtbAlgebra(AbstractAlgebra):
             Identity element.
         """
         sub_d = self._get_sub_d(d)
-        return (np.eye(sub_d) / d ** 0.25).flatten()
+        return (np.eye(sub_d) / d**0.25).flatten()
 
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
         r"""Return the negative identity element of dimensionality *d*.

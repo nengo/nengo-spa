@@ -93,7 +93,7 @@ def test_populate(rng):
     with pytest.raises(SpaParseError):
         v.populate("x = A")
     with pytest.raises(SpaParseError):
-        v.populate(u"Aα = A")
+        v.populate("Aα = A")
 
 
 def test_pointer_gen():

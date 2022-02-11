@@ -60,8 +60,16 @@ setup(
     long_description=read("README.rst", "CHANGES.rst"),
     zip_safe=True,
     include_package_data=True,
-    setup_requires=["pytest-runner>=5.2"] if testing else [] + [numpy,],
-    install_requires=["nengo>=2.7", numpy,],
+    setup_requires=["pytest-runner>=5.2"]
+    if testing
+    else []
+    + [
+        numpy,
+    ],
+    install_requires=[
+        "nengo>=2.7",
+        numpy,
+    ],
     extras_require={
         "all": docs_require + optional_requires + tests_require,
         "docs": docs_require,

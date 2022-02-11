@@ -26,3 +26,4 @@ htmlcov
 .vscode
 .pytest_cache/
 .doctrees
+.ci/

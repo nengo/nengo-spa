@@ -141,7 +141,7 @@ class PointerSymbol(Symbol):
     @symbolic_op
     def __pow__(self, other):
         type_ = infer_types(self, other)
-        return PointerSymbol(self._expr_tree ** other._expr_tree, type_)
+        return PointerSymbol(self._expr_tree**other._expr_tree, type_)
 
     def dot(self, other):
         other = as_symbolic_node(other)
