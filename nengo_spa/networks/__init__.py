@@ -1,4 +1,5 @@
-"""Basic networks that are used by NengoSPA.
+"""
+Basic networks that are used by NengoSPA.
 
 These networks do not provide any information about inputs, outputs or used
 vocabularies and are completely independent of SPA specifics.

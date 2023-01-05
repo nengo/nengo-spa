@@ -56,10 +56,10 @@ method may be overwritten to specify a partial ordering. A call to
 type *a*. For example, the type for an unspecified vocabulary can be cast to
 the type for a specific vocabulary.
 
-Currently, the types `.TScalar`, `.TAnyVocab`, `.TAnyVocabOfDim`, and 
-`.TVocabulary` are defined, with partial ordering `TScalar < TAnyVocab`,
-`TAnyVocab < TAnyVocabOfDim`, `TAnyVocab < TVocabulary`,
-`TAnyVocabOfDim(vocab.dimensions) < TVocabulary(vocab)`.
+Currently, the types ``TScalar``, ``TAnyVocab``, `.TAnyVocabOfDim`, and
+`.TVocabulary` are defined, with partial ordering ``TScalar < TAnyVocab``,
+``TAnyVocab < TAnyVocabOfDim``, ``TAnyVocab < TVocabulary``,
+``TAnyVocabOfDim(vocab.dimensions) < TVocabulary(vocab)``.
 
 The `nengo_spa.types.coerce_types` can be used to determine the smallest type
 in the partial ordering enclosing all given types.
@@ -69,10 +69,10 @@ Actions and the ``>>`` operator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``>>`` (right shift) operator for creating connections is also implemented
-through operator overloading on the `.ModuleInput` class. Depending on the
+through operator overloading on the ``ModuleInput`` class. Depending on the
 context, it either creates the connection immediately or creates
-a `.RoutedConnection` instance in the context of an `nengo_spa.Actions` object.
-`nengo_spa.actions.ifmax` will then trigger the actual creation of the gated
+a ``RoutedConnection`` instance in the context of an ``nengo_spa.Actions`` object.
+``nengo_spa.actions.ifmax`` will then trigger the actual creation of the gated
 connection with the appropriate gating.
 
 
@@ -81,16 +81,16 @@ Application of the operator overloading to `nengo_spa.Network`
 
 So far the operator overloading has only been done on specific classes deriving
 from `nengo_spa.ast.base.Node`. However, the operators need to work with SPA
-networks. For this, `nengo_spa.Network` derives from `.SpaOperatorMixin` which:
+networks. For this, `nengo_spa.Network` derives from ``SpaOperatorMixin`` which:
 
 1. Defines the overloaded operators
 2. Converts the operands to the appropriate
-   `nengo_spa.ast.base.Node` (or `.ModuleInput`) class
+   `nengo_spa.ast.base.Node` (or ``ModuleInput``) class
 3. Delegates to the class's implementation of the operator.
 
 Furthermore, the operators need to be overloaded for the input and outputs of
 a SPA network. These will be basic Nengo objects and should continue to be
 usable as such. Thus, the `.Network.declare_input` and
-`.Network.declare_output` methods will dynamically insert `.SpaOperatorMixin`
+`.Network.declare_output` methods will dynamically insert ``SpaOperatorMixin``
 into the inheritance list of a single instance. They also register the
 associated vocabulary for the type checking.

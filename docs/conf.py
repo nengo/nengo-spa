@@ -21,7 +21,6 @@ extensions = [
     "nengo_sphinx_theme.ext.sourcelinks",
     "notfound.extension",
     "numpydoc",
-    "sphinx.ext.viewcode",
     "matplotlib.sphinxext.plot_directive",
 ]
 

@@ -6,7 +6,8 @@ import numpy as np
 def assert_sp_close(
     t, data, target_sp, skip=0.0, duration=None, atol=0.2, normalized=False
 ):
-    """Test that the RMSE to a Semantic Pointer is below threshold.
+    """
+    Test that the RMSE to a Semantic Pointer is below threshold.
 
     Parameters
     ----------

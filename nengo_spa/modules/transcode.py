@@ -110,7 +110,8 @@ class TranscodeFunctionParam(Parameter):
 
 
 class Transcode(Network):
-    """Transcode from, to, and between Semantic Pointers.
+    """
+    Transcode from, to, and between Semantic Pointers.
 
     This can thought of the equivalent of a `nengo.Node` for Semantic Pointers.
 
@@ -202,13 +203,13 @@ class Transcode(Network):
             )
         if self.input_vocab is not None and self.size_in is not None:
             raise ValidationError(
-                "The input_vocab and size_in arguments are mutually " "exclusive.",
+                "The input_vocab and size_in arguments are mutually exclusive.",
                 "size_in",
                 self,
             )
         if self.output_vocab is not None and self.size_out is not None:
             raise ValidationError(
-                "The output_vocab and size_out arguments are mutually " "exclusive.",
+                "The output_vocab and size_out arguments are mutually exclusive.",
                 "size_in",
                 self,
             )

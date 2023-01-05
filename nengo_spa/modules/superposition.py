@@ -5,7 +5,8 @@ from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class Superposition(Network):
-    """Network for superposing multiple inputs.
+    """
+    Network for superposing multiple inputs.
 
     Parameters
     ----------

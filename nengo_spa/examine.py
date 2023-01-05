@@ -12,7 +12,8 @@ from nengo_spa.vocabulary import Vocabulary
 
 
 def similarity(data, vocab, normalize=False):
-    """Return the similarity between simulation data and Semantic Pointers.
+    """
+    Return the similarity between simulation data and Semantic Pointers.
 
     Computes the dot products between all Semantic Pointers in the Vocabulary
     and the simulation data for each timestep. If ``normalize=True``,
@@ -61,7 +62,8 @@ def similarity(data, vocab, normalize=False):
 
 
 def pairs(vocab):
-    """Return expressions for all possible combinations to bind *vocab*'s keys.
+    """
+    Return expressions for all possible combinations to bind *vocab*'s keys.
 
     Examples
     --------
@@ -85,7 +87,8 @@ def text(
     terms=None,
     normalize=False,
 ):
-    """Return a human-readable text version of the provided vector.
+    """
+    Return a human-readable text version of the provided vector.
 
     This is meant to give a quick text version of a vector for display
     purposes. To do this, compute the dot product between the vector

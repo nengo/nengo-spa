@@ -1,9 +1,9 @@
 nengo\_spa\.algebras
 ====================
 
-The following items are re-exported by :mod:`nengo_spa.algebras`:
-
 .. currentmodule:: nengo_spa.algebras
+
+The following items are re-exported by ``nengo_spa.algebras``:
 
 .. autosummary::
 
@@ -33,7 +33,7 @@ Base classes
       CommonProperties
       ElementSidedness
       GenericSign
-      
+
 
 Holographic reduced representations (HRR)
 -----------------------------------------

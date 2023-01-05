@@ -3,7 +3,8 @@ import numpy as np
 
 
 class MatrixMult(nengo.Network):
-    """Computes the matrix product A*B.
+    """
+    Computes the matrix product A*B.
 
     Both matrices need to be two dimensional.
 

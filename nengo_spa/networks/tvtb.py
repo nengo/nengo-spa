@@ -23,7 +23,8 @@ def inversion_matrix(dimensions):
 
 
 class TVTB(nengo.Network):
-    r"""Compute transposed vector-derived transformation binding (TVTB).
+    r"""
+    Compute transposed vector-derived transformation binding (TVTB).
 
     VTB uses elementwise addition for superposition. The binding operation
     :math:`\mathcal{B}(x, y)` is defined as

@@ -34,14 +34,16 @@ class _DuckTypedABCMeta(ABCMeta):
 
 
 class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
-    """Abstract base class for algebras.
+    """
+    Abstract base class for algebras.
 
-    Custom algebras can be defined by implementing the interface of this
-    abstract base class.
+    Custom algebras can be defined by implementing the interface of this abstract
+    base class.
     """
 
     def is_valid_dimensionality(self, d):
-        """Checks whether *d* is a valid vector dimensionality.
+        """
+        Checks whether *d* is a valid vector dimensionality.
 
         Parameters
         ----------
@@ -57,7 +59,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def create_vector(self, d, properties, *, rng=None):
-        """Create a vector fulfilling given properties in the algebra.
+        """
+        Create a vector fulfilling given properties in the algebra.
 
         Valid properties and combinations thereof depend on the concrete
         algebra. It is suggested that the *properties* is either a *set* of
@@ -86,7 +89,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def make_unitary(self, v):
-        """Returns a unitary vector based on the vector *v*.
+        """
+        Returns a unitary vector based on the vector *v*.
 
         A unitary vector does not change the length of a vector it is bound to.
 
@@ -103,7 +107,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def superpose(self, a, b):
-        """Returns the superposition of *a* and *b*.
+        """
+        Returns the superposition of *a* and *b*.
 
         This is commonly elementwise addition.
 
@@ -122,7 +127,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def bind(self, a, b):
-        """Returns the binding of *a* and *b*.
+        """
+        Returns the binding of *a* and *b*.
 
         The resulting vector should in most cases be dissimilar to both inputs.
 
@@ -141,7 +147,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def binding_power(self, v, exponent):
-        """Returns the binding power of *v* using the *exponent*.
+        """
+        Returns the binding power of *v* using the *exponent*.
 
         For a positive *exponent*, the binding power is defined as binding
         (*exponent*-1) times bindings of *v* to itself. For a negative
@@ -195,7 +202,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         return power
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
-        """Invert vector *v*.
+        """
+        Invert vector *v*.
 
         A vector bound to its inverse will result in the identity vector.
 
@@ -218,7 +226,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def get_binding_matrix(self, v, swap_inputs=False):
-        """Returns the transformation matrix for binding with a fixed vector.
+        """
+        Returns the transformation matrix for binding with a fixed vector.
 
         Parameters
         ----------
@@ -239,7 +248,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Returns the transformation matrix for inverting a vector.
+        """
+        Returns the transformation matrix for inverting a vector.
 
         Some algebras might not have an inverse only on specific sides. In that
         case a *NotImplementedError* may be raised for non-existing inverses.
@@ -260,7 +270,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def implement_superposition(self, n_neurons_per_d, d, n):
-        """Implement neural network for superposing vectors.
+        """
+        Implement neural network for superposing vectors.
 
         Parameters
         ----------
@@ -281,7 +292,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def implement_binding(self, n_neurons_per_d, d, unbind_left, unbind_right):
-        """Implement neural network for binding vectors.
+        """
+        Implement neural network for binding vectors.
 
         Parameters
         ----------
@@ -304,7 +316,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def sign(self, v):
-        """Returns the sign of *v* defined by the algebra.
+        """
+        Returns the sign of *v* defined by the algebra.
 
         The exact definition of the sign depends on the concrete algebra, but
         should be analogous to the sign of a (complex) number in so far that
@@ -336,7 +349,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def abs(self, v):
-        """Returns the absolute vector of *v* defined by the algebra.
+        """
+        Returns the absolute vector of *v* defined by the algebra.
 
         The exact definition of "absolute vector" may depend on the concrete
         algebra. It should be a "positive" vector (see `.sign`) that relates
@@ -362,7 +376,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         return self.bind(self.invert(self.sign(v).to_vector(len(v))), v)
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the standard absorbing element of dimensionality *d*.
+        """
+        Return the standard absorbing element of dimensionality *d*.
 
         An absorbing element will produce a scaled version of itself when bound
         to another vector. The standard absorbing element is the absorbing
@@ -386,7 +401,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the identity element of dimensionality *d*.
+        """
+        Return the identity element of dimensionality *d*.
 
         The identity does not change the vector it is bound to.
 
@@ -408,7 +424,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Returns the negative identity element of dimensionality *d*.
+        """
+        Returns the negative identity element of dimensionality *d*.
 
         The negative identity only changes the sign of the vector it is bound to.
 
@@ -432,7 +449,8 @@ class AbstractAlgebra(metaclass=_DuckTypedABCMeta):
         raise NotImplementedError()
 
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the zero element of dimensionality *d*.
+        """
+        Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
         Usually this will be the zero vector.
@@ -467,8 +485,8 @@ class AbstractSign(ABC):
         raise NotImplementedError()
 
     def is_zero(self):
-        """Return whether the sign neither positive nor negative (i.e. zero),
-        but definite."""
+        """Return whether the sign neither positive nor negative (i.e. zero), but
+        definite."""
         return not (self.is_positive() or self.is_negative() or self.is_indefinite())
 
     def is_indefinite(self):
@@ -476,7 +494,8 @@ class AbstractSign(ABC):
         raise NotImplementedError()
 
     def to_vector(self, d):
-        """Return the vector in the algebra corresponding to the sign.
+        """
+        Return the vector in the algebra corresponding to the sign.
 
         Parameters
         ----------
@@ -492,7 +511,8 @@ class AbstractSign(ABC):
 
 
 class GenericSign(AbstractSign):
-    """A generic sign implementation.
+    """
+    A generic sign implementation.
 
     Parameters
     ----------
@@ -525,7 +545,8 @@ class GenericSign(AbstractSign):
 
 
 class CommonProperties:
-    """Definition of constants for common properties of vectors in an algebra.
+    """
+    Definition of constants for common properties of vectors in an algebra.
 
     Use these for best interoperability between algebras.
     """
@@ -534,7 +555,8 @@ class CommonProperties:
     """A unitary vector does not change the length of a vector it is bound to."""
 
     POSITIVE = "positive"
-    """A positive vector does not change the sign of a vector it is bound to.
+    """
+    A positive vector does not change the sign of a vector it is bound to.
 
     A positive vector allows for fractional binding powers.
     """

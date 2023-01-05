@@ -1,14 +1,14 @@
-"""Operator-like SPA functions.
+"""
+Operator-like SPA functions.
 
-The operator functions work similar to other overloaded operators in Python.
-They call the class implementation on the operand, e.g. ``reinterpret(a, ...)``
-calls ``a.reinterpret(...)`` like ``-a`` calls ``a.__neg__()``. For binary
-operators, this will be tried for the left operand first. If the left operand
-does not have the corresponding method or if it returns `NotImplemented`, the
-same method prefixed with an ``r`` will be called on the right operand. For
-example, ``dot(a, b)`` tries ``a.dot(b)`` first and then ``b.rdot(a)``. This is
-equivalent to for example ``a + b`` trying ``a.__add__(b)`` first and then
-``b.__radd__(a)``.
+The operator functions work similar to other overloaded operators in Python. They
+call the class implementation on the operand, e.g. ``reinterpret(a, ...)`` calls
+``a.reinterpret(...)`` like ``-a`` calls ``a.__neg__()``. For binary operators,
+this will be tried for the left operand first. If the left operand does not have
+the corresponding method or if it returns `NotImplemented`, the same method
+prefixed with an ``r`` will be called on the right operand. For example, ``dot(a,
+b)`` tries ``a.dot(b)`` first and then ``b.rdot(a)``. This is equivalent to for
+example ``a + b`` trying ``a.__add__(b)`` first and then ``b.__radd__(a)``.
 """
 
 
@@ -27,11 +27,12 @@ def dot(a, b):
 
 
 def reinterpret(source, vocab=None):
-    """Reinterpret *source* Semantic Pointer as part of vocabulary *vocab*.
+    """
+    Reinterpret *source* Semantic Pointer as part of vocabulary *vocab*.
 
-    The *vocab* parameter can be set to *None* to clear the associated
-    vocabulary and allow the *source* to be interpreted as part of the
-    vocabulary of any Semantic Pointer it is combined with.
+    The *vocab* parameter can be set to *None* to clear the associated vocabulary
+    and allow the *source* to be interpreted as part of the vocabulary of any
+    Semantic Pointer it is combined with.
     """
     if hasattr(source, "reinterpret"):
         return source.reinterpret(vocab)
@@ -40,7 +41,8 @@ def reinterpret(source, vocab=None):
 
 
 def translate(source, vocab, populate=None, keys=None, solver=None):
-    """Translate *source* Semantic Pointer to vocabulary *vocab*.
+    """
+    Translate *source* Semantic Pointer to vocabulary *vocab*.
 
     The translation of a Semantic Pointer uses some form of projection to
     convert the source Semantic Pointer to a Semantic Pointer of another

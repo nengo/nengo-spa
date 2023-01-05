@@ -299,6 +299,6 @@ class _LimitStrLengthVisitor:
 
 
 def limit_str_length(expr_tree, max_len):
-    """Returns a modified expression tree with a string length limited to
-    approximately *max_len*."""
+    """Returns a modified expression tree with a string length limited to approximately
+    ``max_len``."""
     return _LimitStrLengthVisitor(max_len).visit_node(expr_tree)

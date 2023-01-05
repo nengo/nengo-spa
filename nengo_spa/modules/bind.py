@@ -5,7 +5,8 @@ from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class Bind(Network):
-    """Network for binding together two inputs.
+    """
+    Network for binding together two inputs.
 
     Parameters
     ----------
@@ -44,7 +45,7 @@ class Bind(Network):
         neurons_per_dimension=Default,
         unbind_left=Default,
         unbind_right=Default,
-        **kwargs
+        **kwargs,
     ):
         super(Bind, self).__init__(**kwargs)
 

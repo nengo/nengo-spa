@@ -5,7 +5,8 @@ from nengo_spa.network import Network
 
 
 class Product(Network):
-    """Multiplies two scalars.
+    """
+    Multiplies two scalars.
 
     Parameters
     ----------

@@ -4,7 +4,8 @@ from nengo.dists import CosineSimilarity
 
 
 def prob_cleanup(similarity, dimensions, vocab_size):
-    """Estimate the chance of successful cleanup.
+    """
+    Estimate the chance of successful cleanup.
 
     This returns the chance that, out of *vocab_size* randomly chosen
     vectors, none of them will be closer to a particular

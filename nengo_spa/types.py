@@ -4,7 +4,8 @@ from nengo_spa.exceptions import SpaTypeError
 
 
 class Type:
-    """Describes a type.
+    """
+    Describes a type.
 
     Types can be compared and by default two types are considered to be equal
     when their class and name match. Subclasses are allowed to overwrite
@@ -102,7 +103,8 @@ class TAnyVocabOfDim(Type):
 
 
 class TVocabulary(Type):
-    """Type for a specific vocabulary.
+    """
+    Type for a specific vocabulary.
 
     All vocabulary types constitute a type class.
     """
@@ -136,7 +138,8 @@ class TVocabulary(Type):
 
 
 def coerce_types(*types):
-    """Returns the most specific type in the argument list.
+    """
+    Returns the most specific type in the argument list.
 
     If the types passed in the argument list are incompatible a `.SpaTypeError`
     will be raised.

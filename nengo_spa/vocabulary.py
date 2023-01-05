@@ -24,7 +24,8 @@ reserved_sp_names = {"None", "True", "False"} | set(special_sps.keys())
 
 
 class Vocabulary(Mapping):
-    """A collection of semantic pointers, each with their own text label.
+    """
+    A collection of semantic pointers, each with their own text label.
 
     The Vocabulary can also act as a dictionary, with keys as the names
     of the semantic pointers and values as the `.SemanticPointer` objects
@@ -32,11 +33,11 @@ class Vocabulary(Mapping):
     identifiers starting with a capital letter.
 
     Every vocabulary knows the special elements *AbsorbingElement*, *Identity*,
-    and *Zero*. However, these are not included in the keys returned by `.keys`
-    or the vectors returned by `.vectors`.
+    and *Zero*. However, these are not included in the vectors returned by
+    ``vectors``.
 
     Parameters
-    -----------
+    ----------
     dimensions : int
         Number of dimensions for each semantic pointer.
     strict : bool, optional
@@ -52,7 +53,7 @@ class Vocabulary(Mapping):
         after 100 tries, a warning message is printed.
     pointer_gen : generator or np.random.RandomState, optional
         Generator used to create vectors for new Semantic Pointers. Defaults to
-        `.UnitLengthVectors`. If a `np.random.RandomState` is passed, it will
+        `.UnitLengthVectors`. If a ``np.random.RandomState`` is passed, it will
         be used by `.UnitLengthVectors`.
     name : str
         A name to display in the string representation of this vocabulary.
@@ -62,8 +63,6 @@ class Vocabulary(Mapping):
 
     Attributes
     ----------
-    keys : sequence
-        The names of all known semantic pointers (e.g., ``['A', 'B', 'C']``).
     max_similarity : float
         When randomly generating pointers, ensure that the cosine of the
         angle between the new pointer and all existing pointers is less
@@ -77,7 +76,7 @@ class Vocabulary(Mapping):
         pointer that does not exist in the vocabulary.
     vectors : ndarray
         All of the semantic pointer vectors in a matrix, in the same order
-        as in `keys`.
+        as in ``keys``.
     algebra : AbstractAlgebra, optional
         Defines the vector symbolic operators used for Semantic Pointers in the
         vocabulary.
@@ -133,9 +132,10 @@ class Vocabulary(Mapping):
         return f"{self.dimensions}-dimensional vocab {name} at 0x{id(self):x}"
 
     def create_pointer(self, attempts=100, transform=None):
-        """Create a new semantic pointer and add it to the vocabulary.
+        """
+        Create a new semantic pointer and add it to the vocabulary.
 
-        This will take into account the `max_similarity` attribute.  If a
+        This will take into account the ``max_similarity`` attribute.  If a
         pointer satisfying max_similarity is not generated after the specified
         number of attempts, the candidate pointer with lowest maximum cosine
         similarity with all existing pointers is returned.
@@ -144,7 +144,7 @@ class Vocabulary(Mapping):
         ----------
         attempts : int, optional
             Maximum number of attempts to create a Semantic Pointer not
-            exceeding `max_similarity`.
+            exceeding ``max_similarity``.
         transform : str, optional
             A transform to apply to the generated vector. Needs to be the name
             of a method of `.SemanticPointer`. Currently, the only sensible
@@ -213,7 +213,8 @@ class Vocabulary(Mapping):
         return hash(id(self))
 
     def add(self, key, p):
-        """Add the semantic pointer *p* to the vocabulary.
+        """
+        Add the semantic pointer *p* to the vocabulary.
 
         Parameters
         ----------
@@ -252,7 +253,8 @@ class Vocabulary(Mapping):
         self._vectors = np.vstack([self._vectors, p.v])
 
     def populate(self, pointers):
-        """Populate the vocabulary with semantic pointers given an expression.
+        """
+        Populate the vocabulary with semantic pointers given an expression.
 
         In its most basic form *pointers* is a string of names separated with
         ``;``::
@@ -294,7 +296,8 @@ class Vocabulary(Mapping):
             self.add(name.strip(), value)
 
     def parse(self, text):
-        """Evaluate a text string and return the corresponding SemanticPointer.
+        """
+        Evaluate a text string and return the corresponding SemanticPointer.
 
         This uses the Python ``eval()`` function, so any Python operators that
         have been defined for SemanticPointers are valid (``+``, ``-``, ``*``,
@@ -329,7 +332,8 @@ class Vocabulary(Mapping):
         return [self.parse(t) for t in texts]
 
     def dot(self, v):
-        """Returns the dot product with all terms in the Vocabulary.
+        """
+        Returns the dot product with all terms in the Vocabulary.
 
         Parameters
         ----------
@@ -341,7 +345,8 @@ class Vocabulary(Mapping):
         return np.dot(self._vectors, v)
 
     def transform_to(self, other, populate=None, keys=None, solver=None):
-        """Create a linear transform from one Vocabulary to another.
+        """
+        Create a linear transform from one Vocabulary to another.
 
         This is simply the sum of the outer products of the corresponding
         terms in each Vocabulary if no *solver* is given, otherwise a
@@ -390,7 +395,8 @@ class Vocabulary(Mapping):
             return solver(from_vocab, to_vocab)[0].T
 
     def create_subset(self, keys):
-        """Returns a subset of this vocabulary.
+        """
+        Returns a subset of this vocabulary.
 
         Creates and returns a subset of the current vocabulary that contains
         all the semantic pointers found in keys.
@@ -418,7 +424,8 @@ class Vocabulary(Mapping):
 
 
 class VocabularyMap(Mapping):
-    """Maps dimensionalities to corresponding vocabularies.
+    """
+    Maps dimensionalities to corresponding vocabularies.
 
     Acts like a Python dictionary.
 
@@ -448,7 +455,8 @@ class VocabularyMap(Mapping):
             )
 
     def add(self, vocab):
-        """Add a vocabulary to the map.
+        """
+        Add a vocabulary to the map.
 
         The dimensionality will be determined from the vocabulary.
 
@@ -469,7 +477,8 @@ class VocabularyMap(Mapping):
         del self._vocabs[dimensions]
 
     def discard(self, vocab):
-        """Discard (remove) a vocabulary from the mapping.
+        """
+        Discard (remove) a vocabulary from the mapping.
 
         Parameters
         ----------
@@ -487,7 +496,8 @@ class VocabularyMap(Mapping):
         return self._vocabs[dimensions]
 
     def get_or_create(self, dimensions):
-        """Gets or creates a vocabulary of given dimensionality.
+        """
+        Gets or creates a vocabulary of given dimensionality.
 
         If the mapping already maps the given dimensionality to a vocabulary,
         it will be returned. Otherwise, a new vocabulary will be created,
@@ -528,7 +538,8 @@ class VocabularyMap(Mapping):
 
 
 class VocabularyMapParam(nengo.params.Parameter):
-    """Nengo parameter that accepts `.VocabularyMap` instances.
+    """
+    Nengo parameter that accepts `.VocabularyMap` instances.
 
     Sequences of `.Vocabulary` will be coerced to `.VocabularyMap`.
     """
@@ -551,7 +562,8 @@ class VocabularyMapParam(nengo.params.Parameter):
 
 
 class VocabularyOrDimParam(nengo.params.Parameter):
-    """Nengo parameter that accepts `.Vocabulary` or integer dimensionality.
+    """
+    Nengo parameter that accepts `.Vocabulary` or integer dimensionality.
 
     If an integer is assigned, the vocabulary will retrieved from the
     instance's *vocabs* attribute with *vocabs.get_or_create(dimensions)*.

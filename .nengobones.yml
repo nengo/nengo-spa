@@ -130,7 +130,6 @@ setup_cfg:
 
 docs_conf_py:
   extensions:
-    - sphinx.ext.viewcode
     - matplotlib.sphinxext.plot_directive
   nengo_logo: nengo-spa-full-light.svg
   nengo_logo_color: "#d40000"

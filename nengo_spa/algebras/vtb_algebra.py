@@ -13,7 +13,8 @@ from nengo_spa.networks.vtb import VTB
 
 
 class VtbAlgebra(AbstractAlgebra):
-    r"""Vector-derived Transformation Binding (VTB) algebra.
+    r"""
+    Vector-derived Transformation Binding (VTB) algebra.
 
     VTB uses elementwise addition for superposition. The binding operation
     :math:`\mathcal{B}(x, y)` is defined as
@@ -75,7 +76,8 @@ class VtbAlgebra(AbstractAlgebra):
         return cls._instance
 
     def is_valid_dimensionality(self, d):
-        """Checks whether *d* is a valid vector dimensionality.
+        """
+        Checks whether *d* is a valid vector dimensionality.
 
         For VTB all square numbers are valid dimensionalities.
 
@@ -102,7 +104,8 @@ class VtbAlgebra(AbstractAlgebra):
         return sub_d
 
     def create_vector(self, d, properties, *, rng=None):
-        """Create a vector fulfilling given properties in the algebra.
+        """
+        Create a vector fulfilling given properties in the algebra.
 
         Creating positive vectors requires SciPy.
 
@@ -185,7 +188,8 @@ class VtbAlgebra(AbstractAlgebra):
         return np.dot(m, a)
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
-        """Invert vector *v*.
+        """
+        Invert vector *v*.
 
         A vector bound to its inverse will result in the identity vector.
 
@@ -202,7 +206,7 @@ class VtbAlgebra(AbstractAlgebra):
         v : (d,) ndarray
             Vector to invert.
         sidedness : ElementSidedness
-            Must be set to `ElementSidedness.RIGHT`.
+            Must be set to `.ElementSidedness.RIGHT`.
 
         Returns
         -------
@@ -225,7 +229,8 @@ class VtbAlgebra(AbstractAlgebra):
         return v.reshape((sub_d, sub_d)).T.flatten()
 
     def binding_power(self, v, exponent):
-        r"""Returns the binding power of *v* using the *exponent*.
+        r"""
+        Returns the binding power of *v* using the *exponent*.
 
         The binding power is defined as binding (*exponent*-1) times bindings
         of *v* to itself.
@@ -311,7 +316,8 @@ class VtbAlgebra(AbstractAlgebra):
         return m
 
     def get_swapping_matrix(self, d):
-        """Get matrix to swap operands in bound state.
+        """
+        Get matrix to swap operands in bound state.
 
         Parameters
         ----------
@@ -327,7 +333,8 @@ class VtbAlgebra(AbstractAlgebra):
         return self.get_inversion_matrix(d, sidedness=ElementSidedness.RIGHT)
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Returns the transformation matrix for inverting a vector.
+        """
+        Returns the transformation matrix for inverting a vector.
 
         VTB has a right inverse only.
 
@@ -343,7 +350,7 @@ class VtbAlgebra(AbstractAlgebra):
         d : int
             Vector dimensionality.
         sidedness : ElementSidedness
-            Must be set to `ElementSidedness.RIGHT`.
+            Must be set to `.ElementSidedness.RIGHT`.
 
         Returns
         -------
@@ -374,6 +381,7 @@ class VtbAlgebra(AbstractAlgebra):
         return net, (net.input_left, net.input_right), net.output
 
     def sign(self, v):
+        """See `.AbstractAlgebra.sign`."""
         m = self.get_binding_matrix(v)
         if not np.allclose(m, m.T):
             return VtbSign(None)
@@ -388,19 +396,22 @@ class VtbAlgebra(AbstractAlgebra):
             return VtbSign(None)
 
     def abs(self, v):
+        """See `.AbstractAlgebra.abs`."""
         # No inverse of sign required because in VTB sign vectors are their
         # own inverse.
         return self.bind(v, self.sign(v).to_vector(len(v)))
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """VTB has no absorbing element except the zero vector.
+        """
+        VTB has no absorbing element except the zero vector.
 
         Always raises a `NotImplementedError`.
         """
         raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the identity element of dimensionality *d*.
+        """
+        Return the identity element of dimensionality *d*.
 
         VTB has a right identity only.
 
@@ -415,7 +426,7 @@ class VtbAlgebra(AbstractAlgebra):
         d : int
             Vector dimensionality.
         sidedness : ElementSidedness
-            Must be set to `ElementSidedness.RIGHT`.
+            Must be set to `.ElementSidedness.RIGHT`.
 
         Returns
         -------
@@ -438,7 +449,8 @@ class VtbAlgebra(AbstractAlgebra):
         return (np.eye(sub_d) / d**0.25).flatten()
 
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        r"""Return the negative identity element of dimensionality *d*.
+        r"""
+        Return the negative identity element of dimensionality *d*.
 
         VTB has a right negative identity only.
 
@@ -447,7 +459,7 @@ class VtbAlgebra(AbstractAlgebra):
         d : int
             Vector dimensionality.
         sidedness : ElementSidedness, optional
-            Must be set to `ElementSidedness.RIGHT`.
+            Must be set to `.ElementSidedness.RIGHT`.
 
         Returns
         -------
@@ -459,7 +471,8 @@ class VtbAlgebra(AbstractAlgebra):
         return -self.identity_element(d, sidedness)
 
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the zero element of dimensionality *d*.
+        """
+        Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
         For VTB this is the zero vector.
@@ -481,15 +494,16 @@ class VtbAlgebra(AbstractAlgebra):
 
 
 class VtbSign(GenericSign):
-    """Represents a sign in the `.VtbAlgebra`.
+    """
+    Represents a sign in the `.VtbAlgebra`.
 
     The sign depends on the symmetry and positive/negative definiteness of the
-    binding matrix derived from the vector. For all non-symmetric matrices,
-    the sign is indefinite. It is also indefinite, if the matrices' eigenvalues
-    have different signs. A symmetric, positive (negative) definite binding
-    matrix corresponds to a positive (negative) sign (equivalent to all
-    eigenvalues being greater than 0, respectively lower than 0). If all
-    eigenvalues are equal to 0, the sign is also 0.
+    binding matrix derived from the vector. For all non-symmetric matrices, the
+    sign is indefinite. It is also indefinite, if the matrices' eigenvalues have
+    different signs. A symmetric, positive (negative) definite binding matrix
+    corresponds to a positive (negative) sign (equivalent to all eigenvalues
+    being greater than 0, respectively lower than 0). If all eigenvalues are
+    equal to 0, the sign is also 0.
     """
 
     def to_vector(self, d):
@@ -518,7 +532,8 @@ class VtbProperties:
     """A unitary vector does not change the length of a vector it is bound to."""
 
     POSITIVE = CommonProperties.POSITIVE
-    """A positive vector does not change the sign of a vector it is bound to.
+    """
+    A positive vector does not change the sign of a vector it is bound to.
 
     A positive vector allows for fractional binding powers.
     """

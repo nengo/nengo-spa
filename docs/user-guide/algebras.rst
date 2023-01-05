@@ -31,8 +31,8 @@ absorbing element, zero element, and inverse might only fulfil their properties
 on a specific side of the binding operation. In these cases, the method to
 obtain the element usually has a ``sidedness`` argument to specify for which
 side of the binding operation the element is requested. For the inverse,
-however, you have the choice between ``~`` for the two-sided inverse, `.linv()`
-and `.rinv()` for the left and right inverse, respectively.
+however, you have the choice between ``~`` for the two-sided inverse, ``linv()``
+and ``rinv()`` for the left and right inverse, respectively.
 Moreover, when given :math:`\mathcal{B}(\mathcal{B}(a, b), c)` in VTB, it is not
 possible to directly unbind :math:`a`, but :math:`c` has to be unbound first
 because VTB is not associative.

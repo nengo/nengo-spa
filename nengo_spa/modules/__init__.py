@@ -1,4 +1,5 @@
-"""SPA modules with defined inputs and outputs usable in action rules.
+"""
+SPA modules with defined inputs and outputs usable in action rules.
 
 SPA modules derive from `nengo_spa.Network` and thus provide information about
 inputs and outputs that can be used in action rules and the associated

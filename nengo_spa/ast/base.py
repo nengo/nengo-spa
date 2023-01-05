@@ -5,7 +5,8 @@ from nengo_spa.types import TAnyVocab, TVocabulary, coerce_types
 
 
 def infer_types(*nodes):
-    """Infers the most specific type for given nodes, sets end returns it.
+    """
+    Infers the most specific type for given nodes, sets end returns it.
 
     This determines the most specific type for given nodes. If it is a specific
     vocabulary, this vocabulary will be set for all less specific vocabulary
@@ -21,7 +22,8 @@ def infer_types(*nodes):
 
 
 class Node:
-    """Base class for nodes in the AST for NengoSPA operations.
+    """
+    Base class for nodes in the AST for NengoSPA operations.
 
     Parameters
     ----------
@@ -33,7 +35,8 @@ class Node:
         self.type = type_
 
     def connect_to(self, sink, **kwargs):
-        """Implement the computation represented by the node and connect it.
+        """
+        Implement the computation represented by the node and connect it.
 
         Parameters
         ----------
@@ -45,7 +48,8 @@ class Node:
         raise NotImplementedError()
 
     def construct(self):
-        """Implement the computation represented by the node.
+        """
+        Implement the computation represented by the node.
 
         Returns
         -------
@@ -75,7 +79,8 @@ class Fixed(Node):
 
 
 class TypeCheckedBinaryOp:
-    """Decorator to check the type of the *other* parameter of an operator.
+    """
+    Decorator to check the type of the *other* parameter of an operator.
 
     If the *other* parameter is not an instance of *expected_type*,
     *NotImplemented* will be returned from the decorated method. If

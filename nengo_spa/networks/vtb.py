@@ -32,7 +32,8 @@ def swapping_matrix(dimensions):
 
 
 class VTB(nengo.Network):
-    r"""Compute vector-derived transformation binding (VTB).
+    r"""
+    Compute vector-derived transformation binding (VTB).
 
     VTB uses elementwise addition for superposition. The binding operation
     :math:`\mathcal{B}(x, y)` is defined as

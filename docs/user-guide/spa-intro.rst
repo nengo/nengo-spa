@@ -103,7 +103,7 @@ If we want to know the color of the square, we can unbind the *square* vector:
    NengoSPA are potentially better suited for certain tasks. The
    :doc:`algebras` section explains how to use other binding operations. Choices
    included in NengoSPA are documented in the API documentation of
-   `nengo_spa.algebras`.
+   ``nengo_spa.algebras``.
 
 
 An example: Spaun
@@ -163,7 +163,7 @@ something like this:
    average relationship and applying it to the last input (i.e., ``33``) to
    generate an internal representation of the answer.
 6. This representation is then used to drive the motor system to write out the
-   correct answer (see :numref:`spa_2`), by sending the relevant Semantic
+   correct answer (see :ref:`spa_2`), by sending the relevant Semantic
    Pointers to the motor system.
 7. The motor system “dereferences” the semantic pointer by going down the motor
    hierarchy to generate appropriate control signals for a high-degree of

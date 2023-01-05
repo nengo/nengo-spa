@@ -12,7 +12,8 @@ from nengo_spa.types import TScalar
 
 
 class ActionSelection(Mapping):
-    """Implements an action selection system with basal ganglia and thalamus.
+    """
+    Implements an action selection system with basal ganglia and thalamus.
 
     The *ActionSelection* instance has to be used as context manager and each
     potential action is defined by an `.ifmax` call providing an expression
@@ -165,7 +166,8 @@ class ActionSelection(Mapping):
 
 
 def ifmax(name, condition, *actions):
-    """Defines a potential action within an `ActionSelection` context.
+    """
+    Defines a potential action within an `ActionSelection` context.
 
     Parameters
     ----------
@@ -184,7 +186,7 @@ def ifmax(name, condition, *actions):
     """
     if ActionSelection.active is None:
         raise SpaActionSelectionError(
-            "ifmax must be used within the context of an ActionSelection " "instance."
+            "ifmax must be used within the context of an ActionSelection instance."
         )
     if condition.type != TScalar:
         raise SpaTypeError(

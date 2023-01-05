@@ -9,8 +9,9 @@ from nengo_spa.typechecks import is_iterable
 
 
 class IdentityEnsembleArray(nengo.Network):
-    """An ensemble array optimized for representing the identity circular
-    convolution vector besides random unit vectors.
+    """
+    An ensemble array optimized for representing the identity circular convolution
+    vector besides random unit vectors.
 
     The ensemble array will use ensembles with *subdimensions* dimensions,
     except for the first *subdimensions* dimensions. These will be split into
@@ -84,7 +85,8 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_neuron_input(self):
-        """Adds a node providing input to the neurons of all ensembles.
+        """
+        Adds a node providing input to the neurons of all ensembles.
 
         This node will be accessible through the *neuron_input* attribute.
 
@@ -120,7 +122,8 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_neuron_output(self):
-        """Adds a node providing neuron (non-decoded) output of all ensembles.
+        """
+        Adds a node providing neuron (non-decoded) output of all ensembles.
 
         This node will be accessible through the *neuron_output* attribute.
 
@@ -156,7 +159,8 @@ class IdentityEnsembleArray(nengo.Network):
 
     @with_self
     def add_output(self, name, function, synapse=None, **conn_kwargs):
-        """Adds a new decoded output.
+        """
+        Adds a new decoded output.
 
         This will add the attribute named *name* to the object.
 
@@ -208,14 +212,14 @@ class IdentityEnsembleArray(nengo.Network):
             output[:first_size],
             function=first_fn,
             synapse=synapse,
-            **conn_kwargs
+            **conn_kwargs,
         )
         nengo.Connection(
             self.second,
             output[first_size:remainder_start],
             function=second_fn,
             synapse=synapse,
-            **conn_kwargs
+            **conn_kwargs,
         )
         nengo.Connection(
             remainder_fn_out, output[remainder_start:], synapse=synapse, **conn_kwargs

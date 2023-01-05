@@ -172,7 +172,8 @@ class DynamicNode(Node):
 
 
 class Transformed(DynamicNode):
-    """AST node representing a transform.
+    """
+    AST node representing a transform.
 
     Parameters
     ----------
@@ -207,7 +208,8 @@ class Transformed(DynamicNode):
 
 
 class Summed(DynamicNode):
-    """AST node representing the sum of multiple nodes.
+    """
+    AST node representing the sum of multiple nodes.
 
     Parameters
     ----------
@@ -242,7 +244,8 @@ class Summed(DynamicNode):
 
 
 class ModuleOutput(DynamicNode):
-    """AST node representing the output of a SPA module.
+    """
+    AST node representing the output of a SPA module.
 
     Parameters
     ----------

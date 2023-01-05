@@ -19,7 +19,8 @@ from nengo_spa.algebras.vtb_algebra import VtbAlgebra
 
 
 class TestConfig:
-    """Parameters affecting all NengoSPA testes.
+    """
+    Parameters affecting all NengoSPA testes.
 
     These are essentially global variables used by py.test to modify aspects
     of the NengoSPA tests. We collect them in this class to provide a mini

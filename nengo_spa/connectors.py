@@ -62,7 +62,8 @@ def as_sink(obj):
 
 
 class ModuleInput:
-    """Represents the input to a module with type information.
+    """
+    Represents the input to a module with type information.
 
     Supports the ``>>`` operator to provide input from an AST node. It will
     create a simple connection by default, but a `.RoutedConnection` instance
@@ -93,7 +94,8 @@ class ModuleInput:
 
 
 class RoutedConnection:
-    """Represents a routed connection from an AST node to a `.ModuleInput`.
+    """
+    Represents a routed connection from an AST node to a `.ModuleInput`.
 
     A routed connection is passed through an inhibitable channel to allow the
     routed connection to be disabled.
@@ -135,7 +137,8 @@ class RoutedConnection:
 
 
 class SpaOperatorMixin:
-    """Mixin class that implements the SPA operators.
+    """
+    Mixin class that implements the SPA operators.
 
     All operands will be converted to AST node and the implementation of the
     operator itself is delegated to the implementation provided by those nodes.
@@ -187,7 +190,8 @@ class SpaOperatorMixin:
 
 
 class ConnectorRegistry:
-    """Registry associating connectors with vocabularies and enable SPA syntax.
+    """
+    Registry associating connectors with vocabularies and enable SPA syntax.
 
     A connector is either an input or output to a SPA module.
 
@@ -211,7 +215,8 @@ class ConnectorRegistry:
         return self._registry[key]
 
     def declare_connector(self, obj, vocab):
-        """Declares a connector.
+        """
+        Declares a connector.
 
         Parameters
         ----------

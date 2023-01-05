@@ -19,7 +19,8 @@ from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 
 
 class SemanticPointer(Fixed):
-    """A Semantic Pointer, based on Holographic Reduced Representations.
+    """
+    A Semantic Pointer, based on Holographic Reduced Representations.
 
     Operators are overloaded so that ``+`` and ``-`` are addition,
     ``*`` is circular convolution, and ``~`` is the two-sided inversion operator.
@@ -125,7 +126,8 @@ class SemanticPointer(Fixed):
         return nengo.Node(self.v, label=str(self).format(len(self)))
 
     def normalized(self):
-        """Normalize the Semantic Pointer and return it as a new object.
+        """
+        Normalize the Semantic Pointer and return it as a new object.
 
         If the vector length is zero, the Semantic Pointer will be returned
         unchanged.
@@ -143,7 +145,8 @@ class SemanticPointer(Fixed):
         )
 
     def unitary(self):
-        """Make the Semantic Pointer unitary and return it as a new object.
+        """
+        Make the Semantic Pointer unitary and return it as a new object.
 
         The original object is not modified.
 
@@ -158,7 +161,8 @@ class SemanticPointer(Fixed):
         )
 
     def sign(self):
-        """Return the sign of the Semantic Pointer.
+        """
+        Return the sign of the Semantic Pointer.
 
         See `.AbstractAlgebra.sign` for details on signs of Semantic Pointers.
 
@@ -176,7 +180,8 @@ class SemanticPointer(Fixed):
         )
 
     def abs(self):
-        """Return the absolute Semantic Pointer.
+        """
+        Return the absolute Semantic Pointer.
 
         See `.AbstractAlgebra.abs` for details on absolute Semantic Pointers.
         """
@@ -252,14 +257,16 @@ class SemanticPointer(Fixed):
         return (-self) + other
 
     def __mul__(self, other):
-        """Multiplication of two SemanticPointers is circular convolution.
+        """
+        Multiplication of two SemanticPointers is circular convolution.
 
         If multiplied by a scalar, we do normal multiplication.
         """
         return self._mul(other, swap=False)
 
     def __rmul__(self, other):
-        """Multiplication of two SemanticPointers is circular convolution.
+        """
+        Multiplication of two SemanticPointers is circular convolution.
 
         If multiplied by a scalar, we do normal multiplication.
         """
@@ -291,7 +298,8 @@ class SemanticPointer(Fixed):
             return NotImplemented
 
     def __pow__(self, other):
-        """Binding power of the Semantic Pointer.
+        """
+        Binding power of the Semantic Pointer.
 
         Integer exponents are supported for any algebra.
         See the `~.AbstractAlgebra.binding_power` documentation of the respective
@@ -329,8 +337,9 @@ class SemanticPointer(Fixed):
             return NotImplemented
 
     def __invert__(self):
-        """Return a reorganized `SemanticPointer` that acts as a two-sided
-        inverse for binding.
+        """
+        Return a reorganized `SemanticPointer` that acts as a two-sided inverse for
+        binding.
 
         .. seealso:: `linv`, `rinv`
         """
@@ -342,8 +351,8 @@ class SemanticPointer(Fixed):
         )
 
     def linv(self):
-        """Return a reorganized `SemanticPointer` that acts as a left inverse
-        for binding.
+        """
+        Return a reorganized `SemanticPointer` that acts as a left inverse for binding.
 
         .. seealso:: `__invert__`, `rinv`
         """
@@ -355,8 +364,8 @@ class SemanticPointer(Fixed):
         )
 
     def rinv(self):
-        """Return a reorganized `SemanticPointer` that acts as a right inverse
-        for binding.
+        """
+        Return a reorganized `SemanticPointer` that acts as a right inverse for binding.
 
         .. seealso:: `__invert__`, `linv`
         """
@@ -392,10 +401,10 @@ class SemanticPointer(Fixed):
         )
 
     def get_binding_matrix(self, swap_inputs=False):
-        """Return the matrix that does a binding with this vector.
+        """
+        Return the matrix that does a binding with this vector.
 
-        This should be such that
-        ``A*B == dot(A.get_binding_matrix(), B.v)``.
+        This should be such that ``A*B == dot(A.get_binding_matrix(), B.v)``.
         """
         return self.algebra.get_binding_matrix(self.v, swap_inputs=swap_inputs)
 
@@ -413,10 +422,11 @@ class SemanticPointer(Fixed):
         return self.dot(other)
 
     def compare(self, other):
-        """Return the similarity between two SemanticPointers.
+        """
+        Return the similarity between two SemanticPointers.
 
-        This is the normalized dot product, or (equivalently), the cosine of
-        the angle between the two vectors.
+        This is the normalized dot product, or (equivalently), the cosine of the
+        angle between the two vectors.
         """
         if isinstance(other, SemanticPointer):
             infer_types(self, other)
@@ -427,7 +437,8 @@ class SemanticPointer(Fixed):
         return np.dot(self.v, other) / scale
 
     def reinterpret(self, vocab):
-        """Reinterpret the Semantic Pointer as part of vocabulary *vocab*.
+        """
+        Reinterpret the Semantic Pointer as part of vocabulary *vocab*.
 
         The *vocab* parameter can be set to *None* to clear the associated
         vocabulary and allow the *source* to be interpreted as part of the
@@ -436,7 +447,8 @@ class SemanticPointer(Fixed):
         return SemanticPointer(self.v, vocab=vocab, name=self.name)
 
     def translate(self, vocab, populate=None, keys=None, solver=None):
-        """Translate the Semantic Pointer to vocabulary *vocab*.
+        """
+        Translate the Semantic Pointer to vocabulary *vocab*.
 
         The translation of a Semantic Pointer uses some form of projection to
         convert the Semantic Pointer to a Semantic Pointer of another
@@ -466,7 +478,8 @@ class SemanticPointer(Fixed):
         )
 
     def distance(self, other):
-        """Return a distance measure between the vectors.
+        """
+        Return a distance measure between the vectors.
 
         This is ``1-cos(angle)``, so that it is 0 when they are identical, and
         the distance gets larger as the vectors are farther apart.
@@ -481,7 +494,8 @@ class SemanticPointer(Fixed):
         return np.sum((self.v - other) ** 2) / len(self.v)
 
     def _ensure_algebra_match(self, other):
-        """Check the algebra of the *other*.
+        """
+        Check the algebra of the *other*.
 
         If the *other* parameter is a `SemanticPointer` and uses a different
         algebra, a `TypeError` will be raised.
@@ -495,7 +509,8 @@ class SemanticPointer(Fixed):
 
 
 class SemanticPointerSign(AbstractSign):
-    """Sign of a Semantic Pointer.
+    """
+    Sign of a Semantic Pointer.
 
     This class acts as proxy to the actual sign instance of the underlying
     algebra. Use the *sign* attribute if you want to perform equality checks
@@ -580,7 +595,8 @@ class SemanticPointerSign(AbstractSign):
         )
 
     def to_semantic_pointer(self):
-        """Return the Semantic Pointer corresponding to the represented sign.
+        """
+        Return the Semantic Pointer corresponding to the represented sign.
 
         Returns
         -------
@@ -600,7 +616,8 @@ class SemanticPointerSign(AbstractSign):
 
 
 class Identity(SemanticPointer):
-    """Identity element.
+    """
+    Identity element.
 
     Parameters
     ----------
@@ -634,7 +651,8 @@ class Identity(SemanticPointer):
 
 
 class NegativeIdentity(SemanticPointer):
-    """Negative identity element.
+    """
+    Negative identity element.
 
     Parameters
     ----------
@@ -668,7 +686,8 @@ class NegativeIdentity(SemanticPointer):
 
 
 class AbsorbingElement(SemanticPointer):
-    r"""Absorbing element.
+    r"""
+    Absorbing element.
 
     If :math:`z` denotes the absorbing element, :math:`v \circledast z = c z`,
     where :math:`v` is a Semantic Pointer and :math:`c` is a real-valued
@@ -706,7 +725,8 @@ class AbsorbingElement(SemanticPointer):
 
 
 class Zero(SemanticPointer):
-    """Zero element.
+    """
+    Zero element.
 
     Parameters
     ----------

@@ -5,7 +5,8 @@ from nengo.networks.product import Product
 
 
 def transform_in(dims, align, invert):
-    """Create a transform to map the input into the Fourier domain.
+    """
+    Create a transform to map the input into the Fourier domain.
 
     See CircularConvolution docstring for more details.
 
@@ -73,7 +74,8 @@ def dft_half(n):
 
 
 class CircularConvolution(nengo.Network):
-    r"""Compute the circular convolution of two vectors.
+    r"""
+    Compute the circular convolution of two vectors.
 
     The circular convolution :math:`c` of vectors :math:`a` and :math:`b`
     is given by
@@ -171,7 +173,7 @@ class CircularConvolution(nengo.Network):
         invert_a=False,
         invert_b=False,
         input_magnitude=1.0,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 

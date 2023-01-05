@@ -9,7 +9,8 @@ from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class State(Network):
-    """Represents a single vector, with optional memory.
+    """
+    Represents a single vector, with optional memory.
 
     This is a minimal SPA network, useful for passing data along (for example,
     visual input).

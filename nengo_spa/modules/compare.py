@@ -7,7 +7,8 @@ from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class Compare(Network):
-    """Computes the dot product of two inputs.
+    """
+    Computes the dot product of two inputs.
 
     Parameters
     ----------

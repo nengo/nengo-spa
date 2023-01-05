@@ -4,7 +4,8 @@ import numpy as np
 
 
 class IA(nengo.Network):
-    """Independent accumulator (IA) winner-take-all (WTA) network.
+    """
+    Independent accumulator (IA) winner-take-all (WTA) network.
 
     This is a two-layered network. The first layer consists of independent
     accumulators (integrators), whereas the second layer does a thresholding.
@@ -80,7 +81,7 @@ class IA(nengo.Network):
         ff_synapse=0.005,
         intercept_width=0.15,
         radius=1.0,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 
@@ -142,7 +143,8 @@ class IA(nengo.Network):
 
 
 class Thresholding(nengo.Network):
-    """Array of thresholding ensembles.
+    """
+    Array of thresholding ensembles.
 
     All inputs below the threshold will produce an output of 0, whereas inputs
     above the threshold produce an output of equal value.
@@ -183,7 +185,7 @@ class Thresholding(nengo.Network):
         intercept_width=0.15,
         function=None,
         radius=1.0,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 
@@ -210,7 +212,8 @@ class Thresholding(nengo.Network):
 
 
 class WTA(Thresholding):
-    """Winner-take-all (WTA) network with lateral inhibition.
+    """
+    Winner-take-all (WTA) network with lateral inhibition.
 
     Parameters
     ----------

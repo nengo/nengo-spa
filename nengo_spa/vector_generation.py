@@ -4,7 +4,8 @@ import numpy as np
 
 
 def AxisAlignedVectors(d):
-    """Generator for axis aligned vectors.
+    """
+    Generator for axis aligned vectors.
 
     Can yield at most *d* vectors.
 
@@ -30,7 +31,8 @@ def AxisAlignedVectors(d):
 
 
 class UnitLengthVectors:
-    """Generator for uniformly distributed unit-length vectors.
+    """
+    Generator for uniformly distributed unit-length vectors.
 
     Parameters
     ----------
@@ -60,7 +62,8 @@ class UnitLengthVectors:
 
 
 class UnitaryVectors:
-    """Generator for unitary vectors (given some binding method).
+    """
+    Generator for unitary vectors (given some binding method).
 
     Parameters
     ----------
@@ -91,7 +94,8 @@ class UnitaryVectors:
 
 
 class EquallySpacedPositiveUnitaryHrrVectors:
-    """Generator for equally spaced positive unitary HRR vectors.
+    """
+    Generator for equally spaced positive unitary HRR vectors.
 
     The vectors produced by this generator lie all on a hyper-circle of
     positive, unitary vectors under the `.HrrAlgebra`. The distance from one
@@ -142,7 +146,8 @@ class EquallySpacedPositiveUnitaryHrrVectors:
 
 
 class OrthonormalVectors:
-    """Generator for random orthonormal vectors.
+    """
+    Generator for random orthonormal vectors.
 
     Parameters
     ----------
@@ -182,7 +187,8 @@ class OrthonormalVectors:
 
 
 class ExpectedUnitLengthVectors:
-    r"""Generator for vectors with expected unit-length.
+    r"""
+    Generator for vectors with expected unit-length.
 
     The vectors will be uniformly distributed with an expected norm
     of 1, but each specific pointer may have a length different than 1.
@@ -215,7 +221,8 @@ class ExpectedUnitLengthVectors:
 
 
 class VectorsWithProperties:
-    """Generator for vectors with given properties.
+    """
+    Generator for vectors with given properties.
 
     Supported properties depend on the algebra. See the respective algebra's
     :meth:`.AbstractAlgebra.create_vector` method.

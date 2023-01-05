@@ -13,7 +13,8 @@ from nengo_spa.networks.tvtb import TVTB
 
 
 class TvtbAlgebra(AbstractAlgebra):
-    r"""Transposed Vector-derived Transformation Binding (TVTB) algebra.
+    r"""
+    Transposed Vector-derived Transformation Binding (TVTB) algebra.
 
     TVTB uses elementwise addition for superposition. The binding operation
     :math:`\mathcal{B}(x, y)` is defined as
@@ -64,7 +65,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return cls._instance
 
     def is_valid_dimensionality(self, d):
-        """Checks whether *d* is a valid vector dimensionality.
+        """
+        Checks whether *d* is a valid vector dimensionality.
 
         For TVTB all square numbers are valid dimensionalities.
 
@@ -91,7 +93,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return sub_d
 
     def create_vector(self, d, properties, *, rng=None):
-        """Create a vector fulfilling given properties in the algebra.
+        """
+        Create a vector fulfilling given properties in the algebra.
 
         Creating positive vectors requires SciPy.
 
@@ -174,7 +177,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return np.dot(m, a)
 
     def binding_power(self, v, exponent):
-        r"""Returns the binding power of *v* using the *exponent*.
+        r"""
+        Returns the binding power of *v* using the *exponent*.
 
         The binding power is defined as binding (*exponent*-1) times bindings
         of *v* to itself.
@@ -252,7 +256,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return power.real
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
-        """Invert vector *v*.
+        """
+        Invert vector *v*.
 
         A vector bound to its inverse will result in the identity vector.
 
@@ -281,7 +286,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return m
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Returns the transformation matrix for inverting a vector.
+        """
+        Returns the transformation matrix for inverting a vector.
 
         Parameters
         ----------
@@ -308,6 +314,7 @@ class TvtbAlgebra(AbstractAlgebra):
         return net, (net.input_left, net.input_right), net.output
 
     def sign(self, v):
+        """See `.AbstractAlgebra.sign`."""
         m = self.get_binding_matrix(v)
         if not np.allclose(m, m.T):
             return TvtbSign(None)
@@ -322,14 +329,16 @@ class TvtbAlgebra(AbstractAlgebra):
             return TvtbSign(None)
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """TVTB has no absorbing element except the zero vector.
+        """
+        TVTB has no absorbing element except the zero vector.
 
         Always raises a `NotImplementedError`.
         """
         raise NotImplementedError("VtbAlgebra does not have any absorbing elements.")
 
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the identity element of dimensionality *d*.
+        """
+        Return the identity element of dimensionality *d*.
 
         Parameters
         ----------
@@ -348,7 +357,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return (np.eye(sub_d) / d**0.25).flatten()
 
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        r"""Return the negative identity element of dimensionality *d*.
+        r"""
+        Return the negative identity element of dimensionality *d*.
 
         Parameters
         ----------
@@ -366,7 +376,8 @@ class TvtbAlgebra(AbstractAlgebra):
         return -self.identity_element(d, sidedness)
 
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the zero element of dimensionality *d*.
+        """
+        Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
         For VTB this is the zero vector.
@@ -388,15 +399,16 @@ class TvtbAlgebra(AbstractAlgebra):
 
 
 class TvtbSign(GenericSign):
-    """Represents a sign in the `.TvtbAlgebra`.
+    """
+    Represents a sign in the `.TvtbAlgebra`.
 
     The sign depends on the symmetry and positive/negative definiteness of the
-    binding matrix derived from the vector. For all non-symmetric matrices,
-    the sign is indefinite. It is also indefinite, if the matrices' eigenvalues
-    have different signs. A symmetric, positive (negative) definite binding
-    matrix corresponds to a positive (negative) sign (equivalent to all
-    eigenvalues being greater than 0, respectively lower than 0). If all
-    eigenvalues are equal to 0, the sign is also 0.
+    binding matrix derived from the vector. For all non-symmetric matrices, the
+    sign is indefinite. It is also indefinite, if the matrices' eigenvalues have
+    different signs. A symmetric, positive (negative) definite binding matrix
+    corresponds to a positive (negative) sign (equivalent to all eigenvalues
+    being greater than 0, respectively lower than 0). If all eigenvalues are
+    equal to 0, the sign is also 0.
     """
 
     def to_vector(self, d):
@@ -423,7 +435,8 @@ class TvtbProperties:
     """A unitary vector does not change the length of a vector it is bound to."""
 
     POSITIVE = CommonProperties.POSITIVE
-    """A positive vector does not change the sign of a vector it is bound to.
+    """
+    A positive vector does not change the sign of a vector it is bound to.
 
     A positive vector allows for fractional binding powers.
     """

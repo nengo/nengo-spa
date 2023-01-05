@@ -51,7 +51,7 @@ Usage
 
 The recommended way to use NengoSPA is to ``import nengo_spa as spa``. (Note
 that this uses an underscore in the module name and is different from
-`nengo.spa` which refers to the legacy SPA module shipped with core Nengo.)
+``nengo.spa`` which refers to the legacy SPA module shipped with core Nengo.)
 
 To use NengoSPA functionality in your models use `nengo_spa.Network` instead of
 `nengo.Network`. A basic NengoSPA model can look like this::

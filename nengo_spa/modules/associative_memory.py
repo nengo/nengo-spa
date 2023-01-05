@@ -1,4 +1,5 @@
-"""Associative memory implementations.
+"""
+Associative memory implementations.
 
 See :doc:`examples/associative_memory` for an introduction and examples.
 """
@@ -13,7 +14,8 @@ from nengo_spa.vocabulary import VocabularyOrDimParam
 
 
 class AssociativeMemory(Network):
-    """General associative memory network.
+    """
+    General associative memory network.
 
     This provides a low-level selection network with the necessary interface
     to include it within the SPA system.
@@ -69,7 +71,7 @@ class AssociativeMemory(Network):
         seed=None,
         add_to_container=None,
         vocabs=None,
-        **selection_net_kwargs
+        **selection_net_kwargs,
     ):
         super(AssociativeMemory, self).__init__(
             label=label, seed=seed, add_to_container=add_to_container, vocabs=vocabs
@@ -104,7 +106,7 @@ class AssociativeMemory(Network):
 
         if len(mapping) < 1:
             raise ValidationError(
-                "At least one item must be provided with the mapping " "argument.",
+                "At least one item must be provided with the mapping argument.",
                 attr="mapping",
                 obj=self,
             )
@@ -122,7 +124,7 @@ class AssociativeMemory(Network):
                 n_neurons=n_neurons,
                 n_ensembles=len(input_vectors),
                 label="selection",
-                **selection_net_kwargs
+                **selection_net_kwargs,
             )
             self.input = nengo.Node(size_in=self.input_vocab.dimensions, label="input")
             self.output = nengo.Node(
@@ -139,7 +141,8 @@ class AssociativeMemory(Network):
 
     @with_self
     def add_default_output(self, key, min_activation_value, n_neurons=50):
-        """Adds a Semantic Pointer to output when no other pointer is active.
+        """
+        Adds a Semantic Pointer to output when no other pointer is active.
 
         Parameters
         ----------
@@ -171,7 +174,8 @@ class AssociativeMemory(Network):
 
 
 class IAAssocMem(AssociativeMemory):
-    """Associative memory based on the `.IA` network.
+    """
+    Associative memory based on the `.IA` network.
 
     See `AssociativeMemory` and `.IA` for more information.
     """
@@ -186,7 +190,7 @@ class IAAssocMem(AssociativeMemory):
         seed=None,
         add_to_container=None,
         vocabs=None,
-        **selection_net_kwargs
+        **selection_net_kwargs,
     ):
         super(IAAssocMem, self).__init__(
             selection_net=IA,
@@ -198,14 +202,15 @@ class IAAssocMem(AssociativeMemory):
             seed=seed,
             add_to_container=add_to_container,
             vocabs=vocabs,
-            **selection_net_kwargs
+            **selection_net_kwargs,
         )
         self.input_reset = self.selection.input_reset
         self.declare_input(self.input_reset, None)
 
 
 class ThresholdingAssocMem(AssociativeMemory):
-    """Associative memory based on `.Thresholding`.
+    """
+    Associative memory based on `.Thresholding`.
 
     See `AssociativeMemory` and `.Thresholding` for more information.
     """
@@ -221,7 +226,7 @@ class ThresholdingAssocMem(AssociativeMemory):
         seed=None,
         add_to_container=None,
         vocabs=None,
-        **selection_net_kwargs
+        **selection_net_kwargs,
     ):
         selection_net_kwargs["threshold"] = threshold
         super(ThresholdingAssocMem, self).__init__(
@@ -234,12 +239,13 @@ class ThresholdingAssocMem(AssociativeMemory):
             seed=seed,
             add_to_container=add_to_container,
             vocabs=vocabs,
-            **selection_net_kwargs
+            **selection_net_kwargs,
         )
 
 
 class WTAAssocMem(AssociativeMemory):
-    """Associative memory based on the `.WTA` network.
+    """
+    Associative memory based on the `.WTA` network.
 
     See `AssociativeMemory` and `.WTA` for more information.
     """
@@ -255,7 +261,7 @@ class WTAAssocMem(AssociativeMemory):
         seed=None,
         add_to_container=None,
         vocabs=None,
-        **selection_net_kwargs
+        **selection_net_kwargs,
     ):
         selection_net_kwargs["threshold"] = threshold
         super(WTAAssocMem, self).__init__(
@@ -268,5 +274,5 @@ class WTAAssocMem(AssociativeMemory):
             seed=seed,
             add_to_container=add_to_container,
             vocabs=vocabs,
-            **selection_net_kwargs
+            **selection_net_kwargs,
         )

@@ -31,7 +31,8 @@ class _AutoConfig:
 
 
 def ifmax(name, condition=None, *actions):
-    """Defines a potential action within an `ActionSelection` context.
+    """
+    Defines a potential action within an `ActionSelection` context.
 
     This implementation allows Nengo objects in addition to AST nodes as
     condition argument.
@@ -69,12 +70,13 @@ def ifmax(name, condition=None, *actions):
 
 
 class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
-    """Base class for SPA networks or modules.
+    """
+    Base class for SPA networks or modules.
 
-    SPA modules are networks that declare their inputs and outputs with
+    SPA modules are networks ethat declare their inputs and outputs with
     associated `.Vocabulary` instances. These inputs and outputs can then be
     be used in the SPA syntax, for example ``module1.output >> module2.input``.
-    Inputs and outputs named `default` can be omitted in the SPA syntax so that
+    Inputs and outputs named ``default`` can be omitted in the SPA syntax so that
     one can write ``module1 >> module2``.
 
     Furthermore, SPA modules allow to configure parameters of contained SPA
@@ -132,6 +134,7 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
 
     @property
     def config(self):
+        """Configuration for this network."""
         return _AutoConfig(self._config)
 
     @classmethod
@@ -145,7 +148,8 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         return output_vocab_registry[obj]
 
     def declare_input(self, obj, vocab):
-        """Declares a network input.
+        """
+        Declares a network input.
 
         Parameters
         ----------
@@ -157,7 +161,8 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
         return input_vocab_registry.declare_connector(obj, vocab)
 
     def declare_output(self, obj, vocab):
-        """Declares a network output.
+        """
+        Declares a network output.
 
         Parameters
         ----------
@@ -170,7 +175,8 @@ class Network(nengo.Network, SupportDefaultsMixin, SpaOperatorMixin):
 
 
 def create_inhibit_node(net, strength=2.0, **kwargs):
-    """Creates a node that inhibits all ensembles in a network.
+    """
+    Creates a node that inhibits all ensembles in a network.
 
     Parameters
     ----------

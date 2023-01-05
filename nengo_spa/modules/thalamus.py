@@ -12,7 +12,8 @@ from nengo_spa.types import TScalar
 
 
 class Thalamus(Network):
-    """Inhibits non-selected actions.
+    """
+    Inhibits non-selected actions.
 
     The thalamus is intended to work in tandem with a `.BasalGanglia` module.
     It converts basal ganglia output into a signal with (approximately) 1 for
@@ -91,7 +92,7 @@ class Thalamus(Network):
         neurons_gate=Default,
         threshold_gate=Default,
         synapse_to_gate=Default,
-        **kwargs
+        **kwargs,
     ):
         super(Thalamus, self).__init__(**kwargs)
 
@@ -139,7 +140,8 @@ class Thalamus(Network):
         self.output = self.actions.output
 
     def construct_gate(self, index, bias, label=None):
-        """Construct a gate ensemble.
+        """
+        Construct a gate ensemble.
 
         The gate neurons have no activity when the action is selected, but are
         active when the action is not selected. This makes the gate useful for
@@ -182,7 +184,8 @@ class Thalamus(Network):
         return self.gates[index]
 
     def construct_channel(self, sink, type_, label=None):
-        """Construct a channel.
+        """
+        Construct a channel.
 
         Channels are an additional neural population in-between a source
         population and a target population. This allows inhibiting the channel
@@ -222,7 +225,8 @@ class Thalamus(Network):
         )
 
     def connect_gate(self, index, channel):
-        """Connect a gate to a channel for information routing.
+        """
+        Connect a gate to a channel for information routing.
 
         Parameters
         ----------
@@ -244,7 +248,8 @@ class Thalamus(Network):
         )
 
     def connect_fixed(self, index, target, transform):
-        """Create connection to route fixed value.
+        """
+        Create connection to route fixed value.
 
         Parameters
         ----------
@@ -260,7 +265,8 @@ class Thalamus(Network):
         )
 
     def connect(self, source, target, transform):
-        """Create connection.
+        """
+        Create connection.
 
         The connection will use the thalamus's *synapse_channel*.
 

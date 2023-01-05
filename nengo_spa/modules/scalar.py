@@ -5,7 +5,8 @@ from nengo_spa.network import Network
 
 
 class Scalar(Network):
-    """Represents a single scalar.
+    """
+    Represents a single scalar.
 
     Parameters
     ----------

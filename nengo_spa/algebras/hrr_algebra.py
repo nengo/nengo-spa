@@ -11,7 +11,8 @@ from nengo_spa.networks.circularconvolution import CircularConvolution
 
 
 class HrrAlgebra(AbstractAlgebra):
-    r"""Holographic Reduced Representations (HRRs) algebra.
+    r"""
+    Holographic Reduced Representations (HRRs) algebra.
 
     Uses element-wise addition for superposition, circular convolution for
     binding with an approximate inverse.
@@ -49,7 +50,8 @@ class HrrAlgebra(AbstractAlgebra):
         return cls._instance
 
     def is_valid_dimensionality(self, d):
-        """Checks whether *d* is a valid vector dimensionality.
+        """
+        Checks whether *d* is a valid vector dimensionality.
 
         For circular convolution all positive numbers are valid
         dimensionalities.
@@ -68,7 +70,8 @@ class HrrAlgebra(AbstractAlgebra):
         return d > 0
 
     def create_vector(self, d, properties, *, rng=None):
-        """Create a vector fulfilling given properties in the algebra.
+        """
+        Create a vector fulfilling given properties in the algebra.
 
         Parameters
         ----------
@@ -127,7 +130,8 @@ class HrrAlgebra(AbstractAlgebra):
         return np.fft.irfft(np.fft.rfft(a) * np.fft.rfft(b), n=n)
 
     def binding_power(self, v, exponent):
-        r"""Returns the binding power of *v* using the *exponent*.
+        r"""
+        Returns the binding power of *v* using the *exponent*.
 
         The binding power is defined as binding (*exponent*-1) times bindings
         of *v* to itself. Fractional binding powers are supported.
@@ -172,7 +176,8 @@ class HrrAlgebra(AbstractAlgebra):
         return np.fft.irfft(np.fft.rfft(v) ** abs(exponent), n=len(v))
 
     def invert(self, v, sidedness=ElementSidedness.TWO_SIDED):
-        """Invert vector *v*.
+        """
+        Invert vector *v*.
 
         This turns circular convolution into circular correlation, meaning that
         ``A*B*~B`` is approximately ``A``.
@@ -204,7 +209,8 @@ class HrrAlgebra(AbstractAlgebra):
         return np.array(T)
 
     def get_inversion_matrix(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Returns the transformation matrix for inverting a vector.
+        """
+        Returns the transformation matrix for inverting a vector.
 
         Parameters
         ----------
@@ -230,9 +236,10 @@ class HrrAlgebra(AbstractAlgebra):
         return net, (net.input_a, net.input_b), net.output
 
     def sign(self, v):
-        """Returns the HRR sign of *v*.
+        """
+        Returns the HRR sign of *v*.
 
-        See `AbstractAlgebra.sign` for general information on the notion of a
+        See `.AbstractAlgebra.sign` for general information on the notion of a
         sign for algbras, and `.HrrSign` for details specific to HRRs.
 
         Parameters
@@ -252,7 +259,8 @@ class HrrAlgebra(AbstractAlgebra):
         return HrrSign(int(np.sign(dc.real)), int(np.sign(nyquist.real)))
 
     def absorbing_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        r"""Return the standard absorbing element of dimensionality *d*.
+        r"""
+        Return the standard absorbing element of dimensionality *d*.
 
         An absorbing element will produce a scaled version of itself when bound
         to another vector. The standard absorbing element is the absorbing
@@ -277,7 +285,8 @@ class HrrAlgebra(AbstractAlgebra):
         return np.ones(d) / np.sqrt(d)
 
     def identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        r"""Return the identity element of dimensionality *d*.
+        r"""
+        Return the identity element of dimensionality *d*.
 
         The identity does not change the vector it is bound to.
 
@@ -302,7 +311,8 @@ class HrrAlgebra(AbstractAlgebra):
         return data
 
     def negative_identity_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        r"""Return the negative identity element of dimensionality *d*.
+        r"""
+        Return the negative identity element of dimensionality *d*.
 
         The negative identity element for circular convolution is the vector
         :math:`(-1, 0, \dots, 0)^{\top}`.
@@ -323,7 +333,8 @@ class HrrAlgebra(AbstractAlgebra):
         return -self.identity_element(d, sidedness)
 
     def zero_element(self, d, sidedness=ElementSidedness.TWO_SIDED):
-        """Return the zero element of dimensionality *d*.
+        """
+        Return the zero element of dimensionality *d*.
 
         The zero element produces itself when bound to a different vector.
         For circular convolution this is the zero vector.
@@ -345,7 +356,8 @@ class HrrAlgebra(AbstractAlgebra):
 
 
 class HrrSign(AbstractSign):
-    r"""Represents a sign in the `.HrrAlgebra`.
+    r"""
+    Represents a sign in the `.HrrAlgebra`.
 
     For odd dimensionalities, the sign is equal to the sign of the DC component
     of the Fourier representation of the vector. For even dimensionalities the
@@ -409,7 +421,8 @@ class HrrSign(AbstractSign):
         return False
 
     def to_vector(self, d):
-        """Return the vector in the algebra corresponding to the sign.
+        """
+        Return the vector in the algebra corresponding to the sign.
 
         =======  ============  =======================================
         DC sign  Nyquist sign  Vector
@@ -457,7 +470,8 @@ class HrrProperties:
     """A unitary vector does not change the length of a vector it is bound to."""
 
     POSITIVE = CommonProperties.POSITIVE
-    """A positive vector does not change the sign of a vector it is bound to.
+    """
+    A positive vector does not change the sign of a vector it is bound to.
 
     A positive vector allows for fractional binding powers.
     """

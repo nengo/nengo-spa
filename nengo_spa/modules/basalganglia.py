@@ -54,7 +54,8 @@ class Weights:
 
 
 class BasalGanglia(Network):
-    """Winner take all network, typically used for action selection.
+    """
+    Winner take all network, typically used for action selection.
 
     The basal ganglia network outputs approximately 0 at the dimension with
     the largest value, and is negative elsewhere.
@@ -149,7 +150,7 @@ class BasalGanglia(Network):
         input_bias=Default,
         ampa_synapse=Default,
         gaba_synapse=Default,
-        **kwargs
+        **kwargs,
     ):
         super(BasalGanglia, self).__init__(**kwargs)
 
@@ -185,27 +186,27 @@ class BasalGanglia(Network):
             self.strD1 = EnsembleArray(
                 label="Striatal D1 neurons",
                 intercepts=nengo.dists.Uniform(Weights.e, 1),
-                **ea_params
+                **ea_params,
             )
             self.strD2 = EnsembleArray(
                 label="Striatal D2 neurons",
                 intercepts=nengo.dists.Uniform(Weights.e, 1),
-                **ea_params
+                **ea_params,
             )
             self.stn = EnsembleArray(
                 label="Subthalamic nucleus",
                 intercepts=nengo.dists.Uniform(Weights.ep, 1),
-                **ea_params
+                **ea_params,
             )
             self.gpi = EnsembleArray(
                 label="Globus pallidus internus",
                 intercepts=nengo.dists.Uniform(Weights.eg, 1),
-                **ea_params
+                **ea_params,
             )
             self.gpe = EnsembleArray(
                 label="Globus pallidus externus",
                 intercepts=nengo.dists.Uniform(Weights.ee, 1),
-                **ea_params
+                **ea_params,
             )
 
             self.input = nengo.Node(label="input", size_in=self.action_count)
