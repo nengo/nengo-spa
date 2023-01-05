@@ -1,9 +1,11 @@
 project_name: NengoSPA
 pkg_name: nengo_spa
 repo_name: nengo/nengo-spa
+description: An implementation of the Semantic Pointer Architecture for Nengo
 
 copyright_start: 2013
 license: abr-free
+main_branch: main
 
 contributing_rst: {}
 
@@ -15,45 +17,8 @@ manifest_in:
   global-exclude:
     - "*.swp" # exclude VIM swp files
 
-travis_yml:
-  python: 3.8
-  global_vars:
-    NUMPY: numpy
-    SCIPY: scipy
-  jobs:
-    - script: static
-    - script: docs
-      dist: focal
-    - script: test
-      python: 3.6
-      env:
-        NUMPY: numpy>=1.10,<1.11
-        SCIPY: scipy>=1.0,<1.1
-      dist: $DIST
-    - script: test
-      python: 3.7
-      dist: $DIST
-    - script: test
-      python: 3.9
-    - script: test-coverage
-    - script: test-coverage-no-scipy
-  pypi_user: __token__
-  deploy_dists:
-    - sdist
-    - bdist_wheel
-
-codecov_yml:
-  abs_target: 90%
-  diff_target: 90%
-
 ci_scripts:
   - template: static
-    codespell_ignore_words:
-      - ba
-    pip_install:
-      - flake8
-    post_commands:
-      - flake8 -v nengo_spa
   - template: test
     pip_install:
       - $NUMPY
@@ -74,3 +39,123 @@ ci_scripts:
       - matplotlib
       - $SCIPY
   - template: deploy
+    wheel: true
+
+setup_py:
+  include_package_data: True
+  install_req:
+    - nengo>=2.7
+    - numpy>=1.8
+  docs_req:
+    - jupyter
+    - matplotlib>=2.0
+    - nbsphinx>=0.8.11
+    - nengo_sphinx_theme
+    - numpydoc>=1.4.0
+  optional_req:
+    - scipy>=1.4.1
+    - scikit-learn
+  tests_req:
+    - jupyter>=1.0.0
+    - matplotlib>=2.0
+    - nbformat>=5.0.7
+    - pytest>=3.6
+    - pytest-plt
+    - pytest-rng
+  classifiers:
+    - "Development Status :: 5 - Production/Stable"
+    - "Framework :: Nengo"
+    - "Intended Audience :: Science/Research"
+    - "Operating System :: OS Independent"
+    - "Programming Language :: Python :: 3 :: Only"
+    - "Programming Language :: Python :: 3.6"
+    - "Programming Language :: Python :: 3.7"
+    - "Programming Language :: Python :: 3.8"
+    - "Programming Language :: Python :: 3.9"
+    - "Topic :: Scientific/Engineering :: Artificial Intelligence"
+
+setup_cfg:
+  codespell:
+    ignore_words:
+      - ba
+  coverage:
+    exclude_lines:
+      - "# Don't complain if non-runnable code isn't run:"
+      - "if __name__ == .__main__.:"
+    omit_files:
+      - nengo_spa/conftest.py
+  pylint:
+    ignore:
+      - compat.py
+    disable:
+      # TODO: fix these and start checking for them
+      - abstract-method
+      - broad-except
+      - chained-comparison
+      - consider-using-f-string
+      - consider-using-in
+      - eval-used
+      - expression-not-assigned
+      - import-error
+      - import-outside-toplevel
+      - inconsistent-return-statements
+      - keyword-arg-before-vararg
+      - missing-class-docstring
+      - missing-function-docstring
+      - missing-module-docstring
+      - no-else-break
+      - no-self-argument
+      - not-callable
+      - pointless-statement
+      - raise-missing-from
+      - reimported
+      - super-with-arguments
+      - superfluous-parens
+      - too-many-public-methods
+      - undefined-variable
+      - unnecessary-dunder-call
+      - unnecessary-lambda-assignment
+      - unneeded-not
+      - unspecified-encoding
+      - unused-variable
+      - use-implicit-booleaness-not-comparison
+  pytest:
+    filterwarnings:
+      - ignore::ImportWarning
+      - ignore:(Buffer|Memory):DeprecationWarning
+      - ignore:IPython.core.inputsplitter is deprecated:DeprecationWarning
+      - ignore:Skipping some optimization steps
+      - ignore:SciPy is not installed
+      - ignore:numpy.(dtype|ufunc) size changed
+
+docs_conf_py:
+  extensions:
+    - sphinx.ext.viewcode
+    - matplotlib.sphinxext.plot_directive
+  nengo_logo: nengo-spa-full-light.svg
+  nengo_logo_color: "#d40000"
+  html_redirects:
+    dev_syntax.html: dev-syntax.html
+    examples/associative_memory.html: examples/associative-memory.html
+    examples/custom_module.html: examples/custom-module.html
+    examples/intro_coming_from_legacy_spa.html: examples/intro-coming-from-legacy-spa.html
+    examples/question_control.html: examples/question-control.html
+    examples/question_memory.html: examples/question-memory.html
+    examples/spa_parser.html: examples/spa-parser.html
+    examples/spa_sequence_routed.html: examples/spa-sequence-routed.html
+    examples/spa_sequence.html: examples/spa-sequence.html
+    examples/vocabulary_casting.html: examples/vocabulary-casting.html
+    getting_started.html: getting-started.html
+    user_guide.html: user-guide.html
+    user_guide/algebras.html: user-guide/algebras.html
+    user_guide/spa_intro.html: user-guide/spa-intro.htm
+
+pyproject_toml: {}
+
+pre_commit_config_yaml: {}
+
+version_py:
+  major: 1
+  minor: 3
+  patch: 1
+  release: false

@@ -6,10 +6,6 @@
   :target: https://pypi.org/project/nengo-spa
   :alt: Python versions
 
-.. image:: https://img.shields.io/codecov/c/github/nengo/nengo-spa/master.svg
-  :target: https://codecov.io/gh/nengo/nengo-spa/branch/master
-  :alt: Test coverage
-
 |
 
 .. image:: https://www.nengo.ai/design/_images/nengo-spa-full-light.svg
