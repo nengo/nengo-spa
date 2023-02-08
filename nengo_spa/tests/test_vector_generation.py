@@ -37,14 +37,20 @@ def test_unitary_pointers(rng):
 @pytest.mark.parametrize(
     "constructor_kwargs,expected",
     [
-        (dict(d=16, n=8, offset=0), np.eye(16)[::2]),
-        (dict(d=16, n=8, offset=2), np.roll(np.eye(16)[::2], -2, axis=0)),
-        (dict(d=16, n=8, offset=0.3), HrrAlgebra().binding_power(np.eye(16)[2], 0.3)),
-        (dict(d=16, n=20, offset=1), None),
-        (dict(d=9, n=9, offset=0), np.eye(9)),
-        (dict(d=9, n=9, offset=2), np.roll(np.eye(9), -2, axis=0)),
-        (dict(d=9, n=9, offset=0.3), HrrAlgebra().binding_power(np.eye(9)[1], 0.3)),
-        (dict(d=9, n=20, offset=1), None),
+        ({"d": 16, "n": 8, "offset": 0}, np.eye(16)[::2]),
+        ({"d": 16, "n": 8, "offset": 2}, np.roll(np.eye(16)[::2], -2, axis=0)),
+        (
+            {"d": 16, "n": 8, "offset": 0.3},
+            HrrAlgebra().binding_power(np.eye(16)[2], 0.3),
+        ),
+        ({"d": 16, "n": 20, "offset": 1}, None),
+        ({"d": 9, "n": 9, "offset": 0}, np.eye(9)),
+        ({"d": 9, "n": 9, "offset": 2}, np.roll(np.eye(9), -2, axis=0)),
+        (
+            {"d": 9, "n": 9, "offset": 0.3},
+            HrrAlgebra().binding_power(np.eye(9)[1], 0.3),
+        ),
+        ({"d": 9, "n": 20, "offset": 1}, None),
     ],
 )
 def test_equally_spaced_positive_unitary_hrr_vectors(constructor_kwargs, expected):
