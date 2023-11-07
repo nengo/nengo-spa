@@ -4,7 +4,7 @@ repo_name: nengo/nengo-spa
 description: An implementation of the Semantic Pointer Architecture for Nengo
 
 copyright_start: 2013
-license: abr-free
+license: gpl-v2
 main_branch: main
 
 contributing_rst: {}
@@ -154,7 +154,7 @@ pyproject_toml: {}
 pre_commit_config_yaml: {}
 
 version_py:
-  major: 1
-  minor: 3
-  patch: 1
+  major: 2
+  minor: 0
+  patch: 0
   release: false

@@ -11,7 +11,7 @@ unless the code base represents a release version. Release versions are git
 tagged with the version.
 """
 
-version_info = (1, 3, 1)
+version_info = (2, 0, 0)
 
 name = "nengo-spa"
 dev = 0
