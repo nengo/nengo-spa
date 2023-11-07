@@ -187,7 +187,8 @@ class IdentityEnsembleArray(nengo.Network):
                 raise ValidationError(
                     "Must provide one function per ensemble or one function "
                     "each for the first ensemble, the second ensembles, and "
-                    "all remaining ensembles."
+                    "all remaining ensembles.",
+                    attr="function",
                 )
             first_fn = function[0]
             second_fn = function[1]

@@ -13,7 +13,7 @@ nengo\_spa
 
 .. function:: nengo_spa.ifmax([name,] condition, actions)
 
-   Defines a potential aciton within an `ActionSelection` context.
+   Defines a potential action within an `ActionSelection` context.
 
    :param name: Name for the action. Can be omitted.
    :type name: str

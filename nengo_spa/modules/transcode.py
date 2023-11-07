@@ -44,20 +44,20 @@ def make_parse_func(fn, vocab):
 
 
 class TranscodeFunctionParam(Parameter):
-    def coerce(self, obj, fn):
-        fn = super(TranscodeFunctionParam, self).coerce(obj, fn)
+    def coerce(self, instance, value):
+        fn = super(TranscodeFunctionParam, self).coerce(instance, value)
 
         pointer_cls = (SemanticPointer, PointerSymbol)
 
         if fn is None:
             return fn
         elif callable(fn):
-            return self.coerce_callable(obj, fn)
-        elif not obj.input_vocab and isinstance(fn, (str, pointer_cls)):
+            return self.coerce_callable(instance, fn)
+        elif not instance.input_vocab and isinstance(fn, (str, pointer_cls)):
             return fn
         else:
             raise ValidationError(
-                f"Invalid output type {type(fn)!r}", attr=self.name, obj=obj
+                f"Invalid output type {type(fn)!r}", attr=self.name, obj=instance
             )
 
     def coerce_callable(self, obj, fn):

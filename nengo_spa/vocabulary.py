@@ -544,8 +544,8 @@ class VocabularyMapParam(nengo.params.Parameter):
     Sequences of `.Vocabulary` will be coerced to `.VocabularyMap`.
     """
 
-    def coerce(self, instance, vocab_set):
-        vocab_set = super(VocabularyMapParam, self).coerce(instance, vocab_set)
+    def coerce(self, instance, value):
+        vocab_set = super(VocabularyMapParam, self).coerce(instance, value)
 
         if vocab_set is not None and not isinstance(vocab_set, VocabularyMap):
             try:

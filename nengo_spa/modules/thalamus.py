@@ -242,6 +242,7 @@ class Thalamus(Network):
         else:
             raise NotImplementedError()
 
+        # pylint: disable=invalid-unary-operand-type
         inhibit = [[-self.route_inhibit]] * (target.size_in)
         self.gate_out_connections[index] = nengo.Connection(
             self.gates[index], target, transform=inhibit, synapse=self.synapse_inhibit

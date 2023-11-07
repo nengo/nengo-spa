@@ -15,6 +15,10 @@ on:
         required: false
         default: false
 
+defaults:
+  run:
+    shell: bash -el {0}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,9 +29,9 @@ jobs:
           - script: static
           - script: docs
           - script: test
-            numpy-version: numpy==1.16.0
+            numpy-version: numpy==1.21.0
             scipy-version: scipy==1.4.1
-            python-version: "3.7"
+            python-version: "3.8"
           - script: test
             python-version: "3.9"
           - script: test-coverage
@@ -38,11 +42,15 @@ jobs:
     env:
       NUMPY: ${{ matrix.numpy-version || 'numpy' }}
       SCIPY: ${{ matrix.scipy-version || 'scipy' }}
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.PUBLIC_GH_TOKEN }}
     steps:
       - uses: nengo/nengo-bones/actions/setup@main
         with:
           python-version: ${{ matrix.python-version || '3.8' }}
+      - name: Install pandoc
+        if: ${{ matrix.script == 'docs' }}
+        run: |
+          micromamba install pandoc
       - uses: nengo/nengo-bones/actions/generate-and-check@main
       - uses: nengo/nengo-bones/actions/run-script@main
         with:

@@ -27,6 +27,7 @@ If you have any technical support questions, please post them on the ABR
 community forums at `<https://forum.nengo.ai/>`_ or contact
 `<support@appliedbrainresearch.com>`_.
 
+
 Licensed code
 =============
 
@@ -35,7 +36,7 @@ NengoSPA imports several open source libraries:
 * `NumPy <http://www.numpy.org/>`_ - Used under
   `BSD license <http://www.numpy.org/doc/stable/license.html>`__
 * `Sphinx <https://www.sphinx-doc.org/>`_ - Used under
-  `BSD license <https://github.com/sphinx-doc/sphinx/blob/master/LICENSE>`__
+  `BSD license <https://github.com/sphinx-doc/sphinx/blob/master/LICENSE.rst>`__
 * `nbsphinx <https://github.com/spatialaudio/nbsphinx>`_ - Used under
   `MIT license <https://github.com/spatialaudio/nbsphinx/blob/master/LICENSE>`__
 * `matplotlib <https://matplotlib.org/>`_ - Used under
