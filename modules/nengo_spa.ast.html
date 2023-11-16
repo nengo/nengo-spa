@@ -1,0 +1,935 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nengo_spa.ast package &#8212; NengoSPA 2.0.1.dev0 docs</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+<link rel="stylesheet" href="https://www.nengo.ai/css/bootstrap.css" type="text/css">
+<style>
+ body .title-bar,
+ body .documentation-source h1:after {
+   background-color: #d40000;
+ }
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stickyfill/2.1.0/stickyfill.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<!-- From basic/layout.html -->
+<script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+
+<script src="../_static/underscore.js"></script>
+
+
+<script src="../_static/doctools.js"></script>
+
+
+<script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-GT8XEDLTMJ"></script>
+        <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+         gtag('config', 'G-GT8XEDLTMJ');
+        </script>
+        <!-- End Google tag (gtag.js) -->
+        <!-- Matomo -->
+        <script>
+         var _paq = window._paq = window._paq || [];
+         _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+         _paq.push(["setCookieDomain", "*.appliedbrainresearch.com"]);
+         _paq.push(["setDomains", ["*.appliedbrainresearch.com","*.edge.nengo.ai","*.forum.nengo.ai","*.nengo.ai"]]);
+         _paq.push(["enableCrossDomainLinking"]);
+         _paq.push(["setDoNotTrack", true]);
+         _paq.push(['trackPageView']);
+         _paq.push(['enableLinkTracking']);
+         (function() {
+           var u="https://appliedbrainresearch.matomo.cloud/";
+           _paq.push(['setTrackerUrl', u+'matomo.php']);
+           _paq.push(['setSiteId', '3']);
+           var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+           g.async=true; g.src='//cdn.matomo.cloud/appliedbrainresearch.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+         })();
+        </script>
+        <!-- End Matomo Code -->
+    
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nengo_spa.examine" href="nengo_spa.examine.html" />
+    <link rel="prev" title="nengo_spa.algebras" href="nengo_spa.algebras.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  </head><body class="bg-dark"><!-- prettier-ignore -->
+
+
+<header class="fixed-top header-top shadow-sm">
+  <nav class="navbar navbar-expand-md navbar-light bg-white">
+    <a class="navbar-brand" href="https://www.nengo.ai/">
+      <img src="https://www.nengo.ai/design/_images/general-full-light.svg" alt="Nengo" class="logo" />
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+      aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.nengo.ai/">What is Nengo?</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.nengo.ai/examples/">Examples</a>
+        </li>
+        <li class="nav-item dropdown active">
+          <a class="nav-link dropdown-toggle text-nowrap" id="navbar-dropdown-docs" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" href="#">Documentation</a>
+          <div class="dropdown-menu shadow-lg border-0" aria-labelledby="navbar-dropdown-docs">
+            
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo/">Nengo core</a>
+            <a class="dropdown-item" href="https://github.com/nengo/nengo-gui/">NengoGUI</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-dl/">NengoDL</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-spa/">NengoSPA</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-extras/">NengoExtras</a>
+            <a class="dropdown-item" href="https://arvoelke.github.io/nengolib-docs/">Nengolib</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/keras-spiking">KerasSpiking</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/pytorch-spiking">PyTorchSpiking</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-fpga/">NengoFPGA</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-loihi/">NengoLoihi</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/nengo-ocl/">NengoOCL</a>
+            <a class="dropdown-item" href="https://github.com/project-rig/nengo_spinnaker">NengoSpiNNaker</a>
+            <a class="dropdown-item" href="https://github.com/nengo/nengo-mpi">NengoMPI</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/documentation/">All documentation</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-nowrap" id="navbar-dropdown-community" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" href="#">Community</a>
+          <div class="dropdown-menu shadow-lg border-0" aria-labelledby="navbar-dropdown-community">
+            <a class="dropdown-item" href="https://forum.nengo.ai">Forum</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="https://www.nengo.ai/people/">People</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/summer-school/">Summer school</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/contributing/">Contributing</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/publications/">Publications</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/videos/">Videos</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/conduct/">Code of conduct</a>
+            <a class="dropdown-item" href="https://www.nengo.ai/caa/">CAA</a>
+          </div>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link btn btn-success btn-sm text-white" href="https://www.nengo.ai/getting-started/">Getting
+            started</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<div class="main-content gradient-top">
+  <div class="container-fluid">
+    <div class="row"><a class="toggle-sidenav d-block d-md-none" href="#"
+  ><i class="icon-close fa fa-fw fa-arrow-left"></i
+  ><i class="icon-open fa fa-fw fa-arrow-right"></i
+></a>
+<div role="complementary" class="sidenav col-4 col-xl-3 p-0 border-right">
+  <h3 class="pt-5 px-5">
+    <a href="../index.html">
+      <img
+        class="img-fluid documentation-image"
+        src="https://www.nengo.ai/design/_images/nengo-spa-full-light.svg"
+        alt="NengoSPA"
+      />
+    </a>
+  </h3>
+<form class="px-5 py-3 my-0 border-bottom" action="../search.html" method="get">
+  <div class="form-group form-group-single">
+    <input type="text" name="q" class="form-control" placeholder="Search" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+    <button type="submit" class="btn btn-link">
+      <img src="https://www.nengo.ai/img/icon-search.svg" alt="Go" />
+    </button>
+  </div>
+</form><div class="p-5 toctree">
+  
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user-guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.html">nengo_spa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.algebras.html">nengo_spa.algebras</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">nengo_spa.ast package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-nengo_spa.ast.base">nengo_spa.ast.base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-nengo_spa.ast.dynamic">nengo_spa.ast.dynamic module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-nengo_spa.ast.expr_tree">nengo_spa.ast.expr_tree module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-nengo_spa.ast.symbolic">nengo_spa.ast.symbolic module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-nengo_spa.ast">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.examine.html">nengo_spa.examine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.exceptions.html">nengo_spa.exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.math.html">nengo_spa.math</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.modules.html">nengo_spa.modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.networks.html">nengo_spa.networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.operators.html">nengo_spa.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.semantic_pointer.html">nengo_spa.semantic_pointer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.testing.html">nengo_spa.testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.types.html">nengo_spa.types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.vector_generation.html">nengo_spa.vector_generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nengo_spa.vocabulary.html">nengo_spa.vocabulary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer Guide</a></li>
+</ul>
+
+  
+  </div>
+  
+  <form class="p-5 my-0 border-top">
+    <div class="form-group">
+      <label class="text-gray">Version:</label>
+      <select class="custom-select" onchange="switchVersion(this);">
+        
+        
+        <option selected>latest</option>
+        
+        
+          
+        <option value="../v1.3.0/modules/nengo_spa.ast.html">
+          v1.3.0
+        </option>
+          
+        
+          
+        <option value="../v1.2.0/modules/nengo_spa.ast.html">
+          v1.2.0
+        </option>
+          
+        
+          
+        <option value="../v1.1.1/modules/nengo_spa.ast.html">
+          v1.1.1
+        </option>
+          
+        
+          
+        <option value="../v1.1.0/modules/nengo_spa.ast.html">
+          v1.1.0
+        </option>
+          
+        
+      </select>
+    </div>
+  </form>
+  
+</div>
+      
+
+      <div class="col-12 col-md-8 col-xl-9">
+        <div class="container">
+          <div class="row">
+            <div class="col-10 offset-1 pb-5 documentation-source" role="main">
+              
+              
+              <div class="admonition note">
+                  <p class="admonition-title">Note</p>
+                  <p>
+                  This documentation is for a development version.
+                  <a href="../v1.3.0/modules/nengo_spa.ast.html">
+                  Click here for the latest stable release (v1.3.0).
+                  </a>
+                  </p>
+              </div>
+              
+              
+  <div class="section" id="nengo-spa-ast-package">
+<h1>nengo_spa.ast package<a class="headerlink" href="#nengo-spa-ast-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nengo_spa.ast.base">
+<span id="nengo-spa-ast-base-module"></span><h2>nengo_spa.ast.base module<a class="headerlink" href="#module-nengo_spa.ast.base" title="Permalink to this headline">¶</a></h2>
+<p>Basic classes for abstract syntax trees (ASTs) in NengoSPA.</p>
+<dl class="py function">
+<dt id="nengo_spa.ast.base.infer_types">
+<code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.base.</span></code><code class="sig-name descname"><span class="pre">infer_types</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">nodes</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L7-L21"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.infer_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers the most specific type for given nodes, sets end returns it.</p>
+<p>This determines the most specific type for given nodes. If it is a specific
+vocabulary, this vocabulary will be set for all less specific vocabulary
+types (but not scalar types) on the given node. Then the type will be
+returned.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.base.Node">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.base.</span></code><code class="sig-name descname"><span class="pre">Node</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L24-L60"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for nodes in the AST for NengoSPA operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>type_</strong><span class="classifier">nengo_spa.types.Type</span></dt><dd><p>Type that the node evaluates to.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nengo_spa.ast.base.Node.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L37-L48"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Node.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.base.Node.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L50-L60"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Node.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.base.Noop">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.base.</span></code><code class="sig-name descname"><span class="pre">Noop</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L63-L70"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Noop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.base.Node" title="nengo_spa.ast.base.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.base.Node</span></code></a></p>
+<p>Node that has no effect.</p>
+<dl class="py method">
+<dt id="nengo_spa.ast.base.Noop.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L66-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Noop.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.base.Noop.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L69-L70"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Noop.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.base.Fixed">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.base.</span></code><code class="sig-name descname"><span class="pre">Fixed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L73-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Fixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.base.Node" title="nengo_spa.ast.base.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.base.Node</span></code></a></p>
+<p>Base class for AST nodes that provide a fixed value.</p>
+<dl class="py method">
+<dt id="nengo_spa.ast.base.Fixed.evaluate">
+<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L76-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.Fixed.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fixed value that the node evaluates to.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.base.TypeCheckedBinaryOp">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.base.</span></code><code class="sig-name descname"><span class="pre">TypeCheckedBinaryOp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L81-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.base.TypeCheckedBinaryOp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Decorator to check the type of the <em>other</em> parameter of an operator.</p>
+<p>If the <em>other</em> parameter is not an instance of <em>expected_type</em>,
+<em>NotImplemented</em> will be returned from the decorated method. If
+<em>conversion</em> is given it will be applied first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>expected_type</strong><span class="classifier">class</span></dt><dd><p>Type for which the operator is implemented.</p>
+</dd>
+<dt><strong>conversion</strong><span class="classifier">function, optional</span></dt><dd><p>Used to convert <em>other</em> before checking its type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="nengo_spa.ast.base.TypeCheckedBinaryOp.expected_type">
+<code class="sig-name descname"><span class="pre">expected_type</span></code><a class="headerlink" href="#nengo_spa.ast.base.TypeCheckedBinaryOp.expected_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="nengo_spa.ast.base.TypeCheckedBinaryOp.conversion">
+<code class="sig-name descname"><span class="pre">conversion</span></code><a class="headerlink" href="#nengo_spa.ast.base.TypeCheckedBinaryOp.conversion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-nengo_spa.ast.dynamic">
+<span id="nengo-spa-ast-dynamic-module"></span><h2>nengo_spa.ast.dynamic module<a class="headerlink" href="#module-nengo_spa.ast.dynamic" title="Permalink to this headline">¶</a></h2>
+<p>AST classes for dynamic operations (i.e. their output changes over time).</p>
+<dl class="py function">
+<dt id="nengo_spa.ast.dynamic.as_node">
+<code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.dynamic.</span></code><code class="sig-name descname"><span class="pre">as_node</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L23-L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.as_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.dynamic.DynamicNode">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.dynamic.</span></code><code class="sig-name descname"><span class="pre">DynamicNode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L32-L171"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.base.Node" title="nengo_spa.ast.base.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.base.Node</span></code></a></p>
+<p>Base class for AST node with an output that changes over time.</p>
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.linv">
+<code class="sig-name descname"><span class="pre">linv</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L38-L39"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.linv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.rinv">
+<code class="sig-name descname"><span class="pre">rinv</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L41-L42"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.rinv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.dot">
+<code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/base.py#L104-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.rdot">
+<code class="sig-name descname"><span class="pre">rdot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L154-L155"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.rdot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.reinterpret">
+<code class="sig-name descname"><span class="pre">reinterpret</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L160-L167"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.reinterpret" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.DynamicNode.translate">
+<code class="sig-name descname"><span class="pre">translate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L169-L171"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.DynamicNode.translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.dynamic.Transformed">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.dynamic.</span></code><code class="sig-name descname"><span class="pre">Transformed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L174-L207"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Transformed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.dynamic.DynamicNode" title="nengo_spa.ast.dynamic.DynamicNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.dynamic.DynamicNode</span></code></a></p>
+<p>AST node representing a transform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>source</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object providing the output to apply the transform to.</p>
+</dd>
+<dt><strong>transform</strong><span class="classifier">ndarray</span></dt><dd><p>Transform to apply.</p>
+</dd>
+<dt><strong>type_</strong><span class="classifier">nengo_spa.types.Type</span></dt><dd><p>The resulting type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.Transformed.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L193-L198"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Transformed.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.Transformed.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L200-L207"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Transformed.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.dynamic.Summed">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.dynamic.</span></code><code class="sig-name descname"><span class="pre">Summed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sources</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L210-L243"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Summed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.dynamic.DynamicNode" title="nengo_spa.ast.dynamic.DynamicNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.dynamic.DynamicNode</span></code></a></p>
+<p>AST node representing the sum of multiple nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sources</strong><span class="classifier">sequence of NengoObject</span></dt><dd><p>Sequence of Nengo objects providing outputs to be summed.</p>
+</dd>
+<dt><strong>type_</strong><span class="classifier">nengo_spa.types.Type</span></dt><dd><p>The resulting type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.Summed.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L226-L231"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Summed.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.Summed.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L233-L243"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.Summed.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.dynamic.ModuleOutput">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.dynamic.</span></code><code class="sig-name descname"><span class="pre">ModuleOutput</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L246-L266"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.ModuleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.dynamic.DynamicNode" title="nengo_spa.ast.dynamic.DynamicNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.dynamic.DynamicNode</span></code></a></p>
+<p>AST node representing the output of a SPA module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>output</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object providing the module output.</p>
+</dd>
+<dt><strong>type_</strong><span class="classifier">nengo_spa.types.Type</span></dt><dd><p>The resulting type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.ModuleOutput.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L262-L263"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.ModuleOutput.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.dynamic.ModuleOutput.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/dynamic.py#L265-L266"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.dynamic.ModuleOutput.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-nengo_spa.ast.expr_tree">
+<span id="nengo-spa-ast-expr-tree-module"></span><h2>nengo_spa.ast.expr_tree module<a class="headerlink" href="#module-nengo_spa.ast.expr_tree" title="Permalink to this headline">¶</a></h2>
+<p>Representation of simple expression trees.</p>
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.Node">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">Node</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L40-L90"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.Leaf">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">Leaf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L93-L100"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.Leaf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.EllipsisLeaf">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">EllipsisLeaf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L103-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.EllipsisLeaf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Leaf" title="nengo_spa.ast.expr_tree.Leaf"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Leaf</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.UnaryOperator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">UnaryOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L110-L121"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.UnaryOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.BinaryOperator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">BinaryOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L124-L144"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.BinaryOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+<dl class="py method">
+<dt id="nengo_spa.ast.expr_tree.BinaryOperator.lhs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lhs</span></code><a class="headerlink" href="#nengo_spa.ast.expr_tree.BinaryOperator.lhs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.expr_tree.BinaryOperator.rhs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">rhs</span></code><a class="headerlink" href="#nengo_spa.ast.expr_tree.BinaryOperator.rhs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.AttributeAccess">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">AttributeAccess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L147-L158"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.AttributeAccess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.FunctionCall">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">FunctionCall</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L161-L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.FunctionCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.expr_tree.KeywordArgument">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">KeywordArgument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precedence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L180-L187"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.KeywordArgument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.expr_tree.Node" title="nengo_spa.ast.expr_tree.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.expr_tree.Node</span></code></a></p>
+<p>Create new instance of Node(value, precedence, children)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nengo_spa.ast.expr_tree.limit_str_length">
+<code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.expr_tree.</span></code><code class="sig-name descname"><span class="pre">limit_str_length</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr_tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/expr_tree.py#L301-L304"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.expr_tree.limit_str_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a modified expression tree with a string length limited to approximately
+<code class="docutils literal notranslate"><span class="pre">max_len</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nengo_spa.ast.symbolic">
+<span id="nengo-spa-ast-symbolic-module"></span><h2>nengo_spa.ast.symbolic module<a class="headerlink" href="#module-nengo_spa.ast.symbolic" title="Permalink to this headline">¶</a></h2>
+<p>AST classes for symbolic operations.</p>
+<dl class="py function">
+<dt id="nengo_spa.ast.symbolic.as_symbolic_node">
+<code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.symbolic.</span></code><code class="sig-name descname"><span class="pre">as_symbolic_node</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L16-L19"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.as_symbolic_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.symbolic.Symbol">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.symbolic.</span></code><code class="sig-name descname"><span class="pre">Symbol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L22-L25"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.Symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.base.Fixed" title="nengo_spa.ast.base.Fixed"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.base.Fixed</span></code></a></p>
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.Symbol.expr">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">expr</span></code><a class="headerlink" href="#nengo_spa.ast.symbolic.Symbol.expr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.symbolic.FixedScalar">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.symbolic.</span></code><code class="sig-name descname"><span class="pre">FixedScalar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L31-L60"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.FixedScalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.symbolic.Symbol" title="nengo_spa.ast.symbolic.Symbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.symbolic.Symbol</span></code></a></p>
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.FixedScalar.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L42-L43"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.FixedScalar.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.FixedScalar.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L45-L46"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.FixedScalar.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.FixedScalar.evaluate">
+<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L48-L49"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.FixedScalar.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fixed value that the node evaluates to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.FixedScalar.expr">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">expr</span></code><a class="headerlink" href="#nengo_spa.ast.symbolic.FixedScalar.expr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.symbolic.</span></code><code class="sig-name descname"><span class="pre">PointerSymbol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_TAnyVocab('TAnyVocab')</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L63-L167"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#nengo_spa.ast.symbolic.Symbol" title="nengo_spa.ast.symbolic.Symbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">nengo_spa.ast.symbolic.Symbol</span></code></a></p>
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.connect_to">
+<code class="sig-name descname"><span class="pre">connect_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sink</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L70-L71"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.connect_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node and connect it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sink</strong><span class="classifier">NengoObject</span></dt><dd><p>Nengo object to connect to and transmit the result to.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://www.nengo.ai/nengo/frontend-api.html#nengo.Connection" title="(in Nengo v4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nengo.Connection</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.construct">
+<code class="sig-name descname"><span class="pre">construct</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L73-L74"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the computation represented by the node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NengoObject</dt><dd><p>Usually the object providing the computation result as output, but
+can be something else in certain cases.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.evaluate">
+<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L76-L82"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fixed value that the node evaluates to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.expr">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">expr</span></code><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.expr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.normalized">
+<code class="sig-name descname"><span class="pre">normalized</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L88-L89"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.normalized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.unitary">
+<code class="sig-name descname"><span class="pre">unitary</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L91-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.unitary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.linv">
+<code class="sig-name descname"><span class="pre">linv</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L97-L98"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.linv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.rinv">
+<code class="sig-name descname"><span class="pre">rinv</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L100-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.rinv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.dot">
+<code class="sig-name descname"><span class="pre">dot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L141-L146"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.rdot">
+<code class="sig-name descname"><span class="pre">rdot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L151-L152"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.rdot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.reinterpret">
+<code class="sig-name descname"><span class="pre">reinterpret</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L157-L158"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.reinterpret" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="nengo_spa.ast.symbolic.PointerSymbol.translate">
+<code class="sig-name descname"><span class="pre">translate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L160-L164"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbol.translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nengo_spa.ast.symbolic.PointerSymbolFactory">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nengo_spa.ast.symbolic.</span></code><code class="sig-name descname"><span class="pre">PointerSymbolFactory</span></code><a class="reference external" href="https://github.com/nengo/nengo-spa/blob/master/nengo_spa/ast/symbolic.py#L170-L188"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nengo_spa.ast.symbolic.PointerSymbolFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Provides syntactic sugar to create <em>PointerSymbol</em> instances.</p>
+<p>Use the <a class="reference internal" href="nengo_spa.html#nengo_spa.sym" title="nengo_spa.sym"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sym</span></code></a> instance of this class to create <em>PointerSymbols</em> like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sym</span><span class="o">.</span><span class="n">foo</span>  <span class="c1"># creates PointerSymbol(&#39;foo&#39;)</span>
+</pre></div>
+</div>
+<p>To create more complex symbolic expressions the following syntax is
+supported too:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;foo + bar * baz&#39;</span><span class="p">)</span>  <span class="c1"># creates PointerSymbol(&#39;foo+bar*baz&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nengo_spa.ast">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nengo_spa.ast" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><footer class="text-light footer-main gradient-bottom-center">
+  <p class="text-center">
+    <a class="no-hover-line" href="https://appliedbrainresearch.com">
+      <img class="abr-logo" src="https://www.nengo.ai/img/abr-logo.svg" height="32" />
+    </a>
+    <a href="https://www.nengo.ai/">What is Nengo?</a>
+    <a href="https://www.nengo.ai/examples/">Examples</a>
+    <a href="https://www.nengo.ai/documentation/">Documentation</a>
+    <a href="https://www.nengo.ai/getting-started/">Getting started</a>
+    <a href="https://www.nengo.ai/privacy/">Privacy</a>
+  </p>
+  <p class="small text-center pb-0 mb-0">&copy; Applied Brain Research</p>
+</footer>
+<script>
+  function switchVersion(select) {
+    var option = select.selectedOptions[0];
+    if (option.hasAttribute("value")) {
+      window.location = option.value;
+    }
+  }
+</script>
+
+<script>
+  var elements = document.querySelectorAll('.sidenav');
+  Stickyfill.add(elements);
+</script>
+<script>
+  ScrollReveal().reveal(".fade-in", {
+      scale: 0.85,
+      duration: 1000,
+      delay: 250,
+      interval: 50
+  });
+</script>
+<script>
+  $('a.toggle-sidenav').on('click', function(e) {
+    e.preventDefault();
+    if ( $(this).hasClass('active') ) {
+      $(this).removeClass('active');
+      $('.sidenav').removeClass('open');
+    } else {
+      $(this).addClass('active');
+      $('.sidenav').addClass('open');
+    }
+  });
+</script>
+<script>
+  var lists = document.querySelectorAll('.toctree ul');
+  lists.forEach((ul) => {
+      ul.classList.add("nav");
+  });
+  var links = document.querySelectorAll('.toctree a');
+  links.forEach((link) => {
+      link.classList.add("nav-link");
+  });
+  $("body").scrollspy({target: ".sidenav"});
+</script>
+  </body>
+</html>
