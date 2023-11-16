@@ -1,0 +1,446 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "italian-perfume",
+   "metadata": {},
+   "source": [
+    "# Learning\n",
+    "\n",
+    "This example shows two ways of implementing learning in the context of NengoSPA. It\n",
+    "assumes some basic knowledge of learning in Nengo core, so you might want to check out\n",
+    "[those examples](https://www.nengo.ai/nengo/examples.html#learning) first."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "olive-marking",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "\n",
+    "import nengo\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from cycler import cycler\n",
+    "\n",
+    "import nengo_spa as spa\n",
+    "\n",
+    "seed = 0\n",
+    "rng = np.random.RandomState(seed + 1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "floppy-african",
+   "metadata": {},
+   "source": [
+    "In this example, we will be learning simple associations from fruits (orange, apricot,\n",
+    "cherry, apple) to their colors (orange, yellow, red, green). Thus, we will set up\n",
+    "vocabularies accordingly and define the desired target associations."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "dangerous-representative",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dim = 64\n",
+    "vocab_fruits = spa.Vocabulary(dimensions=dim, pointer_gen=rng)\n",
+    "vocab_colors = spa.Vocabulary(dimensions=dim, pointer_gen=rng)\n",
+    "\n",
+    "fruits = [\"ORANGE\", \"APRICOT\", \"CHERRY\", \"APPLE\"]\n",
+    "vocab_fruits.populate(\";\".join(fruits))\n",
+    "\n",
+    "colors = [\"ORANGE\", \"YELLOW\", \"RED\", \"GREEN\"]\n",
+    "vocab_colors.populate(\";\".join(colors))\n",
+    "\n",
+    "targets = {\n",
+    "    \"ORANGE\": \"ORANGE\",\n",
+    "    \"APRICOT\": \"YELLOW\",\n",
+    "    \"CHERRY\": \"RED\",\n",
+    "    \"APPLE\": \"GREEN\",\n",
+    "}\n",
+    "\n",
+    "matplotlib_colors = {\n",
+    "    \"ORANGE\": \"tab:orange\",\n",
+    "    \"YELLOW\": \"yellow\",\n",
+    "    \"RED\": \"tab:red\",\n",
+    "    \"GREEN\": \"tab:green\",\n",
+    "}\n",
+    "matplotlib_color_cycle = cycler(\n",
+    "    \"color\", [matplotlib_colors[k] for k in vocab_colors.keys()]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "detailed-converter",
+   "metadata": {},
+   "source": [
+    "Furthermore, we define some variables:\n",
+    "\n",
+    "* length of the learning period,\n",
+    "* the duration each item will be shown before switching to the next one,\n",
+    "* and the total simulation time.\n",
+    "\n",
+    "We also define some helper functions to provide the desired inputs to the model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "congressional-daisy",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "item_seconds = 0.2\n",
+    "learn_for_seconds = 10 * item_seconds * len(fruits)\n",
+    "\n",
+    "run_for_seconds = learn_for_seconds + len(fruits) * item_seconds\n",
+    "\n",
+    "\n",
+    "def is_recall(t):\n",
+    "    return t > learn_for_seconds\n",
+    "\n",
+    "\n",
+    "def current_item(t):\n",
+    "    return fruits[int(t // item_seconds) % len(fruits)]\n",
+    "\n",
+    "\n",
+    "def current_target(t):\n",
+    "    return targets[current_item(t)]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "skilled-elite",
+   "metadata": {},
+   "source": [
+    "## Method 1: Represent the Semantic Pointers in single, large ensembles\n",
+    "\n",
+    "The `State` module in NengoSPA isn't a single ensemble, but a slightly more complex\n",
+    "network to ensure an accurate representation of Semantic Pointers. However, learning\n",
+    "connections work between individual ensembles and not whole networks. To implement\n",
+    "learning between two SPA `State` modules, we can configure the modules to produce only\n",
+    "single ensembles and connect those with a learning connection.\n",
+    "\n",
+    "Two parameters are important for this:\n",
+    "\n",
+    "* `subdimensions` needs to be set to the total dimensionality of the `State`'s\n",
+    "vocabulary,\n",
+    "* `represent_cc_identity` must be set to `False`.\n",
+    "\n",
+    "The `State` ensemble itself can then be accessed via the `all_ensembles` property, which\n",
+    "will only have a single element in this case."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "underlying-director",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with spa.Network() as model:\n",
+    "    # Inputs to the model\n",
+    "    item = spa.Transcode(\n",
+    "        lambda t: vocab_fruits[current_item(t)], output_vocab=vocab_fruits\n",
+    "    )\n",
+    "    target = spa.Transcode(\n",
+    "        lambda t: vocab_colors[current_target(t)], output_vocab=vocab_colors\n",
+    "    )\n",
+    "\n",
+    "    # States/ensembles for learning\n",
+    "    # Note that the `error` state may use multiple ensembles.\n",
+    "    pre_state = spa.State(\n",
+    "        vocab_fruits, subdimensions=vocab_fruits.dimensions, represent_cc_identity=False\n",
+    "    )\n",
+    "    post_state = spa.State(\n",
+    "        vocab_colors, subdimensions=vocab_colors.dimensions, represent_cc_identity=False\n",
+    "    )\n",
+    "    error = spa.State(vocab_colors)\n",
+    "\n",
+    "    # Setup the item input and error signals\n",
+    "    item >> pre_state\n",
+    "    -post_state >> error\n",
+    "    target >> error\n",
+    "\n",
+    "    # Create the learning connection with some randomly initialized weights\n",
+    "    assert len(pre_state.all_ensembles) == 1\n",
+    "    assert len(post_state.all_ensembles) == 1\n",
+    "    learning_connection = nengo.Connection(\n",
+    "        pre_state.all_ensembles[0],\n",
+    "        post_state.all_ensembles[0],\n",
+    "        function=lambda x: np.random.random(vocab_colors.dimensions),\n",
+    "        learning_rule_type=nengo.PES(0.00015),\n",
+    "    )\n",
+    "    nengo.Connection(error.output, learning_connection.learning_rule, transform=-1)\n",
+    "\n",
+    "    # Suppress learning in the final iteration to test recall\n",
+    "    is_recall_node = nengo.Node(is_recall)\n",
+    "    for ens in error.all_ensembles:\n",
+    "        nengo.Connection(\n",
+    "            is_recall_node, ens.neurons, transform=-100 * np.ones((ens.n_neurons, 1))\n",
+    "        )\n",
+    "\n",
+    "    # Probes to record simulation data\n",
+    "    p_target = nengo.Probe(target.output)\n",
+    "    p_error = nengo.Probe(error.output, synapse=0.01)\n",
+    "    p_post_state = nengo.Probe(post_state.output, synapse=0.01)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "crucial-methodology",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with nengo.Simulator(model) as sim:\n",
+    "    sim.run(run_for_seconds)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "expensive-clear",
+   "metadata": {},
+   "source": [
+    "As a sanity check we can look at the norm of the error and see it decrease."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "passing-bracelet",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure()\n",
+    "plt.plot(sim.trange(), np.linalg.norm(sim.data[p_error], axis=1))\n",
+    "plt.xlim(0, learn_for_seconds)\n",
+    "plt.ylim(bottom=0)\n",
+    "plt.title(\"Error signal\")\n",
+    "plt.xlabel(\"Time [s]\")\n",
+    "plt.ylabel(\"Error norm\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "relative-ozone",
+   "metadata": {},
+   "source": [
+    "And here is the recall of the learned associations compared to the target colors:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ceramic-oxford",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure()\n",
+    "ax = plt.subplot(2, 1, 1)\n",
+    "ax.set_prop_cycle(matplotlib_color_cycle)\n",
+    "plt.plot(sim.trange(), spa.similarity(sim.data[p_target], vocab_colors))\n",
+    "plt.ylim(bottom=0)\n",
+    "plt.title(\"Target colors\")\n",
+    "plt.ylabel(\"Similarity\")\n",
+    "\n",
+    "ax = plt.subplot(2, 1, 2, sharex=ax, sharey=ax)\n",
+    "ax.set_prop_cycle(matplotlib_color_cycle)\n",
+    "plt.plot(sim.trange(), spa.similarity(sim.data[p_post_state], vocab_colors))\n",
+    "plt.xlim(learn_for_seconds, run_for_seconds)\n",
+    "plt.title(\"Recalled colors\")\n",
+    "plt.xlabel(\"time [s]\")\n",
+    "plt.ylabel(\"Similarity\")\n",
+    "plt.tight_layout()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "outdoor-modeling",
+   "metadata": {},
+   "source": [
+    "### Considerations\n",
+    "\n",
+    "This approach allows for full connectivity between the two `State` modules. Thus, any\n",
+    "linear transform could be learned in theory.\n",
+    "\n",
+    "However, single ensembles representing large dimensionalities need much more neurons to\n",
+    "achieve the same representational accuracy compared to multiple ensembles, where each\n",
+    "only represents a subset of all dimensions. Additionally, the model build time and\n",
+    "memory usage can be a problem with such large ensembles."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "similar-sarah",
+   "metadata": {},
+   "source": [
+    "## Method 2: Create multiple, pairwise connections between the state ensembles\n",
+    "\n",
+    "Instead of configuring the `State` modules to use only a single ensemble, we can use the\n",
+    "default configuration with multiple ensembles and create a separate connection between\n",
+    "each pair of ensembles in the pre-synaptic and post-synaptic `State`. This can be done\n",
+    "with a simple `for` loop and using `zip` to create the appropriate ensemble pairs. In\n",
+    "addition, we need to connect the error signal analogously."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "experienced-biography",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with spa.Network() as model:\n",
+    "    # Inputs to the model\n",
+    "    item = spa.Transcode(\n",
+    "        lambda t: vocab_fruits[current_item(t)], output_vocab=vocab_fruits\n",
+    "    )\n",
+    "    target = spa.Transcode(\n",
+    "        lambda t: vocab_colors[current_target(t)], output_vocab=vocab_colors\n",
+    "    )\n",
+    "\n",
+    "    # States/ensembles for learning\n",
+    "    pre_state = spa.State(vocab_fruits)\n",
+    "    post_state = spa.State(vocab_colors)\n",
+    "    error = spa.State(vocab_colors)\n",
+    "\n",
+    "    # Setup the item input and error signals\n",
+    "    item >> pre_state\n",
+    "    -post_state >> error\n",
+    "    target >> error\n",
+    "\n",
+    "    # Create pairwise learning connections with randomly initialized weights\n",
+    "    for pre_ensemble, post_ensemble, error_ensemble in zip(\n",
+    "        pre_state.all_ensembles, post_state.all_ensembles, error.all_ensembles\n",
+    "    ):\n",
+    "        learning_connection = nengo.Connection(\n",
+    "            pre_ensemble,\n",
+    "            post_ensemble,\n",
+    "            function=lambda x, post_ensemble=post_ensemble: np.random.random(\n",
+    "                post_ensemble.dimensions\n",
+    "            ),\n",
+    "            learning_rule_type=nengo.PES(0.00015),\n",
+    "        )\n",
+    "        nengo.Connection(\n",
+    "            error_ensemble, learning_connection.learning_rule, transform=-1\n",
+    "        )\n",
+    "\n",
+    "    # Suppress learning in the final iteration to test recall\n",
+    "    is_recall_node = nengo.Node(is_recall)\n",
+    "    for ens in error.all_ensembles:\n",
+    "        nengo.Connection(\n",
+    "            is_recall_node, ens.neurons, transform=-100 * np.ones((ens.n_neurons, 1))\n",
+    "        )\n",
+    "\n",
+    "    # Probes to record simulation data\n",
+    "    p_target = nengo.Probe(target.output)\n",
+    "    p_error = nengo.Probe(error.output, synapse=0.01)\n",
+    "    p_post_state = nengo.Probe(post_state.output, synapse=0.01)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "superb-validity",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with nengo.Simulator(\n",
+    "    model,\n",
+    ") as sim:\n",
+    "    sim.run(run_for_seconds)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "desperate-glenn",
+   "metadata": {},
+   "source": [
+    "We can look at the error signal again as a sanity check:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "formed-spectacular",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure()\n",
+    "plt.plot(sim.trange(), np.linalg.norm(sim.data[p_error], axis=1))\n",
+    "plt.xlim(0, learn_for_seconds)\n",
+    "plt.ylim(bottom=0)\n",
+    "plt.title(\"Error signal\")\n",
+    "plt.xlabel(\"Time [s]\")\n",
+    "plt.ylabel(\"Error norm\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "national-reputation",
+   "metadata": {},
+   "source": [
+    "The recall of the learned associations:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "forbidden-exercise",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure()\n",
+    "ax = plt.subplot(2, 1, 1)\n",
+    "ax.set_prop_cycle(matplotlib_color_cycle)\n",
+    "plt.plot(sim.trange(), spa.similarity(sim.data[p_target], vocab_colors))\n",
+    "plt.ylim(bottom=0)\n",
+    "plt.title(\"Target colors\")\n",
+    "plt.ylabel(\"Similarity\")\n",
+    "\n",
+    "ax = plt.subplot(2, 1, 2, sharex=ax, sharey=ax)\n",
+    "ax.set_prop_cycle(matplotlib_color_cycle)\n",
+    "plt.plot(sim.trange(), spa.similarity(sim.data[p_post_state], vocab_colors))\n",
+    "plt.xlim(learn_for_seconds, run_for_seconds)\n",
+    "plt.title(\"Recalled colors\")\n",
+    "plt.xlabel(\"time [s]\")\n",
+    "plt.ylabel(\"Similarity\")\n",
+    "plt.tight_layout()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "plain-fusion",
+   "metadata": {},
+   "source": [
+    "### Considerations\n",
+    "\n",
+    "By using the default ensemble configuration, this approach scales better with regards to\n",
+    "build time and representational accuracy. However, the space of potentially learnable\n",
+    "functions is limited. Only connectivity matrices with a block diagonal structure can be\n",
+    "learned. It is not possible to learn a connection from the $n$-th pre-ensemble to the\n",
+    "$m$-th post-ensemble for $n \\neq m$. This can be fine for certain use cases, such as\n",
+    "learning associations, but might not be fine for other use cases. For example, learning\n",
+    "the involution is probably not possible with this approach as it requires reversing most\n",
+    "of the vector."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
