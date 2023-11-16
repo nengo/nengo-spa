@@ -20,8 +20,13 @@ Release History
    - Fixed
 
 
-1.3.1 (unreleased)
-==================
+2.0.0 (November 16, 2023)
+=========================
+
+**Changed**
+
+- Made NengoSPA available under the GPLv2 license.
+  (`#295 <https://github.com/nengo/nengo-spa/pull/295>`__)
 
 
 1.3.0 (November 30, 2021)

@@ -84,6 +84,8 @@ jobs:
           echo '${{ secrets.PYPIRC_FILE }}' > ~/.pypirc
       - uses: actions/checkout@v3
       - uses: nengo/nengo-bones/actions/setup@main
+        with:
+          python-version: '3.9'
       - uses: nengo/nengo-bones/actions/generate-and-check@main
       - uses: nengo/nengo-bones/actions/run-script@main
         with:
