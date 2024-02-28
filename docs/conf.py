@@ -16,7 +16,6 @@ extensions = [
     "sphinx.ext.todo",
     "nbsphinx",
     "nengo_sphinx_theme",
-    "nengo_sphinx_theme.ext.backoff",
     "nengo_sphinx_theme.ext.redirects",
     "nengo_sphinx_theme.ext.sourcelinks",
     "notfound.extension",
@@ -76,7 +75,7 @@ user_agent = "nengo_spa"
 
 project = "NengoSPA"
 authors = "Applied Brain Research"
-copyright = "2013-2023 Applied Brain Research"
+copyright = "2013-2024 Applied Brain Research"
 version = ".".join(nengo_spa.__version__.split(".")[:2])  # Short X.Y version
 release = nengo_spa.__version__  # Full version, with tags
 
