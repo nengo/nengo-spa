@@ -215,7 +215,7 @@ def test_errors():
     with pytest.raises(AttributeError):
         with spa.Network() as model:
             model.vision = spa.State(vocab=16)
-            with spa.ActionSelection:
+            with spa.ActionSelection():
                 spa.ifmax(0.5, spa.sym.A >> model.motor)
 
 
