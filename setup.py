@@ -39,7 +39,7 @@ docs_req = [
     "numpydoc>=1.4.0",
 ]
 optional_req = [
-    "scipy>=1.4.1",
+    "scipy>=1.4.1,<=1.13.1",
     "scikit-learn",
 ]
 tests_req = [
