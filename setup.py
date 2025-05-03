@@ -28,8 +28,8 @@ root = pathlib.Path(__file__).parent
 version = runpy.run_path(str(root / "nengo_spa" / "version.py"))["version"]
 
 install_req = [
-    "nengo>=2.7",
-    "numpy>=1.8",
+    "nengo>=2.7, <=4.0.0", # 4.0.1 needed to get fixed numpy version
+    "numpy>=1.8, <=1.26",
 ]
 docs_req = [
     "jupyter",
@@ -70,7 +70,7 @@ setup(
         "optional": optional_req,
         "tests": tests_req,
     },
-    python_requires=">=3.8",
+    python_requires=">=3.8, <=3.9",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Nengo",
