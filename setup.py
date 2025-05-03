@@ -29,7 +29,7 @@ version = runpy.run_path(str(root / "nengo_spa" / "version.py"))["version"]
 
 install_req = [
     "nengo @ git+https://github.com/nengo/nengo.git@fix-numpy",
-    "numpy>=1.8, <=1.26",
+    "numpy>=2.2.5",
 ]
 docs_req = [
     "jupyter<=1.1.1",
