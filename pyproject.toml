@@ -32,6 +32,7 @@ all = [
     "matplotlib>=2.0,<=3.9.4",
     "nbformat>=5.0.7,<=5.10.4",
     "pytest>=3.6,<=8.3.5",
+		"pytest-allclose~=1.0.0",
     "pytest-plt<=1.1.1",
     "pytest-rng<=1.0.0",
 ]
@@ -52,6 +53,7 @@ tests = [
     "matplotlib>=2.0,<=3.9.4",
     "nbformat>=5.0.7,<=5.10.4",
     "pytest>=3.6,<=8.3.5",
+		"pytest-allclose~=1.0.0",
     "pytest-plt<=1.1.1",
     "pytest-rng<=1.0.0",
 ]
@@ -60,8 +62,8 @@ tests = [
 #[project.entry-points."nengo.backends"]
 #reference = "nengo:Simulator"
 #
-[project.entry-points."pytest11"]
-nengo_spa = "pytest_nengo_spa"
+#[project.entry-points."pytest11"]
+#nengo_spa = "pytest_nengo_spa"
 
 [tool.setuptools.packages.find]
 where = ["."]
