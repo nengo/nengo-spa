@@ -28,7 +28,7 @@ root = pathlib.Path(__file__).parent
 version = runpy.run_path(str(root / "nengo_spa" / "version.py"))["version"]
 
 install_req = [
-    "nengo>=2.7, <=4.0.0", # 4.0.1 needed to get fixed numpy version
+    "nengo @ git+https://github.com/nengo/nengo.git@fix-numpy",
     "numpy>=1.8, <=1.26",
 ]
 docs_req = [
