@@ -82,12 +82,12 @@ class SspAlgebra(HrrAlgebra):
         if self.phase_dist is None:
             v = rng.randn(d)
             v /= np.linalg.norm(v)
+            v = self.abs(v)
+            v = self.make_unitary(v)
         else:
             v = self.make_good_unitary(d, rng)
             
 
-        v = self.abs(v)
-        v = self.make_unitary(v)
 
 
         if SspProperties.POSITIVE in properties:
