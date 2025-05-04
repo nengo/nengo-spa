@@ -79,7 +79,7 @@ class SspAlgebra(HrrAlgebra):
         if rng is None:
             rng = np.random.RandomState()
 
-        if self.dist is None:
+        if self.phase_dist is None:
             v = rng.randn(d)
             v /= np.linalg.norm(v)
         else:
