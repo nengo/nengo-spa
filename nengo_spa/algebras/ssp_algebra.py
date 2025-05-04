@@ -47,9 +47,10 @@ class SspAlgebra(HrrAlgebra):
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, phase_distribution=None):
         if type(cls._instance) is not cls:
             cls._instance = super(SspAlgebra, cls).__new__(cls)
+            cls._instance.phase_dist = phase_distribution
         return cls._instance
 
     def create_vector(self, d, properties, *, rng=None):
@@ -78,8 +79,12 @@ class SspAlgebra(HrrAlgebra):
         if rng is None:
             rng = np.random.RandomState()
 
-        v = rng.randn(d)
-        v /= np.linalg.norm(v)
+        if self.dist is None:
+            v = rng.randn(d)
+            v /= np.linalg.norm(v)
+        else:
+            v = self.make_good_unitary(d, rng)
+            
 
         v = self.abs(v)
         v = self.make_unitary(v)
@@ -95,6 +100,27 @@ class SspAlgebra(HrrAlgebra):
 
         return v
 
+    def make_good_unitary(dim, rng, eps=1e-3, mul=1):
+        a = self.phase_dist.sample(n=(dim - 1) // 2)
+        sign = rng.choice((-1, +1), len(a))
+        phi = sign * mul * np.pi * (eps + a * (1 - 2 * eps))
+        assert np.all(np.abs(phi) >= np.pi * eps)
+        assert np.all(np.abs(phi) <= np.pi * (1 - eps))
+
+        fv = np.zeros(dim, dtype='complex64')
+        fv[0] = 1
+        fv[1:(dim + 1) // 2] = np.cos(phi) + 1j * np.sin(phi)
+        fv[-1:dim // 2:-1] = np.conj(fv[1:(dim + 1) // 2])
+        if dim % 2 == 0:
+            fv[dim // 2] = 1
+
+        assert np.allclose(np.abs(fv), 1)
+        v = np.fft.ifft(fv)
+        
+        v = v.real
+        assert np.allclose(np.fft.fft(v), fv)
+        assert np.allclose(np.linalg.norm(v), 1)
+        return v
 
 
 class SspProperties:
