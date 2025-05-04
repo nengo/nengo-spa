@@ -47,11 +47,13 @@ class SspAlgebra(HrrAlgebra):
 
     _instance = None
 
-    def __new__(cls, phase_distribution=None):
+    def __new__(cls):
         if type(cls._instance) is not cls:
             cls._instance = super(SspAlgebra, cls).__new__(cls)
-            cls._instance.phase_dist = phase_distribution
         return cls._instance
+
+    def __init__(self, phase_distribution=None):
+        self.phase_dist = phase_distribution
 
     def create_vector(self, d, properties, *, rng=None):
         """
