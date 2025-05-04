@@ -47,7 +47,7 @@ class SspAlgebra(HrrAlgebra):
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if type(cls._instance) is not cls:
             cls._instance = super(SspAlgebra, cls).__new__(cls)
         return cls._instance
