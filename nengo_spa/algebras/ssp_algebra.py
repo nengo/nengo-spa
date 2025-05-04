@@ -100,7 +100,7 @@ class SspAlgebra(HrrAlgebra):
 
         return v
 
-    def make_good_unitary(dim, rng, eps=1e-3, mul=1):
+    def make_good_unitary(self, dim, rng, eps=1e-3, mul=1):
         a = self.phase_dist.sample(n=(dim - 1) // 2)
         sign = rng.choice((-1, +1), len(a))
         phi = sign * mul * np.pi * (eps + a * (1 - 2 * eps))
