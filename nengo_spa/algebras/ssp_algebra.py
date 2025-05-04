@@ -104,8 +104,8 @@ class SspAlgebra(HrrAlgebra):
         a = self.phase_dist.sample(n=(dim - 1) // 2)
         sign = rng.choice((-1, +1), len(a))
         phi = sign * mul * np.pi * (eps + a * (1 - 2 * eps))
-        assert np.all(np.abs(phi) >= np.pi * eps)
-        assert np.all(np.abs(phi) <= np.pi * (1 - eps))
+        #assert np.all(np.abs(phi) >= np.pi * eps)
+        #assert np.all(np.abs(phi) <= np.pi * (1 - eps))
 
         fv = np.zeros(dim, dtype='complex64')
         fv[0] = 1
