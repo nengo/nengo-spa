@@ -50,7 +50,7 @@ class FixedScalar(Symbol):
 
     @property
     def expr(self):
-        return repr(self.value)
+        return str(self.value)
 
     @property
     def _expr_tree(self):

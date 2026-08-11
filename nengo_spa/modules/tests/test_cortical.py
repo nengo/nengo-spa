@@ -29,8 +29,8 @@ def test_connect(Simulator, seed):
 
 def test_transform(Simulator, seed):
     with spa.Network(seed=seed) as model:
-        model.buffer1 = spa.State(vocab=32)
-        model.buffer2 = spa.State(vocab=32)
+        model.buffer1 = spa.State(vocab=64)
+        model.buffer2 = spa.State(vocab=64)
 
         spa.sym.A >> model.buffer1
         model.buffer1 * spa.sym.B >> model.buffer2

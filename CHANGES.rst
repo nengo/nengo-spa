@@ -19,6 +19,18 @@ Release History
    - Removed
    - Fixed
 
+2.0.2 (May 30, 2025)
+====================
+
+**Added**
+
+- Support for python 3.13 was added.
+- pyproject.toml was added
+
+**Removed**
+
+- setup.py was removed
+
 
 2.0.1 (unreleased)
 ==================
