@@ -25,12 +25,13 @@ def test_bind(Simulator, seed, rng):
 
 @pytest.mark.parametrize("side", ("left", "right"))
 def test_unbind(Simulator, side, seed, rng):
-    vocab = spa.Vocabulary(36, pointer_gen=rng, algebra=TvtbAlgebra())
+    vector_dim = 49
+    vocab = spa.Vocabulary(vector_dim, pointer_gen=rng, algebra=TvtbAlgebra())
     vocab.populate("A; B")
 
     with spa.Network(seed=seed) as model:
         vtb = TVTB(
-            100, 36, unbind_left=(side == "left"), unbind_right=(side == "right")
+            100, vector_dim, unbind_left=(side == "left"), unbind_right=(side == "right")
         )
 
         if side == "left":

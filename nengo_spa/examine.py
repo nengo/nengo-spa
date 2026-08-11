@@ -38,7 +38,7 @@ def similarity(data, vocab, normalize=False):
     elif is_iterable(vocab):
         if isinstance(next(iter(vocab)), SemanticPointer):
             vocab = [p.v for p in vocab]
-        vectors = np.array(vocab, copy=False, ndmin=2)
+        vectors = np.atleast_2d(np.asarray(vocab))
     else:
         raise ValidationError(
             f"{type(vocab).__name__:r} object is not a valid vocabulary", attr="vocab"

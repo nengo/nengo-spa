@@ -166,7 +166,7 @@ class Vocabulary(Mapping):
                 best_p = p
                 break
             else:
-                p_sim = np.max(np.dot(self._vectors, p.v))
+                p_sim = np.max(np.abs(np.dot(self._vectors, p.v)))
                 if p_sim < best_sim:
                     best_p = p
                     best_sim = p_sim

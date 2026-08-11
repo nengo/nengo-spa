@@ -2,5 +2,6 @@
 
 from .base import AbstractAlgebra, CommonProperties, ElementSidedness
 from .hrr_algebra import HrrAlgebra, HrrProperties
+from .ssp_algebra import SspAlgebra, SspProperties
 from .tvtb_algebra import TvtbAlgebra, TvtbProperties
 from .vtb_algebra import VtbAlgebra, VtbProperties
