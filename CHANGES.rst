@@ -19,6 +19,13 @@ Release History
    - Removed
    - Fixed
 
+2.0.1 (2025-05-30)
+==================
+
+**Changed**
+
+Modified setup.py to specify an upper limit on dependencies' versions.
+
 
 2.0.1 (unreleased)
 ==================

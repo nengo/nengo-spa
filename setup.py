@@ -28,27 +28,27 @@ root = pathlib.Path(__file__).parent
 version = runpy.run_path(str(root / "nengo_spa" / "version.py"))["version"]
 
 install_req = [
-    "nengo>=2.7",
-    "numpy>=1.8",
+    "nengo>=2.7, <=4.0.0", # 4.0.1 needed to get fixed numpy version
+    "numpy>=1.8, <=1.26",
 ]
 docs_req = [
-    "jupyter",
-    "matplotlib>=2.0",
-    "nbsphinx>=0.8.11",
-    "nengo_sphinx_theme",
+    "jupyter<=1.1.1",
+    "matplotlib>=2.0,<=3.9.4",
+    "nbsphinx>=0.8.11,<=0.9.7",
+    "nengo_sphinx_theme<=20.9",
     "numpydoc>=1.4.0",
 ]
 optional_req = [
-    "scipy>=1.4.1",
-    "scikit-learn",
+    "scipy>=1.4.1,<=1.13.1",
+    "scikit-learn<=1.6.1",
 ]
 tests_req = [
-    "jupyter>=1.0.0",
-    "matplotlib>=2.0",
-    "nbformat>=5.0.7",
-    "pytest>=3.6",
-    "pytest-plt",
-    "pytest-rng",
+    "jupyter>=1.0.0,<=1.1.1",
+    "matplotlib>=2.0,<=3.9.4",
+    "nbformat>=5.0.7,<=5.10.4",
+    "pytest>=3.6,<=8.3.5",
+    "pytest-plt<=1.1.1",
+    "pytest-rng<=1.0.0",
 ]
 
 setup(
@@ -70,7 +70,7 @@ setup(
         "optional": optional_req,
         "tests": tests_req,
     },
-    python_requires=">=3.8",
+    python_requires=">=3.8, <=3.9",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Nengo",
